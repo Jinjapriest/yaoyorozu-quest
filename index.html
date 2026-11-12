@@ -3814,12 +3814,18 @@ function drawKendo(x,y,t){const b=(t>>5)&1;
 /* 人間を捨てた神：黒い 衣・無貌の 白い 面・ほどけた 法典の 帯・錨の 後光 */
 function drawKGod(x,y,t){const top=y-84;
   for(let a=0;a<360;a+=4){const r=26+((a/4)%3===0?2:0),q=a*Math.PI/180;if((a+t)%40<28)R(x+Math.cos(q)*r,top+26+Math.sin(q)*r,1,1,'#7c5c10');}
-  anchorG(x,top+1,1,'#7c5c10');
+  anchorG(x,top-5,1,'#7c5c10');
   for(let s=0;s<6;s++){const side=s%2?1:-1,ph=t/20+s;for(let k=0;k<22;k++){const px=x+side*(12+k*1.7),py=top+40+s*6+Math.sin(ph+k*.35)*4+k*.6;R(px,py,3,2,k%5===0?'#5c5c64':'#a4a4ac');if(k%5===2)R(px,py,1,1,'#3c3c44');}}
   for(let r=0;r<56;r++){const w=10+Math.floor(r*.6);R(x-w/2,top+30+r,w,1,r%6?'#0c0814':'#1c1428');R(x-w/2,top+30+r,1,1,'#3c2860');R(x+w/2-1,top+30+r,1,1,'#3c2860');}
   R(x-1,top+32,2,52,'#3c2c08');
-  {const MW=[8,12,14,16,16,16,16,16,16,16,16,16,15,15,14,13,12,11,10,8,6];MW.forEach((mw,r)=>{R(x-mw/2,top+11+r,mw,1,r<2?'#fcfcfc':r>15?'#bcbcc4':'#e8e8f0');});}
-  R(x-5,top+24,4,1,'#000');R(x+1,top+24,4,1,'#000');R(x-5,top+25,1,1,'#3c3c44');R(x+4,top+25,1,1,'#3c3c44');anchorG(x,top+13,1,'#7c5c10');
+  /* 人の 顔を 残した 神：目は なく 赤い 溝が 横へ 流れる */
+  {const FW=[10,12,14,14,14,14,14,14,14,14,14,13,13,12,11,10,8,6];FW.forEach((fw,r)=>{R(x-fw/2,top+11+r,fw,1,r>13?'#b8a090':'#d8c0a8');});
+    R(x-8,top+8,16,5,'#bcbcbc');R(x-6,top+7,12,1,'#d8d8d8');R(x-9,top+10,2,10,'#a4a4a4');R(x+7,top+10,2,10,'#a4a4a4');R(x-5,top+8,10,1,'#fcfcfc');
+    R(x-7,top+16,14,1,'#a08870');
+    R(x-7,top+17,14,2,'#3c0000');R(x-6,top+17,12,1,'#d82800');const fl=t%24;R(x-6+(fl>>1),top+17,2,1,'#fc7460');
+    for(let k=0;k<5;k++){const dx=8+((k*3+(t>>2))%9);R(x+dx,top+17+(k%2),2,1,k%2?'#a81000':'#d82800');R(x-dx-2,top+17+(k%2),2,1,k%2?'#a81000':'#d82800');}
+    R(x-1,top+20,2,4,'#b8a090');R(x-3,top+25,6,1,'#7c4c3c');R(x-4,top+24,1,1,'#7c4c3c');R(x+3,top+24,1,1,'#7c4c3c');
+    R(x-2,top+29,4,1,'#a08870');}
   for(let i=0;i<8;i++){const q=t/30+i*.8;R(x+Math.cos(q)*34,top+50+Math.sin(q)*10,2,2,'#6844a0');}}
 
 /* ===================== グンマー帝国 シナリオ（人類保管計画） ===================== */
