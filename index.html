@@ -495,8 +495,8 @@ const BASE_PACK={
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
     {id:'pu_kami',name:'名もなき神 降臨ピックアップ',type:'char',pickup:['kami','yusha2']},
-    {id:'pu_kuniumi',name:'XR 国生みの二柱 降臨',type:'char',pickup:['izanagi','izanami','amaterasu','susanoo','tsukuyomi']},
-    {id:'pu_amanuboko',name:'XR 天乃沼鉾 降臨',type:'weapon',pickup:['w_amanuboko','w_nuboko','w_habakiri','w_futsu']},
+    {id:'pu_kuniumi',name:'国生みの伝説（伊邪那岐命・伊邪那美命）',type:'char',pickup:['izanagi','izanami']},
+    {id:'pu_amanuboko',name:'国生みの伝説（天乃沼鉾）',type:'weapon',pickup:['w_amanuboko']},
     {id:'pu_longinus',name:'XR ロンギヌス＆カシウスの槍 降臨',type:'weapon',pickup:['w_longinus','w_cassius','w_totsuka','w_ryujin','w_seishin']},
     {id:'pu_newarms',name:'新武器 LR・UR ピックアップ',type:'weapon',pickup:['w_totsuka','w_ryujin','w_seishin','w_doji','w_kanabo','w_norito','w_houou','w_raijodo','w_nyoi']},
     {id:'pu_jingi',name:'三種の神器ピックアップ',type:'weapon',pickup:['w_yata','w_ame','w_magatama']},
@@ -1468,9 +1468,14 @@ function pull(b,n,minR=0){
 /* ガチャ：通常2種＋期間限定ピックアップ（全ピックアップを ごちゃ混ぜにして 現実の 毎週月曜に 入れかえ） */
 const GACHA_PERIOD=7;
 function activeBanners(){
-  const base=BANNERS.filter(b=>b.src==='基本'),extra=BANNERS.filter(b=>b.src!=='基本');
   /* 現実の 日本時間で 毎週月曜0時に 入れかわる */
-  const D=Math.floor((Date.now()+9*3600000)/86400000),P=Math.floor((D+3)/GACHA_PERIOD),left=GACHA_PERIOD-((D+3)%GACHA_PERIOD),r=lcg(P*7919+101);
+  const D=Math.floor((Date.now()+9*3600000)/86400000),
+    /* 特別キャンペーン（期間中は 専用ガチャ、終わったら ごちゃ混ぜ候補に 入る） */
+    CAMP=[{ids:['pu_kuniumi','pu_amanuboko'],start:'2026-11-12',end:'2026-11-29'}],dayOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000),
+    camp=CAMP.filter(c=>D>=dayOf(c.start)&&D<=dayOf(c.end)),hide=new Set(CAMP.filter(c=>D<dayOf(c.start)||D<=dayOf(c.end)).flatMap(c=>c.ids)),
+    P=Math.floor((D+3)/GACHA_PERIOD),left=GACHA_PERIOD-((D+3)%GACHA_PERIOD),r=lcg(P*7919+101);
+  const base=BANNERS.filter(b=>b.src==='基本'&&!hide.has(b.id)),extra=BANNERS.filter(b=>b.src!=='基本');
+  const CB=camp.flatMap(c=>c.ids.map(id=>BANNERS.find(b=>b.id===id)).filter(Boolean).map(b=>({...b,name:'【期間限定】'+b.name,lim:1,left:dayOf(c.end)-D+1})));
   const pool=t=>[...new Set(base.filter(b=>b.type===t).flatMap(b=>b.pickup))].filter(id=>(t==='weapon'?WPD:CH)[id]);
   const pick=(arr,n)=>{const a=arr.slice(),o=[];while(a.length&&o.length<n)o.push(a.splice(Math.floor(r()*a.length),1)[0]);return o;};
   const PRE=['神無月','祭囃子','月下','黄金','紅蓮','蒼天','百鬼夜行','天岩戸','夢幻','雷神','龍宮','桜吹雪','初詣','大祓'],SUF=['降臨祭','ピックアップ','大感謝祭','特選ガチャ','超召喚'];
@@ -1478,7 +1483,7 @@ function activeBanners(){
   for(const t of ['char','char','weapon','weapon']){const ids=pick(pool(t).filter(x=>!used.has(x)),2+Math.floor(r()*3));ids.forEach(x=>used.add(x));
     const d=t==='weapon'?WPD:CH;ids.sort((a,b)=>d[b].rar-d[a].rar);
     L.push({id:`lim_${P}_${L.length}`,name:`【期間限定】${PRE[Math.floor(r()*PRE.length)]}${SUF[Math.floor(r()*SUF.length)]}`,type:t,pickup:ids,lim:1,left,src:'期間限定'});}
-  return [{id:'std_char',name:'通常ガチャ（キャラ）',type:'char',pickup:[],src:'通常'},{id:'std_weapon',name:'通常ガチャ（武器）',type:'weapon',pickup:[],src:'通常'},...L,...extra];
+  return [...CB,{id:'std_char',name:'通常ガチャ（キャラ）',type:'char',pickup:[],src:'通常'},{id:'std_weapon',name:'通常ガチャ（武器）',type:'weapon',pickup:[],src:'通常'},...L,...extra];
 }
 function openGacha(){
   const GB=activeBanners();
