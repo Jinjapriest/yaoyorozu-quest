@@ -786,7 +786,8 @@ function drawTile(t,x,y){const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a
 /* ===================== ゲーム状態 ===================== */
 const SKEY='yaoyorozu-quest-v1';
 const BOOKV=[100,1000,10000,1000000],BN=['小','中','大','極'];
-const need=lv=>10+lv*3;
+/* 必要経験値：Lvが 上がるほど 重くなる（キャラ・武器 共通） */
+const need=lv=>Math.round((10+lv*3)*3*(1+lv/1000));
 function blessMul(){return G.bless&&G.bless.left>0?1+G.bless.pct/100:1;}
 function wstat(id){const d=WPD[id],w=G.weapons[id];if(!d||!w)return{atk:0,mag:0};const p=(d.pow??WPOW[d.rar])*(1+(w.lv-1)*.06)*(1+w.dup*.1),t=WT[d.type];return{atk:Math.round(p*t.a),mag:Math.round(p*t.m)};}
 function partyBonus(){const mk=G.party.filter(id=>CH[id]&&CH[id].special==='miko');if(!mk.length||!G.party.some(id=>isKannushi(id)))return 1;return 1+Math.max(...mk.map(id=>.1+.04*CH[id].rar));}
