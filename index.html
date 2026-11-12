@@ -388,7 +388,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'祝詞':{a:.6,m:1.9},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess'];
 const BASE_SKILLS={
@@ -491,12 +491,14 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_futonorito','太祝詞','UR','祝詞',90],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
     {id:'pu_kami',name:'名もなき神 降臨ピックアップ',type:'char',pickup:['kami','yusha2']},
     {id:'pu_kuniumi',name:'国生みの伝説（伊邪那岐命・伊邪那美命）',type:'char',pickup:['izanagi','izanami']},
     {id:'pu_amanuboko',name:'国生みの伝説（天乃沼鉾）',type:'weapon',pickup:['w_amanuboko']},
+    {id:'pu_sakahoko',name:'XR 天乃逆鉾 降臨（太祝詞も）',type:'weapon',pickup:['w_sakahoko','w_futonorito','w_norito','w_amanuboko']},
     {id:'pu_longinus',name:'XR ロンギヌス＆カシウスの槍 降臨',type:'weapon',pickup:['w_longinus','w_cassius','w_totsuka','w_ryujin','w_seishin']},
     {id:'pu_newarms',name:'新武器 LR・UR ピックアップ',type:'weapon',pickup:['w_totsuka','w_ryujin','w_seishin','w_doji','w_kanabo','w_norito','w_houou','w_raijodo','w_nyoi']},
     {id:'pu_jingi',name:'三種の神器ピックアップ',type:'weapon',pickup:['w_yata','w_ame','w_magatama']},
@@ -611,7 +613,7 @@ function rebuild(){
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD);
+const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy);
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=142,MAINW=64,MH0=56;
@@ -873,12 +875,19 @@ const baseTwo=id=>isGod(id)||id==='buddha';
 const isSpear=w=>!!(w&&WPD[w]&&WPD[w].type==='聖槍');
 /* 聖槍を 持つと だれでも 2つめに もう1本の 聖槍を 持てる */
 const twoSlot=id=>baseTwo(id)||!!(G&&G.chars&&G.chars[id]&&(isSpear(G.chars[id].wpn)||isSpear(G.chars[id].wpn2)));
-const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[c.wpn,c.wpn2];return a.includes('w_longinus')&&a.includes('w_cassius');};
+/* 武器の 2本目以降（基礎Lv10超で かぶったとき 残せる） */
+const WSUF=['','','・弐','・参','・肆','・伍','・陸','・漆','・捌','・玖','・拾'];
+const baseW=k=>String(k||'').split('~')[0];
+function wcopyReg(){if(!G||!G.weapons)return;for(const k in G.weapons){if(!k.includes('~'))continue;const b=baseW(k),d=WPD[b];if(!d)continue;const n=+k.split('~')[1];
+  WPD[k]=Object.assign({},d,{id:k,name:d.name+(WSUF[n]||'・'+n),copy:1,_base:{name:d.name}});if(GOD_BOOST[b])GOD_BOOST[k]=GOD_BOOST[b];}}
+function addCopy(id){let n=2;while(G.weapons[id+'~'+n])n++;const k=id+'~'+n;G.weapons[k]={lv:1,exp:0,dup:0};wcopyReg();return k;}
+let wQ=[],pullBulk=false;
+const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[baseW(c.wpn),baseW(c.wpn2)];return a.includes('w_longinus')&&a.includes('w_cassius');};
 const PAIR_MUL=4;
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
-const GOD_BOOST={w_amanuboko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -950,7 +959,7 @@ function fixSave(){
   const d=Object.assign({coins:0,items:{herb:0,b:[0,0,0,0,0],o:[0,0,0,0,0],tk:0},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
   for(const k in d)if(G[k]==null)G[k]=d[k];
   if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];while(G.items.b.length<5)G.items.b.push(0);while(G.items.o.length<5)G.items.o.push(0);applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
-  if(G.ukaiho&&G.ukaiho.rank>=2)G.cap3=1;applyXR();wrapCoins();
+  if(G.ukaiho&&G.ukaiho.rank>=2)G.cap3=1;wcopyReg();applyXR();wrapCoins();
   G.party=G.party.filter(id=>CH[id]&&G.chars[id]);
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
   for(const id in G.chars){const c=G.chars[id];if(c.wpn&&!WPD[c.wpn])c.wpn=null;if(c.wpn&&!xrwOk(id,c.wpn))c.wpn=null;if(c.wpn2&&WPD[c.wpn2]&&!xrwOk(id,c.wpn2))c.wpn2=null;if(c.wpn2&&(!WPD[c.wpn2]||!twoSlot(id)))c.wpn2=null;}
@@ -1027,8 +1036,10 @@ function drawWIcon(id,x,y,sc=1){
       break;
     case '聖槍':if(/カシウス/.test(d.name)){for(let k=0;k<13;k++)P(1+k,15-k,2,2,k%3?'#3c3c3c':'#00a800');for(let k=0;k<5;k++){P(10+k,4-((k+1)>>1),1,2,'#7c7c7c');P(13-((k)>>1),k,2,1,'#5c5c5c');}P(14,0,1,4,col);P(10,1,1,3,col);P(4,11,2,2,col);break;}
       for(let k=0;k<13;k++)P(1+k,15-k,2,2,'#a81000');P(11,0,2,6,'#d82800');P(14,2,2,6,'#d82800');P(12,4,3,2,'#d82800');P(10,0,1,3,col);P(15,1,1,3,col);P(4,11,2,2,col);break;
+    case '祝詞':P(3,2,10,12,'#fcfcfc');P(3,2,10,1,'#d8d8d8');for(let y=4;y<13;y+=2)P(5,y,6,1,'#3c3c3c');P(2,1,12,2,'#a05000');P(2,13,12,2,'#a05000');P(1,1,1,2,'#f8b800');P(14,13,1,2,'#f8b800');P(11,4,1,8,'#d82800');break;
     case '神宝':
-      if(/矛|鉾/.test(d.name)){for(let k=0;k<12;k++)P(2+k,14-k,2,2,'#c89060');P(12,1,3,4,'#f8d878');P(11,2,5,1,'#f8d878');}
+      if(/逆鉾/.test(d.name)){for(let k=0;k<12;k++)P(2+k,1+k,2,2,'#8c6c4c');P(1,0,4,3,'#f8d878');P(0,1,6,1,'#f8d878');P(12,12,3,3,'#d82800');}
+      else if(/矛|鉾/.test(d.name)){for(let k=0;k<12;k++)P(2+k,14-k,2,2,'#c89060');P(12,1,3,4,'#f8d878');P(11,2,5,1,'#f8d878');}
       else if(/弓/.test(d.name)){for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#f8b800');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#f8d878');}
       else if(/鏡/.test(d.name)){pc(8,8,7,'#fc7460');pc(8,8,5,'#f8d878');for(let k=0;k<8;k++){const a=k/8*Math.PI*2;P(8+Math.round(Math.cos(a)*7),8+Math.round(Math.sin(a)*7),1,1,'#fcfcfc');}}
       else{for(let k=0;k<11;k++)P(4+k,11-k,2,2,'#fcfcfc');for(let k=0;k<10;k++)P(5+k,11-k,1,1,'#a4e4fc');P(2,10,5,2,'#f8d878');P(1,13,3,3,'#d82800');}
@@ -1477,9 +1488,9 @@ function itemScr(){
     drw(a){R(0,0,W,H,'#000');menuDraw(m,a);txt('経験値書・祝詞・鍛錬鉱は「キャラ育成」「武器の鍛錬」で使います',8,172,'#bcbcbc','left',240);}});
 }
 function settingsScr(){
-  const m=mkMenu([],{x:8,y:20,w:200,rows:4});
-  const refresh=()=>{m.items=[`オートバトル：${G.auto?'ON':'OFF'}`,`戦闘メッセージ：${G.fast?'はやい':'ふつう'}`,{t:`支払い方法：${payName()}`,dis:!G.card},'もどる'];};refresh();
-  push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===3){pop();save();return;}if(r===0)G.auto=!G.auto;if(r===1)G.fast=!G.fast;if(r===2&&G.card){G.payMode=nextPay();toast(`支払い方法：${payName()}`);}refresh();},drw(a){menuDraw(m,a);}});
+  const m=mkMenu([],{x:8,y:20,w:224,rows:5});const WD={ask:'毎回 聞く',merge:'いつも 合成',keep:'いつも 残す'};
+  const refresh=()=>{m.items=[`オートバトル：${G.auto?'ON':'OFF'}`,`戦闘メッセージ：${G.fast?'はやい':'ふつう'}`,{t:`支払い方法：${payName()}`,dis:!G.card},`かぶり武器（UR以上・基礎Lv11〜）：${WD[G.wdup||'ask']}`,'もどる'];};refresh();
+  push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===4){pop();save();return;}if(r===0)G.auto=!G.auto;if(r===1)G.fast=!G.fast;if(r===2&&G.card){G.payMode=nextPay();toast(`支払い方法：${payName()}`);}if(r===3){const o=['ask','merge','keep'];G.wdup=o[(o.indexOf(G.wdup||'ask')+1)%3];}refresh();},drw(a){menuDraw(m,a);}});
 }
 function saveScr(){
   const m=mkMenu(['きろくする','データを 書き出す（ファイル）','データを 読み込む（ファイル）','タイトルにもどる','はじめからやりなおす'],{x:8,y:20,w:180});
@@ -1518,8 +1529,10 @@ function pull(b,n,minR=0){
     let fl=minR;if(n>=10&&i%10===9&&!got)fl=Math.max(fl,3);if(n>=100&&i===n-1&&!gotUR)fl=Math.max(fl,4);
     let rar=rollRar(fl);if(rar===5&&poolFor(b,6).length&&rnd()<(b.pickup.some(id=>{const d=(b.type==='weapon'?WPD:CH)[id];return d&&d.rar===6;})?.5:.1))rar=6;
     const p=pickOne(b,rar);if(p.rar>=3)got=true;if(p.rar>=4)gotUR=true;
-    const isNew=b.type==='weapon'?addWeapon(p.id):addChar(p.id);
-    out.push({id:p.id,rar:p.rar,isNew,w:b.type==='weapon',dup:(b.type==='weapon'?G.weapons:G.chars)[p.id].dup});
+    let isNew,cp=null;const mode=G.wdup||'ask';
+    if(b.type==='weapon'&&p.rar>=4&&G.weapons[p.id]&&G.weapons[p.id].dup>=10&&mode!=='merge'&&!(pullBulk&&mode==='ask')){if(mode==='keep'){cp=addCopy(p.id);isNew=true;}else{wQ.push(p.id);isNew=false;}}
+    else isNew=b.type==='weapon'?addWeapon(p.id):addChar(p.id);
+    out.push({id:cp||p.id,rar:p.rar,isNew,w:b.type==='weapon',dup:cp?0:(b.type==='weapon'?G.weapons:G.chars)[p.id].dup});
   }
   return out;
 }
@@ -1529,20 +1542,20 @@ const GACHA_PERIOD=7;
 function pullSummary(title,res,extra){const cnt=[0,0,0,0,0,0,0];res.forEach(x=>cnt[x.rar]++);const top=res.filter(x=>x.rar>=5);const nm=x=>{const d=(x.w?WPD:CH)[x.id];return d?(d._base||d).name:x.id;},names=[...new Set(top.map(nm))];
   const L=[title,`N ${fmt(cnt[0])}　R ${fmt(cnt[1])}　SR ${fmt(cnt[2])}　SSR ${fmt(cnt[3])}\nUR ${fmt(cnt[4])}　LR ${fmt(cnt[5])}　XR ${fmt(cnt[6])}`];
   if(names.length)L.push('LR以上：'+names.slice(0,6).join('・')+(names.length>6?` ほか${names.length-6}種`:''));if(extra)L.push(extra);return L;}
-function bulkPull(b,n,minR,nm){const res=[];for(let i=0;i<n;i+=100){res.push(...pull(b,Math.min(100,n-i),i===0?minR:minR));}save();sfx(res.some(x=>x.rar>=5)?'g5':'g3');
+function bulkPull(b,n,minR,nm){const res=[];pullBulk=true;for(let i=0;i<n;i+=100){res.push(...pull(b,Math.min(100,n-i),i===0?minR:minR));}pullBulk=false;save();sfx(res.some(x=>x.rar>=5)?'g5':'g3');
   dialog(pullSummary(`${nm} ${fmt(n)}枚で まとめて 引いた！`,res));}
 function xrUntil(b){const MAXP=200000;
   choice(`XRが 出るまで 引きつづけます。\nガチャチケット → イェソ（1回 ${fmt(Math.round(GACHA_PRICE*gachaDisc()))}）の 順に 使います。\nXRの 確率は とても 低いです（目安 1万回に 1回）。`,['引く','やめる'],k=>{if(k!==0)return;
     const res=[];let paid=0,tku=0,got=null;const one=Math.round(GACHA_PRICE*gachaDisc());
     while(res.length<MAXP){if((G.items.tk||0)>0){G.items.tk--;tku++;}else if(G.coins>=one){noCount(()=>{G.coins-=one;});paid+=one;}else break;
-      const r=pull(b,1,0)[0];res.push(r);if(r.rar===6){got=r;break;}}
+      pullBulk=true;const r=pull(b,1,0)[0];pullBulk=false;res.push(r);if(r.rar===6){got=r;break;}}
     save();sfx(got?'g5':'ng');
     dialog(pullSummary(got?`XR「${((got.w?WPD:CH)[got.id]._base||(got.w?WPD:CH)[got.id]).name}」が 出た！（${fmt(res.length)}回目）`:`XRは 出なかった…（${fmt(res.length)}回）`,res,`使った：ガチャチケット ${fmt(tku)}枚・${fmt(paid)}イェソ${got?'':'\n（お金か チケットが 足りなく なった）'}`));},110);}
 function activeBanners(){
   /* 現実の 日本時間で 毎週月曜0時に 入れかわる */
   const D=Math.floor((Date.now()+9*3600000)/86400000),
     /* 特別キャンペーン（期間中は 専用ガチャ、終わったら ごちゃ混ぜ候補に 入る） */
-    CAMP=[{ids:['pu_kuniumi','pu_amanuboko'],start:'2026-11-12',end:'2026-11-29'}],dayOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000),
+    CAMP=[{ids:['pu_kuniumi','pu_amanuboko'],start:'2026-11-12',end:'2026-11-29'},{ids:['pu_sakahoko'],start:'2026-11-12',end:'2026-12-06'}],dayOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000),
     camp=CAMP.filter(c=>D>=dayOf(c.start)&&D<=dayOf(c.end)),hide=new Set(CAMP.filter(c=>D<dayOf(c.start)||D<=dayOf(c.end)).flatMap(c=>c.ids)),
     P=Math.floor((D+3)/GACHA_PERIOD),left=GACHA_PERIOD-((D+3)%GACHA_PERIOD),r=lcg(P*7919+101);
   const base=BANNERS.filter(b=>b.src==='基本'&&!hide.has(b.id)),extra=BANNERS.filter(b=>b.src!=='基本');
@@ -1569,6 +1582,10 @@ function openGacha(){
   push({full:true,canBack:true,
     upd(){
       const b=GB[banIdx];
+      if(st==='menu'&&wQ.length){const mode=G.wdup||'ask';if(mode!=='ask'){wQ.splice(0).forEach(id=>{if(mode==='keep')addCopy(id);else addWeapon(id);});save();return;}
+        const id=wQ.shift(),w=G.weapons[id],d=WPD[id];sfx('g3');
+        choice(`${d.name}（基礎Lv${w.dup+1}）が かぶった！\n合成して 基礎Lvを 上げるか\nもう1本 武器として 残すか えらべる`,['合成する（基礎Lv+1）','もう1本 残す','以後 すべて 合成する','以後 すべて 残す'],k=>{
+          if(k===1||k===3){const c=addCopy(id);toast(`${WPD[c].name}を 手に入れた`);}else addWeapon(id);if(k===2)G.wdup='merge';if(k===3)G.wdup='keep';save();},150);return;}
       if(st==='menu'&&xrNews.length){const ids=xrNews.splice(0);sfx('g5');dialog(ids.flatMap(id=>[`${CH[id]._base.name}の 基礎Lvが 100に 達した…！\nまばゆい 光が あふれだす！`,`新レアリティ XR（超越）\n「${CH[id].name}」に なった！\n（すべての 能力が 2.4倍）`]));return;}
       if(st==='menu'){
         if(I.pl||I.pr){banIdx=(banIdx+(I.pr?1:GB.length-1))%GB.length;sfx('cur');}
@@ -4144,7 +4161,7 @@ function ukaihoScr(){
     dialog(`丑三つ時。 黒装束に 身を つつみ\n裏の 峰々を 歩きはじめた…\n（${n}日分の 裏回峰）`,()=>{while(stack.length>1)pop();startBattle(false,null,{kind:'ukaiho',n,mult});});
   },170);}
 /* 満行報酬（好きな XR）と エンディング */
-const XR_REWARD=[['char','izanagi'],['char','izanami'],['wpn','w_amanuboko'],['wpn','w_longinus'],['wpn','w_cassius']];
+const XR_REWARD=[['char','izanagi'],['char','izanami'],['wpn','w_amanuboko'],['wpn','w_sakahoko'],['wpn','w_longinus'],['wpn','w_cassius']];
 function ukFinale(){
   listPick('満行の 証：好きな XRを ひとつ えらぶ',XR_REWARD.map(([k,id])=>{const d=k==='char'?CH[id]:WPD[id];const own=k==='char'?G.chars[id]:G.weapons[id];return{t:(k==='char'?'XRキャラ ':'XR武器 ')+(k==='char'?d.name.replace('全てを超越せし',''):d.name),r:own?'（かぶり）':'',col:'#f8d878'};}),i=>{
     const [k,id]=XR_REWARD[i];G.ukPend=0;if(k==='char')addChar(id);else addWeapon(id);save();sfx('g5');
