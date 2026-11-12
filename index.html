@@ -963,8 +963,8 @@ function slimSave(){const g=JSON.parse(JSON.stringify(G));if(g.stock&&g.stock.h)
 async function makeSaveCode(){const json=JSON.stringify({format:'yaoyorozu-save-1',savedAt:G.savedAt,day:G.day,g:slimSave()});
   if(typeof CompressionStream!=='function')return json;
   const buf=await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();let b='';const u=new Uint8Array(buf);for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return 'YQ1:'+btoa(b);}
-async function loadAnySave(t){t=String(t||'').trim();const i=t.indexOf('YQ1:');
-  if(i>=0){let code=t.slice(i+4).replace(/[^A-Za-z0-9+/=]/g,'');
+async function loadAnySave(t){t=String(t||'').trim();let i=t.indexOf('YQ1:'),skip=4;if(i<0){i=t.indexOf('H4sI');skip=0;}
+  if(i>=0&&!/^\s*\{/.test(t)){let code=t.slice(i+skip).replace(/[^A-Za-z0-9+/=]/g,'');
     try{const bin=atob(code),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);
       t=await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
     catch(e){return '引き継ぎコードが 途中で 切れているようです。もう一度 全部 コピーしてください';}}
