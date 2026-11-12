@@ -2420,6 +2420,7 @@ const STOCKS=[
   {id:'games',out:70000,top:['八百万ゲームス 社長',6000],n:'八百万ゲームス',p0:3200,vol:.04,mu:.0009,perk:'ガチャチケット ×4枚',give:k=>{G.items.tk+=4*k;}},
   {id:'tokoyobio',out:50000,top:['常世研究所',5000],n:'常世バイオ',p0:4200,vol:.045,mu:.0009,perk:'経験値書（極） ×1冊',give:k=>{G.items.b[3]+=k;}},
   {id:'nichirin',out:80000,top:['日輪 発電組合',6000],n:'日輪ソーラー',p0:1900,vol:.026,mu:.0006,perk:'鍛錬鉱（極） ×1個',give:k=>{G.items.o[3]+=k;}},
+  {id:'teiai',out:100000,top:['帝愛グループ 会長',60000],n:'帝愛産業',p0:3000,vol:.12,perk:'UR確定チケット ×1枚・1,000,000イェソ',give:k=>{G.items.urtk=(G.items.urtk||0)+k;noCount(()=>{G.coins+=1000000*k;});},ipo:'teiai'},
   {id:'res_coal',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 グラード炭鉱',sn:'グラード炭鉱',p0:0,vol:.02,perk:'鍛錬鉱（大） ×10個',give:k=>{G.items.o[2]+=10*k;},ipo:'res',rid:'coal'},
   {id:'res_oil',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 ザルマ油田',sn:'ザルマ油田',p0:0,vol:.025,perk:'ガチャチケット ×3枚',give:k=>{G.items.tk+=3*k;},ipo:'res',rid:'oil'},
   {id:'res_kanmine',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 ヴェルナ金冠鉱山',sn:'金冠鉱山',p0:0,vol:.02,perk:'鍛錬鉱（極） ×1個',give:k=>{G.items.o[3]+=k;},ipo:'res',rid:'kanmine'},
@@ -2431,7 +2432,7 @@ const canSoukai=c=>stockOwn(c.id)>c.top[1]&&!isPres(c.id);
 const presPay=c=>Math.floor(G.stock.p[c.id]*(c.ipo?20:40));
 const stockOwn=id=>(G.stock&&G.stock.own[id])||0;
 const ownRatio=()=>Math.min(1,stockOwn('tamakane')/TAMA_SHARES);
-const isListed=c=>!c.ipo||(c.ipo==='res'?!!(G.res&&G.res[c.rid]&&G.res[c.rid].ipo):!!(G.mine&&G.mine.ipo));
+const isListed=c=>!c.ipo||(c.ipo==='teiai'?!!G.teiaiStock:c.ipo==='res'?!!(G.res&&G.res[c.rid]&&G.res[c.rid].ipo):!!(G.mine&&G.mine.ipo));
 const listed=()=>STOCKS.filter(isListed).concat(G.myco?myList():[]);
 const resRatio=rid=>Math.min(1,stockOwn('res_'+rid)/RES_SHARES);
 function resFair(rid){const M=G.res&&G.res[rid];if(!M)return 50;return RES_LV[rid][M.lv].coin*1.3*100/RES_SHARES;}
@@ -2440,7 +2441,12 @@ const nextKenri=()=>Math.ceil((G.day+1)/KENRI)*KENRI;
 function stockDaily(){
   const S=stk(),msgs=[],hrMsgs=[];
   for(const c of listed()){let p=S.p[c.id];if(p==null)continue;
-    if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());}
+    if(c.ipo==='teiai'){let ev=rnd();p=p*Math.exp(c.vol*gauss()+.004);
+      if(ev<.01){const own=S.own.teiai||0;msgs.push('【速報】帝愛産業 上場廃止！','粉飾決算と 地下施設の 違法労働が 発覚…\n帝愛産業の 株は 紙くずに なった。'+(own?`\n持っていた ${fmt(own)}株が 消えた…`:''));S.own.teiai=0;S.cost.teiai=0;delete S.pres.teiai;p=c.p0;S.h.teiai=[];}
+      else if(ev<.05){p*=2.2+rnd();msgs.push(`【速報】帝愛産業 ストップ高！\n新規カジノ船 事業が 発表され\n株価が ${pf(p)}イェソに 急騰！`);}
+      else if(ev<.09){p*=.25+rnd()*.15;msgs.push(`【速報】帝愛産業 暴落！\n会長の 黒い 噂が 報じられ\n株価が ${pf(p)}イェソに 急落…`);}
+      p=Math.min(1e6,Math.max(1,p));}
+    else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());}
     else{const tr=c.p0*Math.exp(c.mu*G.day);p=Math.max(c.p0*.15,p*Math.exp(c.vol*gauss()+(Math.log(tr)-Math.log(p))*.02));}
     if(isPres(c.id)&&G.hr&&G.hr[c.id]){const h=G.hr[c.id];p*=1+(h.mor-50)/50*.003+(h.f.mochikabu?.002:0)-(h.strike>0?.01:0);}
     S.p[c.id]=Math.round(p*10)/10;(S.h[c.id]=S.h[c.id]||[]).push(S.p[c.id]);if(S.h[c.id].length>30)S.h[c.id].shift();}
@@ -2470,10 +2476,15 @@ function stockSell(c){
     else if(c.ipo===true&&stockOwn('tamakane')<TAMA_SHARES/2)dialog('持株が 半分を 切った…\n魂鉱山の イェソ収益の 取り分が へる。');},170);
 }
 function stockFac(){
+  let seq=[];const CODE=['u','u','d','d','l','r','l','r','B'];
   const S=stk(),items=()=>[...listed().map(c=>({t:c.sn||c.n,col:c.ipo||c.my?'#f8b800':null})),{t:'取引所を でる'}];
   const m=mkMenu(items(),{x:4,y:18,w:112,rows:9,rh:13});m.rows=9;
   push({full:true,canBack:true,finance:true,
-    upd(){m.items=items();const r=menuUpd(m);if(r==='cancel'||r===m.items.length-1){pop();save();return;}if(r==null)return;
+    upd(){m.items=items();
+      if(!G.teiaiStock){const key=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':I.B?'B':null;if(key){seq.push(key);seq=seq.slice(-CODE.length);
+        if(seq.join()===CODE.join()){G.teiaiStock=1;if(S.p.teiai==null){S.p.teiai=3000;S.h.teiai=[3000];}m.items=items();m.sel=listed().findIndex(c=>c.id==='teiai');sfx('g5');save();
+          dialog(['…場内の 照明が 一瞬 消えた。','黒服「お客様… 裏の 銘柄に ご興味が？」','「帝愛産業。 値動きは 1日で 倍にも 4分の1にも なる。\n株主優待は UR確定チケットと 100万イェソ」','「ただし… ある日 突然 紙くずに なることも\nございます。 お気を つけて」']);return;}}}
+      const r=menuUpd(m);if(r==='cancel'||r===m.items.length-1){pop();save();return;}if(r==null)return;
       const c=listed()[r],ops=['買う','売る'];if(canSoukai(c))ops.push('株主総会を開く');else if(isPres(c.id))ops.push('社長室');ops.push('やめる');
       choice(`${c.n}\n株主優待（100株以上）\n${c.perk}`,ops,k=>{const o=ops[k];if(o==='買う')stockBuy(c);if(o==='売る')stockSell(c);if(o==='株主総会を開く')soukai(c);if(o==='社長室')presRoom(c);},104);},
     drw(a){R(0,0,W,H,'#000');txt(`${VIL[curVil]?VIL[curVil].name:''} 証券取引所`,8,5,'#00e8b8','left',150);txt(`${G.day}日目`,196,5,'#bcbcbc','right');
