@@ -3225,7 +3225,7 @@ function cardMenu(){
     choice('解約すると 利用額と ランクが\n0に もどります。 解約しますか？',['解約する','やめる'],j=>{if(j===0){if(C.bill>0){const b=Math.ceil(C.bill);if(G.coins+G.bank.sav<b){dialog('未払いの 請求を 精算できる お金が ない…');return;}debitAuto(b);}G.card=null;G.payMode='cash';save();dialog('カードを 解約した。\n（未払いの 請求は 普通預金・財布から 精算した）');}},96);}},120);});
 }
 /* ===================== リリース記念 ログインボーナス（現実の日付・7日分） ===================== */
-const LB_START='2026-11-12',LB_END='2026-11-30';
+const LB_START='2026-11-12',LB_END='2026-12-11';
 const LB=[{t:'1,000,000イェソ\n仮想通貨高騰券',s:'100万\n高騰券',give:()=>{noCount(()=>{G.coins+=1000000;});G.items.cryup=(G.items.cryup||0)+1;}},
   {t:'ガチャチケット×30',s:'ガチャ券\n×30',give:()=>{G.items.tk+=30;}},
   {t:'経験値書（極）×100\n鍛錬鉱（極）×100',s:'書・鉱\n極×100',give:()=>{G.items.b[3]+=100;G.items.o[3]+=100;}},
