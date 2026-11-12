@@ -957,14 +957,26 @@ async function exportSave(){
   catch(e){const ta=document.getElementById('saveText');if(ta){ta.value=text;}toast('下の「セーブデータの引き継ぎ」欄に 出しました');}
   const ta=document.getElementById('saveText');if(ta)ta.value=text;
 }
+/* 引き継ぎコード：YQ1:＋gzip圧縮＋base64（短くして コピペで 切れにくく する） */
+function slimSave(){const g=JSON.parse(JSON.stringify(G));if(g.stock&&g.stock.h)for(const k in g.stock.h)if(Array.isArray(g.stock.h[k]))g.stock.h[k]=g.stock.h[k].slice(-20);
+  if(g.mk)for(const k in g.mk){const v=g.mk[k];if(v&&Array.isArray(v.h))v.h=v.h.slice(-20);}return g;}
+async function makeSaveCode(){const json=JSON.stringify({format:'yaoyorozu-save-1',savedAt:G.savedAt,day:G.day,g:slimSave()});
+  if(typeof CompressionStream!=='function')return json;
+  const buf=await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();let b='';const u=new Uint8Array(buf);for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return 'YQ1:'+btoa(b);}
+async function loadAnySave(t){t=String(t||'').trim();const i=t.indexOf('YQ1:');
+  if(i>=0){let code=t.slice(i+4).replace(/[^A-Za-z0-9+/=]/g,'');
+    try{const bin=atob(code),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);
+      t=await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
+    catch(e){return '引き継ぎコードが 途中で 切れているようです。もう一度 全部 コピーしてください';}}
+  return readSaveText(t);}
 function readSaveText(t){
-  let o;try{o=JSON.parse(t);}catch(e){return '読み込めませんでした（JSONではありません）';}
+  let o;try{o=JSON.parse(t);}catch(e){return /^\s*\{/.test(t)?'データが 途中で 切れているようです（全部 コピーできていません）。「書き出す」で 出る 短い 引き継ぎコードを 使ってください':'読み込めませんでした（セーブデータではありません）';}
   const g=o&&o.format==='yaoyorozu-save-1'?o.g:o;if(!g||typeof g!=='object'||!g.chars||!g.items||!Array.isArray(g.party))return '八百万クエストの セーブデータでは ないようです';
   G=g;fixSave();G.savedAt=Date.now();save();while(stack.length>1)pop();startField();toast(`セーブデータを 読み込みました（${G.day}日目）`);return '';
 }
 function importSavePick(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json,text/plain';
-  inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;f.text().then(t=>{const err=readSaveText(t);if(err)dialog(err);});};
+  inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;f.text().then(async t=>{const err=await loadAnySave(t);if(err)dialog(err);});};
   try{inp.click();}catch(e){toast('下の「セーブデータの引き継ぎ」欄から 読み込めます');}
 }
 function newExtras(){return{ura:0,cap2:0,tokenRight:0,token:null,res:{},colo:0,stock:null,codes:{},mine:null,freed:{},taki:0,depop:{},warps:[],pachi:{medals:0,hall:null,cards:{}},day:1,bc:0,career:0,job:null,meal:null,morning:0,rifts:[],seen:{},bank:{sav:0,terms:[],nisa:0,nisaCost:0,cry:0,cryCost:0,fx:null},mk:{nisa:{p:10000,h:[10000]},cry:{p:100,h:[100]},fx:{p:150,h:[150]}}};}
@@ -3780,10 +3792,13 @@ function loop(ts){
 
 /* ===================== セーブ引き継ぎUI ===================== */
 {const ta=document.getElementById('saveText'),msg=document.getElementById('saveMsg');const say=(t,ok)=>{msg.textContent=t;msg.className=ok?'ok':'err';msg.style.color=ok?'#7ee07e':'#fc7460';};
-  document.getElementById('saveOut').addEventListener('click',()=>{if(!G){say('ゲームを 始めてから 書き出してください',false);return;}ta.value=saveFileText();say(`書き出しました（${G.day}日目）。この文字を 全部 コピーして 保管してください`,true);});
-  document.getElementById('saveCopy').addEventListener('click',async()=>{if(!ta.value){say('先に「書き出す」を 押してください',false);return;}try{await navigator.clipboard.writeText(ta.value);say('コピーしました',true);}catch(e){ta.select();say('自動コピーできません。欄を 全選択して コピーしてください',false);}});
-  document.getElementById('saveIn').addEventListener('click',()=>{const t=ta.value.trim();if(!t){say('欄に セーブデータを 貼り付けてください',false);return;}const err=readSaveText(t);say(err||`読み込みました（${G.day}日目）`,!err);});
-  document.getElementById('saveFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;f.text().then(t=>{const err=readSaveText(t);say(err||`読み込みました（${G.day}日目）`,!err);});});}
+  document.getElementById('saveOut').addEventListener('click',async()=>{if(!G){say('ゲームを 始めてから 書き出してください',false);return;}save();const c=await makeSaveCode();ta.value=c;say(`引き継ぎコードを 出しました（${G.day}日目・${fmt(c.length)}文字）。「コピー」を 押してください`,true);});
+  document.getElementById('saveCopy').addEventListener('click',async()=>{if(!ta.value){say('先に「書き出す」を 押してください',false);return;}
+    let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true;}catch(e){}
+    if(!ok){try{ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);ok=document.execCommand('copy');}catch(e){}}
+    say(ok?`コピーしました（${fmt(ta.value.length)}文字）`:'自動コピーできません。欄を 長押し→「すべてを選択」→「コピー」してください',ok);});
+  document.getElementById('saveIn').addEventListener('click',async()=>{const t=ta.value.trim();if(!t){say('欄に セーブデータを 貼り付けてください',false);return;}const err=await loadAnySave(t);say(err||`読み込みました（${G.day}日目）`,!err);});
+  document.getElementById('saveFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;f.text().then(async t=>{const err=await loadAnySave(t);say(err||`読み込みました（${G.day}日目）`,!err);});});}
 /* ===================== データ読み込みUI ===================== */
 const packText=document.getElementById('packText'),packMsg=document.getElementById('packMsg'),packList=document.getElementById('packList');
 function setMsg(s,ok){packMsg.textContent=s;packMsg.className=ok?'ok':'err';}
