@@ -1893,6 +1893,7 @@ const battleScr={full:true,upd:battleUpd,drw(a){
   }else{win(0,150,256,86);BT.log.forEach((l,k)=>txt(l,12,160+k*17,'#fcfcfc','left',232));}
   if(G.auto&&BT.ph!=='end')txtS('オート中（Bで解除）',246,134,'#f8b800','right');
 }};
+const HIGH_X=10;
 function toBooks(v){const out=[0,0,0,0];for(let i=3;i>=0;i--){out[i]=Math.floor(v/BOOKV[i]);v-=out[i]*BOOKV[i];}if(v>0)out[0]++;return out;}
 function winBattle(){
   BT.ph='end';stopBGM();sfx('win');
@@ -1902,7 +1903,9 @@ function winBattle(){
     else{coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4);ex+=30*Math.pow(2.3,e.t);ore+=20*Math.pow(2.3,e.t);if(rnd()<.08)herb++;}
   }
   const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:1;
-  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1));ore=Math.round(ore*mul*rw);
+  /* 高難易度コンテンツは 経験値書・鍛錬鉱が 10倍 */
+  const HX=BT.sp&&(['kaiho','doiri','tokoyo','colo','ura','gimwild','gimrift'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
+  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
   let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
   bk.forEach((n,k)=>G.items.b[k]+=n);ok.forEach((n,k)=>G.items.o[k]+=n);
@@ -1914,10 +1917,10 @@ function winBattle(){
   if(G.taki>0)G.taki--;
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
   if(BT.sp&&BT.sp.kind==='mine'){G.career++;pages.push(`峰入り修行を やりとげた！\n研修歴 +1（いま ${G.career}回）`);if(G.career%50===0){G.items.srtk++;pages.push('研修歴 50回ごとの 特典！\nSR以上確定チケットを 1枚 もらった。');}}
-  if(BT.sp&&BT.sp.kind==='gimrift'){const O=G.gimOcc['v'+BT.sp.vi];if(O){(O.closed=O.closed||[]).push(BT.sp.k);}G.items.b[3]+=30;G.items.o[3]+=30;G.items.urtk=(G.items.urtk||0)+1;
-    pages.push('町の 烈穴を 塞いだ！','経験値書（極）×30・鍛錬鉱（極）×30\nUR確定チケット×1を 手に入れた！');}
-  else if(BT.sp&&BT.sp.kind==='gimwild'){G.gimWin=(G.gimWin||0)+1;G.items.b[3]+=500;G.items.o[3]+=500;G.items.urtk=(G.items.urtk||0)+10;noCount(()=>{G.coins+=30000000;});
-    pages.push('残滓「ば…ばかな… 血が… 足りぬ……」','血に飢えた ギム総書記の残滓は\n闇の 中へ 消えていった…','経験値書（極）×500・鍛錬鉱（極）×500\nUR確定チケット×10・30,000,000イェソを 手に入れた！');}
+  if(BT.sp&&BT.sp.kind==='gimrift'){const O=G.gimOcc['v'+BT.sp.vi];if(O){(O.closed=O.closed||[]).push(BT.sp.k);}G.items.b[3]+=300;G.items.o[3]+=300;G.items.urtk=(G.items.urtk||0)+1;
+    pages.push('町の 烈穴を 塞いだ！','経験値書（極）×300・鍛錬鉱（極）×300\nUR確定チケット×1を 手に入れた！');}
+  else if(BT.sp&&BT.sp.kind==='gimwild'){G.gimWin=(G.gimWin||0)+1;G.items.b[3]+=5000;G.items.o[3]+=5000;G.items.urtk=(G.items.urtk||0)+10;noCount(()=>{G.coins+=30000000;});
+    pages.push('残滓「ば…ばかな… 血が… 足りぬ……」','血に飢えた ギム総書記の残滓は\n闇の 中へ 消えていった…','経験値書（極）×5,000・鍛錬鉱（極）×5,000\nUR確定チケット×10・30,000,000イェソを 手に入れた！');}
   else if(BT.sp&&BT.sp.kind==='dict'&&dinfo(VIL[BT.sp.vi]).gim){const vi=BT.sp.vi;gimFree(vi);G.coins+=3000000;G.items.urtk=(G.items.urtk||0)+5;if(!G.warps.includes(vi))G.warps.push(vi);
     pages.push('ギム総書記の残滓を たおした！',`町の 人々が 広場に あつまってきた…\n${VIL[vi].name}は 解放された！`,'お礼に 3,000,000イェソと\nUR確定チケット 5枚を もらった。','店も 神社も ふたたび 開いた。');}
   else if(BT.sp&&BT.sp.kind==='dict'&&dinfo(VIL[BT.sp.vi]).res!=='mine'){const vi=BT.sp.vi,v=VIL[vi],D=dinfo(v),rd=RES.find(r=>r.id===D.res);G.freed['v'+vi]=1;G.coins+=1000000;G.items.tk+=30;G.items.urtk=(G.items.urtk||0)+3;if(!G.warps.includes(vi))G.warps.push(vi);setT(v.x,v.y,T.CITY);
@@ -2620,7 +2623,7 @@ const COLO_ROUNDS=['予選','一回戦','準々決勝','準決勝','決勝'],COL
 function coloFac(){
   dialog(['闘技場の 支配人「ようこそ 魔物コロシアムへ！」','「5連戦を 勝ち抜けば 優勝だ。\n試合の 合間に HPと MPは 回復する。\n決勝の 相手は 闘魔王 ガルゴス」',`「推奨レベルは 9100。\n優勝賞品は 経験値書（極）と\n鍛錬鉱（極）を どっさりだ！」`],()=>{
     choice(`挑戦料 ${fmt(COLO_FEE)}イェソ（所持 ${fmt(G.coins)}イェソ）\n優勝回数 ${G.colo||0}回`,['エントリーする','賞品を 見る','やめる'],k=>{
-      if(k===1){dialog(['優勝賞品：\n経験値書（極） ×500\n鍛錬鉱（極） ×500\n3,000,000イェソ','初優勝の 記念に\nUR確定チケット ×10 と\n「コロシアム王者」の 称号']);return;}
+      if(k===1){dialog(['優勝賞品：\n経験値書（極） ×5,000\n鍛錬鉱（極） ×5,000\n3,000,000イェソ','初優勝の 記念に\nUR確定チケット ×10 と\n「コロシアム王者」の 称号']);return;}
       if(k!==0)return;
       const go=()=>{fullHeal();save();while(stack.length>1)pop();startBattle(false,null,{kind:'colo',round:1});};
       const cash=()=>{if(G.coins<COLO_FEE){dialog('挑戦料が 足りない。');return;}noCount(()=>{G.coins-=COLO_FEE;});go();};
@@ -2629,8 +2632,8 @@ function coloFac(){
       choice(`挑戦料 ${fmt(COLO_FEE)}イェソ\nどちらで 払いますか？`,['現金',`クレジット（${CARDS[G.card.brand].n}）`,'やめる'],j=>{if(j===0)cash();else if(j===1)cred();},110);},128);});
 }
 function coloClear(){
-  const first=!G.colo;G.colo=(G.colo||0)+1;G.items.b[3]+=500;G.items.o[3]+=500;G.coins+=3000000;if(first){G.items.urtk=(G.items.urtk||0)+10;G.coloKing=1;}sfx('g5');save();
-  dialog(['観客「うおおおお！！」','魔物コロシアム 優勝！',`経験値書（極） ×500\n鍛錬鉱（極） ×500\n3,000,000イェソを 手に入れた！`,...(first?['初優勝の 記念に UR確定チケット ×10！\n「コロシアム王者」の 称号を 得た。']:[])],returnField);
+  const first=!G.colo;G.colo=(G.colo||0)+1;G.items.b[3]+=5000;G.items.o[3]+=5000;G.coins+=3000000;if(first){G.items.urtk=(G.items.urtk||0)+10;G.coloKing=1;}sfx('g5');save();
+  dialog(['観客「うおおおお！！」','魔物コロシアム 優勝！',`経験値書（極） ×5,000\n鍛錬鉱（極） ×5,000\n3,000,000イェソを 手に入れた！`,...(first?['初優勝の 記念に UR確定チケット ×10！\n「コロシアム王者」の 称号を 得た。']:[])],returnField);
 }
 /* ===================== 裏闘技場（推奨Lv9999） ===================== */
 const URA_ROUNDS=['第一の 檻','第二の 檻','第三の 檻','憎悪の 玉座'];
@@ -2642,7 +2645,7 @@ function uraClear(){
   const first=!G.ura;G.ura=(G.ura||0)+1;sfx('g5');
   const pages=['ギム総書記「ぐ…ぐおおお… わしの… 党が……」','怒りと 憎しみに 満ちた ギム総書記を\nついに 打ち倒した！'];
   if(first){G.cap2=1;G.tokenRight=1;pages.push('体の 奥から 力が あふれてくる…！','キャラの レベル上限が\n9999 → 19999 に 上がった！','さらに 地下金庫から\n「仮想通貨 発行権」を 手に入れた！\n銀行の 融資窓口で 発行できる。');}
-  else{G.items.b[3]+=200;G.items.o[3]+=200;G.coins+=5000000;pages.push('経験値書（極）×200・鍛錬鉱（極）×200\n5,000,000イェソを 手に入れた！');}
+  else{G.items.b[3]+=2000;G.items.o[3]+=2000;G.coins+=5000000;pages.push('経験値書（極）×2,000・鍛錬鉱（極）×2,000\n5,000,000イェソを 手に入れた！');}
   save();dialog(pages,returnField);
 }
 /* ===================== 仮想通貨の 発行 ===================== */
