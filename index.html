@@ -2711,6 +2711,7 @@ function advanceDay(){
   B.terms=B.terms.filter(tm=>{if(G.day>=tm.end){const pay=Math.floor(tm.amt*(1+tm.rate*tm.days));B.sav+=pay;msgs.push(`${tm.days}日定期が 満期に なった。\n${fmt(pay)}イェソが 普通預金に 入った。`);return false;}return true;});
   const mv=(o,mu,sig,min)=>{o.p=Math.max(min,o.p*Math.exp(mu+sig*gauss()));o.h.push(o.p);if(o.h.length>30)o.h.shift();};
   mv(M.nisa,.0012,.015,100);mv(M.cry,.001,.11,.01);
+  if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
   msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily());
@@ -2766,7 +2767,9 @@ function bankTerm(){
 }
 function bankAsset(k){
   const B=G.bank,o=G.mk[k],val=B[k]*o.p,cost=B[k+'Cost'],pl=val-cost,tax=k==='cry';
-  choice(`${assetName[k]}　価格 ${pf(o.p)}イェソ\n保有 評価額 ${fmt(val)}イェソ（損益 ${pl>=0?'+':''}${fmt(pl)}）\n${tax?'もうけの 20%は 税金です。':'NISAは もうけに 税金が かかりません。'}`,['買う','半分 売る','全部 売る'],r=>{
+  const upT=k==='cry'&&(G.items.cryup||0)>0;
+  choice(`${assetName[k]}　価格 ${pf(o.p)}イェソ${k==='cry'&&G.cryUp>0?`（高騰中 あと${G.cryUp}日）`:''}\n保有 評価額 ${fmt(val)}イェソ（損益 ${pl>=0?'+':''}${fmt(pl)}）\n${tax?'もうけの 20%は 税金です。':'NISAは もうけに 税金が かかりません。'}`,['買う','半分 売る','全部 売る',...(upT?[`高騰券を 使う（${G.items.cryup}枚）`]:[])],r=>{
+    if(r===3&&upT){G.items.cryup--;G.cryUp=(G.cryUp||0)+2;sfx('g5');save();dialog(['仮想通貨高騰券を 使った！','これから 2日間（ゲーム内）\n仮想通貨が 高騰する！','（ヤオコインと 自分の 仮想通貨が 対象）']);return;}
     if(r===0)fromSrc('いくら 分 買いますか？',a=>{B[k]+=a/o.p;B[k+'Cost']+=a;sfx('coin');save();toast(`${fmt(a)}イェソ 分 買いました`);});
     if(r===1||r===2){if(B[k]<=0){toast('持っていません');return;}const part=r===1?.5:1,u=B[k]*part,c=B[k+'Cost']*part,get=u*o.p,gain=get-c,tx=tax&&gain>0?Math.floor(gain*.2):0;
       B[k]-=u;B[k+'Cost']-=c;if(r===2){B[k]=0;B[k+'Cost']=0;}const net=Math.floor(get-tx);sfx('coin');save();
@@ -3221,6 +3224,25 @@ function cardMenu(){
     choice(`どうする？\n支払い方法：${payName()}\n今回の 請求予定 ${fmt(Math.ceil(C.bill||0))}イェソ`,[`支払い方法を 変える（いま：${payName()}）`,'このまま','解約する'],k=>{if(k===0){choice('支払い方法を えらぶ',['毎回 えらぶ','いつも クレジット','いつも 現金'],j=>{if(j<0)return;G.payMode=['ask','credit','cash'][j];save();toast(`支払い方法：${payName()}`);},96);return;}if(k===2){if(C.brand==='teiai'&&((G.cf&&G.cf.debt>0)||C.bill>0)){dialog('帝愛の 黒服「借金が 残って いますね。\n完済するまで 退会は 認めません。」');return;}if(C.late){dialog('延滞中の カードは 解約できません。\n先に 延滞分を 支払って ください。');return;}
     choice('解約すると 利用額と ランクが\n0に もどります。 解約しますか？',['解約する','やめる'],j=>{if(j===0){if(C.bill>0){const b=Math.ceil(C.bill);if(G.coins+G.bank.sav<b){dialog('未払いの 請求を 精算できる お金が ない…');return;}debitAuto(b);}G.card=null;G.payMode='cash';save();dialog('カードを 解約した。\n（未払いの 請求は 普通預金・財布から 精算した）');}},96);}},120);});
 }
+/* ===================== リリース記念 ログインボーナス（現実の日付・7日分） ===================== */
+const LB_START='2026-11-12',LB_END='2026-11-30';
+const LB=[{t:'1,000,000イェソ\n仮想通貨高騰券',s:'100万\n高騰券',give:()=>{noCount(()=>{G.coins+=1000000;});G.items.cryup=(G.items.cryup||0)+1;}},
+  {t:'ガチャチケット×30',s:'ガチャ券\n×30',give:()=>{G.items.tk+=30;}},
+  {t:'経験値書（極）×100\n鍛錬鉱（極）×100',s:'書・鉱\n極×100',give:()=>{G.items.b[3]+=100;G.items.o[3]+=100;}},
+  {t:'SR以上確定チケット×20',s:'SR確定\n×20',give:()=>{G.items.srtk+=20;}},
+  {t:'5,000,000イェソ',s:'500万\nイェソ',give:()=>{noCount(()=>{G.coins+=5000000;});}},
+  {t:'UR確定チケット×5',s:'UR確定\n×5',give:()=>{G.items.urtk=(G.items.urtk||0)+5;}},
+  {t:'UR確定チケット×50',s:'UR確定\n×50',give:()=>{G.items.urtk=(G.items.urtk||0)+50;}}];
+const jstDay=()=>Math.floor((Date.now()+9*3600000)/86400000),jstOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000);
+function lbCheck(){if(!G)return false;const d=jstDay();if(d<jstOf(LB_START)||d>jstOf(LB_END))return false;const L=G.lb||(G.lb={n:0,last:0});return L.n<LB.length&&L.last!==d;}
+function lbShow(){const L=G.lb||(G.lb={n:0,last:0});const i=L.n;L.n++;L.last=jstDay();LB[i].give();save();sfx('lvup');let t=0;
+  push({upd(){t++;if(t>30&&(I.A||I.B)){pop();dialog([`リリース記念 ログインボーナス ${i+1}日目！`,`${LB[i].t.replace('\n','・')}を 手に入れた！`,...(i===0?['仮想通貨高騰券は 銀行の「仮想通貨」で 使えます。\n使うと 2日間（ゲーム内）仮想通貨が 高騰！']:[]),...(i<LB.length-1?[`明日も ログインしてね！（全${LB.length}日）`]:['7日間 ありがとう！ これからも 八百万クエストを\nよろしく おねがいします！'])]);}},
+    drw(){R(0,0,W,H,'rgba(0,0,0,.75)');win(8,22,240,188,'#f8b800');big('リリース記念',128,34,'#f8b800','center',14);txt('ログインボーナス（7日間）',128,52,'#fcfcfc','center');
+      for(let k=0;k<7;k++){const x=k<4?18+k*56:46+(k-4)*56,y=k<4?68:134,got=k<=i,now=k===i,c=k===6?'#f8d878':'#3cbcfc';
+        R(x,y,50,58,now?(frame>>3)%2?'#7c4c10':'#5c3c08':got?'#24242c':'#14141c');R(x,y,50,1,c);R(x,y+57,50,1,c);R(x,y,1,58,c);R(x+49,y,1,58,c);
+        txt(`${k+1}日目`,x+25,y+5,k===6?'#f8d878':'#bcbcbc','center');LB[k].s.split('\n').forEach((l,j)=>txt(l,x+25,y+22+j*12,got&&!now?'#7c7c7c':'#fcfcfc','center',48));
+        if(got&&!now){txt('済',x+40,y+44,'#d82800','center');}}
+      if(t>30)txt('Zで うけとる',128,198,(frame>>4)%2?'#fcfcfc':'#7c7c7c','center');}});}
 function teiaiChika(){const P=G.chikaPending;G.chikaPending=null;const days=P.days,wage=100;
   dialog(['黒服たちが 現れ 両腕を つかまれた！','帝愛の 取り立て人「TEIAI CARDの ご利用、\nありがとうございました。」','「延滞分は 地下で 働いて 返して いただきます。」'],()=>{
     cutscene(360,t=>{R(0,0,W,H,'#100800');for(let k=0;k<20;k++)R((k*37)%W,(k*61)%H,2,2,'#2c1c08');R(0,150,W,90,'#3c2808');
@@ -3757,6 +3779,7 @@ function drawTopBtn(){
 function update(){
   frame++;readInput();
   if(G&&G.chikaPending&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr))teiaiChika();
+  else if(G&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr)&&frame%30===0&&lbCheck())lbShow();
   const s=top();if(s)s.upd();
   if(toastT>0)toastT--;
   timers=timers.filter(t=>{if(--t.n<=0){t.f();return false;}return true;});
