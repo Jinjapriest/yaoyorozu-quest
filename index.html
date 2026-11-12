@@ -3598,6 +3598,8 @@ function shugyoFac(){
 function palaceFac(vi){
   const D=dinfo(VIL[vi]);
   if(!occupied(vi)){dialog(`${D.hall}は 町の 資料館に なっている。\n「圧政の 記録」が 展示されている。`);return;}
+  if(D.gim&&TW&&TW.vi===vi){const left=TW.C.reduce((n,row)=>n+row.filter(c=>c&&c.t==='trift').length,0);
+    if(left>0){dialog(['党本部の 扉が 黒い 魔力に 覆われている…',`残滓の 魔力は 町の 烈穴から 流れこんでいるようだ。\n烈穴を すべて 塞がないと 中に 入れない。\n（残り ${left}か所）`]);return;}}
   dialog([`親衛隊「止まれ！ ここは ${D.hall}だ！」`,`${D.boss}「ほう… わが 町に 逆らう 者が いるとはな。」`],()=>{
     choice(`${D.boss}に 挑みますか？\n（かなり 強い 相手です${VIL[vi].tier>=11?'・推奨Lv4800':''}）`,['挑む','やめる'],k=>{if(k===0){while(stack.length>1)pop();startBattle(false,null,{kind:'dict',vi});}});});
 }
