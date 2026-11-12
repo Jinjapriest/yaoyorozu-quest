@@ -709,6 +709,10 @@ const GOUT={x0:130,y0:64,x1:186,y1:99};
   VIL.push({x:182,y:92,name:'外縁の砦町',shrine:'砦八幡宮',rank:5,tier:12,size:2,from:K+3,desc:'帝国の 壁を 見張る 古い 砦の 町'});
   VIL.push({x:172,y:72,name:'廃線沿いの村',shrine:'鉄道神社',rank:1,tier:12,size:0,from:K+3,depop:'ruin',target:150,desc:'帝国の 鉄道が 止まり 人が 去った 村'});
   VIL.push({x:158,y:94,name:'峠の集落',shrine:'峠の神の祠',rank:1,tier:12,size:0,from:K,depop:'aging',target:150,desc:'壁の 影に なり 日の 当たらない 集落'});}
+/* 財政破綻した 村（不活動法人の 村の 一部） */
+['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
+const hatan=vi=>{const v=VIL[vi];if(!v||!v.hatan)return false;const D=G&&G.depop&&G.depop['v'+vi];return !(D&&D.revived);};
+const taxRate=vi=>hatan(vi)?.4:.15;
 const GCAP=()=>VIL.findIndex(v=>v.gm==='cap');
 const inGun=(x,y)=>x>=GWALL.x0&&x<=GWALL.x1&&y>=GWALL.y0&&y<=GWALL.y1;
 const ISLES=[{cx:78,cy:15,rx:9,ry:7},{cx:87,cy:40,rx:9,ry:8},{cx:117,cy:44,rx:6,ry:5},{cx:117,cy:116,rx:7,ry:6}];
@@ -1269,7 +1273,7 @@ function doPray(rank,name,key){
   fullHeal();save();return lines;
 }
 function openShop(vi){
-  const S=SIZES[VIL[vi].size],off=1-S.off/100,PR=[60,550,5000,450000,50000000].map(p=>Math.ceil(p*off));
+  const S=SIZES[VIL[vi].size],off=(1-S.off/100)*(hatan(vi)?1.5:1),PR=[60,550,5000,450000,50000000].map(p=>Math.ceil(p*off));
   const list=[{name:'やくそう',price:Math.ceil(30*off),give:n=>G.items.herb+=n}];
   for(let k=0;k<=S.shop;k++){list.push({name:BKN(k),price:PR[k],give:n=>G.items.b[k]+=n});}
   for(let k=0;k<=S.shop;k++){list.push({name:ORN(k).replace('（純度100%）',''),price:PR[k],give:n=>G.items.o[k]+=n});}
@@ -2278,7 +2282,7 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
-    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship?120:88);if(!TW.ship)txt(SIZES[TW.sz].n,136,10,'#7ee07e','right');
+    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship?120:88);if(!TW.ship)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right');}
   }
@@ -2292,11 +2296,11 @@ function enterVillage(i,atShrine){
   curVil=i;TW=buildTown(i);if(atShrine){TW.py=4+(TW.top||0);}
   townScr.mv=null;setBase(townScr);playBGM('village');
   const first=!G.seen['v'+i];G.seen['v'+i]=1;
-  const msgs=[...(first?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc:''}`]:[]),...jobProgress('deliver',i)];
+  const msgs=[...(first?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc:''}`]:[]),...(first&&hatan(i)?['この 村は 財政破綻して\n財政再生団体に なっている…','税金が 高く 店の 値段も 5割増し。\n不動産の 固定資産税も 重く\n入居者も なかなか 集まらない。','（村を 再生すれば 財政も 再建される）']:[]),...jobProgress('deliver',i)];
   save();if(msgs.length)dialog(msgs);
 }
 function leaveTown(){TW=null;startField();}
-const tierCost=b=>Math.ceil(b*Math.pow(1.7,VIL[curVil].tier)*(1-SIZES[VIL[curVil].size].off/100));
+const tierCost=b=>Math.ceil(b*Math.pow(1.7,VIL[curVil].tier)*(1-SIZES[VIL[curVil].size].off/100)*(hatan(curVil)?1.5:1));
 function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
@@ -3890,7 +3894,7 @@ function reS(){if(!G.re)G.re={p:[],pend:0,total:0};return G.re;}
 const landMul=vi=>{const v=VIL[vi],D=v.depop?dep(vi):null;return LAND[Math.min(6,v.size)]*(D&&!D.revived?.2:1);};
 const reCap=(vi,t)=>{const v=VIL[vi],sz=v.size;return{akiya:sz<=1||v.depop?3:1,chuko:sz>=1&&sz<=3?4:sz>=4?2:0,office:sz>=3?sz:0,tower:sz>=5?2:0,lot:2+sz}[t]||0;};
 const reOwned=(vi,t)=>reS().p.filter(p=>p.vi===vi&&(p.t===t||(t==='akiya'&&p.t==='reno')||(t==='lot'&&RET[p.t].build))).length;
-const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi)*(p.fu>G.day?.8:1));
+const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi)*(p.fu>G.day?.8:1)*(hatan(p.vi)?.5:1));
 const reDayRent=()=>reS().p.reduce((a,p)=>a+rentOf(p),0);
 function rePay(price,cb){const B=G.bank;
   if(G.coins<price&&B.sav<price){dialog(`お金が たりない。\n（${fmt(price)}イェソ 必要）`);return;}
@@ -3900,15 +3904,15 @@ function rePay(price,cb){const B=G.bank;
 function reDaily(){const S=G.re;if(!S||!S.p.length)return[];const msgs=[];
   for(const p of S.p){if(p.done&&p.done===G.day)msgs.push(`${VIL[p.vi].name}の ${RET[p.t].n}が 完成した！\n入居者の 募集を 始めた。`);}
   const occ=.85+rnd()*.15;
-  for(const p of S.p){const r=Math.round(rentOf(p)*occ);if(!r)continue;
+  for(const p of S.p){const hb=hatan(p.vi),r=Math.round(rentOf(p)*(hb?.35+rnd()*.3:occ));if(!r)continue;
     if(p.ar){p.ar.amt+=r;
       if(p.ar.law&&G.day>=p.ar.law){const got=Math.floor(p.ar.amt*.7);G.bank.sav+=got;msgs.push(`裁判所の 支払督促で\n${VIL[p.vi].name}の 滞納家賃を 回収！\n${fmt(got)}イェソが 普通預金に 入った。（7割）`);p.ar=null;}
       else if(!p.ar.law&&G.day-p.ar.since>=30){msgs.push(`${VIL[p.vi].name}の ${RET[p.t].n}で\n${p.ar.n}が 夜逃げした！\n滞納家賃 ${fmt(p.ar.amt)}イェソは 回収不能…`);p.ar=null;}}
-    else{S.pend+=r;if(rnd()<.004){p.ar={n:TENANTS[Math.floor(rnd()*TENANTS.length)],amt:0,since:G.day};msgs.push(`【家賃滞納】${VIL[p.vi].name}の ${RET[p.t].n}\n入居者「${p.ar.n}」の 家賃が 入らない！\n（開拓所で 取り立てできる）`);}}}
-  if(G.day%RE_PAYDAY===0&&S.pend>0){const net=Math.floor(S.pend*RE_KEEP);
+    else{S.pend+=r;S.tx=(S.tx||0)+Math.round(r*taxRate(p.vi));if(rnd()<(hb?.012:.004)){p.ar={n:TENANTS[Math.floor(rnd()*TENANTS.length)],amt:0,since:G.day};msgs.push(`【家賃滞納】${VIL[p.vi].name}の ${RET[p.t].n}\n入居者「${p.ar.n}」の 家賃が 入らない！\n（開拓所で 取り立てできる）`);}}}
+  if(G.day%RE_PAYDAY===0&&S.pend>0){const tx=S.tx!=null?S.tx:Math.floor(S.pend*.15),net=Math.max(0,S.pend-tx);S.tx=0;
     if(G.reco){const sh=Math.min(1,stockOwn('reco')/RE_OUT),mine=Math.floor(net*sh);G.bank.sav+=mine;S.total+=mine;
       msgs.push(`${G.reco.n}の 決算日！\n家賃収入 ${fmt(net)}イェソ（税・管理費 引き後）\n持株 ${Math.round(sh*100)}%分の 配当 ${fmt(mine)}イェソが\n普通預金に 入った。`);}
-    else{G.bank.sav+=net;S.total+=net;msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・固定資産税を\n引いた ${fmt(net)}イェソが 普通預金に 入った。`);}
+    else{G.bank.sav+=net;S.total+=net;msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・税金\n${fmt(tx)}イェソを 引いた ${fmt(net)}イェソが\n普通預金に 入った。`);}
     S.pend=0;}
   return msgs;}
 /* 町の 物件（建物に 話しかける／不動産メニュー） */
@@ -3916,7 +3920,7 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
   if(!reOn()){dialog(TW&&TW.city?'オフィスビルだ。 用は なさそうだ。':'ふつうの 民家だ。');return;}
   if(occupied(vi)){dialog('独裁者の 支配下では\n不動産の 取引は できない…');return;}
   const mine=S.p.filter(p=>p.vi===vi),lots=mine.filter(p=>p.t==='lot'),ak=mine.filter(p=>p.t==='akiya');
-  const head=`${v.name}の 不動産（地価 ×${lm<1?lm.toFixed(2):lm}）\n所有 ${mine.length}件　家賃 ${fmt(mine.reduce((a,p)=>a+rentOf(p),0))}/日`;
+  const head=`${v.name}の 不動産（地価 ×${lm<1?lm.toFixed(2):lm}）\n所有 ${mine.length}件　家賃 ${fmt(mine.reduce((a,p)=>a+rentOf(p),0))}/日`+(hatan(vi)?'\n財政破綻：税40%・家賃半分・入居率 低':'');
   const ops=[{t:'物件を 買う'},{t:`空き地に 建てる（${lots.length}区画）`,dis:!lots.length},{t:`空き家を リフォーム（${ak.length}軒）`,dis:!ak.length},{t:'物件を 売る',dis:!mine.length},{t:'やめる'}];
   choice(head,ops,k=>{
     if(k===0){const L=['akiya','chuko','office','tower','lot'].filter(t=>reCap(vi,t)>0).map(t=>({t,left:reCap(vi,t)-reOwned(vi,t),price:Math.round(RET[t].base*lm)}));
@@ -3935,14 +3939,14 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
   },150);}
 /* メニュー：所有物件の 一覧 */
 const RE_OUT=100000,RE_MIN=5;
-const reNet=()=>reDayRent()*.925*RE_KEEP;
+const reNet=()=>reS().p.reduce((a,p)=>a+rentOf(p)*(hatan(p.vi)?.5:.925)*(1-taxRate(p.vi)),0);
 const reFair=()=>Math.max(1,reNet()*250/RE_OUT);
 function recoDef(){const C=G.reco;return{id:'reco',n:C.n,sn:C.n.slice(0,9),vol:.02,out:RE_OUT,top:['機関投資家',30000],perk:'経験値祝詞・極上鉱石 ×1',give:k=>{G.items.b[4]=(G.items.b[4]||0)+k;G.items.o[4]=(G.items.o[4]||0)+k;},ipo:'re'};}
 const reRented=()=>reS().p.filter(p=>RET[p.t].rent>0&&!(p.done>G.day)).length;
 function reList(){const S=reS(),nxt=RE_PAYDAY-(G.day%RE_PAYDAY);
   if(!S.p.length){dialog(['所有物件は まだ ない。','町の 民家や ビルに 話しかけると\n売り物件を 見られる。']);return;}
   listPick(`所有物件 ${S.p.length}件　家賃 ${fmt(reDayRent())}/日`,S.p.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')}　${RET[p.t].n}`,r:p.done>G.day?`工事中あと${p.done-G.day}日`:fmt(rentOf(p))})),()=>{},
-    ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に ${G.reco?'決算':'振込'}）\nこれまでの 受取 ${fmt(S.total)}イェソ\n管理費・固定資産税 15%`);}
+    ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に ${G.reco?'決算':'振込'}）\nこれまでの 受取 ${fmt(S.total)}イェソ\n管理費・税 15%（財政破綻の 村は 40%）`);}
 function reIpo(){const n=reRented();
   if(n<RE_MIN){dialog(['証券会社「上場するには 家賃の 入る 物件が\n'+RE_MIN+'件 以上 必要です」',`（いま ${n}件）`]);return;}
   askText('不動産会社の 名前を 決めてください',[{label:'会社名（12文字まで）',placeholder:'例：八百万リアルティ',max:12}],v=>{if(!v)return;const nm=String(v[0]||'').trim();if(!nm)return;
@@ -3963,7 +3967,7 @@ function kaitakuFac(){
     C?{t:`${C.n.slice(0,8)}（上場済み）`,dis:true}:n>=RE_MIN?'不動産会社を 上場する':{t:`上場（物件 ${RE_MIN}件 以上）`,dis:true},'やめる'],k=>{
     if(k===0){reList();return;}
     if(k===1){const T=VIL.map((v,i)=>i).filter(i=>(G.seen['v'+i]||G.warps.includes(i))&&!VIL[i].tokoyo);
-      listPick('どの 町の 不動産？',T.map(i=>{const m=S.p.filter(p=>p.vi===i).length;return{t:VIL[i].name,r:m?`所有${m}件`:`地価×${landMul(i)<1?landMul(i).toFixed(2):landMul(i)}`,col:m?'#7ee07e':null};}),i=>reTown(T[i]),i=>{const v=VIL[T[i]];return v?`${v.name}（${SIZES[v.size].n}）\n建てられる 最大：${['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>RET[t].n).pop()}`:'';});return;}
+      listPick('どの 町の 不動産？',T.map(i=>{const m=S.p.filter(p=>p.vi===i).length;return{t:VIL[i].name+(hatan(i)?'（破綻）':''),r:m?`所有${m}件`:`地価×${landMul(i)<1?landMul(i).toFixed(2):landMul(i)}`,col:hatan(i)?'#fc7460':m?'#7ee07e':null};}),i=>reTown(T[i]),i=>{const v=VIL[T[i]];return v?`${v.name}（${SIZES[v.size].n}）\n建てられる 最大：${['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>RET[t].n).pop()}`:'';});return;}
     if(k===2){collectScr();return;}
     if(k===3){choice(`空き家 ${ak.length}軒を まとめて リフォーム\n費用 合計 ${fmt(akCost)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(akCost,()=>{ak.forEach(p=>{p.paid+=Math.round(REN_COST*Math.max(landMul(p.vi),.5));p.t='reno';});sfx('lvup');dialog(`空き家 ${ak.length}軒の リフォームが 完了した！`);});},96);return;}
     if(k===4){const B=['apart','mansion','shoubiru','btower'];
