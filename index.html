@@ -1024,6 +1024,8 @@ function drawWIcon(id,x,y,sc=1){
 function drawEnemy(e,x,y,t){
   const c1=e.c1,c2=e.c2,K='#000000',Wt='#fcfcfc';
   switch(e.shape){
+    case 'kendo':drawKendo(x,y,t);break;
+    case 'kgod':drawKGod(x,y,t);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -1929,7 +1931,7 @@ function battleUpd(){
 const battleScr={full:true,upd:battleUpd,drw(a){
   const sx=BT.shake>0?((frame&2)?3:-3):0;
   R(0,0,W,H,'#000');ctx.save();ctx.translate(sx,0);
-  R(6,48,244,98,BT.bg[0]);R(6,118,244,28,BT.bg[1]);R(6,118,244,1,'#000');
+  if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='minus')drawMinusBG(6,48,244,98,frame);else if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='teio'){R(6,48,244,98,'#0c0814');for(let x=14;x<244;x+=30){R(x,52,6,66,'#1c1428');R(x,52,6,2,'#5c4410');}R(6,118,244,28,'#241c30');R(108,118,40,28,'#5c0000');R(108,118,40,1,'#a07800');}else{R(6,48,244,98,BT.bg[0]);R(6,118,244,28,BT.bg[1]);R(6,118,244,1,'#000');}
   R(6,48,244,1,'#fcfcfc');R(6,145,244,1,'#fcfcfc');R(6,48,1,98,'#fcfcfc');R(249,48,1,98,'#fcfcfc');
   BT.en.forEach((e,i)=>{if(!e.alive&&e.die<=0)return;if(e.flash>0&&(frame&2))return;if(!e.alive&&(e.die&2))return;drawEnemy(e,e.x,e.y,frame);});
   if(BT.ph==='cmd'&&BT.sub&&BT.sub.kind==='enemy'&&a){const s=BT.sub,e=BT.en[s.list[s.m.sel]];if(e&&frame%30<20)txtS('▼',e.x-4,e.y-e.h-14,'#f8b800');
@@ -3772,6 +3774,54 @@ function kaihoWin(pages){
   const u=[...new Set(msgs)];if(u.length)pages.push(...u.slice(0,3));
 }
 
+/* ===== 錨ケンドウ（オリジナル意匠）と 4次元的な マイナス宇宙 ===== */
+const ANCHOR=['..###..','..#.#..','..###..','#######','...#...','...#...','#..#..#','##.#.##','.#####.'];
+function anchorG(x,y,k,col){for(let r=0;r<9;r++)for(let c=0;c<7;c++)if(ANCHOR[r][c]==='#')R(x+(c-3)*k,y+r*k,k,k,col);}
+function pixLine(x0,y0,x1,y1,col,cl){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy,n=0;
+  while(n++<600){if(!cl||(x0>=cl[0]&&y0>=cl[1]&&x0<cl[2]&&y0<cl[3]))R(x0,y0,1,1,col);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+/* 回転する 4次元超立方体（テセラクト）の 射影 */
+function tesseract(cx,cy,sc,a,b,col,cl){const P=[];
+  for(let i=0;i<16;i++){let x=i&1?1:-1,y=i&2?1:-1,z=i&4?1:-1,w=i&8?1:-1;
+    let x2=x*Math.cos(a)-w*Math.sin(a),w2=x*Math.sin(a)+w*Math.cos(a);let y2=y*Math.cos(b)-z*Math.sin(b),z2=y*Math.sin(b)+z*Math.cos(b);
+    const k4=1/(2.6-w2),X=x2*k4,Y=y2*k4,Z=z2*k4;const c3=Math.cos(a*.7),s3=Math.sin(a*.7),X2=X*c3-Z*s3,Z2=X*s3+Z*c3,k3=1/(2.4-Z2);
+    P.push([cx+X2*k3*sc,cy+Y*k3*sc]);}
+  for(let i=0;i<16;i++)for(let j=0;j<4;j++){const k=i^(1<<j);if(k>i)pixLine(P[i][0],P[i][1],P[k][0],P[k][1],col,cl);}}
+function drawMinusBG(x0,y0,w,h,t){const cl=[x0,y0,x0+w,y0+h],cx=x0+w/2,vy=y0+h*.48;
+  R(x0,y0,w,h,'#04000a');
+  /* 奥へ 無限に 続く 入れ子の 枠（4次元の 廊下） */
+  for(let i=0;i<9;i++){const f=Math.pow(.72,i+((t/90)%1)),ww=w*f,hh=h*f*.9,col=['#1c0a2c','#160824','#10061c'][i%3];
+    pixLine(cx-ww/2,vy-hh/2,cx+ww/2,vy-hh/2,col,cl);pixLine(cx-ww/2,vy+hh/2,cx+ww/2,vy+hh/2,col,cl);pixLine(cx-ww/2,vy-hh/2,cx-ww/2,vy+hh/2,col,cl);pixLine(cx+ww/2,vy-hh/2,cx+ww/2,vy+hh/2,col,cl);}
+  /* 床と 天井が 鏡写しの 格子 */
+  for(let k=-6;k<=6;k++){pixLine(cx,vy,cx+k*w/6,y0+h,'#140a24',cl);pixLine(cx,vy,cx+k*w/6,y0,'#0e061a',cl);}
+  for(let i=1;i<6;i++){const d=Math.pow(i/6,2)*(h*.52);pixLine(x0,vy+d,x0+w,vy+d,'#140a24',cl);pixLine(x0,vy-d,x0+w,vy-d,'#0e061a',cl);}
+  /* 回転する 超立方体 */
+  tesseract(cx,vy,Math.min(w,h)*.9,t/70,t/110,'#3a2060',cl);
+  tesseract(x0+w*.14,y0+h*.24,h*.32,-t/50,t/80,'#2a1848',cl);tesseract(x0+w*.86,y0+h*.72,h*.36,t/60,-t/90,'#2a1848',cl);
+  /* 保存された 記憶の 粒 */
+  for(let i=0;i<26;i++){const px=x0+((i*53+t*(1+i%3)*.2)%w),py=y0+((i*37)%h);R(px,py,1,1,i%4?'#6844a0':'#a4e4fc');}}
+/* 帝王 錨ケンドウ：白髪の 総髪・軍服と 和装の 礼装・錨の 紋・法典 */
+function drawKendo(x,y,t){const b=(t>>5)&1;
+  R(x-11,y-34,22,34,'#141c34');R(x-11,y-34,22,2,'#24305c');R(x-13,y-34,4,3,'#f8b800');R(x+9,y-34,4,3,'#f8b800');
+  R(x-2,y-34,4,34,'#fcfcfc');R(x-1,y-34,2,34,'#d8d8d8');R(x-11,y-16,22,3,'#7c0000');R(x-8,y-30,1,10,'#f8b800');
+  anchorG(x+6,y-29,1,'#f8b800');
+  R(x-15,y-31,4,16,'#141c34');R(x+11,y-31,4,16,'#141c34');R(x-15,y-16,4,3,'#d8c0a8');R(x+11,y-16,4,3,'#d8c0a8');
+  R(x+10,y-22,8,10,'#3c2410');R(x+11,y-21,6,8,'#5c3c18');R(x+10,y-18,8,1,'#f8b800');
+  R(x-9,y-4,7,4,'#000');R(x+2,y-4,7,4,'#000');
+  R(x-6,y-47,12,13,'#d8c0a8');R(x-7,y-50,14,5,'#d8d8d8');R(x-8,y-48,2,10,'#bcbcbc');R(x+6,y-48,2,10,'#bcbcbc');R(x-5,y-51,10,2,'#fcfcfc');
+  R(x-4,y-43,3,1,'#000');R(x+1,y-43,3,1,'#000');if(b){R(x-4,y-42,3,1,'#5c5c5c');R(x+1,y-42,3,1,'#5c5c5c');}
+  R(x-3,y-38,6,1,'#7c4c3c');R(x-4,y-39,1,1,'#7c4c3c');R(x+3,y-39,1,1,'#7c4c3c');}
+/* 人間を捨てた神：黒い 衣・無貌の 白い 面・ほどけた 法典の 帯・錨の 後光 */
+function drawKGod(x,y,t){const top=y-84;
+  for(let a=0;a<360;a+=4){const r=26+((a/4)%3===0?2:0),q=a*Math.PI/180;if((a+t)%40<28)R(x+Math.cos(q)*r,top+26+Math.sin(q)*r,1,1,'#7c5c10');}
+  anchorG(x,top+1,1,'#7c5c10');
+  for(let s=0;s<6;s++){const side=s%2?1:-1,ph=t/20+s;for(let k=0;k<22;k++){const px=x+side*(12+k*1.7),py=top+40+s*6+Math.sin(ph+k*.35)*4+k*.6;R(px,py,3,2,k%5===0?'#5c5c64':'#a4a4ac');if(k%5===2)R(px,py,1,1,'#3c3c44');}}
+  for(let r=0;r<56;r++){const w=10+Math.floor(r*.6);R(x-w/2,top+30+r,w,1,r%6?'#0c0814':'#1c1428');R(x-w/2,top+30+r,1,1,'#3c2860');R(x+w/2-1,top+30+r,1,1,'#3c2860');}
+  R(x-1,top+32,2,52,'#3c2c08');
+  {const MW=[8,12,14,16,16,16,16,16,16,16,16,16,15,15,14,13,12,11,10,8,6];MW.forEach((mw,r)=>{R(x-mw/2,top+11+r,mw,1,r<2?'#fcfcfc':r>15?'#bcbcc4':'#e8e8f0');});}
+  R(x-5,top+24,4,1,'#000');R(x+1,top+24,4,1,'#000');R(x-5,top+25,1,1,'#3c3c44');R(x+4,top+25,1,1,'#3c3c44');anchorG(x,top+13,1,'#7c5c10');
+  for(let i=0;i<8;i++){const q=t/30+i*.8;R(x+Math.cos(q)*34,top+50+Math.sin(q)*10,2,2,'#6844a0');}}
+
 /* ===================== グンマー帝国 シナリオ（人類保管計画） ===================== */
 var GM_F=33;
 function gmS(){if(!G.gm)G.gm={ch:0};return G.gm;}
@@ -3787,8 +3837,7 @@ function drawScene(k){
   if(k==='court'){R(0,0,W,H,'#3c2000');R(0,0,W,30,'#503000');R(40,40,176,50,'#7c4c10');R(40,40,176,4,'#a05000');pc(128,62,10,'#f8b800');R(127,52,2,20,'#7c4c10');R(119,60,18,2,'#7c4c10');
     R(108,90,40,20,'#24188c');R(120,74,16,16,'#fcbcb0');R(116,72,24,4,'#000');return;}
   if(k==='vanish'){R(0,0,W,H,'#000');for(let i=0;i<60;i++){const x=(i*41)%W,y=(H-((frame*(1+i%3)+i*37)%H));R(x,y,2,2,i%2?'#fcfcfc':'#a4e4fc');}return;}
-  if(k==='minus'){R(0,0,W,H,'#100018');for(let i=0;i<50;i++){const x=(i*61+frame/4)%W,y=(i*37)%H;R(x,y,1,1,i%3?'#f878f8':'#fcfcfc');}
-    R(30,60+Math.sin(frame/30)*4,40,20,'#5c5c64');R(180,100+Math.cos(frame/40)*4,50,30,'#3c3c44');R(186,104,10,8,'#f8d878');R(100,150,60,12,'#5c5c64');return;}
+  if(k==='minus'){drawMinusBG(0,0,W,H,frame);return;}
   R(0,0,W,H,'#000');}
 function scene(k,pages,cb){push({full:true,upd(){},drw(){drawScene(k);}});dialog(pages,()=>{pop();cb&&cb();});}
 function titleCard(text,cb){let t=0;push({full:true,upd(){t++;if(t>90&&(I.A||I.B)){pop();cb&&cb();}},drw(){R(0,0,W,H,'#000');const a=Math.min(1,t/60);if(a>.3)txt(text,128,112,a>.7?'#fcfcfc':'#7c7c7c','center',240);if(t>90&&(frame>>4)&1)txt('▼',128,150,'#7c7c7c','center');}});}
@@ -3823,13 +3872,13 @@ const GSTG={
   keibi:{waves:1,f:()=>.55,mk:()=>[['宮廷警備隊','bones','#24188c','#f8b800',1.3,1.1],['宮廷警備隊','bones','#24188c','#f8b800',1.3,1.1],['警備隊長','oni','#24188c','#f8b800',5,1.4,1],['宮廷警備隊','bones','#24188c','#f8b800',1.3,1.1]],intro:()=>'宮廷警備隊に 取り囲まれた！'},
   seal:{waves:3,f:(w,sp)=>GSEAL_EN[sp.id].f+(w-1)*.03,mk:(sp,w)=>{const E=GSEAL_EN[sp.id];return w<3?[[...E.m[0],1,1],[...E.m[1],1,1],[...E.m[w-1],1,1]]:[[...E.m[0],1,1],[...E.g,8,1.4,1],[...E.m[1],1,1]];},intro:(sp)=>sp.wave<3?`${GSEALS.find(g=>g.id===sp.id).n}　第${sp.wave}区画`:`${GSEAL_EN[sp.id].g[0]}が 立ちはだかった！`},
   shi:{waves:1,f:(w,sp)=>.8+sp.n*.05,mk:(sp)=>{const S=GSH[sp.n];return[['近衛兵','bones','#24188c','#fcfcfc',1.5,1.1],[S.n,S.sh,S.c1,S.c2,10,1.5,1],['近衛兵','bones','#24188c','#fcfcfc',1.5,1.1]];},intro:(sp)=>`${GSH[sp.n].n}が 立ちはだかった！`},
-  teio:{waves:1,f:()=>.78,mk:()=>[['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2],['帝王 錨ケンドウ','oni','#fcfcfc','#f8b800',16,1.6,1],['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2]],intro:()=>'錨ケンドウ「来い、外来の 者よ！」'},
+  teio:{waves:1,f:()=>.78,mk:()=>[['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2],['帝王 錨ケンドウ','oni','#fcfcfc','#f8b800',16,1.6,1,'kendo'],['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2]],intro:()=>'錨ケンドウ「来い、外来の 者よ！」'},
   bannin:{waves:1,f:()=>.8,mk:()=>[['保管施設の 番人','bones','#3c3c3c','#3cbcfc',10,1.5,1]],intro:()=>'番人「保管 対象 外の 生体を 確認。\n排除 します」'},
-  minus:{waves:4,f:w=>w<4?.75:1,mk:(sp,w)=>w<4?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1],['保存された 嘆き','spirit','#24188c','#f878f8',1.4,1.1],['反響する 声','bat','#940084','#fcfcfc',1.4,1.1]].concat(w===3?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1]]:[]):[['人間を捨てた神 錨ケンドウ','spirit','#fcfcfc','#f8b800',24,1.8,1]],
+  minus:{waves:4,f:w=>w<4?.75:1,mk:(sp,w)=>w<4?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1],['保存された 嘆き','spirit','#24188c','#f878f8',1.4,1.1],['反響する 声','bat','#940084','#fcfcfc',1.4,1.1]].concat(w===3?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1]]:[]):[['人間を捨てた神 錨ケンドウ','spirit','#fcfcfc','#f8b800',24,1.8,1,'kgod']],
     intro:(sp)=>sp.wave<4?`マイナス宇宙　記憶の 層 ${sp.wave}\n保存された 人々の 声が 反響する…`:'人間を捨てた神「じゆうを えらぶというのか。」'}};
 const gmStage=sp=>GSTG[sp.st];
 function gmEnemies(sp,en){const d=gmStage(sp),w=sp.wave||1,F=GM_F*d.f(w,sp);
-  for(const [n,sh,c1,c2,hm,sm,boss] of d.mk(sp,w)){const e=mkEnemy(12,[n,sh,c1,c2]);for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm*F);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*sm*F);
+  for(const [n,sh,c1,c2,hm,sm,boss,look] of d.mk(sp,w)){const e=mkEnemy(12,[n,sh,c1,c2]);if(look){e.shape=look;if(look==='kgod'){e.w=90;e.h=86;}else{e.w=36;e.h=52;}}for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm*F);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*sm*F);
     if(boss){e.magic=true;e.dboss=true;e.mag=Math.max(e.mag,e.atk);}en.push(e);}}
 function startGm(st,extra){fullHeal();G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;while(stack.length>1)pop();startBattle(false,null,Object.assign({kind:'gunma',st,wave:1},extra||{}));}
 const gmGive=(b,o,u,c)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)+o;if(u)G.items.urtk=(G.items.urtk||0)+u;if(c)noCount(()=>{G.coins+=c;});
