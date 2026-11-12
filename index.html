@@ -791,7 +791,7 @@ function blessMul(){return G.bless&&G.bless.left>0?1+G.bless.pct/100:1;}
 function wstat(id){const d=WPD[id],w=G.weapons[id];if(!d||!w)return{atk:0,mag:0};const p=(d.pow??WPOW[d.rar])*(1+(w.lv-1)*.06)*(1+w.dup*.1),t=WT[d.type];return{atk:Math.round(p*t.a),mag:Math.round(p*t.m)};}
 function partyBonus(){const mk=G.party.filter(id=>CH[id]&&CH[id].special==='miko');if(!mk.length||!G.party.some(id=>isKannushi(id)))return 1;return 1+Math.max(...mk.map(id=>.1+.04*CH[id].rar));}
 function cstat(id,m){
-  const d=CH[id],c=G.chars[id],lm=1+(c.lv-1)*.08,dm=1+c.dup*.1,bl=blessMul(),w0=c.wpn&&WPD[c.wpn]?wstat(c.wpn):{atk:0,mag:0},w1=twoSlot(id)&&c.wpn2&&WPD[c.wpn2]?wstat(c.wpn2):{atk:0,mag:0},w={atk:w0.atk+w1.atk,mag:w0.mag+w1.mag};
+  const d=CH[id],c=G.chars[id],lm=1+(c.lv-1)*.08,dm=1+c.dup*.1,bl=blessMul(),gb=(w,o)=>{const k=GOD_BOOST[w]&&isGod(id)?GOD_BOOST[w]:1;return{atk:o.atk*k,mag:o.mag*k};},w0=c.wpn&&WPD[c.wpn]?gb(c.wpn,wstat(c.wpn)):{atk:0,mag:0},w1=twoSlot(id)&&c.wpn2&&WPD[c.wpn2]?gb(c.wpn2,wstat(c.wpn2)):{atk:0,mag:0},w={atk:w0.atk+w1.atk,mag:w0.mag+w1.mag};
   let atk=(d.atk*lm*dm+w.atk)*bl,mag=(d.mag*lm*dm+w.mag)*bl,def=d.def*lm*dm*bl,spd=d.spd*(1+(c.lv-1)*.012)*dm;
   const xm=isXR(id)?XR_MUL:1;if(xm>1){atk*=xm;mag*=xm;def*=xm;spd*=xm;}
   if(spearPair(id)){atk*=PAIR_MUL;mag*=PAIR_MUL;def*=PAIR_MUL;spd*=PAIR_MUL;}
@@ -829,7 +829,8 @@ const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[c.wpn,c.wpn
 const PAIR_MUL=4;
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='聖槍')return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+const GOD_BOOST={w_amanuboko:2};/* 誰でも装備できるが 神が持つと さらに強い */
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -1380,7 +1381,7 @@ function equipMenu(id,slot){
   slot=slot||'wpn';
   const list=()=>ownedWeapons().filter(w=>canEquip(id,w)&&(baseTwo(id)||slot==='wpn'||isSpear(w)||!isSpear(G.chars[id].wpn)));
   const m=mkMenu([],{x:4,y:8,w:248,rows:12,title:`${CH[id].short}の 武器${twoSlot(id)?(slot==='wpn'?'（1つめ）':'（2つめ）'):''}`});
-  const refresh=()=>{m.items=[{t:'（はずす）'},...list().map(w=>{const s=wstat(w),o=wOwner(w);return{tag:RAR[WPD[w].rar].n,tcol:RAR[WPD[w].rar].c,t:WPD[w].name+(o&&o!==id?'＊':'')+(WPD[w].type==='神宝'?'（神専用）':WPD[w].type==='仏具'?'（仏陀専用）':WPD[w].type==='飲料'?'（先輩専用）':WPD[w].type==='マイク'?'（ビート兄専用）':WPD[w].type==='狙撃銃'?'（狙撃弟専用）':''),r:xrwOk(id,w)?`攻${fmt(s.atk)} 魔${fmt(s.mag)}`:`Lv${XRW_LV+1}〜`,dis:!xrwOk(id,w),col:G.chars[id][slot]===w?'#f8b800':null};})];};refresh();
+  const refresh=()=>{m.items=[{t:'（はずす）'},...list().map(w=>{const s=wstat(w),o=wOwner(w);return{tag:RAR[WPD[w].rar].n,tcol:RAR[WPD[w].rar].c,t:WPD[w].name+(o&&o!==id?'＊':'')+(GOD_BOOST[w]?`（神なら${GOD_BOOST[w]}倍）`:WPD[w].type==='神宝'?'（神専用）':WPD[w].type==='仏具'?'（仏陀専用）':WPD[w].type==='飲料'?'（先輩専用）':WPD[w].type==='マイク'?'（ビート兄専用）':WPD[w].type==='狙撃銃'?'（狙撃弟専用）':''),r:xrwOk(id,w)?`攻${fmt(s.atk)} 魔${fmt(s.mag)}`:`Lv${XRW_LV+1}〜`,dis:!xrwOk(id,w),col:G.chars[id][slot]===w?'#f8b800':null};})];};refresh();
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r==null)return;
       if(r===0)G.chars[id][slot]=null;else{const w=list()[r-1],o=wOwner(w);if(!xrwOk(id,w)){sfx('ng');toast(`XR武器は キャラLv${XRW_LV+1}以上で 装備できる（今 Lv${G.chars[id].lv}）`);return;}if(o){if(G.chars[o].wpn===w)G.chars[o].wpn=null;if(G.chars[o].wpn2===w)G.chars[o].wpn2=null;}G.chars[id][slot]=w;}
       if(!twoSlot(id))G.chars[id].wpn2=null;fixHp(id);save();pop();toast(spearPair(id)?'ロンギヌスと カシウス… 双槍が 共鳴した！ 全ステータス +300%':'そうびを かえた');},
