@@ -3943,7 +3943,7 @@ function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS();
     dialog(pages,()=>{BT=null;scene('peace',['人間を捨てた神は 光の 中で 崩れていく…','錨ケンドウ「それでも 人間は\n過ちを 繰り返すぞ…」','答えは 言葉では なかった。\nただ 帰還の 道を 選んだ。','保管された 人々の 意識が\n元の 世界へ 帰っていく…','帝都に 人々が 戻り\n街の 灯りが ふたたび 点った。',rw],()=>{
       st.ch=7;G.townBack=null;G.pos={x:GGATE.x+1,y:GGATE.y};save();startField();
       scene('gate',['国境門に たどりついた。','最初に 捕まえた あの 衛兵が 立っている。','衛兵「おまえが ていこくを すくった えいゆうか。\n礼を いう。」','（ようやく 門を 通れる…！）','衛兵が すっと 手を 伸ばした。','「……ところで しゅっこくてがたは？」','「きそくは きそく。\nてがたが なければ とおせない。」'],()=>
-        titleCard('グンマー帝国は 今日も 平和である。',()=>{sfx('g5');dialog(['─ グンマー帝国編　完 ─','（帝都の 出国管理局で\n正式な 出国手形を もらおう）']);}));});});return;}
+        titleCard('グンマー帝国は 今日も 平和である。',()=>{sfx('g5');endingScr(()=>dialog(['（エンディングを 見終えた。\n冒険は まだまだ つづけられます）','（帝都の 出国管理局で\n正式な 出国手形を もらおう）']));}));});});return;}
   back([]);
 }
 /* 出国管理局 */
@@ -4017,19 +4017,19 @@ const XR_REWARD=[['char','izanagi'],['char','izanami'],['wpn','w_amanuboko'],['w
 function ukFinale(){
   listPick('満行の 証：好きな XRを ひとつ えらぶ',XR_REWARD.map(([k,id])=>{const d=k==='char'?CH[id]:WPD[id];const own=k==='char'?G.chars[id]:G.weapons[id];return{t:(k==='char'?'XRキャラ ':'XR武器 ')+(k==='char'?d.name.replace('全てを超越せし',''):d.name),r:own?'（かぶり）':'',col:'#f8d878'};}),i=>{
     const [k,id]=XR_REWARD[i];G.ukPend=0;if(k==='char')addChar(id);else addWeapon(id);save();sfx('g5');
-    dialog(`${k==='char'?CH[id].name:WPD[id].name}を 手に入れた！`,()=>endingScr());},()=>'選ばないと 先に 進めません');}
-function endingScr(){
+    dialog([`${k==='char'?CH[id].name:WPD[id].name}を 手に入れた！`,'大阿闍梨「…これで 裏の 峰々は 鎮まった。」','「だが 東の 海の 向こう、北方大陸の さらに 先に\n鎖国の 帝国が あると 聞く。」','「光り続ける 都… グンマー帝国。\n本当の 試練は そこに あるやもしれぬ」','（ノルデン港から 東へ 大橋を 渡ろう）']);},()=>'選ばないと 先に 進めません');}
+function endingScr(cb){
   stopBGM();playBGM('title');let t=0,y0=0;const party=G.party.slice(0,4);
   const L=[['八百万クエスト','#f8d878',2],['',0],['── 完 ──','#fcfcfc',1],['',0],['',0],
-    ['八岐大蛇の 怨念は 裏の 峰々で 鎮められ',0],['八百万の 神々の 国に','#bcbcbc'],['ふたたび 静かな 朝が おとずれた。','#bcbcbc'],['',0],['',0],
+    ['人類保管計画は 止められ',0],['グンマー帝国に 灯りが 戻った。','#bcbcbc'],['不完全でも 自分の 意思で 生きる 人々の 国に','#bcbcbc'],['ふたたび 騒がしい 朝が おとずれた。','#bcbcbc'],['',0],['',0],
     ['── STAFF ──','#f8b800'],['',0],['企画・制作','#7c7c7c'],['田村 斎','#fcfcfc',1],['（ただの 神主）','#bcbcbc'],['',0],
     ['シナリオ・ゲームデザイン','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['キャラクター・ドット絵','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],
     ['音楽・効果音','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['テストプレイ','#7c7c7c'],['遊んでくれた 友だち のみなさん','#fcfcfc'],['',0],
     ['SPECIAL THANKS','#f8b800'],['八百万の 神々','#fcfcfc'],['そして この 冒険を 遊んでくれた あなた','#fcfcfc'],['',0],['',0],
-    [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${G.boss} 撃破`,'#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
-    ['THE END','#f8d878',2],['',0],['これからも 冒険は つづく…','#bcbcbc']];
+    [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${G.boss} 撃破`,'#bcbcbc'],['人間を捨てた神 錨ケンドウ 撃破','#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
+    ['THE END','#f8d878',2],['',0],['…ところで 出国手形は お持ちですか？','#bcbcbc']];
   const total=L.length*18+150-60;
-  push({full:true,upd(){t++;const sp=(I.holdA||keys.has('KeyZ'))?3:.45;y0+=sp;if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
+  push({full:true,upd(){t++;const sp=(I.holdA||keys.has('KeyZ'))?3:.45;y0+=sp;if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();if(cb)cb();else dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
     drw(){const g=Math.min(1,y0/400);R(0,0,W,H,'#0c0820');R(0,150,W,90,`rgb(${Math.round(24+200*g)},${Math.round(16+90*g)},${Math.round(40+20*g)})`);pc(128,170,26,`rgba(252,216,120,${.25+.6*g})`);
       for(let k=0;k<5;k++)R(0,150+k*2,W,1,'#0c0820');
       R(0,196,W,44,'#000');R(96,150,6,46,'#a81000');R(154,150,6,46,'#a81000');R(86,146,84,6,'#d82800');R(92,156,72,4,'#a81000');
