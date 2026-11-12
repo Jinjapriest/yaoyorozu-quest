@@ -799,7 +799,7 @@ function cstat(id,m){
   if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;}
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
-  const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.party.includes(id)?partyBonus():1);atk*=aj;mag*=aj;def*=aj;
+  const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1);atk*=aj;mag*=aj;def*=aj;
   const pm=spearPair(id)?PAIR_MUL:1;
   return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
 }
@@ -1191,7 +1191,8 @@ function onStep(){
   {const rr=RES.find(r=>r.x===x&&r.y===y);if(rr){resScr(rr.id);return;}}
   if(t===T.MINE){mineScr();return;}
   if(t===T.SHR){const s=SHRS.find(s=>s.x===x&&s.y===y);if(s.key==='tamakane'){tamakaneScr(s);return;}if(s.rank){choice(`山頂に ${s.name}が ある。\n修験者の 聖地だ。 参拝しますか？`,['はい','いいえ'],r=>{if(r===0)prayScr(s.rank,s.name,s.key,()=>{});});return;}choice('道ばたに 小さな 無格社が ある。\n参拝しますか？',['はい','いいえ'],r=>{if(r===0)prayScr(0,'無格社',s.key,()=>{});});return;}
-  if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。\n挑みますか？（目安Lv${Math.round(820*Math.pow(1.5,G.boss))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
+  if(t===T.CAVE&&G.boss>=OROCHI_MAX){dialog(['八岐大蛇は 完全に 鎮まっている…',`洞窟の 奥から 不気味な 気配が 法螺ヶ岳の 方へ 流れていく。\n（裏千日回峰行が 解放されている）`]);return;}
+  if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。（Lv${G.boss+1}/${OROCHI_MAX}）\n挑みますか？（目安Lv${Math.round(820*Math.pow(1.5,G.boss))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
   G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
@@ -1621,6 +1622,10 @@ function startBattle(boss,rift=null,sp=null){
   const en=[];if(boss)en.push(mkBoss());
   else if(sp&&sp.kind==='dict'){const D=dinfo(VIL[sp.vi]),dt=VIL[sp.vi].tier>=11?11:9,ff=dt===11?DICT_F:1;for(let k=0;k<2;k++){const e=mkEnemy(dt,['しんえいたい','bones','#3c3c3c','#d82800']);e.name='親衛隊';for(const q of ['maxhp','hp','atk','def'])e[q]=Math.round(e[q]*1.2*ff);if(ff>1)e.mag=Math.round(e.mag*ff);en.push(e);}
     const g=mkEnemy(dt,[D.boss,D.shape,D.c1,D.c2]);if(ff>1)for(const q of ['maxhp','hp','atk','def','mag'])g[q]=Math.round(g[q]*ff);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*6);for(const q of ['atk','def','mag'])g[q]=Math.round(g[q]*1.6);g.mag=g.atk;g.magic=true;g.dboss=true;en.splice(1,0,g);}
+  else if(sp&&sp.kind==='uorochi'){const g=mkEnemy(12,['裏オロチ','oni','#24003c','#a800a8']);g.shape='orochi';g.w=120;g.h=80;for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*20);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.8);g.magic=true;g.dboss=true;en.push(g);
+    for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F);}
+  else if(sp&&sp.kind==='ukaiho'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(12,ETIER[12]?ETIER[12][ri(0,2)]:ETIER[9][ri(0,2)]);e.name='裏峰の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F*.22*sp.mult);en.push(e);}}
+  else if(sp&&sp.kind==='udoiri'){const e=mkEnemy(12,['業火の化身','spirit','#3c0000','#d82800']);for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*8);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*1.5);for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F*.35);en.push(e);}
   else if(sp&&sp.kind==='kaiho'&&sp.all){const g=mkEnemy(12,['千日の魔障','spirit','#3c3c3c','#f8b800']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*10);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.4);g.magic=true;g.dboss=true;en.push(g);
     for(let k=0;k<2;k++){const e=mkEnemy(12,ETIER[8][2]);e.name='峰の大天狗';en.push(e);}
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*KAIHO_F);}
@@ -1656,6 +1661,7 @@ function startBattle(boss,rift=null,sp=null){
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
+  if(sp&&sp.kind==='uorochi')BT.pend.push('裏オロチ「千の 峰に 積もった 怨念…\nすべて 喰らいつくしてくれる！！」');
   if(sp&&sp.kind==='gimwild')BT.pend.push('残滓「血だ… 血を よこせえええ！！」\n総書記の 怨念が 襲いかかってきた！');
   if(sp&&sp.kind==='ura')BT.pend.push(sp.round<4?`裏闘技場　${URA_ROUNDS[sp.round-1]}`:'ギム総書記「死ねえええ！！」\n憎悪の 炎が 闘技場を つつんだ！');
   if(sp&&sp.kind==='colo')BT.pend.push(`魔物コロシアム　${COLO_ROUNDS[sp.round-1]}！\n観客の 歓声が ひびく！`);
@@ -1752,7 +1758,7 @@ function eAct(i){
 }
 function fleeAct(){
   BT.pend.push('\f');P_('みんなは にげだした！');
-  P_(()=>{if(BT.boss||(BT.sp&&BT.sp.kind==='gimwild'))return 'しかし 総書記の残滓からは にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
+  P_(()=>{if(BT.boss||(BT.sp&&(BT.sp.kind==='gimwild'||BT.sp.kind==='uorochi')))return 'しかし 総書記の残滓からは にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
 }
 const canCmd=m=>isAlive(m)&&!(m.stun>0);
 const nextAlive=i=>{for(let k=i+1;k<BT.pt.length;k++)if(canCmd(BT.pt[k]))return k;return -1;};
@@ -1902,10 +1908,10 @@ function winBattle(){
     if(e.boss){const s=Math.pow(1.5,G.boss);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
     else{coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4);ex+=30*Math.pow(2.3,e.t);ore+=20*Math.pow(2.3,e.t);if(rnd()<.08)herb++;}
   }
-  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:1;
+  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:1;
   /* 高難易度コンテンツは 経験値書・鍛錬鉱が 10倍 */
-  const HX=BT.sp&&(['kaiho','doiri','tokoyo','colo','ura','gimwild','gimrift'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
-  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
+  const HX=BT.sp&&(['kaiho','doiri','ukaiho','udoiri','uorochi','tokoyo','colo','ura','gimwild','gimrift'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
+  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*(G.ukaiho&&G.ukaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
   let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
   bk.forEach((n,k)=>G.items.b[k]+=n);ok.forEach((n,k)=>G.items.o[k]+=n);
@@ -1916,6 +1922,7 @@ function winBattle(){
   if(BT.rift!=null){G.rifts.splice(BT.rift,1);pages.push(...jobProgress('seal'));}
   if(G.taki>0)G.taki--;
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
+  if(BT.sp&&(BT.sp.kind==='ukaiho'||BT.sp.kind==='udoiri'||BT.sp.kind==='uorochi'))ukaihoWin(pages);
   if(BT.sp&&BT.sp.kind==='mine'){G.career++;pages.push(`峰入り修行を やりとげた！\n研修歴 +1（いま ${G.career}回）`);if(G.career%50===0){G.items.srtk++;pages.push('研修歴 50回ごとの 特典！\nSR以上確定チケットを 1枚 もらった。');}}
   if(BT.sp&&BT.sp.kind==='gimrift'){const O=G.gimOcc['v'+BT.sp.vi];if(O){(O.closed=O.closed||[]).push(BT.sp.k);}G.items.b[3]+=300;G.items.o[3]+=300;G.items.urtk=(G.items.urtk||0)+1;
     pages.push('町の 烈穴を 塞いだ！','経験値書（極）×300・鍛錬鉱（極）×300\nUR確定チケット×1を 手に入れた！');}
@@ -1935,7 +1942,8 @@ function winBattle(){
   if(G.morning>0)G.morning--;
   G.bc++;if(G.bc>=10){G.bc=0;pages.push(`${G.day+1}日目に なった。`,...advanceDay());}
   if(G.bless&&G.bless.left>0){G.bless.left--;if(G.bless.left===0)pages.push('加護の 効果が きれた。\n神社で また 参拝しよう。');}
-  if(BT.boss){G.boss++;pages.push(`八岐大蛇は 眠りについた。\nしかし いつか さらに 強くなって\nふたたび あらわれるだろう…`);}
+  if(BT.boss){G.boss=Math.min(OROCHI_MAX,G.boss+1);if(G.boss>=OROCHI_MAX){sfx('g5');pages.push('八岐大蛇 Lv15を 打ち倒した！','八岐大蛇は 完全に 鎮まった…','しかし その 怨念は 法螺ヶ岳の 峰々へ 流れこんだ。\n修行場で「裏千日回峰行」が 解放された！');}
+    else pages.push(`八岐大蛇は 眠りについた。\nしかし いつか さらに 強くなって\nふたたび あらわれるだろう…（次は Lv${G.boss+1}）`);}
   if(!G.tut){G.tut=1;pages.push('経験値書と 鍛錬鉱は メニューの\n「キャラ育成」「武器の鍛錬」で 使うと\nレベルが あがるぞ。');}
   G.party.forEach(fixHp);save();
   if(BT.sp&&BT.sp.kind==='ura'){const r=BT.sp.round;if(r<4){pages.push(`${URA_ROUNDS[r-1]}を 突破した！\n（HP・MPは 回復しない）`,`次は ${URA_ROUNDS[r]}…`);dialog(pages,()=>{BT=null;startBattle(false,null,{kind:'ura',round:r+1});});return;}
@@ -3605,8 +3613,10 @@ const DICT_DEF={boss:'ギム総書記',title:'総書記',hall:'党本部',party:
 const dinfo=v=>Object.assign({},DICT_DEF,typeof (v&&v.dict)==='object'?v.dict:{});
 function shugyoFac(){
   const cost=tierCost(300);
-  choice('行者「よく 来られた。\nいかなる 修行を 望まれるか。」',['滝行（無料・1日 すすむ）',`護摩祈祷（${fmt(cost)}イェソ）`,'峰入り修行（強敵と 戦う）','千日回峰行','やめる'],r=>{
+  const uk=G.boss>=OROCHI_MAX;
+  choice('行者「よく 来られた。\nいかなる 修行を 望まれるか。」',['滝行（無料・1日 すすむ）',`護摩祈祷（${fmt(cost)}イェソ）`,'峰入り修行（強敵と 戦う）','千日回峰行',...(uk?['裏千日回峰行']:[]),'やめる'],r=>{
     if(r===3){kaihoScr();return;}
+    if(uk&&r===4){ukaihoScr();return;}
     if(r===0){let t=0;push({full:true,upd(){t++;if(t>=120||(I.A&&t>20)){pop();const msgs=advanceDay();fullHeal();G.taki=5;save();sfx('lvup');
         dialog([`冷たい 滝に 打たれ 心身を 清めた。\n${G.day}日目に なった。 HP・MPが 全回復。`,'5戦の あいだ 経験値書が 3割 増える。',...msgs]);}},
       drw(){R(0,0,W,H,'#3c3c3c');R(100,0,56,H,'#a4e4fc');for(let k=0;k<30;k++){const y=(k*29+t*6)%H;R(102+(k*13)%52,y,2,10,'#fcfcfc');}R(80,200,96,40,'#5c5c5c');
@@ -3664,6 +3674,41 @@ function kaihoWin(pages){
   else if(K.d>=700&&!K.doiri)pages.push('700日に 達した。\n次は 堂入りだ。 修行場で 申し出よう。');
   const u=[...new Set(msgs)];if(u.length)pages.push(...u.slice(0,3));
 }
+
+/* ===================== 裏千日回峰行（八岐大蛇Lv15 撃破で 解放・推奨Lv19999・ラスボス 裏オロチ） ===================== */
+const OROCHI_MAX=15,UK_F=61,UAJ=['','裏阿闍梨','裏大阿闍梨'];
+function ukState(){if(!G.ukaiho)G.ukaiho={d:0,doiri:false,rank:0};return G.ukaiho;}
+function ukaihoScr(){
+  const K=ukState();
+  if(K.rank>=2){dialog(`裏千日回峰行は すでに 満行している。\n称号：${UAJ[K.rank]}\n全能力 +30%・経験値書 +50%（表と 重なる）`);return;}
+  if(K.d>=1000){choice('千の 裏峰を 歩きとおした…\n最後に 山頂で 裏オロチが 待っている。\n（推奨Lv19999・にげられない）',['裏オロチに 挑む','やめる'],k=>{if(k!==0)return;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'uorochi',fin:true});},110);return;}
+  const needDoiri=K.d>=700&&!K.doiri,cap=K.doiri?1000-K.d:700-K.d;
+  const head=`裏千日回峰行　${K.d}/1000日${K.rank?`　称号：${UAJ[K.rank]}`:''}\n${needDoiri?'700日を 越えた。 裏堂入りの 時だ。':`次の 節目：${K.d<700?'700日 裏堂入り':'1000日 裏オロチ'}`}\n100日ごとに 研修歴+10と UR確定チケット。`;
+  const rest=1000-K.d,allT=`残り${rest}日 まとめて（裏オロチ Lv19999）`;
+  const opts=needDoiri?['裏堂入りに 入る（9日間）',allT,'やめる']:['裏回峰に 出る（1日）','10日 まとめて 歩く','100日 まとめて 歩く',allT,'やめる'];
+  choice(head,opts,r=>{
+    if(r<0)return;
+    if(opts[r]===allT){dialog(['大阿闍梨「裏の 峰々を 一度に 越えると 申すか…」',`「${rest}日分の 業と 八岐大蛇の 怨念が 一つになり\n裏オロチと なって 立ちはだかるであろう。\n推奨レベル 19999。 これが 最後の 戦いだ」`],()=>{
+        choice(`残り${rest}日 まとめて 挑みますか？\n（負けると イェソが 半分）`,['挑む','やめる'],k=>{if(k!==0)return;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'uorochi',n:rest,all:true});},96);});return;}
+    if(needDoiri){if(r!==0)return;choice('裏堂入りでは 9日間 業火の 中で\n経を 唱えつづける。\n弱った からだで 業火の化身と 戦う。',['入る','やめる'],k=>{if(k!==0)return;
+        G.party.forEach(id=>{const s=cstat(id),c=G.chars[id];c.hp=Math.max(1,Math.round(s.hp*.3));c.mp=0;});while(stack.length>1)pop();startBattle(false,null,{kind:'udoiri'});},90);return;}
+    if(r===4)return;
+    const n=Math.min(cap,[1,10,100][r]),mult=[1,1.35,1.9][r];
+    dialog(`丑三つ時。 黒装束に 身を つつみ\n裏の 峰々を 歩きはじめた…\n（${n}日分の 裏回峰）`,()=>{while(stack.length>1)pop();startBattle(false,null,{kind:'ukaiho',n,mult});});
+  },170);}
+function ukaihoWin(pages){
+  const K=ukState(),sp=BT.sp;
+  if(sp.kind==='udoiri'){K.doiri=true;K.rank=Math.max(K.rank,1);const msgs=[];for(let i=0;i<9;i++)msgs.push(...advanceDay());fullHeal();
+    pages.push('業火の化身を しりぞけた…','9日間の 裏堂入りを なしとげた！\n「裏阿闍梨」の 称号を 得た。\n全能力が ずっと 10% アップ。',...[...new Set(msgs)].slice(0,3));return;}
+  if(sp.kind==='uorochi'){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());K.rank=2;
+    G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');
+    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','── 八百万クエスト 完 ──\n（これからも 冒険は つづく）',...[...new Set(msgs)].slice(0,2));return;}
+  const before=K.d;K.d=Math.min(1000,K.d+sp.n);const msgs=[];for(let i=0;i<sp.n;i++)msgs.push(...advanceDay());
+  pages.push(`裏回峰を やりとげた。（${before} → ${K.d}日）\n${G.day}日目に なった。`);
+  for(let m=Math.floor(before/100)+1;m<=Math.floor(K.d/100);m++){G.career+=10;G.items.urtk=(G.items.urtk||0)+1;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\nUR確定チケットを 1枚 もらった。`);}
+  if(K.d>=1000)pages.push('千の 裏峰を 歩きとおした！\n山頂で 裏オロチが 待っている。 修行場で 申し出よう。');
+  else if(K.d>=700&&!K.doiri)pages.push('700日に 達した。\n次は 裏堂入りだ。 修行場で 申し出よう。');
+  const u=[...new Set(msgs)];if(u.length)pages.push(...u.slice(0,3));}
 
 /* ===================== エスポワール号・地下労働の演出 ===================== */
 function drawKuro(x,y,f){R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+1,6,3,'#000');R(x+5,y+5,6,1,'#000');R(x+6,y+5,1,1,'#3cbcfc');R(x+9,y+5,1,1,'#3cbcfc');
