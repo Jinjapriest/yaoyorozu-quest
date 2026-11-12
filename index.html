@@ -901,7 +901,7 @@ function newGame(){
 function fixSave(){
   const d=Object.assign({coins:0,items:{herb:0,b:[0,0,0,0],o:[0,0,0,0],tk:0},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
   for(const k in d)if(G[k]==null)G[k]=d[k];
-  if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];applyRevived();VIL.forEach((v,i)=>{if(v.dict)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
+  if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
   applyXR();wrapCoins();
   G.party=G.party.filter(id=>CH[id]&&G.chars[id]);
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
@@ -1194,7 +1194,7 @@ function onStep(){
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
   G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
-  if(G.steps>3&&rnd()<rate){G.steps=0;startBattle(false);}
+  if(G.steps>3&&rnd()<rate){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
 }
 
 /* ===================== 村・神社・道具屋 ===================== */
@@ -1625,6 +1625,9 @@ function startBattle(boss,rift=null,sp=null){
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*KAIHO_F);}
   else if(sp&&sp.kind==='kaiho'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(9,ETIER[9][ri(0,2)]);e.name='峰の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*1.15*sp.mult);en.push(e);}}
   else if(sp&&sp.kind==='doiri'){const e=mkEnemy(9,['煩悩の化身','spirit','#3c3c3c','#d82800']);for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*8);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*1.5);en.push(e);}
+  else if(sp&&sp.kind==='gimwild'){const g=mkEnemy(12,['血に飢えた ギム総書記の残滓','oni','#5c0000','#d82800']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*22);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.8);g.magic=true;g.dboss=true;en.push(g);
+    for(let k=0;k<2;k++){const e=mkEnemy(12,['しんえいたい','bones','#3c0000','#d82800']);e.name='狂信の 親衛隊';en.push(e);}
+    for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*URA_F*1.24*GIMW_F);}
   else if(sp&&sp.kind==='ura'){const R0=sp.round;
     if(R0<4){const pool=[['檻の 魔獣','beast','#000000','#d82800'],['亡者の 親衛隊','bones','#3c3c3c','#940084'],['憎悪の 影','spirit','#000000','#fc7460']];for(let k=0;k<3+(R0>1?1:0);k++){const e=mkEnemy(12,pool[(k+R0)%3]);en.push(e);}}
     else{const g=mkEnemy(12,['憎悪の ギム総書記','oni','#000000','#d82800']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*16);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.6);g.magic=true;g.dboss=true;en.push(g);
@@ -1648,6 +1651,7 @@ function startBattle(boss,rift=null,sp=null){
   const bt=tileAt(G.pos.x,G.pos.y);
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
+  if(sp&&sp.kind==='gimwild')BT.pend.push('残滓「血だ… 血を よこせえええ！！」\n総書記の 怨念が 襲いかかってきた！');
   if(sp&&sp.kind==='ura')BT.pend.push(sp.round<4?`裏闘技場　${URA_ROUNDS[sp.round-1]}`:'ギム総書記「死ねえええ！！」\n憎悪の 炎が 闘技場を つつんだ！');
   if(sp&&sp.kind==='colo')BT.pend.push(`魔物コロシアム　${COLO_ROUNDS[sp.round-1]}！\n観客の 歓声が ひびく！`);
   if(sp&&sp.kind==='tokoyo')BT.pend.push(sp.wave<4?`常世の門　第${sp.wave}の試練`:'常世の門　最後の試練…\n海が 割れ 大海神が 目を さました！');
@@ -1743,7 +1747,7 @@ function eAct(i){
 }
 function fleeAct(){
   BT.pend.push('\f');P_('みんなは にげだした！');
-  P_(()=>{if(BT.boss)return 'しかし にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
+  P_(()=>{if(BT.boss||(BT.sp&&BT.sp.kind==='gimwild'))return 'しかし 総書記の残滓からは にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
 }
 const canCmd=m=>isAlive(m)&&!(m.stun>0);
 const nextAlive=i=>{for(let k=i+1;k<BT.pt.length;k++)if(canCmd(BT.pt[k]))return k;return -1;};
@@ -1892,7 +1896,7 @@ function winBattle(){
     if(e.boss){const s=Math.pow(1.5,G.boss);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
     else{coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4);ex+=30*Math.pow(2.3,e.t);ore+=20*Math.pow(2.3,e.t);if(rnd()<.08)herb++;}
   }
-  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:1;
+  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:1;
   const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1));ore=Math.round(ore*mul*rw);
   let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
@@ -1905,7 +1909,11 @@ function winBattle(){
   if(G.taki>0)G.taki--;
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
   if(BT.sp&&BT.sp.kind==='mine'){G.career++;pages.push(`峰入り修行を やりとげた！\n研修歴 +1（いま ${G.career}回）`);if(G.career%50===0){G.items.srtk++;pages.push('研修歴 50回ごとの 特典！\nSR以上確定チケットを 1枚 もらった。');}}
-  if(BT.sp&&BT.sp.kind==='dict'&&dinfo(VIL[BT.sp.vi]).res!=='mine'){const vi=BT.sp.vi,v=VIL[vi],D=dinfo(v),rd=RES.find(r=>r.id===D.res);G.freed['v'+vi]=1;G.coins+=1000000;G.items.tk+=30;G.items.urtk=(G.items.urtk||0)+3;if(!G.warps.includes(vi))G.warps.push(vi);setT(v.x,v.y,T.CITY);
+  if(BT.sp&&BT.sp.kind==='gimwild'){G.gimWin=(G.gimWin||0)+1;G.items.b[3]+=500;G.items.o[3]+=500;G.items.urtk=(G.items.urtk||0)+10;noCount(()=>{G.coins+=30000000;});
+    pages.push('残滓「ば…ばかな… 血が… 足りぬ……」','血に飢えた ギム総書記の残滓は\n闇の 中へ 消えていった…','経験値書（極）×500・鍛錬鉱（極）×500\nUR確定チケット×10・30,000,000イェソを 手に入れた！');}
+  else if(BT.sp&&BT.sp.kind==='dict'&&dinfo(VIL[BT.sp.vi]).gim){const vi=BT.sp.vi;gimFree(vi);G.coins+=3000000;G.items.urtk=(G.items.urtk||0)+5;if(!G.warps.includes(vi))G.warps.push(vi);
+    pages.push('ギム総書記の残滓を たおした！',`町の 人々が 広場に あつまってきた…\n${VIL[vi].name}は 解放された！`,'お礼に 3,000,000イェソと\nUR確定チケット 5枚を もらった。','店も 神社も ふたたび 開いた。');}
+  else if(BT.sp&&BT.sp.kind==='dict'&&dinfo(VIL[BT.sp.vi]).res!=='mine'){const vi=BT.sp.vi,v=VIL[vi],D=dinfo(v),rd=RES.find(r=>r.id===D.res);G.freed['v'+vi]=1;G.coins+=1000000;G.items.tk+=30;G.items.urtk=(G.items.urtk||0)+3;if(!G.warps.includes(vi))G.warps.push(vi);setT(v.x,v.y,T.CITY);
     if(!G.res)G.res={};if(rd&&!G.res[rd.id])G.res[rd.id]=newRes();
     pages.push(`${D.boss}を たおした！`,`町の 人々が 広場に あつまってきた…\n${v.name}は 解放された！`,`お礼に 1,000,000イェソと\nガチャチケット 30枚・UR確定チケット 3枚を\nもらった。`,'店も 神社も ふたたび 開いた。\nワープの鳥居も 使えるように なった。');
     if(rd)pages.push(`町長「${D.party}が 独占していた\n${rd.n}を あなたに おまかせしたい」`,`${rd.n}の 権利を 手に入れた！\n毎日 収益が たまっていく。\n（入口で 受け取れる）`);}
@@ -1930,6 +1938,7 @@ function winBattle(){
 }
 function loseBattle(){
   BT.ph='end';stopBGM();sfx('lose');
+  if(BT.sp&&BT.sp.kind==='gimwild'){gimWildLose();return;}
   dialog(['ぜんめつ してしまった…'],()=>{noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
     enterVillage(G.home,true);dialog(`…${v.shrine}の 御神徳により\nめを さました。\nイェソが はんぶんに なった。`);});
 }
@@ -3537,6 +3546,20 @@ function jankenScr(mode='normal',debt=0){
 
 /* ===================== 修験道の修行場・独裁者の町 ===================== */
 const occupied=vi=>!!(VIL[vi]&&VIL[vi].dict&&!(G.freed&&G.freed['v'+vi]));
+/* ===================== 血に飢えた ギム総書記の残滓（裏闘技場クリア後に ごくまれに 野良で出る・推奨Lv10999） ===================== */
+const GIMW_RATE=.004,GIMW_F=1.35,GIM_DICT={boss:'ギム総書記の残滓',title:'残滓',hall:'党本部',party:'党',res:'none',shape:'oni',c1:'#5c0000',c2:'#d82800',gim:1};
+const baseTile=v=>v.depop?T.RUIN:[T.HUT,T.VIL,T.VIL,T.TOWN,T.CITY,T.CITY][v.size];
+function applyGimOcc(){if(!G.gimOcc)G.gimOcc={};VIL.forEach((v,i)=>{if(v.dict&&v.dict.gim){delete v.dict;setT(v.x,v.y,baseTile(v));}if(G.gimOcc['v'+i]){v.dict=Object.assign({},GIM_DICT);setT(v.x,v.y,T.DICT);}});}
+function gimFree(vi){delete G.gimOcc['v'+vi];if(G.freed)delete G.freed['v'+vi];applyGimOcc();save();}
+function gimWildIntro(){sfx('ng');BT=null;
+  dialog(['…空気が 血の においに 変わった。','裏闘技場で 倒れた はずの 総書記の 怨念が\n黒い 霧と なって 集まっていく…','血に飢えた ギム総書記の残滓「裏闘技場の 屈辱…\n忘れては おらんぞ……」\n（推奨Lv10999・にげられない）'],()=>startBattle(false,null,{kind:'gimwild'}));}
+function gimWildLose(){
+  let best=-1,bd=1e9;VIL.forEach((v,i)=>{if(v.dict||v.depop||v.tokoyo||v.colo||(G.gimOcc&&G.gimOcc['v'+i]))return;const d=Math.abs(v.x-G.pos.x)+Math.abs(v.y-G.pos.y);if(d<bd){bd=d;best=i;}});
+  const pages=['ぜんめつ してしまった…'];
+  if(best>=0){if(!G.gimOcc)G.gimOcc={};G.gimOcc['v'+best]={day:G.day};if(G.freed)delete G.freed['v'+best];applyGimOcc();if(G.home===best){const h=VIL.findIndex((v,i)=>!v.dict&&!v.depop&&i!==best);if(h>=0)G.home=h;}
+    pages.push(`残滓「この 町は 今日から わが 党の ものだ！」`,`${VIL[best].name}は ギム総書記の残滓に 占領され\n独裁都市に なってしまった…`,`町の 奥の ${GIM_DICT.hall}で 残滓を たおせば\n町を 解放できる。`);}
+  dialog(pages,()=>{noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
+    enterVillage(G.home,true);dialog(`…${v.shrine}の 御神徳により\nめを さました。\nイェソが はんぶんに なった。`);});}
 const DICT_DEF={boss:'ギム総書記',title:'総書記',hall:'党本部',party:'党',res:'mine',shape:'oni',c1:'#3c3c3c',c2:'#d82800'};
 const dinfo=v=>Object.assign({},DICT_DEF,typeof (v&&v.dict)==='object'?v.dict:{});
 function shugyoFac(){
