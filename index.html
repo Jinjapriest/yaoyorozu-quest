@@ -1458,11 +1458,12 @@ function pull(b,n,minR=0){
   }
   return out;
 }
-/* ガチャ：通常2種＋期間限定ピックアップ（全ピックアップを ごちゃ混ぜにして 7日ごとに 入れかえ） */
+/* ガチャ：通常2種＋期間限定ピックアップ（全ピックアップを ごちゃ混ぜにして 現実の 毎週月曜に 入れかえ） */
 const GACHA_PERIOD=7;
 function activeBanners(){
   const base=BANNERS.filter(b=>b.src==='基本'),extra=BANNERS.filter(b=>b.src!=='基本');
-  const P=Math.floor(((G&&G.day)||1)-1)/GACHA_PERIOD|0,left=GACHA_PERIOD-((((G&&G.day)||1)-1)%GACHA_PERIOD),r=lcg(P*7919+101);
+  /* 現実の 日本時間で 毎週月曜0時に 入れかわる */
+  const D=Math.floor((Date.now()+9*3600000)/86400000),P=Math.floor((D+3)/GACHA_PERIOD),left=GACHA_PERIOD-((D+3)%GACHA_PERIOD),r=lcg(P*7919+101);
   const pool=t=>[...new Set(base.filter(b=>b.type===t).flatMap(b=>b.pickup))].filter(id=>(t==='weapon'?WPD:CH)[id]);
   const pick=(arr,n)=>{const a=arr.slice(),o=[];while(a.length&&o.length<n)o.push(a.splice(Math.floor(r()*a.length),1)[0]);return o;};
   const PRE=['神無月','祭囃子','月下','黄金','紅蓮','蒼天','百鬼夜行','天岩戸','夢幻','雷神','龍宮','桜吹雪','初詣','大祓'],SUF=['降臨祭','ピックアップ','大感謝祭','特選ガチャ','超召喚'];
@@ -1520,9 +1521,9 @@ function openGacha(){
           R(cx-24,50,48,62,'#000');R(cx-24,50,48,1,rcol(d.rar));R(cx-24,111,48,1,rcol(d.rar));
           if(b.type==='weapon')drawWIcon(id,cx-16,58,2);else drawChar(id,cx-16,56,(frame>>4)&1,2);
           txt(RAR[d.rar].n,cx,92,rcol(d.rar),'center');txt(b.type==='weapon'?d.name:d.short,cx,102,'#fcfcfc','center',46);});
-        if(b.pickup.length){txt(b.lim?`PICK UP!　期間限定 あと${b.left}日`:'PICK UP!',128,116,`hsl(${(frame*5)%360},100%,70%)`,'center');
+        if(b.pickup.length){txt(b.lim?(b.left<=1?'PICK UP!　期間限定 今日まで！':`PICK UP!　期間限定 あと${b.left}日`):'PICK UP!',128,116,`hsl(${(frame*5)%360},100%,70%)`,'center');
         txt('同じレアリティの中で ピックアップが 50%',128,128,'#fce0a8','center',240);}
-        else txt(`期間限定ガチャは ${GACHA_PERIOD}日ごとに 入れかわる`,128,122,'#fce0a8','center',240);
+        else txt('期間限定ガチャは 毎週月曜0時に 入れかわる',128,122,'#fce0a8','center',240);
         txt(`${fmt(G.coins)}イェソ`,194,8,'#f8b800','right',120);txt(`チケット ${fmt(G.items.tk)}・SR ${fmt(G.items.srtk)}・UR ${fmt(G.items.urtk||0)}`,128,138,'#bcbcbc','center',240);
         menuDraw(m,a);
       }else if(st==='rates'){
