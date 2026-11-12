@@ -4390,21 +4390,21 @@ if(document.getElementById('rankTable'))document.getElementById('rankTable').inn
 /* ===================== 起動 ===================== */
 /* 起動時の 企業ロゴ（田村企画） */
 const splashScr={full:true,t:0,
-  upd(){this.t++;if(this.t===48)sfx('bell');if((this.t>30&&(I.A||I.B))||this.t>=270){titleScr.init();setBase(titleScr);playBGM('title');}},
-  drw(){const t=this.t,INK='#1E2A47',GD='#9A7B45',cl=v=>Math.max(0,Math.min(1,v)),ez=v=>1-Math.pow(1-cl(v),3);
-    R(0,0,W,H,'#000');ctx.globalAlpha=cl(t/20)*(t>240?cl((270-t)/30):1);R(0,0,W,H,'#F6F3EC');
-    const base=ctx.globalAlpha,cx=128,f=ez((t-18)/50),cy=86+Math.round((1-f)*24);
+  upd(){this.t++;if(this.t===74)sfx('bell');if((this.t>30&&(I.A||I.B))||this.t>=420){titleScr.init();setBase(titleScr);playBGM('title');}},
+  drw(){const t=this.t/1.55,INK='#1E2A47',GD='#9A7B45',cl=v=>Math.max(0,Math.min(1,v)),ez=v=>1-Math.pow(1-cl(v),3);
+    const fade=cl(t/20)*(t>240?cl((270-t)/30):1);R(0,0,W,H,'#F6F3EC');
+    const base=1,cx=128,f=ez((t-18)/50),cy=86+Math.round((1-f)*24);
     ctx.globalAlpha=base*cl((t-18)/30);
-    pc(cx,cy,35,INK);pc(cx,cy,32,'#F6F3EC');pc(cx,cy,29,GD);pc(cx,cy,28,'#F6F3EC');
-    for(const [dx,dy] of [[-15,-15],[2,-15],[-15,2],[2,2]])R(cx+dx,cy+dy,13,13,INK);
+    if(!splashScr.mk){const c=document.createElement('canvas');c.width=c.height=72;const g=c.getContext('2d'),P=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);},C=(r,col)=>{for(let dy=-r;dy<=r;dy++){const w=Math.floor(Math.sqrt(r*r-dy*dy+r*.6));P(36-w,36+dy,w*2+1,1,col);}};
+      C(35,INK);C(32,'#F6F3EC');C(29,GD);C(28,'#F6F3EC');for(const [dx,dy] of [[-15,-15],[2,-15],[-15,2],[2,2]])P(36+dx,36+dy,13,13,INK);splashScr.mk=c;}
+    ctx.drawImage(splashScr.mk,cx-36,cy-36);
     if(t>=120&&t<160){const sx=cx-40+(t-120)*2.2;ctx.globalAlpha=base*.55;for(let k=0;k<70;k++){const y=cy-36+k,x=Math.round(sx+(k-35)*.5);if(Math.hypot(x-cx,y-cy)<34)R(x,y,3,1,'#fcfcfc');}}
     ctx.font='22px '+FONT;ctx.textAlign='center';ctx.textBaseline='top';const T='田村企画';
     for(let i=0;i<4;i++){ctx.globalAlpha=base*cl((t-60-i*8)/16);ctx.fillStyle=INK;ctx.fillText(T[i],cx-45+i*30,130);}
     ctx.globalAlpha=base;const lw=Math.round(120*ez((t-95)/25));R(cx-lw/2,159,lw,1,GD);
     ctx.globalAlpha=base*cl((t-105)/20);ctx.font='8px '+FONT;ctx.fillStyle=GD;ctx.fillText('T A M U R A   K I K A K U',cx,165);
-    ctx.globalAlpha=base*cl((t-140)/25);ctx.fillStyle=INK;ctx.font='10px '+FONT;ctx.fillText('Renovation for Future',cx,196);
-    ctx.globalAlpha=base*cl((t-150)/25);ctx.font='8px '+FONT;ctx.fillStyle='#7c7c7c';ctx.fillText('未来のための進化',cx,210);
-    ctx.globalAlpha=1;ctx.textAlign='left';}};
+    ctx.globalAlpha=base*cl((t-140)/25);ctx.fillStyle=INK;ctx.font='10px '+FONT;ctx.fillText('Renovation for Future',cx,200);
+    ctx.globalAlpha=1-fade;R(0,0,W,H,'#000');ctx.globalAlpha=1;ctx.textAlign='left';}};
 function start(){
   setBase(splashScr);
   let started=false;const go=()=>{if(!started){started=true;requestAnimationFrame(loop);}};
