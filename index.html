@@ -419,6 +419,8 @@ const BASE_SKILLS={
   nightparry:{name:'ナイトパーリィ',mp:60,target:'allies',kind:'xr',verb:'はじめた'},
   addimpact:{name:'アディショナルインパクト',mp:60,target:'enemies',kind:'xr',verb:'はなった'},
   kunizukuri:{name:'国造ラッシュ',mp:60,target:'allies',kind:'xr',verb:'発動した'},
+  kuniumi:{name:'国生み',mp:60,target:'allies',kind:'xr',verb:'はじめた'},
+  yomotsu:{name:'黄泉津大神',mp:60,target:'enemies',kind:'xr',verb:'名のった'},
   yuiga:{name:'天上天下唯我独尊',mp:60,target:'enemies',kind:'xr',verb:'宣言した'},
   niji:{name:'虹の大合唱',mp:16,target:'enemies',kind:'mag',power:4.6,verb:'うたった'},
   meh:{name:'渚まで走るのはメッ！',mp:20,target:'enemies',kind:'debuff',amount:.6,turns:4,verb:'しかった'},
@@ -465,6 +467,8 @@ const BASE_PACK={
     {id:'gambler',name:'賭博師 鉄火場ジョージ',short:'鉄火ジョージ',rarity:'UR',special:'gambler',weapon:'any',hp:95,mp:40,atk:30,mag:18,def:20,spd:24,skills:['tehen','hayabusa'],look:{head:'gambler',hair:'#000000',body:'#fcfcfc',accent:'#d82800',legs:'#3c3c3c',held:'刀'}},
     {id:'buddha',name:'仏陀（ブッダ）',short:'仏陀',rarity:'UR',weapon:'any',hp:140,mp:80,atk:24,mag:38,def:30,spd:16,skills:['jihi','satori'],look:{head:'buddha',hair:'#24188c',body:'#e45c10',accent:'#f8b800',legs:'#e45c10',held:'神器'}},
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
+    {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
+    {id:'izanami',name:'伊邪那美命',short:'伊邪那美',rarity:'XR',weight:1,weapon:'any',special:'god',hp:145,mp:100,atk:30,mag:52,def:28,spd:24,skills:['gekko','jihi'],look:{head:'miko',hair:'#000000',body:'#3c1c5c',accent:'#d82800',legs:'#000000',held:'神器'}},
     {id:'susanoo',name:'須佐之男命',short:'須佐之男',rarity:'UR',weight:2,weapon:'any',hp:150,mp:40,atk:40,mag:14,def:28,spd:20,skills:['yakumo','kabuto'],look:{head:'storm',hair:'#000000',body:'#0058f8',accent:'#fcfcfc',legs:'#24188c',held:'両手剣'}},
     {id:'tsukuyomi',name:'月読命',short:'月読',rarity:'UR',weight:2,weapon:'any',hp:115,mp:75,atk:22,mag:42,def:24,spd:26,skills:['gekko','mamori'],look:{head:'moon',hair:'#d8d8f8',body:'#24188c',accent:'#d8d8f8',legs:'#000000',held:'杖'}},
     {id:'okuninushi',name:'大国主命',short:'大国主',rarity:'UR',weight:2,weapon:'any',hp:160,mp:70,atk:26,mag:32,def:30,spd:16,skills:['inaba','kobu'],look:{head:'okuni',hair:'#000000',body:'#fcfcfc',accent:'#00a800',legs:'#fcfcfc',held:'神器'}},
@@ -486,11 +490,13 @@ const BASE_PACK={
     ['w_ame','天叢雲剣','UR','片手剣'],['w_magatama','八尺瓊勾玉','UR','神器'],['w_yata','八咫鏡','LR','神器'],
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
-    ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_cassius','カシウスの槍','XR','聖槍',200],
+    ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
     {id:'pu_kami',name:'名もなき神 降臨ピックアップ',type:'char',pickup:['kami','yusha2']},
+    {id:'pu_kuniumi',name:'XR 国生みの二柱 降臨',type:'char',pickup:['izanagi','izanami','amaterasu','susanoo','tsukuyomi']},
+    {id:'pu_amanuboko',name:'XR 天乃沼鉾 降臨',type:'weapon',pickup:['w_amanuboko','w_nuboko','w_habakiri','w_futsu']},
     {id:'pu_longinus',name:'XR ロンギヌス＆カシウスの槍 降臨',type:'weapon',pickup:['w_longinus','w_cassius','w_totsuka','w_ryujin','w_seishin']},
     {id:'pu_newarms',name:'新武器 LR・UR ピックアップ',type:'weapon',pickup:['w_totsuka','w_ryujin','w_seishin','w_doji','w_kanabo','w_norito','w_houou','w_raijodo','w_nyoi']},
     {id:'pu_jingi',name:'三種の神器ピックアップ',type:'weapon',pickup:['w_yata','w_ame','w_magatama']},
@@ -800,16 +806,17 @@ function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
-const XRSK={amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
+const XRSK={izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
 const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id))b=b.concat(['addimpact']);return b;};
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
-const xrReady=id=>xrCand(id)&&!!(G&&G.chars&&G.chars[id])&&G.chars[id].dup+1>=XR_LV;
+const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
+const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
 /* XRは 編成に 1体だけ。パーティ内で 先頭の 1体のみ XR、2体目以降は UR扱い（基礎Lvは そのまま） */
 const xrLead=()=>G&&G.party?G.party.find(xrReady):null;
 const isXR=id=>xrReady(id)&&(!G.party||!G.party.includes(id)||xrLead()===id);
-const crar=id=>isXR(id)?6:CH[id].rar;
-function applyXR(){for(const id in CH){if(!xrCand(id))continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
+const crar=id=>isXR(id)?6:Math.min(5,CH[id].rar);
+function applyXR(){for(const id in CH){if(!xrCand(id)&&!xrNative(id))continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
   if(isXR(id)){d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}else{d.name=d._base.name;d.short=d._base.short;}}}
 function addWeapon(id){const w=G.weapons[id];if(w){w.dup=Math.min(999,w.dup+1);return false;}G.weapons[id]={lv:1,exp:0,dup:0};return true;}
 const GOD_IDS=['kami','amaterasu','susanoo','tsukuyomi','okuninushi'];
@@ -972,7 +979,7 @@ function drawWIcon(id,x,y,sc=1){
     case '聖槍':if(/カシウス/.test(d.name)){for(let k=0;k<13;k++)P(1+k,15-k,2,2,k%3?'#3c3c3c':'#00a800');for(let k=0;k<5;k++){P(10+k,4-((k+1)>>1),1,2,'#7c7c7c');P(13-((k)>>1),k,2,1,'#5c5c5c');}P(14,0,1,4,col);P(10,1,1,3,col);P(4,11,2,2,col);break;}
       for(let k=0;k<13;k++)P(1+k,15-k,2,2,'#a81000');P(11,0,2,6,'#d82800');P(14,2,2,6,'#d82800');P(12,4,3,2,'#d82800');P(10,0,1,3,col);P(15,1,1,3,col);P(4,11,2,2,col);break;
     case '神宝':
-      if(/矛/.test(d.name)){for(let k=0;k<12;k++)P(2+k,14-k,2,2,'#c89060');P(12,1,3,4,'#f8d878');P(11,2,5,1,'#f8d878');}
+      if(/矛|鉾/.test(d.name)){for(let k=0;k<12;k++)P(2+k,14-k,2,2,'#c89060');P(12,1,3,4,'#f8d878');P(11,2,5,1,'#f8d878');}
       else if(/弓/.test(d.name)){for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#f8b800');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#f8d878');}
       else if(/鏡/.test(d.name)){pc(8,8,7,'#fc7460');pc(8,8,5,'#f8d878');for(let k=0;k<8;k++){const a=k/8*Math.PI*2;P(8+Math.round(Math.cos(a)*7),8+Math.round(Math.sin(a)*7),1,1,'#fcfcfc');}}
       else{for(let k=0;k<11;k++)P(4+k,11-k,2,2,'#fcfcfc');for(let k=0;k<10;k++)P(5+k,11-k,1,1,'#a4e4fc');P(2,10,5,2,'#f8d878');P(1,13,3,3,'#d82800');}
@@ -1451,7 +1458,7 @@ function pull(b,n,minR=0){
   for(let i=0;i<n;i++){
     if(i%10===0)got=false;
     let fl=minR;if(n>=10&&i%10===9&&!got)fl=Math.max(fl,3);if(n>=100&&i===n-1&&!gotUR)fl=Math.max(fl,4);
-    let rar=rollRar(fl);if(b.type==='weapon'&&rar===5&&poolFor(b,6).length&&rnd()<(b.pickup.some(id=>WPD[id]&&WPD[id].rar===6)?.5:.1))rar=6;
+    let rar=rollRar(fl);if(rar===5&&poolFor(b,6).length&&rnd()<(b.pickup.some(id=>{const d=(b.type==='weapon'?WPD:CH)[id];return d&&d.rar===6;})?.5:.1))rar=6;
     const p=pickOne(b,rar);if(p.rar>=3)got=true;if(p.rar>=4)gotUR=true;
     const isNew=b.type==='weapon'?addWeapon(p.id):addChar(p.id);
     out.push({id:p.id,rar:p.rar,isNew,w:b.type==='weapon',dup:(b.type==='weapon'?G.weapons:G.chars)[p.id].dup});
@@ -1711,6 +1718,8 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='unabarising'){live().forEach(e=>e.stun=5);m.extra=5;BT.shake=16;return '大海原が 荒れくるう！\n敵は 5ターン 動けない！\n須佐之男は 5ターン 追加攻撃する！';}
         if(k==='nightparry'){BT.pt.forEach(t=>{t.ab=t.db=5;t.av=t.dv=1.2;});live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.5);e.mag=Math.round(e.mag*.5);e.def=Math.round(e.def*.5);}e.deb=5;});return '月夜の パーティーが はじまった！\nみかたの 攻撃と 守備が 超強化！\n敵の 攻撃・魔力・守備が 半分に！';}
         if(k==='kunizukuri'){BT.pt.forEach(t=>{if(!isAlive(t))return;t.shield=Math.round(cstat(t.id,t).hp*.6);t.shT=5;t.regen=5;});return '国造りの 力が みかたを つつむ！\n強力な シールドを はった！\n5ターン 毎ターン HPが 35% 回復する！';}
+        if(k==='kuniumi'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;t.ab=t.db=5;t.av=t.dv=1.0;});sfx('heal');BT.shake=10;return '天沼矛で 混沌を かきまわし 国を 生みだす！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\nみかたの 攻撃・守備が 5ターン +100%！';}
+        if(k==='yomotsu'){NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.4))):null));live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.4);e.mag=Math.round(e.mag*.4);e.def=Math.round(e.def*.4);}e.deb=5;});sfx('magic');BT.shake=16;return '黄泉の 国の 主が 姿を あらわす…\n敵全体の HPを 最大HPの 40% 削る！\n敵の 攻撃・魔力・守備が 5ターン -60%！';}
         if(k==='yuiga'){m.db=5;m.dv=4;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
         return null;}
 function pExtra(i){const m=BT.pt[i];if(!isAlive(m)||!(m.extra>0))return;BT.pend.push('\f');const nm=CH[m.id].short;
@@ -1745,7 +1754,9 @@ function autoCmd(i){
     if(xk==='unabarising'&&anyEn&&!BT.en.some(e=>e.alive&&e.stun>0))return{type:'skill',k:xk};
     if(xk==='nightparry'&&anyEn&&BT.pt.some(t=>isAlive(t)&&t.ab<=0))return{type:'skill',k:xk};
     if(xk==='kunizukuri'&&BT.pt.some(t=>isAlive(t)&&!(t.regen>0)&&(t.shield||0)<=0))return{type:'skill',k:xk};
-    if(xk==='yuiga'&&anyEn&&!(BT.taunt&&BT.taunt.t>0))return{type:'skill',k:xk};}}
+    if(xk==='yuiga'&&anyEn&&!(BT.taunt&&BT.taunt.t>0))return{type:'skill',k:xk};
+    if(xk==='kuniumi'&&(dead.length||low.length||BT.pt.some(t=>isAlive(t)&&t.ab<=0)))return{type:'skill',k:xk};
+    if(xk==='yomotsu'&&anyEn&&rnd()<.6)return{type:'skill',k:xk};}}
   if(dead.length){const rv=mySk.find(k=>can(k)&&(SK[k].k==='revive'||(SK[k].k==='heal'&&SK[k].rev)));if(rv)return SK[rv].k==='revive'?{type:'skill',k:rv,t:dead[0]}:{type:'skill',k:rv};}
   if(low.length){const all=mySk.find(k=>can(k)&&(SK[k].k==='heal'||SK[k].k==='song')&&SK[k].tg==='allies');if(all&&(low.length>=2||!mySk.some(k=>can(k)&&SK[k].k==='heal'&&SK[k].tg==='ally')))return{type:'skill',k:all};
     const one=mySk.find(k=>can(k)&&SK[k].k==='heal'&&SK[k].tg==='ally');if(one)return{type:'skill',k:one,t:low[0]};}
@@ -1780,7 +1791,9 @@ const XR_DESC={ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n�
   nightparry:'味方全体の 攻撃・守備 +120%（5ターン）\n＋敵全体の 攻撃・魔力・守備 -50%（5ターン）',
   kunizukuri:'味方全体に 最大HPの 60%の シールド\n＋5ターン 毎ターン HPが 35% 回復',
   yuiga:'自分の 守備力 +400%（5ターン）＋敵は 自分しか\n攻撃できない（5ターン）＋敵全体に 強力な 魔法攻撃',
-  addimpact:'XRスキル5種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊）から\nランダムで 2回 発動する'};
+  kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
+  yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
+  addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
     case 'phys':return `${tg}に 物理攻撃（威力 ×${s.p}${s.hits>1?`・${s.hits}回 攻撃`:''}）\n攻撃力で ダメージが きまる`;
