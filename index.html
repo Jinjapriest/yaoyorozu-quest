@@ -1191,8 +1191,8 @@ function onStep(){
   {const rr=RES.find(r=>r.x===x&&r.y===y);if(rr){resScr(rr.id);return;}}
   if(t===T.MINE){mineScr();return;}
   if(t===T.SHR){const s=SHRS.find(s=>s.x===x&&s.y===y);if(s.key==='tamakane'){tamakaneScr(s);return;}if(s.rank){choice(`山頂に ${s.name}が ある。\n修験者の 聖地だ。 参拝しますか？`,['はい','いいえ'],r=>{if(r===0)prayScr(s.rank,s.name,s.key,()=>{});});return;}choice('道ばたに 小さな 無格社が ある。\n参拝しますか？',['はい','いいえ'],r=>{if(r===0)prayScr(0,'無格社',s.key,()=>{});});return;}
-  if(t===T.CAVE&&G.boss>=OROCHI_MAX){dialog(['八岐大蛇は 完全に 鎮まっている…',`洞窟の 奥から 不気味な 気配が 法螺ヶ岳の 方へ 流れていく。\n（裏千日回峰行が 解放されている）`]);return;}
-  if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。（Lv${G.boss+1}/${OROCHI_MAX}）\n挑みますか？（目安Lv${Math.round(820*Math.pow(1.5,G.boss))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
+  if(t===T.CAVE&&G.boss>=OROCHI_MAX){dialog(['八岐大蛇は 完全に 鎮まっている…','八岐大蛇 Lv30を 倒した 者は もう 誰も 止められない…']);return;}
+  if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。（Lv${G.boss+1}/${OROCHI_MAX}）\n挑みますか？（目安Lv${G.boss>=14?'19999以上':Math.min(19999,Math.round(820*Math.pow(1.5,G.boss)))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
   G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
@@ -1614,7 +1614,9 @@ let BT=null;
 const isAlive=m=>G.chars[m.id].hp>0;
 function mkEnemy(t,def){const [name,shape,c1,c2]=def,b=ESH[shape],M=Math.pow(1.8,t),hp=Math.round(b.hp*M*(.9+rnd()*.2));
   return{name,shape,c1,c2,maxhp:hp,hp,atk:Math.round(b.atk*M),mag:Math.round((b.mag||0)*M),def:Math.round(b.def*M),spd:Math.round(b.spd*Math.pow(1.25,t)),magic:!!b.magic,heavy:!!b.heavy,alive:true,flash:0,die:0,t,w:34,h:40};}
-function mkBoss(){const lv=G.boss,M=Math.pow(1.8,8)*Math.pow(1.6,lv);
+/* Lv16以降は 1レベルごとに 1.12倍（Lv15までは 1.6倍） */
+const orochiGrow=(lv,a,b)=>Math.pow(a,Math.min(lv,14))*Math.pow(b,Math.max(0,lv-14));
+function mkBoss(){const lv=G.boss,M=Math.pow(1.8,8)*orochiGrow(lv,1.6,1.12);
   return{name:'八岐大蛇'+(lv?` Lv${lv+1}`:''),shape:'orochi',c1:'#006800',c2:'#a4e4a4',maxhp:Math.round(400*M),hp:Math.round(400*M),atk:Math.round(18*M),mag:Math.round(14*M),def:Math.round(10*M),spd:Math.round(10*5*Math.pow(1.1,lv)),boss:true,alive:true,flash:0,die:0,t:8,w:120,h:80};}
 function startBattle(boss,rift=null,sp=null){
   stopBGM();sfx('enc');
@@ -1905,7 +1907,7 @@ function winBattle(){
   BT.ph='end';stopBGM();sfx('win');
   const mul=blessMul();let coin=0,ex=0,ore=0,herb=0;
   for(const e of BT.en){
-    if(e.boss){const s=Math.pow(1.5,G.boss);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
+    if(e.boss){const s=orochiGrow(G.boss,1.5,1.12);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
     else{coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4);ex+=30*Math.pow(2.3,e.t);ore+=20*Math.pow(2.3,e.t);if(rnd()<.08)herb++;}
   }
   const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:1;
@@ -1942,7 +1944,8 @@ function winBattle(){
   if(G.morning>0)G.morning--;
   G.bc++;if(G.bc>=10){G.bc=0;pages.push(`${G.day+1}日目に なった。`,...advanceDay());}
   if(G.bless&&G.bless.left>0){G.bless.left--;if(G.bless.left===0)pages.push('加護の 効果が きれた。\n神社で また 参拝しよう。');}
-  if(BT.boss){G.boss=Math.min(OROCHI_MAX,G.boss+1);if(G.boss>=OROCHI_MAX){sfx('g5');pages.push('八岐大蛇 Lv15を 打ち倒した！','八岐大蛇は 完全に 鎮まった…','しかし その 怨念は 法螺ヶ岳の 峰々へ 流れこんだ。\n修行場で「裏千日回峰行」が 解放された！');}
+  if(BT.boss){G.boss=Math.min(OROCHI_MAX,G.boss+1);if(G.boss>=OROCHI_MAX){sfx('g5');G.items.b[3]+=20000;G.items.o[3]+=20000;G.items.urtk=(G.items.urtk||0)+30;pages.push('八岐大蛇 Lv30を 打ち倒した！','八岐大蛇は こんどこそ 完全に 鎮まった…','経験値書（極）×20,000・鍛錬鉱（極）×20,000\nUR確定チケット×30を 手に入れた！');}
+    else if(G.boss===UK_UNLOCK){sfx('g5');pages.push('八岐大蛇 Lv15を 打ち倒した！','八岐大蛇は 深い 眠りに ついた…','しかし その 怨念は 法螺ヶ岳の 峰々へ 流れこんだ。\n修行場で「裏千日回峰行」が 解放された！');}
     else pages.push(`八岐大蛇は 眠りについた。\nしかし いつか さらに 強くなって\nふたたび あらわれるだろう…（次は Lv${G.boss+1}）`);}
   if(!G.tut){G.tut=1;pages.push('経験値書と 鍛錬鉱は メニューの\n「キャラ育成」「武器の鍛錬」で 使うと\nレベルが あがるぞ。');}
   G.party.forEach(fixHp);save();
@@ -3613,7 +3616,7 @@ const DICT_DEF={boss:'ギム総書記',title:'総書記',hall:'党本部',party:
 const dinfo=v=>Object.assign({},DICT_DEF,typeof (v&&v.dict)==='object'?v.dict:{});
 function shugyoFac(){
   const cost=tierCost(300);
-  const uk=G.boss>=OROCHI_MAX;
+  const uk=G.boss>=UK_UNLOCK||(G.ukaiho&&G.ukaiho.rank>0);
   choice('行者「よく 来られた。\nいかなる 修行を 望まれるか。」',['滝行（無料・1日 すすむ）',`護摩祈祷（${fmt(cost)}イェソ）`,'峰入り修行（強敵と 戦う）','千日回峰行',...(uk?['裏千日回峰行']:[]),'やめる'],r=>{
     if(r===3){kaihoScr();return;}
     if(uk&&r===4){ukaihoScr();return;}
@@ -3676,7 +3679,7 @@ function kaihoWin(pages){
 }
 
 /* ===================== 裏千日回峰行（八岐大蛇Lv15 撃破で 解放・推奨Lv19999・ラスボス 裏オロチ） ===================== */
-const OROCHI_MAX=15,UK_F=89,UAJ=['','裏阿闍梨','裏大阿闍梨'];
+const OROCHI_MAX=30,UK_UNLOCK=15,UK_F=89,UAJ=['','裏阿闍梨','裏大阿闍梨'];
 function ukState(){if(!G.ukaiho)G.ukaiho={d:0,doiri:false,rank:0};return G.ukaiho;}
 function ukaihoScr(){
   const K=ukState();
@@ -3710,7 +3713,7 @@ function endingScr(){
     ['シナリオ・ゲームデザイン','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['キャラクター・ドット絵','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],
     ['音楽・効果音','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['テストプレイ','#7c7c7c'],['遊んでくれた 友だち のみなさん','#fcfcfc'],['',0],
     ['SPECIAL THANKS','#f8b800'],['八百万の 神々','#fcfcfc'],['そして この 冒険を 遊んでくれた あなた','#fcfcfc'],['',0],['',0],
-    [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${OROCHI_MAX} 撃破`,'#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
+    [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${G.boss} 撃破`,'#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
     ['THE END','#f8d878',2],['',0],['これからも 冒険は つづく…','#bcbcbc']];
   const total=L.length*18+150-60;
   push({full:true,upd(){t++;const sp=(I.holdA||keys.has('KeyZ'))?3:.45;y0+=sp;if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
