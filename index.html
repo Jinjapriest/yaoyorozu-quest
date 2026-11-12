@@ -167,7 +167,7 @@ td.n{text-align:right}
         <dt>もどる</dt><dd><kbd>X</kbd> / <kbd>Esc</kbd> / 右上の「もどる」</dd>
         <dt>メニュー</dt><dd>フィールドで <kbd>Z</kbd>、または右上の「メニュー」</dd>
         <dt>戦闘</dt><dd>オートにすると自動で戦います。<kbd>Z</kbd>長押しで早送り</dd>
-        <dt>コントローラー</dt><dd>十字キー／左スティックで移動、下のボタン（Xboxの A・PSの ×）で決定・長押しで早送り、右のボタン（B・○）でもどる、START か 上のボタン（Y・△）でメニュー</dd>
+        <dt>コントローラー</dt><dd>十字キー／左スティックで移動。Xbox：A決定（長押しで早送り）・Bもどる・≡（メニュー）かYでメニュー。PS5：×決定（長押しで早送り）・○もどる・OPTIONSか△でメニュー</dd>
         <dt>お金</dt><dd>通貨の単位は イェソ（yso）</dd>
       </dl>
     </section>
@@ -300,7 +300,9 @@ function pollPad(){const gps=navigator.getGamepads?navigator.getGamepads():[];co
     st.PadA=st.PadA||b(0);st.PadB=st.PadB||b(1);st.PadM=st.PadM||b(9)||b(3);}
   for(const k of ['PadU','PadD','PadL','PadR','PadA','PadB','PadM']){if(st[k]){if(!padPrev[k]){hit.add(k);if(k==='PadM')vMenu=true;initAudio();}keys.add(k);}else keys.delete(k);}
   padPrev=st;}
-addEventListener('gamepadconnected',()=>{try{toast('コントローラーを つなぎました');}catch(e){}});
+addEventListener('gamepadconnected',e=>{try{const id=String(e.gamepad&&e.gamepad.id||'').toLowerCase();
+  const ps=/054c|dualsense|dualshock|playstation|wireless controller/.test(id),xb=/045e|xbox|xinput/.test(id);
+  toast(ps?'PSコントローラー：×決定 ○もどる OPTIONS/△メニュー':xb?'Xboxコントローラー：A決定 Bもどる ≡/Yメニュー':'コントローラーを つなぎました');}catch(err){}});
 const touch={u:0,d:0,l:0,r:0,a:0,b:0};
 let vA=false,vB=false,tA=false,tB=false,vU=false,vD=false,vMenu=false;
 const I={u:0,d:0,l:0,r:0,pu:0,pd:0,pl:0,pr:0,A:false,B:false,holdA:false};
