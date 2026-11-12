@@ -2037,7 +2037,7 @@ function returnField(){BT=null;const tb=G.townBack;G.townBack=null;if(tb&&VIL[tb
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -2053,7 +2053,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(sz>=2?['kaitaku']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -2301,7 +2301,7 @@ function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kaitaku'){kaitakuFac();return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   switch(kind){case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -2506,7 +2506,7 @@ const presPay=c=>Math.floor(G.stock.p[c.id]*(c.ipo?20:40));
 const stockOwn=id=>(G.stock&&G.stock.own[id])||0;
 const ownRatio=()=>Math.min(1,stockOwn('tamakane')/TAMA_SHARES);
 const isListed=c=>!c.ipo||(c.ipo==='teiai'?!!G.teiaiStock:c.ipo==='res'?!!(G.res&&G.res[c.rid]&&G.res[c.rid].ipo):!!(G.mine&&G.mine.ipo));
-const listed=()=>STOCKS.filter(isListed).concat(G.myco?myList():[]);
+const listed=()=>STOCKS.filter(isListed).concat(G.myco?myList():[]).concat(G.reco?[recoDef()]:[]);
 const resRatio=rid=>Math.min(1,stockOwn('res_'+rid)/RES_SHARES);
 function resFair(rid){const M=G.res&&G.res[rid];if(!M)return 50;return RES_LV[rid][M.lv].coin*1.3*100/RES_SHARES;}
 function tamaFair(){const M=G.mine;if(!M)return 50;return MINE_LV[M.lv].coin*1.3*(M.boost>0?1.2:1)/100;}
@@ -2519,7 +2519,7 @@ function stockDaily(){
       else if(ev<.05){p*=2.2+rnd();msgs.push(`【速報】帝愛産業 ストップ高！\n新規カジノ船 事業が 発表され\n株価が ${pf(p)}イェソに 急騰！`);}
       else if(ev<.09){p*=.25+rnd()*.15;msgs.push(`【速報】帝愛産業 暴落！\n会長の 黒い 噂が 報じられ\n株価が ${pf(p)}イェソに 急落…`);}
       p=Math.min(1e6,Math.max(1,p));}
-    else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());}
+    else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='re'?reFair():c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());}
     else{const tr=c.p0*Math.exp(c.mu*G.day);p=Math.max(c.p0*.15,p*Math.exp(c.vol*gauss()+(Math.log(tr)-Math.log(p))*.02));}
     if(isPres(c.id)&&G.hr&&G.hr[c.id]){const h=G.hr[c.id];p*=1+(h.mor-50)/50*.003+(h.f.mochikabu?.002:0)-(h.strike>0?.01:0);}
     S.p[c.id]=Math.round(p*10)/10;(S.h[c.id]=S.h[c.id]||[]).push(S.p[c.id]);if(S.h[c.id].length>30)S.h[c.id].shift();}
@@ -3873,8 +3873,11 @@ function rePay(price,cb){const B=G.bank;
 function reDaily(){const S=G.re;if(!S||!S.p.length)return[];const msgs=[];
   for(const p of S.p){if(p.done&&p.done===G.day)msgs.push(`${VIL[p.vi].name}の ${RET[p.t].n}が 完成した！\n入居者の 募集を 始めた。`);}
   const occ=.85+rnd()*.15;S.pend+=Math.round(reDayRent()*occ);
-  if(G.day%RE_PAYDAY===0&&S.pend>0){const net=Math.floor(S.pend*RE_KEEP);G.bank.sav+=net;S.total+=net;
-    msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・固定資産税を\n引いた ${fmt(net)}イェソが 普通預金に 入った。`);S.pend=0;}
+  if(G.day%RE_PAYDAY===0&&S.pend>0){const net=Math.floor(S.pend*RE_KEEP);
+    if(G.reco){const sh=Math.min(1,stockOwn('reco')/RE_OUT),mine=Math.floor(net*sh);G.bank.sav+=mine;S.total+=mine;
+      msgs.push(`${G.reco.n}の 決算日！\n家賃収入 ${fmt(net)}イェソ（税・管理費 引き後）\n持株 ${Math.round(sh*100)}%分の 配当 ${fmt(mine)}イェソが\n普通預金に 入った。`);}
+    else{G.bank.sav+=net;S.total+=net;msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・固定資産税を\n引いた ${fmt(net)}イェソが 普通預金に 入った。`);}
+    S.pend=0;}
   return msgs;}
 /* 町の 物件（建物に 話しかける／不動産メニュー） */
 function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
@@ -3899,12 +3902,50 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
       choice(`${RET[p.t].n}を 売却\n${fmt(get)}イェソ（投資額の 8割）`,['売る','やめる'],r=>{if(r!==0)return;S.p.splice(S.p.indexOf(p),1);G.coins+=get;sfx('coin');save();dialog(`${RET[p.t].n}を 売却した。\n${fmt(get)}イェソを 受け取った。`);},96);});}
   },150);}
 /* メニュー：所有物件の 一覧 */
-function reMenuScr(){const S=reS();
-  if(!reOn()){dialog(['不動産は まだ 扱えない。','（グンマー帝国を 解放すると\n「宅地建物取引の 特許状」が もらえる）']);return;}
+const RE_OUT=100000,RE_MIN=5;
+const reNet=()=>reDayRent()*.925*RE_KEEP;
+const reFair=()=>Math.max(1,reNet()*250/RE_OUT);
+function recoDef(){const C=G.reco;return{id:'reco',n:C.n,sn:C.n.slice(0,9),vol:.02,out:RE_OUT,top:['機関投資家',30000],perk:'経験値祝詞・極上鉱石 ×1',give:k=>{G.items.b[4]=(G.items.b[4]||0)+k;G.items.o[4]=(G.items.o[4]||0)+k;},ipo:'re'};}
+const reRented=()=>reS().p.filter(p=>RET[p.t].rent>0&&!(p.done>G.day)).length;
+function reList(){const S=reS(),nxt=RE_PAYDAY-(G.day%RE_PAYDAY);
   if(!S.p.length){dialog(['所有物件は まだ ない。','町の 民家や ビルに 話しかけると\n売り物件を 見られる。']);return;}
-  const nxt=RE_PAYDAY-(G.day%RE_PAYDAY);
   listPick(`所有物件 ${S.p.length}件　家賃 ${fmt(reDayRent())}/日`,S.p.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')}　${RET[p.t].n}`,r:p.done>G.day?`工事中あと${p.done-G.day}日`:fmt(rentOf(p))})),()=>{},
-    ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に 振込）\nこれまでの 家賃収入 ${fmt(S.total)}イェソ\n管理費・固定資産税 15%`);}
+    ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に ${G.reco?'決算':'振込'}）\nこれまでの 受取 ${fmt(S.total)}イェソ\n管理費・固定資産税 15%`);}
+function reIpo(){const n=reRented();
+  if(n<RE_MIN){dialog(['証券会社「上場するには 家賃の 入る 物件が\n'+RE_MIN+'件 以上 必要です」',`（いま ${n}件）`]);return;}
+  askText('不動産会社の 名前を 決めてください',[{label:'会社名（12文字まで）',placeholder:'例：八百万リアルティ',max:12}],v=>{if(!v)return;const nm=String(v[0]||'').trim();if(!nm)return;
+    const val=reNet()*250,price=Math.max(1,Math.round(val/RE_OUT*10)/10),get=Math.floor(price*RE_OUT*.4*.95),fee=Math.max(1000000,Math.floor(val*.01));
+    dialog([`証券会社「${nm}として\n所有物件 ${reS().p.length}件を まとめて 上場させましょう！」`,`発行株数 ${fmt(RE_OUT)}株\nあなたが 60,000株（60%）を 持ち\n40,000株を 1株 ${pf(price)}イェソで 売り出す`,`売り出しで 約${fmt(get)}イェソが 入る。\n上場費用は ${fmt(fee)}イェソ。`,'上場後の 家賃収入は 会社の 利益に なり\n持株の 割合に 応じて 配当される。\n物件を 増やすほど 株価が 上がる！'],()=>
+      choice(`${nm}を 上場しますか？\n（費用 ${fmt(fee)}イェソ）`,['上場する','やめる'],k=>{if(k!==0)return;if(G.coins+G.bank.sav<fee){dialog('上場費用が 足りない。');return;}
+        if(G.coins>=fee)G.coins-=fee;else{G.bank.sav-=fee-G.coins;G.coins=0;}
+        const S=stk();G.reco={n:nm,day:G.day};S.p.reco=price;S.h.reco=[price];S.own.reco=60000;S.cost.reco=0;S.pres.reco=G.day;noCount(()=>{G.coins+=get;});sfx('lvup');save();
+        dialog(['カーン！ 上場の 鐘が 鳴りひびいた！',`株式会社 ${nm}が 上場した！\n売り出しで ${fmt(get)}イェソを 手に入れた。`,'筆頭株主の あなたが そのまま\n代表取締役社長に 就任した！','（都会以上の 証券取引所で 株価を 見られる。\n社長室で 給料・福利厚生も 決められる）']);},96));},
+    v=>String(v[0]||'').trim()?'':'会社名を 入れてください');}
+/* 開拓所：すべての 不動産を 一括管理 */
+function kaitakuFac(){
+  if(!reOn()){dialog(['開拓所「土地の 売買には\n宅地建物取引の 特許状が 必要だよ」','（グンマー帝国を 解放すると もらえる）']);return;}
+  const S=reS(),C=G.reco,ak=S.p.filter(p=>p.t==='akiya'),lots=S.p.filter(p=>p.t==='lot'),n=reRented();
+  const akCost=ak.reduce((a,p)=>a+Math.round(REN_COST*Math.max(landMul(p.vi),.5)),0);
+  const head=`開拓所　物件 ${S.p.length}件\n家賃 ${fmt(reDayRent())}イェソ/日`+(C?`\n${C.n} 株価 ${pf(stk().p.reco||0)}`:'');
+  choice(head,['所有物件の 一覧','町を えらんで 取引',{t:`空き家を 一括リフォーム（${ak.length}軒）`,dis:!ak.length},{t:`空き地に 一括建設（${lots.length}区画）`,dis:!lots.length},
+    C?{t:`${C.n.slice(0,8)}（上場済み）`,dis:true}:n>=RE_MIN?'不動産会社を 上場する':{t:`上場（物件 ${RE_MIN}件 以上）`,dis:true},'やめる'],k=>{
+    if(k===0){reList();return;}
+    if(k===1){const T=VIL.map((v,i)=>i).filter(i=>(G.seen['v'+i]||G.warps.includes(i))&&!VIL[i].tokoyo);
+      listPick('どの 町の 不動産？',T.map(i=>{const m=S.p.filter(p=>p.vi===i).length;return{t:VIL[i].name,r:m?`所有${m}件`:`地価×${landMul(i)<1?landMul(i).toFixed(2):landMul(i)}`,col:m?'#7ee07e':null};}),i=>reTown(T[i]),i=>{const v=VIL[T[i]];return v?`${v.name}（${SIZES[v.size].n}）\n建てられる 最大：${['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>RET[t].n).pop()}`:'';});return;}
+    if(k===2){choice(`空き家 ${ak.length}軒を まとめて リフォーム\n費用 合計 ${fmt(akCost)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(akCost,()=>{ak.forEach(p=>{p.paid+=Math.round(REN_COST*Math.max(landMul(p.vi),.5));p.t='reno';});sfx('lvup');dialog(`空き家 ${ak.length}軒の リフォームが 完了した！`);});},96);return;}
+    if(k===3){const B=['apart','mansion','shoubiru','btower'];
+      listPick('空き地に まとめて 建てる',B.map(t=>{const ok=lots.filter(p=>VIL[p.vi].size>=RET[t].min);return{t:RET[t].n,r:ok.length?`${ok.length}区画`:'建てられない',dis:!ok.length};}),i=>{const t=B[i],ok=lots.filter(p=>VIL[p.vi].size>=RET[t].min);if(!ok.length)return;
+        const cost=ok.reduce((a,p)=>a+Math.round(RET[t].build*landMul(p.vi)),0),rent=ok.reduce((a,p)=>a+Math.round(RET[t].rent*landMul(p.vi)),0);
+        choice(`${RET[t].n}を ${ok.length}区画に 建設\n建設費 合計 ${fmt(cost)}イェソ（工期${RET[t].days}日）\n完成後 家賃 約${fmt(rent)}イェソ/日`,['建てる','やめる'],r=>{if(r!==0)return;
+          rePay(cost,()=>{ok.forEach(p=>{p.paid+=Math.round(RET[t].build*landMul(p.vi));p.t=t;p.done=G.day+RET[t].days;});sfx('lvup');dialog(`${ok.length}区画で ${RET[t].n}の 建設が 始まった！\n${RET[t].days}日後に 完成する。`);});},96);},
+        i=>{const t=B[i];return t?`${RET[t].n}：${['どの町でも','中以上の町','大以上の町','都会以上の町'][i]}\n工期 ${RET[t].days}日`:'';});return;}
+    if(k===4&&!C)reIpo();
+  },150);}
+function reMenuScr(){
+  if(!reOn()){dialog(['不動産は まだ 扱えない。','（グンマー帝国を 解放すると\n「宅地建物取引の 特許状」が もらえる）']);return;}
+  const C=G.reco,n=reRented();
+  choice(C?`${C.n}　株価 ${pf(stk().p.reco||0)}イェソ\n持株 ${fmt(stockOwn('reco'))}株${isPres('reco')?'（社長）':''}　物件 ${reS().p.length}件`:`不動産　物件 ${reS().p.length}件\n家賃 ${fmt(reDayRent())}イェソ/日`,
+    ['所有物件の 一覧',C?{t:'上場済み',dis:true}:n>=RE_MIN?'不動産会社を 上場する':{t:`上場（物件 ${RE_MIN}件 以上）`,dis:true},'やめる'],k=>{if(k===0)reList();if(k===1&&!C)reIpo();},150);}
 
 /* ===================== グンマー帝国 シナリオ（人類保管計画） ===================== */
 var GM_F=33;
