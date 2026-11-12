@@ -1458,9 +1458,24 @@ function pull(b,n,minR=0){
   }
   return out;
 }
+/* ガチャ：通常2種＋期間限定ピックアップ（全ピックアップを ごちゃ混ぜにして 7日ごとに 入れかえ） */
+const GACHA_PERIOD=7;
+function activeBanners(){
+  const base=BANNERS.filter(b=>b.src==='基本'),extra=BANNERS.filter(b=>b.src!=='基本');
+  const P=Math.floor(((G&&G.day)||1)-1)/GACHA_PERIOD|0,left=GACHA_PERIOD-((((G&&G.day)||1)-1)%GACHA_PERIOD),r=lcg(P*7919+101);
+  const pool=t=>[...new Set(base.filter(b=>b.type===t).flatMap(b=>b.pickup))].filter(id=>(t==='weapon'?WPD:CH)[id]);
+  const pick=(arr,n)=>{const a=arr.slice(),o=[];while(a.length&&o.length<n)o.push(a.splice(Math.floor(r()*a.length),1)[0]);return o;};
+  const PRE=['神無月','祭囃子','月下','黄金','紅蓮','蒼天','百鬼夜行','天岩戸','夢幻','雷神','龍宮','桜吹雪','初詣','大祓'],SUF=['降臨祭','ピックアップ','大感謝祭','特選ガチャ','超召喚'];
+  const L=[];const used=new Set();
+  for(const t of ['char','char','weapon','weapon']){const ids=pick(pool(t).filter(x=>!used.has(x)),2+Math.floor(r()*3));ids.forEach(x=>used.add(x));
+    const d=t==='weapon'?WPD:CH;ids.sort((a,b)=>d[b].rar-d[a].rar);
+    L.push({id:`lim_${P}_${L.length}`,name:`【期間限定】${PRE[Math.floor(r()*PRE.length)]}${SUF[Math.floor(r()*SUF.length)]}`,type:t,pickup:ids,lim:1,left,src:'期間限定'});}
+  return [{id:'std_char',name:'通常ガチャ（キャラ）',type:'char',pickup:[],src:'通常'},{id:'std_weapon',name:'通常ガチャ（武器）',type:'weapon',pickup:[],src:'通常'},...L,...extra];
+}
 function openGacha(){
-  if(!BANNERS.length){toast('ガチャが ありません');return;}
-  banIdx=clamp(banIdx,0,BANNERS.length-1);
+  const GB=activeBanners();
+  if(!GB.length){toast('ガチャが ありません');return;}
+  banIdx=clamp(banIdx,0,GB.length-1);
   let st='menu',res=[],at=0,best=0,rp=0;const prevBgm=bgm;playBGM('gacha');
   const m=mkMenu([],{x:4,y:148,w:248,rows:6,rh:13});
   const tkAll=()=>G.items.tk+G.items.srtk+(G.items.urtk||0);
@@ -1469,10 +1484,10 @@ function openGacha(){
   const close=()=>{pop();save();playBGM(prevBgm||'field');};
   push({full:true,canBack:true,
     upd(){
-      const b=BANNERS[banIdx];
+      const b=GB[banIdx];
       if(st==='menu'&&xrNews.length){const ids=xrNews.splice(0);sfx('g5');dialog(ids.flatMap(id=>[`${CH[id]._base.name}の 基礎Lvが 100に 達した…！\nまばゆい 光が あふれだす！`,`新レアリティ XR（超越）\n「${CH[id].name}」に なった！\n（すべての 能力が 2.4倍）`]));return;}
       if(st==='menu'){
-        if(I.pl||I.pr){banIdx=(banIdx+(I.pr?1:BANNERS.length-1))%BANNERS.length;sfx('cur');}
+        if(I.pl||I.pr){banIdx=(banIdx+(I.pr?1:GB.length-1))%GB.length;sfx('cur');}
         const r=menuUpd(m);
         if(r==='cancel'||r===5){close();return;}
         const go=(n,minR)=>{res=pull(b,n,minR);best=Math.max(...res.map(x=>x.rar));st='anim';at=0;rp=0;save();};
@@ -1489,23 +1504,25 @@ function openGacha(){
       else if(st==='rates'){if(I.A||I.B)st='menu';}
     },
     drw(a){
-      const b=BANNERS[banIdx];
+      const b=GB[banIdx];
       for(let y=0;y<H;y+=8)R(0,y,W,8,y<120?(y%16?'#4c0c3c':'#580c44'):'#24081c');
       for(let k=0;k<30;k++){const x=(k*97+frame*(k%3+1)*.2)%W,y=(k*53)%150;R(x|0,y,1,1,'#f8d878');}
       if(st==='menu'||st==='rates'){
         win(4,22,248,22);txt('◀',12,29,'#f8b800');txt('▶',240,29,'#f8b800','right');
-        region(4,22,30,22,()=>{banIdx=(banIdx+BANNERS.length-1)%BANNERS.length;sfx('cur');});region(222,22,30,22,()=>{banIdx=(banIdx+1)%BANNERS.length;sfx('cur');});
+        region(4,22,30,22,()=>{banIdx=(banIdx+GB.length-1)%GB.length;sfx('cur');});region(222,22,30,22,()=>{banIdx=(banIdx+1)%GB.length;sfx('cur');});
         txt(`${b.type==='weapon'?'武器':'キャラ'}｜${b.name}`,128,29,'#fcfcfc','center',190);
-        txt(`ガチャ ${banIdx+1}/${BANNERS.length}`,8,8,'#bcbcbc');
+        txt(`ガチャ ${banIdx+1}/${GB.length}`,8,8,'#bcbcbc');
       }
       if(st==='menu'){
-        const pu=b.pickup.slice(0,4),n=pu.length,cw=Math.min(60,240/n);
+        if(!b.pickup.length){txt(b.type==='weapon'?'すべての 武器が 出る 通常ガチャ':'すべての キャラが 出る 通常ガチャ',128,80,'#bcbcbc','center',230);}
+        const pu=b.pickup.slice(0,4),n=pu.length,cw=Math.min(60,240/Math.max(1,n));
         pu.forEach((id,k)=>{const cx=128+(k-(n-1)/2)*cw,d=b.type==='weapon'?WPD[id]:CH[id];if(!d)return;
           R(cx-24,50,48,62,'#000');R(cx-24,50,48,1,rcol(d.rar));R(cx-24,111,48,1,rcol(d.rar));
           if(b.type==='weapon')drawWIcon(id,cx-16,58,2);else drawChar(id,cx-16,56,(frame>>4)&1,2);
           txt(RAR[d.rar].n,cx,92,rcol(d.rar),'center');txt(b.type==='weapon'?d.name:d.short,cx,102,'#fcfcfc','center',46);});
-        txt('PICK UP!',128,116,`hsl(${(frame*5)%360},100%,70%)`,'center');
-        txt('同じレアリティの中で ピックアップが 50%',128,128,'#fce0a8','center',240);
+        if(b.pickup.length){txt(b.lim?`PICK UP!　期間限定 あと${b.left}日`:'PICK UP!',128,116,`hsl(${(frame*5)%360},100%,70%)`,'center');
+        txt('同じレアリティの中で ピックアップが 50%',128,128,'#fce0a8','center',240);}
+        else txt(`期間限定ガチャは ${GACHA_PERIOD}日ごとに 入れかわる`,128,122,'#fce0a8','center',240);
         txt(`${fmt(G.coins)}イェソ`,194,8,'#f8b800','right',120);txt(`チケット ${fmt(G.items.tk)}・SR ${fmt(G.items.srtk)}・UR ${fmt(G.items.urtk||0)}`,128,138,'#bcbcbc','center',240);
         menuDraw(m,a);
       }else if(st==='rates'){
