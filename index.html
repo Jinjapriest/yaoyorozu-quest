@@ -167,6 +167,7 @@ td.n{text-align:right}
         <dt>もどる</dt><dd><kbd>X</kbd> / <kbd>Esc</kbd> / 右上の「もどる」</dd>
         <dt>メニュー</dt><dd>フィールドで <kbd>Z</kbd>、または右上の「メニュー」</dd>
         <dt>戦闘</dt><dd>オートにすると自動で戦います。<kbd>Z</kbd>長押しで早送り</dd>
+        <dt>コントローラー</dt><dd>十字キー／左スティックで移動、下のボタン（Xboxの A・PSの ×）で決定・長押しで早送り、右のボタン（B・○）でもどる、START か 上のボタン（Y・△）でメニュー</dd>
         <dt>お金</dt><dd>通貨の単位は イェソ（yso）</dd>
       </dl>
     </section>
@@ -289,13 +290,23 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',()=>{keys.clear();touch.u=touch.d=touch.l=touch.r=touch.a=0;});
-const KA=['KeyZ','Enter','Space','KeyJ'],KB=['KeyX','Escape','Backspace','KeyK'];
-const KD={u:['ArrowUp','KeyW'],d:['ArrowDown','KeyS'],l:['ArrowLeft','KeyA'],r:['ArrowRight','KeyD']};
+const KA=['KeyZ','Enter','Space','KeyJ','PadA'],KB=['KeyX','Escape','Backspace','KeyK','PadB'];
+const KD={u:['ArrowUp','KeyW','PadU'],d:['ArrowDown','KeyS','PadD'],l:['ArrowLeft','KeyA','PadL'],r:['ArrowRight','KeyD','PadR']};
+/* ゲームコントローラー（Xbox・PlayStation・Switch Proなど 標準配置） */
+let padPrev={};
+function pollPad(){const gps=navigator.getGamepads?navigator.getGamepads():[];const st={};
+  for(const g of gps){if(!g||!g.connected)continue;const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=i=>g.axes[i]||0;
+    st.PadU=st.PadU||b(12)||ax(1)<-.5;st.PadD=st.PadD||b(13)||ax(1)>.5;st.PadL=st.PadL||b(14)||ax(0)<-.5;st.PadR=st.PadR||b(15)||ax(0)>.5;
+    st.PadA=st.PadA||b(0);st.PadB=st.PadB||b(1);st.PadM=st.PadM||b(9)||b(3);}
+  for(const k of ['PadU','PadD','PadL','PadR','PadA','PadB','PadM']){if(st[k]){if(!padPrev[k]){hit.add(k);if(k==='PadM')vMenu=true;initAudio();}keys.add(k);}else keys.delete(k);}
+  padPrev=st;}
+addEventListener('gamepadconnected',()=>{try{toast('コントローラーを つなぎました');}catch(e){}});
 const touch={u:0,d:0,l:0,r:0,a:0,b:0};
 let vA=false,vB=false,tA=false,tB=false,vU=false,vD=false,vMenu=false;
 const I={u:0,d:0,l:0,r:0,pu:0,pd:0,pl:0,pr:0,A:false,B:false,holdA:false};
 const rcnt={u:0,d:0,l:0,r:0};
 function readInput(){
+  try{pollPad();}catch(e){}
   for(const k of ['u','d','l','r']){
     const h=KD[k].some(c=>keys.has(c))||!!touch[k];I[k]=h?1:0;rcnt[k]=h?rcnt[k]+1:0;
     I['p'+k]=(rcnt[k]===1||(rcnt[k]>18&&rcnt[k]%5===0)||KD[k].some(c=>hit.has(c)))?1:0;
