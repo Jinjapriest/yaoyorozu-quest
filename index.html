@@ -3383,15 +3383,21 @@ const LB=[{t:'1,000,000イェソ\n仮想通貨高騰券',s:'100万\n高騰券',g
   {t:'5,000,000イェソ',s:'500万\nイェソ',give:()=>{noCount(()=>{G.coins+=5000000;});}},
   {t:'UR確定チケット×5',s:'UR確定\n×5',give:()=>{G.items.urtk=(G.items.urtk||0)+5;}},
   {t:'UR確定チケット×50',s:'UR確定\n×50',give:()=>{G.items.urtk=(G.items.urtk||0)+50;}}];
+const g4=(b,o)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)+o;};
+const LB3=[{t:'経験値祝詞×1000\n極上鉱石×1000\n金景品（大）×100',s:'祝詞・極上\n×1000\n大景品100',give:()=>{g4(1000,1000);G.items.tok[0]+=100;}},
+  ...[2,3,4,5,6].map(()=>({t:'経験値祝詞×1000\n極上鉱石×1000',s:'祝詞・極上\n×1000',give:()=>g4(1000,1000)})),
+  {t:'経験値祝詞×2000\n極上鉱石×2000\nガチャチケット×1000',s:'祝詞・極上\n×2000\n券×1000',give:()=>{g4(2000,2000);G.items.tk+=1000;}}];
+const LBC=[{key:'lb',title:'リリース記念',start:LB_START,end:LB_END,days:LB},{key:'lb3',title:'Ver.3.0 公開記念',start:'2026-11-13',end:'2026-12-12',days:LB3}];
 const jstDay=()=>Math.floor((Date.now()+9*3600000)/86400000),jstOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000);
-function lbCheck(){if(!G)return false;const d=jstDay();if(d<jstOf(LB_START)||d>jstOf(LB_END))return false;const L=G.lb||(G.lb={n:0,last:0});return L.n<LB.length&&L.last!==d;}
-function lbShow(){const L=G.lb||(G.lb={n:0,last:0});const i=L.n;L.n++;L.last=jstDay();LB[i].give();save();sfx('lvup');let t=0;
-  push({upd(){t++;if(t>30&&(I.A||I.B)){pop();dialog([`リリース記念 ログインボーナス ${i+1}日目！`,`${LB[i].t.replace('\n','・')}を 手に入れた！`,...(i===0?['仮想通貨高騰券は 銀行の「仮想通貨」で 使えます。\n使うと 2日間（ゲーム内）仮想通貨が 高騰！']:[]),...(i<LB.length-1?[`明日も ログインしてね！（全${LB.length}日）`]:['7日間 ありがとう！ これからも 八百万クエストを\nよろしく おねがいします！'])]);}},
-    drw(){R(0,0,W,H,'rgba(0,0,0,.75)');win(8,22,240,188,'#f8b800');big('リリース記念',128,34,'#f8b800','center',14);txt('ログインボーナス（7日間）',128,52,'#fcfcfc','center');
+function lbCamp(){if(!G)return null;const d=jstDay();return LBC.find(c=>{if(d<jstOf(c.start)||d>jstOf(c.end))return false;const L=G[c.key]||(G[c.key]={n:0,last:0});return L.n<c.days.length&&L.last!==d;})||null;}
+function lbCheck(){return !!lbCamp();}
+function lbShow(){const C=lbCamp();if(!C)return;const LB=C.days,L=G[C.key];const i=L.n;L.n++;L.last=jstDay();LB[i].give();save();sfx('lvup');let t=0;
+  push({upd(){t++;if(t>30&&(I.A||I.B)){pop();dialog([`${C.title} ログインボーナス ${i+1}日目！`,`${LB[i].t}を 手に入れた！`,...(i===0&&C.key==='lb'?['仮想通貨高騰券は 銀行の「仮想通貨」で 使えます。\n使うと 2日間（ゲーム内）仮想通貨が 高騰！']:[]),...(i<LB.length-1?[`明日も ログインしてね！（全${LB.length}日）`]:['7日間 ありがとう！ これからも 八百万クエストを\nよろしく おねがいします！'])]);}},
+    drw(){R(0,0,W,H,'rgba(0,0,0,.75)');win(8,22,240,188,'#f8b800');big(C.title,128,34,'#f8b800','center',14);txt('ログインボーナス（7日間）',128,52,'#fcfcfc','center');
       for(let k=0;k<7;k++){const x=k<4?18+k*56:46+(k-4)*56,y=k<4?68:134,got=k<=i,now=k===i,c=k===6?'#f8d878':'#3cbcfc';
         R(x,y,50,58,now?(frame>>3)%2?'#7c4c10':'#5c3c08':got?'#24242c':'#14141c');R(x,y,50,1,c);R(x,y+57,50,1,c);R(x,y,1,58,c);R(x+49,y,1,58,c);
         txt(`${k+1}日目`,x+25,y+5,k===6?'#f8d878':'#bcbcbc','center');LB[k].s.split('\n').forEach((l,j)=>txt(l,x+25,y+22+j*12,got&&!now?'#7c7c7c':'#fcfcfc','center',48));
-        if(got&&!now){txt('済',x+40,y+44,'#d82800','center');}}
+        if(got&&!now){txt('済',x+43,y+5,'#d82800','center');}}
       if(t>30)txt('Zで うけとる',128,198,(frame>>4)%2?'#fcfcfc':'#7c7c7c','center');}});}
 function teiaiChika(){const P=G.chikaPending;G.chikaPending=null;const days=P.days,wage=100;
   dialog(['黒服たちが 現れ 両腕を つかまれた！','帝愛の 取り立て人「TEIAI CARDの ご利用、\nありがとうございました。」','「延滞分は 地下で 働いて 返して いただきます。」'],()=>{
