@@ -1455,7 +1455,7 @@ function pickOne(b,rar){
   let src=all;if(pu.length&&pu.length<all.length)src=rnd()<.5?pu:all.filter(p=>!b.pickup.includes(p.id));
   let tot=src.reduce((s,p)=>s+(p.w||1),0),x=rnd()*tot;for(const p of src){x-=(p.w||1);if(x<0)return p;}return src[0];
 }
-const GACHA_PRICE=500;
+const GACHA_PRICE=1000;
 function pull(b,n,minR=0){
   const out=[];let got=false,gotUR=false;
   for(let i=0;i<n;i++){
@@ -1470,6 +1470,19 @@ function pull(b,n,minR=0){
 }
 /* ガチャ：通常2種＋期間限定ピックアップ（全ピックアップを ごちゃ混ぜにして 現実の 毎週月曜に 入れかえ） */
 const GACHA_PERIOD=7;
+/* まとめ結果（大量に 引いたときは 演出を 省いて 集計を 出す） */
+function pullSummary(title,res,extra){const cnt=[0,0,0,0,0,0,0];res.forEach(x=>cnt[x.rar]++);const top=res.filter(x=>x.rar>=5);const nm=x=>{const d=(x.w?WPD:CH)[x.id];return d?(d._base||d).name:x.id;},names=[...new Set(top.map(nm))];
+  const L=[title,`N ${fmt(cnt[0])}　R ${fmt(cnt[1])}　SR ${fmt(cnt[2])}　SSR ${fmt(cnt[3])}\nUR ${fmt(cnt[4])}　LR ${fmt(cnt[5])}　XR ${fmt(cnt[6])}`];
+  if(names.length)L.push('LR以上：'+names.slice(0,6).join('・')+(names.length>6?` ほか${names.length-6}種`:''));if(extra)L.push(extra);return L;}
+function bulkPull(b,n,minR,nm){const res=[];for(let i=0;i<n;i+=100){res.push(...pull(b,Math.min(100,n-i),i===0?minR:minR));}save();sfx(res.some(x=>x.rar>=5)?'g5':'g3');
+  dialog(pullSummary(`${nm} ${fmt(n)}枚で まとめて 引いた！`,res));}
+function xrUntil(b){const MAXP=200000;
+  choice(`XRが 出るまで 引きつづけます。\nガチャチケット → イェソ（1回 ${fmt(Math.round(GACHA_PRICE*gachaDisc()))}）の 順に 使います。\nXRの 確率は とても 低いです（目安 1万回に 1回）。`,['引く','やめる'],k=>{if(k!==0)return;
+    const res=[];let paid=0,tku=0,got=null;const one=Math.round(GACHA_PRICE*gachaDisc());
+    while(res.length<MAXP){if((G.items.tk||0)>0){G.items.tk--;tku++;}else if(G.coins>=one){noCount(()=>{G.coins-=one;});paid+=one;}else break;
+      const r=pull(b,1,0)[0];res.push(r);if(r.rar===6){got=r;break;}}
+    save();sfx(got?'g5':'ng');
+    dialog(pullSummary(got?`XR「${((got.w?WPD:CH)[got.id]._base||(got.w?WPD:CH)[got.id]).name}」が 出た！（${fmt(res.length)}回目）`:`XRは 出なかった…（${fmt(res.length)}回）`,res,`使った：ガチャチケット ${fmt(tku)}枚・${fmt(paid)}イェソ${got?'':'\n（お金か チケットが 足りなく なった）'}`));},110);}
 function activeBanners(){
   /* 現実の 日本時間で 毎週月曜0時に 入れかわる */
   const D=Math.floor((Date.now()+9*3600000)/86400000),
@@ -1495,7 +1508,7 @@ function openGacha(){
   let st='menu',res=[],at=0,best=0,rp=0;const prevBgm=bgm;playBGM('gacha');
   const m=mkMenu([],{x:4,y:148,w:248,rows:6,rh:13});
   const tkAll=()=>G.items.tk+G.items.srtk+(G.items.urtk||0);
-  const gc=n=>Math.round(n*GACHA_PRICE*gachaDisc());const items=()=>[{t:'1回 引く',r:fmt(gc(1))+'イェソ',dis:G.coins<gc(1)},{t:'10連 引く（SSR以上1つ確定）',r:fmt(gc(10))+'イェソ',dis:G.coins<gc(10)},{t:'100連 引く（UR以上1つ確定）',r:fmt(gc(100))+'イェソ',dis:G.coins<gc(100)},{t:'チケットで 引く（1回・10連・100連）',r:`${fmt(tkAll())}枚`,dis:tkAll()<=0},{t:'提供割合とラインナップ'},{t:'もどる'}];
+  const gc=n=>Math.round(n*GACHA_PRICE*gachaDisc());const items=()=>[{t:'1回 引く',r:fmt(gc(1))+'イェソ',dis:G.coins<gc(1)},{t:'10連 引く（SSR以上1つ確定）',r:fmt(gc(10))+'イェソ',dis:G.coins<gc(10)},{t:'100連 引く（UR以上1つ確定）',r:fmt(gc(100))+'イェソ',dis:G.coins<gc(100)},{t:'チケットで 引く（まとめて 引くも）',r:`${fmt(tkAll())}枚`,dis:tkAll()<=0},{t:'XRが 出るまで 引く',r:fmt(gc(1))+'/回',dis:G.coins<gc(1)&&(G.items.tk||0)<=0},{t:'提供割合とラインナップ'},{t:'もどる'}];
   m.items=items();
   const close=()=>{pop();save();playBGM(prevBgm||'field');};
   push({full:true,canBack:true,
@@ -1505,15 +1518,16 @@ function openGacha(){
       if(st==='menu'){
         if(I.pl||I.pr){banIdx=(banIdx+(I.pr?1:GB.length-1))%GB.length;sfx('cur');}
         const r=menuUpd(m);
-        if(r==='cancel'||r===5){close();return;}
+        if(r==='cancel'||r===6){close();return;}
         const go=(n,minR)=>{res=pull(b,n,minR);best=Math.max(...res.map(x=>x.rar));st='anim';at=0;rp=0;save();};
         if(r===0||r===1||r===2){const n=[1,10,100][r];G.coins-=gc(n);go(n,0);}
         if(r===3){const TK=[['tk','ガチャチケット',0],['srtk','SR以上確定チケット',2],['urtk','UR確定チケット',4]];
           choice('どの チケットを 使いますか？',TK.map(([k,nm])=>({t:`${nm}（${fmt(G.items[k]||0)}枚）`,dis:!((G.items[k]||0)>0)})),k=>{if(k<0)return;
-            const [key,nm,minR]=TK[k],have=G.items[key]||0,ns=[1,10,100];
-            choice(`${nm}を 何枚 使いますか？\n（所持 ${fmt(have)}枚）`,ns.map(n=>({t:n===1?'1回 引く':n===10?'10連（10枚）':'100連（100枚）',dis:have<n})),j=>{if(j<0)return;
-              const n=ns[j];G.items[key]-=n;go(n,minR);m.items=items();},120);},170);}
-        if(r===4)st='rates';
+            const [key,nm,minR]=TK[k],have=G.items[key]||0,ns=[1,10,100,have];
+            choice(`${nm}を 何枚 使いますか？\n（所持 ${fmt(have)}枚）`,ns.map((n,q)=>({t:q===3?`まとめて 全部 引く（${fmt(have)}枚）`:n===1?'1回 引く':n===10?'10連（10枚）':'100連（100枚）',dis:q===3?have<2:have<n})),j=>{if(j<0)return;
+              const n=ns[j];G.items[key]-=n;if(n>100){bulkPull(b,n,minR,nm);m.items=items();return;}go(n,minR);m.items=items();},120);},170);}
+        if(r===5)st='rates';
+        if(r===4)xrUntil(b);
         m.items=items();
       }else if(st==='anim'){at++;if((I.A||I.B)&&at<70)at=70;if(at===70)sfx(best>=5?'g5':best>=3?'g3':'g0');if(at>=104){st='result';at=0;}}
       else if(st==='result'){at++;if(res.length>10){if(I.pr||I.pl){const np=Math.ceil(res.length/10)+1;rp=(rp+(I.pr?1:np-1))%np;sfx('cur');at=13;}if(I.B&&at>12)st='menu';else if(I.A&&at>12){rp++;if(rp>Math.ceil(res.length/10)){st='menu';rp=0;}else sfx('cur');}}else if((I.A||I.B)&&at>12)st='menu';}
@@ -2392,6 +2406,20 @@ const STOCKS=[
   {id:'norden',out:70000,top:['ノルデン港湾組合',6000],n:'ノルデン海運',p0:650,vol:.018,mu:.0004,perk:'15,000イェソ',give:k=>{G.coins+=15000*k;}},
   {id:'kohaku',out:40000,top:['琥珀島 網元',4000],n:'琥珀ジュエリー',p0:3500,vol:.03,mu:.0007,perk:'鍛錬鉱（極） ×1個',give:k=>{G.items.o[3]+=k;}},
   {id:'colokogyo',out:60000,top:['闘技場 支配人',6000],n:'コロッセア興行',p0:1800,vol:.028,mu:.0006,perk:'SR以上確定チケット ×1枚',give:k=>{G.items.srtk+=k;}},
+  {id:'koku',out:110000,top:['八百万航空 創業家',9000],n:'八百万航空',p0:1300,vol:.02,mu:.0005,perk:'ガチャチケット ×2枚',give:k=>{G.items.tk+=2*k;}},
+  {id:'iwato',out:90000,top:['岩戸組 会長',7000],n:'天岩戸建設',p0:850,vol:.016,mu:.0004,perk:'鍛錬鉱（大） ×4個',give:k=>{G.items.o[2]+=4*k;}},
+  {id:'tsukuyaku',out:80000,top:['月読財団',6000],n:'月読製薬',p0:2600,vol:.022,mu:.0006,perk:'やくそう ×60',give:k=>{G.items.herb+=60*k;}},
+  {id:'zosen',out:70000,top:['須佐 造船所',6000],n:'須佐之男造船',p0:1100,vol:.02,mu:.0004,perk:'20,000イェソ',give:k=>{G.coins+=20000*k;}},
+  {id:'fudosan',out:130000,top:['出雲 地主会',11000],n:'大国主不動産',p0:1700,vol:.01,mu:.0004,perk:'40,000イェソ',give:k=>{G.coins+=40000*k;}},
+  {id:'kitsune',out:90000,top:['狐火電機 創業家',7000],n:'狐火電機',p0:1450,vol:.019,mu:.0005,perk:'経験値書（大） ×4冊',give:k=>{G.items.b[2]+=4*k;}},
+  {id:'kagura',out:60000,top:['神楽 プロダクション',5000],n:'神楽エンターテインメント',sn:'神楽エンタメ',p0:2800,vol:.032,mu:.0007,perk:'SR以上確定チケット ×1枚',give:k=>{G.items.srtk+=k;}},
+  {id:'torii',out:100000,top:['鳥居ホールディングス',8000],n:'鳥居証券',p0:950,vol:.017,mu:.0004,perk:'25,000イェソ',give:k=>{G.coins+=25000*k;}},
+  {id:'inari',out:90000,top:['稲荷講',7000],n:'稲荷フーズ',p0:780,vol:.011,mu:.0003,perk:'やくそう ×40・経験値書（中） ×10',give:k=>{G.items.herb+=40*k;G.items.b[1]+=10*k;}},
+  {id:'yata',out:100000,top:['八咫 運送組合',8000],n:'八咫烏運輸',p0:1250,vol:.015,mu:.0005,perk:'ガチャチケット ×2枚',give:k=>{G.items.tk+=2*k;}},
+  {id:'raijin',out:120000,top:['雷神 電源開発',10000],n:'雷神エネルギー',p0:1600,vol:.021,mu:.0005,perk:'35,000イェソ',give:k=>{G.coins+=35000*k;}},
+  {id:'games',out:70000,top:['八百万ゲームス 社長',6000],n:'八百万ゲームス',p0:3200,vol:.04,mu:.0009,perk:'ガチャチケット ×4枚',give:k=>{G.items.tk+=4*k;}},
+  {id:'tokoyobio',out:50000,top:['常世研究所',5000],n:'常世バイオ',p0:4200,vol:.045,mu:.0009,perk:'経験値書（極） ×1冊',give:k=>{G.items.b[3]+=k;}},
+  {id:'nichirin',out:80000,top:['日輪 発電組合',6000],n:'日輪ソーラー',p0:1900,vol:.026,mu:.0006,perk:'鍛錬鉱（極） ×1個',give:k=>{G.items.o[3]+=k;}},
   {id:'res_coal',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 グラード炭鉱',sn:'グラード炭鉱',p0:0,vol:.02,perk:'鍛錬鉱（大） ×10個',give:k=>{G.items.o[2]+=10*k;},ipo:'res',rid:'coal'},
   {id:'res_oil',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 ザルマ油田',sn:'ザルマ油田',p0:0,vol:.025,perk:'ガチャチケット ×3枚',give:k=>{G.items.tk+=3*k;},ipo:'res',rid:'oil'},
   {id:'res_kanmine',out:RES_SHARES,top:['機関投資家',20000],n:'株式会社 ヴェルナ金冠鉱山',sn:'金冠鉱山',p0:0,vol:.02,perk:'鍛錬鉱（極） ×1個',give:k=>{G.items.o[3]+=k;},ipo:'res',rid:'kanmine'},
