@@ -1286,9 +1286,9 @@ function openShop(vi){
 function coinWin(x,y){win(x,y,108,36);txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right');
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
 function openMenu(){
-  const m=mkMenu(['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','コード入力','せってい','きろく'],{x:8,y:20,w:96});
+  const m=mkMenu(['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','コード入力','せってい','きろく'],{x:8,y:20,w:96});m.rows=12;
   push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();save();return;}if(r==null)return;
-      [statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,codeScr,settingsScr,saveScr][r]();},
+      [statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,codeScr,settingsScr,saveScr][r]();},
     drw(a){menuDraw(m,a);coinWin(140,20);win(140,58,108,62);txt(`${G.day}日目`,148,65,'#fcfcfc');txt(`研修歴${G.career}`,240,65,'#bcbcbc','right');
       txt(G.job?`仕事：${G.job.prog}/${G.job.need}`:'仕事：なし',148,78,'#bcbcbc','left',92);txt(G.meal&&G.meal.left>0?`食事：${G.meal.n}`:'食事：なし',148,91,'#bcbcbc','left',92);txt(`チケット ${G.items.tk}枚`,148,104,'#f8b800','left',92);}});
 }
@@ -2268,7 +2268,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&c.t==='sdoor'){const v=TW.v,D=v.depop?dep(TW.vi):null;
       if(D&&!D.revived&&!D.kn.length){dialog([`${v.shrine}は 不活動宗教法人に なっている。\n神職が おらず お祭りも 途絶えている…`,'集会所で 神主を 配置すれば\n祭祀を 再開できる。']);return;}
       const rk=D&&!D.revived?0:v.rank;choice(`${D&&!D.revived?'不活動宗教法人':RANKS[rk].n}　${v.shrine}\n参拝しますか？`,['参拝する','やめる'],r=>{if(r===0)prayScr(rk,v.shrine,'v'+TW.vi,()=>{});});return;}
-    if(fresh&&(c.t==='front'||c.t==='roof')&&c.b&&c.b.kind==='house'){dialog(TW.city?'オフィスビルだ。 用は なさそうだ。':'ふつうの 民家だ。');return;}
+    if(fresh&&(c.t==='front'||c.t==='roof')&&c.b&&c.b.kind==='house'){if(TW.ship){dialog('船室だ。');return;}reTown(TW.vi);return;}
     if(!this.bt){sfx('bump');this.bt=14;}
   },
   drw(){
@@ -2837,7 +2837,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily());
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
@@ -3853,6 +3853,59 @@ function drawKGod(x,y,t){const top=y-84;
     R(x-2,top+29,4,1,'#a08870');}
   for(let i=0;i<8;i++){const q=t/30+i*.8;R(x+Math.cos(q)*34,top+50+Math.sin(q)*10,2,2,'#6844a0');}}
 
+/* ===================== 不動産（グンマー帝国 解放の 報酬） ===================== */
+const LAND=[.3,.5,1,2,4,8,15];
+const RET={akiya:{n:'空き家',base:2e6,rent:1e4},reno:{n:'空き家（リフォーム済）',rent:3e4},chuko:{n:'中古住宅',base:8e6,rent:4e4},office:{n:'オフィスビル',base:2e8,rent:1.2e6},tower:{n:'タワマン',base:1e9,rent:6e6},lot:{n:'空き地',base:5e6,rent:0},
+  apart:{n:'アパート',build:3e7,rent:1.8e5,min:0,days:3},mansion:{n:'マンション',build:1.5e8,rent:9e5,min:2,days:7},shoubiru:{n:'商業ビル',build:4e8,rent:2.5e6,min:3,days:10},btower:{n:'タワマン（新築）',build:2e9,rent:1.3e7,min:4,days:20}};
+const REN_COST=3e6,RE_KEEP=.85,RE_PAYDAY=10;
+const reOn=()=>!!(G&&G.gm&&G.gm.ch>=7);
+function reS(){if(!G.re)G.re={p:[],pend:0,total:0};return G.re;}
+const landMul=vi=>{const v=VIL[vi],D=v.depop?dep(vi):null;return LAND[Math.min(6,v.size)]*(D&&!D.revived?.2:1);};
+const reCap=(vi,t)=>{const v=VIL[vi],sz=v.size;return{akiya:sz<=1||v.depop?3:1,chuko:sz>=1&&sz<=3?4:sz>=4?2:0,office:sz>=3?sz:0,tower:sz>=5?2:0,lot:2+sz}[t]||0;};
+const reOwned=(vi,t)=>reS().p.filter(p=>p.vi===vi&&(p.t===t||(t==='akiya'&&p.t==='reno')||(t==='lot'&&RET[p.t].build))).length;
+const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi));
+const reDayRent=()=>reS().p.reduce((a,p)=>a+rentOf(p),0);
+function rePay(price,cb){const B=G.bank;
+  if(G.coins<price&&B.sav<price){dialog(`お金が たりない。\n（${fmt(price)}イェソ 必要）`);return;}
+  const go=src=>{if(src==='sav')B.sav-=price;else G.coins-=price;sfx('coin');cb();save();};
+  if(G.coins>=price&&B.sav>=price)choice(`${fmt(price)}イェソ\nどこから 払いますか？`,['財布から','普通預金から'],k=>{if(k>=0)go(k?'sav':'coins');},96);else go(G.coins>=price?'coins':'sav');}
+/* 毎日：家賃が たまり 10日ごとに 普通預金へ 振込 */
+function reDaily(){const S=G.re;if(!S||!S.p.length)return[];const msgs=[];
+  for(const p of S.p){if(p.done&&p.done===G.day)msgs.push(`${VIL[p.vi].name}の ${RET[p.t].n}が 完成した！\n入居者の 募集を 始めた。`);}
+  const occ=.85+rnd()*.15;S.pend+=Math.round(reDayRent()*occ);
+  if(G.day%RE_PAYDAY===0&&S.pend>0){const net=Math.floor(S.pend*RE_KEEP);G.bank.sav+=net;S.total+=net;
+    msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・固定資産税を\n引いた ${fmt(net)}イェソが 普通預金に 入った。`);S.pend=0;}
+  return msgs;}
+/* 町の 物件（建物に 話しかける／不動産メニュー） */
+function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
+  if(!reOn()){dialog(TW&&TW.city?'オフィスビルだ。 用は なさそうだ。':'ふつうの 民家だ。');return;}
+  if(occupied(vi)){dialog('独裁者の 支配下では\n不動産の 取引は できない…');return;}
+  const mine=S.p.filter(p=>p.vi===vi),lots=mine.filter(p=>p.t==='lot'),ak=mine.filter(p=>p.t==='akiya');
+  const head=`${v.name}の 不動産（地価 ×${lm<1?lm.toFixed(2):lm}）\n所有 ${mine.length}件　家賃 ${fmt(mine.reduce((a,p)=>a+rentOf(p),0))}/日`;
+  const ops=[{t:'物件を 買う'},{t:`空き地に 建てる（${lots.length}区画）`,dis:!lots.length},{t:`空き家を リフォーム（${ak.length}軒）`,dis:!ak.length},{t:'物件を 売る',dis:!mine.length},{t:'やめる'}];
+  choice(head,ops,k=>{
+    if(k===0){const L=['akiya','chuko','office','tower','lot'].filter(t=>reCap(vi,t)>0).map(t=>({t,left:reCap(vi,t)-reOwned(vi,t),price:Math.round(RET[t].base*lm)}));
+      listPick(`${v.name}　売り物件`,L.map(o=>({t:RET[o.t].n,r:o.left>0?fmt(o.price):'売約済',dis:o.left<=0,col:o.left>0?null:'#7c7c7c'})),i=>{const o=L[i];if(o.left<=0){dialog('もう 売り物件が ない。');return;}
+        choice(`${RET[o.t].n}　${fmt(o.price)}イェソ\n${o.t==='lot'?'建物を 建てると 家賃が 入る':`家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`}\n購入しますか？（残り${o.left}件）`,['購入する','やめる'],r=>{if(r!==0)return;
+          rePay(o.price,()=>{S.p.push({vi,t:o.t,paid:o.price,since:G.day});sfx('lvup');dialog([`${v.name}の ${RET[o.t].n}を 購入した！`,o.t==='lot'?'（空き地には アパートや マンションを\n建てられる）':o.t==='akiya'?'（リフォームすると 家賃が 3倍に なる）':'家賃は 10日ごとに 普通預金へ 振り込まれる。']);});},96);},
+        i=>{const o=L[i];return o?`${RET[o.t].n}　残り${o.left}件\n${o.t==='lot'?'建設用の 土地':`家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`}`:'';});return;}
+    if(k===1){const B=['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>({t,cost:Math.round(RET[t].build*lm)}));
+      listPick('なにを 建てる？',B.map(o=>({t:RET[o.t].n,r:fmt(o.cost)})),i=>{const o=B[i];
+        choice(`${RET[o.t].n}を 建設\n建設費 ${fmt(o.cost)}イェソ（工期 ${RET[o.t].days}日）\n完成後 家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`,['建てる','やめる'],r=>{if(r!==0)return;
+          rePay(o.cost,()=>{const L=lots[0];L.t=o.t;L.paid+=o.cost;L.done=G.day+RET[o.t].days;sfx('lvup');dialog([`${RET[o.t].n}の 建設が 始まった！`,`${RET[o.t].days}日後に 完成する。`]);});},96);},
+        i=>{const o=B[i];return o?`${RET[o.t].n}　工期${RET[o.t].days}日\n家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`:'';});return;}
+    if(k===2){const p=ak[0],c=Math.round(REN_COST*Math.max(lm,.5));choice(`空き家を リフォーム\n費用 ${fmt(c)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(c,()=>{p.t='reno';p.paid+=c;sfx('lvup');dialog('空き家が きれいに なった！\n入居者が 決まりやすく なった。');});},96);return;}
+    if(k===3){listPick('売る 物件',mine.map(p=>({t:RET[p.t].n+(p.done>G.day?'（工事中）':''),r:fmt(Math.floor(p.paid*.8))})),i=>{const p=mine[i],get=Math.floor(p.paid*.8);
+      choice(`${RET[p.t].n}を 売却\n${fmt(get)}イェソ（投資額の 8割）`,['売る','やめる'],r=>{if(r!==0)return;S.p.splice(S.p.indexOf(p),1);G.coins+=get;sfx('coin');save();dialog(`${RET[p.t].n}を 売却した。\n${fmt(get)}イェソを 受け取った。`);},96);});}
+  },150);}
+/* メニュー：所有物件の 一覧 */
+function reMenuScr(){const S=reS();
+  if(!reOn()){dialog(['不動産は まだ 扱えない。','（グンマー帝国を 解放すると\n「宅地建物取引の 特許状」が もらえる）']);return;}
+  if(!S.p.length){dialog(['所有物件は まだ ない。','町の 民家や ビルに 話しかけると\n売り物件を 見られる。']);return;}
+  const nxt=RE_PAYDAY-(G.day%RE_PAYDAY);
+  listPick(`所有物件 ${S.p.length}件　家賃 ${fmt(reDayRent())}/日`,S.p.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')}　${RET[p.t].n}`,r:p.done>G.day?`工事中あと${p.done-G.day}日`:fmt(rentOf(p))})),()=>{},
+    ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に 振込）\nこれまでの 家賃収入 ${fmt(S.total)}イェソ\n管理費・固定資産税 15%`);}
+
 /* ===================== グンマー帝国 シナリオ（人類保管計画） ===================== */
 var GM_F=33;
 function gmS(){if(!G.gm)G.gm={ch:0};return G.gm;}
@@ -3940,7 +3993,7 @@ function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS();
   if(sp.st==='minus'){
     if(st.ch>=7){st.minus=(st.minus||0)+1;save();back(['人間を捨てた神は ふたたび 光の 中へ 消えた…',gmGive(30,30)]);return;}
     const rw=gmGive(200,200,50,100000000);
-    dialog(pages,()=>{BT=null;scene('peace',['人間を捨てた神は 光の 中で 崩れていく…','錨ケンドウ「それでも 人間は\n過ちを 繰り返すぞ…」','答えは 言葉では なかった。\nただ 帰還の 道を 選んだ。','保管された 人々の 意識が\n元の 世界へ 帰っていく…','帝都に 人々が 戻り\n街の 灯りが ふたたび 点った。',rw],()=>{
+    dialog(pages,()=>{BT=null;scene('peace',['人間を捨てた神は 光の 中で 崩れていく…','錨ケンドウ「それでも 人間は\n過ちを 繰り返すぞ…」','答えは 言葉では なかった。\nただ 帰還の 道を 選んだ。','保管された 人々の 意識が\n元の 世界へ 帰っていく…','帝都に 人々が 戻り\n街の 灯りが ふたたび 点った。',rw,'帝国から 解放の 礼として\n「宅地建物取引の 特許状」を 授かった！','どこの 町でも 民家や ビルを 買ったり\n空き地に マンションを 建てたり\nできる ように なった。（メニュー「不動産」）'],()=>{
       st.ch=7;G.townBack=null;G.pos={x:GGATE.x+1,y:GGATE.y};save();startField();
       scene('gate',['国境門に たどりついた。','最初に 捕まえた あの 衛兵が 立っている。','衛兵「おまえが ていこくを すくった えいゆうか。\n礼を いう。」','（ようやく 門を 通れる…！）','衛兵が すっと 手を 伸ばした。','「……ところで しゅっこくてがたは？」','「きそくは きそく。\nてがたが なければ とおせない。」'],()=>
         titleCard('グンマー帝国は 今日も 平和である。',()=>{sfx('g5');endingScr(()=>dialog(['（エンディングを 見終えた。\n冒険は まだまだ つづけられます）','（帝都の 出国管理局で\n正式な 出国手形を もらおう）']));}));});});return;}
