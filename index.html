@@ -3676,7 +3676,7 @@ function kaihoWin(pages){
 }
 
 /* ===================== 裏千日回峰行（八岐大蛇Lv15 撃破で 解放・推奨Lv19999・ラスボス 裏オロチ） ===================== */
-const OROCHI_MAX=15,UK_F=61,UAJ=['','裏阿闍梨','裏大阿闍梨'];
+const OROCHI_MAX=15,UK_F=89,UAJ=['','裏阿闍梨','裏大阿闍梨'];
 function ukState(){if(!G.ukaiho)G.ukaiho={d:0,doiri:false,rank:0};return G.ukaiho;}
 function ukaihoScr(){
   const K=ukState();
@@ -3696,13 +3696,37 @@ function ukaihoScr(){
     const n=Math.min(cap,[1,10,100][r]),mult=[1,1.35,1.9][r];
     dialog(`丑三つ時。 黒装束に 身を つつみ\n裏の 峰々を 歩きはじめた…\n（${n}日分の 裏回峰）`,()=>{while(stack.length>1)pop();startBattle(false,null,{kind:'ukaiho',n,mult});});
   },170);}
+/* 満行報酬（好きな XR）と エンディング */
+const XR_REWARD=[['char','izanagi'],['char','izanami'],['wpn','w_amanuboko'],['wpn','w_longinus'],['wpn','w_cassius']];
+function ukFinale(){
+  listPick('満行の 証：好きな XRを ひとつ えらぶ',XR_REWARD.map(([k,id])=>{const d=k==='char'?CH[id]:WPD[id];const own=k==='char'?G.chars[id]:G.weapons[id];return{t:(k==='char'?'XRキャラ ':'XR武器 ')+(k==='char'?d.name.replace('全てを超越せし',''):d.name),r:own?'（かぶり）':'',col:'#f8d878'};}),i=>{
+    const [k,id]=XR_REWARD[i];G.ukPend=0;if(k==='char')addChar(id);else addWeapon(id);save();sfx('g5');
+    dialog(`${k==='char'?CH[id].name:WPD[id].name}を 手に入れた！`,()=>endingScr());},()=>'選ばないと 先に 進めません');}
+function endingScr(){
+  stopBGM();playBGM('title');let t=0,y0=0;const party=G.party.slice(0,4);
+  const L=[['八百万クエスト','#f8d878',2],['',0],['── 完 ──','#fcfcfc',1],['',0],['',0],
+    ['八岐大蛇の 怨念は 裏の 峰々で 鎮められ',0],['八百万の 神々の 国に','#bcbcbc'],['ふたたび 静かな 朝が おとずれた。','#bcbcbc'],['',0],['',0],
+    ['── STAFF ──','#f8b800'],['',0],['企画・制作','#7c7c7c'],['田村 斎','#fcfcfc',1],['（ただの 神主）','#bcbcbc'],['',0],
+    ['シナリオ・ゲームデザイン','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['キャラクター・ドット絵','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],
+    ['音楽・効果音','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['テストプレイ','#7c7c7c'],['遊んでくれた 友だち のみなさん','#fcfcfc'],['',0],
+    ['SPECIAL THANKS','#f8b800'],['八百万の 神々','#fcfcfc'],['そして この 冒険を 遊んでくれた あなた','#fcfcfc'],['',0],['',0],
+    [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${OROCHI_MAX} 撃破`,'#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
+    ['THE END','#f8d878',2],['',0],['これからも 冒険は つづく…','#bcbcbc']];
+  const total=L.length*18+150-60;
+  push({full:true,upd(){t++;const sp=(I.holdA||keys.has('KeyZ'))?3:.45;y0+=sp;if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
+    drw(){const g=Math.min(1,y0/400);R(0,0,W,H,'#0c0820');R(0,150,W,90,`rgb(${Math.round(24+200*g)},${Math.round(16+90*g)},${Math.round(40+20*g)})`);pc(128,170,26,`rgba(252,216,120,${.25+.6*g})`);
+      for(let k=0;k<5;k++)R(0,150+k*2,W,1,'#0c0820');
+      R(0,196,W,44,'#000');R(96,150,6,46,'#a81000');R(154,150,6,46,'#a81000');R(86,146,84,6,'#d82800');R(92,156,72,4,'#a81000');
+      party.forEach((id,i)=>{const x=((t*.4+i*30)%300)-30;drawChar(id,Math.round(x),200,(t>>3)&1);});
+      L.forEach(([s,c,sz],i)=>{const y=150+i*18-y0;if(y<-20||y>132)return;if(!s)return;if(sz===2)big(s,128,y,c||'#fcfcfc','center',22);else if(sz===1)big(s,128,y,c||'#fcfcfc','center',14);else txt(s,128,y,c||'#fcfcfc','center',240);});
+      if(y0>total)txt('Zで もどる',128,226,(frame>>4)%2?'#fcfcfc':'#7c7c7c','center');}});}
 function ukaihoWin(pages){
   const K=ukState(),sp=BT.sp;
   if(sp.kind==='udoiri'){K.doiri=true;K.rank=Math.max(K.rank,1);const msgs=[];for(let i=0;i<9;i++)msgs.push(...advanceDay());fullHeal();
     pages.push('業火の化身を しりぞけた…','9日間の 裏堂入りを なしとげた！\n「裏阿闍梨」の 称号を 得た。\n全能力が ずっと 10% アップ。',...[...new Set(msgs)].slice(0,3));return;}
   if(sp.kind==='uorochi'){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());K.rank=2;
-    G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');
-    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','── 八百万クエスト 完 ──\n（これからも 冒険は つづく）',...[...new Set(msgs)].slice(0,2));return;}
+    G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');G.ukPend=1;
+    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','さらに 満行の 証として\n好きな XRを ひとつ さずけよう…',...[...new Set(msgs)].slice(0,2));return;}
   const before=K.d;K.d=Math.min(1000,K.d+sp.n);const msgs=[];for(let i=0;i<sp.n;i++)msgs.push(...advanceDay());
   pages.push(`裏回峰を やりとげた。（${before} → ${K.d}日）\n${G.day}日目に なった。`);
   for(let m=Math.floor(before/100)+1;m<=Math.floor(K.d/100);m++){G.career+=10;G.items.urtk=(G.items.urtk||0)+1;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\nUR確定チケットを 1枚 もらった。`);}
@@ -3823,7 +3847,8 @@ function drawTopBtn(){
 }
 function update(){
   frame++;readInput();
-  if(G&&G.chikaPending&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr))teiaiChika();
+  if(G&&G.ukPend&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr)){ukFinale();}
+  else if(G&&G.chikaPending&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr))teiaiChika();
   else if(G&&stack.length===1&&(stack[0]===townScr||stack[0]===fieldScr)&&frame%30===0&&lbCheck())lbShow();
   const s=top();if(s)s.upd();
   if(toastT>0)toastT--;
