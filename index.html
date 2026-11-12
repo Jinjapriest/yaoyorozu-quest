@@ -697,6 +697,18 @@ const GSEALS=[{id:'akagi',n:'赤城 封鎖区画',x:147,y:104,c:'#d82800',desc:'
   [['桑畑の村','桑畑神社',143,110,'aging'],['空っ風の里','風神社',178,110,'ruin'],['絹糸の村','絹笠神社',157,106,'aging'],['だるま坂の村','達磨八幡宮',170,128,'aging'],
    ['こんにゃく畑の村','蒟蒻稲荷',180,124,'ruin'],['湯けむり跡の村','湯前神社',163,131,'aging'],['養蚕の里','蚕影神社',142,123,'aging'],['焼きまんじゅう坂','饅頭社',168,104,'ruin']]
   .forEach(([name,shrine,x,y,dp],k)=>VIL.push({x,y,name,shrine,rank:1+(k%3),tier:12,size:0,from:CAP,gm:'vil',depop:dp,target:150,desc:dp==='ruin'?'帝都の 繁栄から 取り残され 人が 去った 村':'帝都へ 若者が 吸い込まれ 年寄りだけが 残った 村'}));}
+/* 帝国の 外：鎖国の 壁の 北に 広がる 外縁地方 */
+const GOUT={x0:130,y0:64,x1:186,y1:99};
+{const NOR=VIL.findIndex(v=>v.name==='ノルデン港'),SEKI=VIL.length;
+  VIL.push({x:135,y:106,name:'関所町 ソトガワ',shrine:'関守神社',rank:3,tier:12,size:3,from:NOR,desc:'国境門の 外に できた 入国待ちの 町'});
+  const K=VIL.length;
+  VIL.push({x:144,y:88,name:'絹の街 キヌガワ',shrine:'絹織天神',rank:4,tier:12,size:3,from:SEKI,desc:'帝国へ 納める 絹で 栄える 外縁の 街'});
+  VIL.push({x:180,y:70,name:'密貿易港 クロフネ',shrine:'黒船稲荷',rank:3,tier:12,size:4,from:K+3,desc:'鎖国の 抜け道と うわさの 港町'});
+  VIL.push({x:150,y:70,name:'亡命者の村',shrine:'逃れ地蔵の祠',rank:0,tier:12,size:1,from:K,desc:'帝国から 逃げてきた 人々の 村'});
+  VIL.push({x:168,y:80,name:'温泉郷 ユノハラ',shrine:'湯原神社',rank:2,tier:12,size:2,from:K,desc:'湯けむりの 立つ 外縁の 温泉郷'});
+  VIL.push({x:182,y:92,name:'外縁の砦町',shrine:'砦八幡宮',rank:5,tier:12,size:2,from:K+3,desc:'帝国の 壁を 見張る 古い 砦の 町'});
+  VIL.push({x:172,y:72,name:'廃線沿いの村',shrine:'鉄道神社',rank:1,tier:12,size:0,from:K+3,depop:'ruin',target:150,desc:'帝国の 鉄道が 止まり 人が 去った 村'});
+  VIL.push({x:158,y:94,name:'峠の集落',shrine:'峠の神の祠',rank:1,tier:12,size:0,from:K,depop:'aging',target:150,desc:'壁の 影に なり 日の 当たらない 集落'});}
 const GCAP=()=>VIL.findIndex(v=>v.gm==='cap');
 const inGun=(x,y)=>x>=GWALL.x0&&x<=GWALL.x1&&y>=GWALL.y0&&y<=GWALL.y1;
 const ISLES=[{cx:78,cy:15,rx:9,ry:7},{cx:87,cy:40,rx:9,ry:8},{cx:117,cy:44,rx:6,ry:5},{cx:117,cy:116,rx:7,ry:6}];
@@ -739,6 +751,10 @@ function genMap(){
     for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
       const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y)+(g4(x,y)-.5)*6;if(edge<0)continue;
       const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.74?T.MOUNT:e<.2?T.WATER:g3(x,y)>.62?T.FOREST:T.GRASS);}}
+  {const g1=mkNoise(251,9,MW),g2=mkNoise(263,4,MW),g3=mkNoise(277,6,MW),g4=mkNoise(281,5,MW),N=GOUT;
+    for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
+      if(x>=GWALL.x0&&x<=GWALL.x1&&y>=GWALL.y0)continue;const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y+6)+(g4(x,y)-.5)*6;if(edge<0)continue;
+      const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.72?T.MOUNT:e<.22?T.WATER:g3(x,y)>.6?T.FOREST:T.GRASS);}}
   const pts=[...VIL.filter(v=>v.from==null&&!v.island),CAVE];
   for(let i=0;i<pts.length-1;i++){
     const a=pts[i],b=pts[i+1],path=[];
