@@ -785,7 +785,8 @@ function drawTile(t,x,y){const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a
 
 /* ===================== ゲーム状態 ===================== */
 const SKEY='yaoyorozu-quest-v1';
-const BOOKV=[100,1000,10000,1000000],BN=['小','中','大','極'];
+const BOOKV=[100,1000,10000,1000000,100000000],BN=['小','中','大','極'];
+const BKN=k=>k===4?'経験値祝詞':`経験値書（${BN[k]}）`,ORN=k=>k===4?'極上鉱石（純度100%）':`鍛錬鉱（${BN[k]}）`,HONO=100;
 /* 必要経験値：Lvが 上がるほど 重くなる（キャラ・武器 共通） */
 const need=lv=>Math.round((10+lv*3)*3*(1+lv/1000));
 function blessMul(){return G.bless&&G.bless.left>0?1+G.bless.pct/100:1;}
@@ -896,13 +897,13 @@ function importSavePick(){
 }
 function newExtras(){return{ura:0,cap2:0,tokenRight:0,token:null,res:{},colo:0,stock:null,codes:{},mine:null,freed:{},taki:0,depop:{},warps:[],pachi:{medals:0,hall:null,cards:{}},day:1,bc:0,career:0,job:null,meal:null,morning:0,rifts:[],seen:{},bank:{sav:0,terms:[],nisa:0,nisaCost:0,cry:0,cryCost:0,fx:null},mk:{nisa:{p:10000,h:[10000]},cry:{p:100,h:[100]},fx:{p:150,h:[150]}}};}
 function newGame(){
-  G=Object.assign({coins:1000,items:{herb:3,b:[5,0,0,0],o:[3,0,0,0],tk:0,srtk:0,tok:[0,0,0]},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
+  G=Object.assign({coins:1000,items:{herb:3,b:[5,0,0,0,0],o:[3,0,0,0,0],tk:0,srtk:0,tok:[0,0,0]},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
   addChar('yusha1');addWeapon('w_dou');G.chars.yusha1.wpn='w_dou';G.party=['yusha1'];fullHeal();applyRevived();applyXR();wrapCoins();
 }
 function fixSave(){
-  const d=Object.assign({coins:0,items:{herb:0,b:[0,0,0,0],o:[0,0,0,0],tk:0},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
+  const d=Object.assign({coins:0,items:{herb:0,b:[0,0,0,0,0],o:[0,0,0,0,0],tk:0},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
   for(const k in d)if(G[k]==null)G[k]=d[k];
-  if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
+  if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];while(G.items.b.length<5)G.items.b.push(0);while(G.items.o.length<5)G.items.o.push(0);applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
   if(G.ukaiho&&G.ukaiho.rank>=2)G.cap3=1;applyXR();wrapCoins();
   G.party=G.party.filter(id=>CH[id]&&G.chars[id]);
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
@@ -1365,17 +1366,20 @@ function charDetail(id,after){
 }
 function bookMenu(id,kind){
   const inv=kind==='char'?G.items.b:G.items.o,nm=kind==='char'?'経験値書':'鍛錬鉱',obj=()=>kind==='char'?G.chars[id]:G.weapons[id];
-  const m=mkMenu([],{x:132,y:118,w:122,title:nm+'を使う'});
-  const CAP=kind==='char'?LVCAP():9999;
-  const refresh=()=>{m.items=[...BN.map((b,k)=>({t:`${nm}（${b}）`,r:'×'+fmt(inv[k]),dis:inv[k]<=0||obj().lv>=CAP})),{t:'ぜんぶ使う',dis:inv.every(v=>v<=0)||obj().lv>=CAP}];m.rows=5;};refresh();
+  const m=mkMenu([],{x:112,y:84,w:142,title:nm+'を使う'});
+  const CAP=kind==='char'?LVCAP():9999,NM=kind==='char'?BKN:ORN,TOP=kind==='char'?'経験値祝詞':'極上鉱石';
+  const refresh=()=>{m.items=[...[0,1,2,3,4].map(k=>({t:NM(k).replace('（純度100%）',''),r:'×'+fmt(inv[k]),dis:inv[k]<=0||obj().lv>=CAP,col:k===4?'#f8b800':null})),{t:'ぜんぶ使う',dis:inv.every(v=>v<=0)||obj().lv>=CAP},{t:`極${HONO}→${TOP}`,dis:inv[3]<HONO,col:'#f8b800'}];m.rows=7;};refresh();
   const use=(k,q)=>{const o=obj();let used=0;while(used<q&&inv[k]>0&&o.lv<CAP){inv[k]--;used++;o.exp+=Math.round(BOOKV[k]*(kind==='char'?expMul():1));while(o.lv<CAP&&o.exp>=need(o.lv)){o.exp-=need(o.lv);o.lv++;}}if(o.lv>=CAP)o.exp=0;return used;};
   const finish=(before)=>{const o=obj();if(kind==='char'){const s=cstat(id);o.hp=s.hp;o.mp=s.mp;}
     if(o.lv>before){sfx('lvup');toast(`Lv ${fmt(before)} → ${fmt(o.lv)}！`);}else toast('レベルは 上がらなかった');refresh();save();};
   push({upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r==null)return;
       const before=obj().lv;
-      if(r===4){for(let k=3;k>=0;k--)use(k,Infinity);finish(before);return;}
+      if(r===5){for(let k=4;k>=0;k--)use(k,Infinity);finish(before);return;}
+      if(r===6){const mx=Math.floor(inv[3]/HONO);
+        const q0=[1,10,100,1000].filter(x=>x<mx),done=n=>{if(!n)return;inv[3]-=n*HONO;inv[4]+=n;sfx('g5');toast(`${TOP}を ${fmt(n)}${kind==='char'?'巻':'個'} 手に入れた！`);refresh();save();};
+        choice((kind==='char'?`経験値書（極）${HONO}冊を 神前に 奉納すると\n「経験値祝詞」1巻を 授かる。\n（祝詞1巻 ＝ 極${HONO}冊分の 経験値）`:`鍛錬鉱（極）${HONO}個を 精錬すると\n純度100%の「極上鉱石」1個に なる。\n（極上1個 ＝ 極${HONO}個分）`)+`\nいくつ？（最大${fmt(mx)}）`,[...q0.map(x=>fmt(x)),`全部（${fmt(mx)}）`],k=>{if(k<0)return;done(k<q0.length?q0[k]:mx);},120);return;}
       const opts=[1,10,100].filter(q=>q<=inv[r]);
-      choice(`${nm}（${BN[r]}）を 何冊 使いますか？`,[...opts.map(q=>`${q}冊`),`全部(${fmt(inv[r])})`],k=>{if(k<0)return;const q=k<opts.length?opts[k]:inv[r];use(r,q);finish(before);});},
+      choice(`${NM(r)}を いくつ 使いますか？`,[...opts.map(q=>`${q}冊`),`全部(${fmt(inv[r])})`],k=>{if(k<0)return;const q=k<opts.length?opts[k]:inv[r];use(r,q);finish(before);});},
     drw(a){menuDraw(m,a);}});
 }
 function equipMenu(id,slot){
@@ -1415,11 +1419,11 @@ function itemScr(){
   const m=mkMenu([],{x:4,y:20,w:200,rows:9,title:'どうぐ'});m.rows=9;
   const refresh=()=>{m.items=[{t:'やくそう（HP40%回復）',r:'×'+fmt(G.items.herb),dis:G.items.herb<=0},
     {t:'ガチャチケット',r:'×'+fmt(G.items.tk),dis:true,col:'#bcbcbc'},{t:'SR以上確定チケット',r:'×'+fmt(G.items.srtk),dis:true,col:'#bcbcbc'},{t:'UR確定チケット',r:'×'+fmt(G.items.urtk||0),dis:true,col:'#bcbcbc'},...PRIZE.map((p,k)=>({t:p.n,r:'×'+fmt(G.items.tok[k]),dis:true,col:'#bcbcbc'})),
-    ...BN.map((b,k)=>({t:`経験値書（${b}）`,r:'×'+fmt(G.items.b[k]),dis:true,col:'#bcbcbc'})),...BN.map((b,k)=>({t:`鍛錬鉱（${b}）`,r:'×'+fmt(G.items.o[k]),dis:true,col:'#bcbcbc'}))];};refresh();
+    ...[0,1,2,3,4].map(k=>({t:BKN(k),r:'×'+fmt(G.items.b[k]||0),dis:true,col:k===4?'#f8b800':'#bcbcbc'})),...[0,1,2,3,4].map(k=>({t:ORN(k),r:'×'+fmt(G.items.o[k]||0),dis:true,col:k===4?'#f8b800':'#bcbcbc'}))];};refresh();
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r!==0)return;
       choice('だれに 使いますか？',G.party.map(id=>CH[id].short),k=>{if(k<0)return;const id=G.party[k],s=cstat(id),c=G.chars[id];
         if(c.hp<=0){toast('たおれている 仲間には きかない');return;}G.items.herb--;c.hp=Math.min(s.hp,c.hp+Math.round(s.hp*.4));sfx('heal');toast(`${CH[id].short}の HPが 回復した`);refresh();save();});},
-    drw(a){R(0,0,W,H,'#000');menuDraw(m,a);txt('経験値書と鍛錬鉱は「キャラ育成」「武器の鍛錬」で使います',8,150,'#bcbcbc','left',240);}});
+    drw(a){R(0,0,W,H,'#000');menuDraw(m,a);txt('経験値書・祝詞・鍛錬鉱は「キャラ育成」「武器の鍛錬」で使います',8,172,'#bcbcbc','left',240);}});
 }
 function settingsScr(){
   const m=mkMenu([],{x:8,y:20,w:200,rows:4});
@@ -3767,14 +3771,14 @@ function ukaihoWin(pages){
   if(sp.kind==='udoiri'){K.doiri=true;K.rank=Math.max(K.rank,1);if(K.again){fullHeal();pages.push('業火の化身を しりぞけた…','裏堂入りを ふたたび なしとげた！');const msgs=[];for(let i=0;i<9;i++)msgs.push(...advanceDay());pages.push(...[...new Set(msgs)].slice(0,3));return;}const msgs=[];for(let i=0;i<9;i++)msgs.push(...advanceDay());fullHeal();
     pages.push('業火の化身を しりぞけた…','9日間の 裏堂入りを なしとげた！\n「裏阿闍梨」の 称号を 得た。\n全能力が ずっと 10% アップ。',...[...new Set(msgs)].slice(0,3));return;}
   if(sp.kind==='uorochi'&&K.again){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;K.again=false;K.laps=(K.laps||1)+1;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());
-    G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');
-    pages.push('裏オロチを ふたたび 打ち倒した！',sp.all?`残りの 裏回峰を 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。',`裏千日回峰行 ${K.laps}回目の 満行！`,'経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。',...[...new Set(msgs)].slice(0,2));return;}
+    G.items.b[3]+=10000;G.items.o[3]+=10000;G.items.b[4]+=50;G.items.o[4]+=50;sfx('g5');
+    pages.push('裏オロチを ふたたび 打ち倒した！',sp.all?`残りの 裏回峰を 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。',`裏千日回峰行 ${K.laps}回目の 満行！`,'経験値書（極）×10,000・鍛錬鉱（極）×10,000\n経験値祝詞×50・極上鉱石×50を もらった。',...[...new Set(msgs)].slice(0,2));return;}
   if(sp.kind==='uorochi'){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());K.rank=2;G.cap3=1;
-    G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');G.ukPend=1;
-    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','体の 奥から 神威が あふれてくる…！\nキャラの レベル上限が\n19999 → 39999 に 上がった！','さらに 満行の 証として\n好きな XRを ひとつ さずけよう…',...[...new Set(msgs)].slice(0,2));return;}
+    G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;G.items.b[4]+=100;G.items.o[4]+=100;sfx('g5');G.ukPend=1;
+    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000\n経験値祝詞×100・極上鉱石×100を もらった。','体の 奥から 神威が あふれてくる…！\nキャラの レベル上限が\n19999 → 39999 に 上がった！','さらに 満行の 証として\n好きな XRを ひとつ さずけよう…',...[...new Set(msgs)].slice(0,2));return;}
   const before=K.d;K.d=Math.min(1000,K.d+sp.n);const msgs=[];for(let i=0;i<sp.n;i++)msgs.push(...advanceDay());
   pages.push(`裏回峰を やりとげた。（${before} → ${K.d}日）\n${G.day}日目に なった。`);
-  for(let m=Math.floor(before/100)+1;m<=Math.floor(K.d/100);m++){G.career+=10;if(K.again){G.items.b[3]+=100;G.items.o[3]+=100;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\n経験値書・鍛錬鉱（極）を 100ずつ もらった。`);}else{G.items.urtk=(G.items.urtk||0)+1;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\nUR確定チケットを 1枚 もらった。`);}}
+  for(let m=Math.floor(before/100)+1;m<=Math.floor(K.d/100);m++){G.career+=10;if(K.again){G.items.b[3]+=100;G.items.o[3]+=100;G.items.b[4]+=5;G.items.o[4]+=5;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\n経験値書・鍛錬鉱（極）を 100ずつ\n経験値祝詞・極上鉱石を 5ずつ もらった。`);}else{G.items.urtk=(G.items.urtk||0)+1;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\nUR確定チケットを 1枚 もらった。`);}}
   if(K.d>=1000)pages.push('千の 裏峰を 歩きとおした！\n山頂で 裏オロチが 待っている。 修行場で 申し出よう。');
   else if(K.d>=700&&!K.doiri)pages.push('700日に 達した。\n次は 裏堂入りだ。 修行場で 申し出よう。');
   const u=[...new Set(msgs)];if(u.length)pages.push(...u.slice(0,3));}
