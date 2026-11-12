@@ -253,6 +253,12 @@ function sfx(n){
     case 'buff':[523,659,784,1047].forEach((f,k)=>tone(f,.07,'square',.11,null,k*.05));break;
     case 'kill':tone(600,.15,'square',.16,120);break;
     case 'clap':noise(.06,.7);tone(1800,.03,'square',.05);break;
+    case 'lg_rise':tone(196,.7,'triangle',.16,784);tone(392,.7,'sine',.08,1568,.05);break;
+    case 'lg_chime':[784,1047,1319,1568,2093].forEach((f,k)=>tone(f,.5,'triangle',.2,null,k*.07));break;
+    case 'lg_tick':tone(1568,.08,'square',.06);tone(2093,.12,'triangle',.08,null,.02);break;
+    case 'lg_line':tone(1047,.6,'sine',.1,2093);break;
+    case 'lg_glint':[2637,3136,3951].forEach((f,k)=>tone(f,.25,'triangle',.1,null,k*.05));break;
+    case 'lg_chord':[523,659,784,1047].forEach((f,k)=>{tone(f,1.6,'triangle',.14,null,k*.03);tone(f*2,1.2,'sine',.04,null,k*.03);});tone(131,1.6,'triangle',.18);break;
     case 'bell':[1319,1568,1319,1568].forEach((f,k)=>tone(f,.25,'triangle',.18,null,k*.06));break;
     case 'coin':tone(1319,.05,'square',.14);tone(1760,.12,'square',.14,null,.05);break;
     case 'lvup':[523,659,784,1047,784,1047].forEach((f,k)=>tone(f,.09,'square',.16,null,k*.07));break;
@@ -4390,7 +4396,7 @@ if(document.getElementById('rankTable'))document.getElementById('rankTable').inn
 /* ===================== 起動 ===================== */
 /* 起動時の 企業ロゴ（田村企画） */
 const splashScr={full:true,t:0,
-  upd(){this.t++;if(this.t===74)sfx('bell');if((this.t>30&&(I.A||I.B))||this.t>=420){titleScr.init();setBase(titleScr);playBGM('title');}},
+  upd(){this.t++;const T=this.t,at=f=>T===Math.round(f*1.55);if(at(18))sfx('lg_rise');if(at(48))sfx('lg_chime');for(let i=0;i<4;i++)if(at(60+i*8))sfx('lg_tick');if(at(95))sfx('lg_line');if(at(120))sfx('lg_glint');if(at(140))sfx('lg_chord');if((this.t>30&&(I.A||I.B))||this.t>=420){titleScr.init();setBase(titleScr);playBGM('title');}},
   drw(){const t=this.t/1.55,INK='#1E2A47',GD='#9A7B45',cl=v=>Math.max(0,Math.min(1,v)),ez=v=>1-Math.pow(1-cl(v),3);
     const fade=cl(t/20)*(t>240?cl((270-t)/30):1);R(0,0,W,H,'#F6F3EC');
     const base=1,cx=128,f=ez((t-18)/50),cy=86+Math.round((1-f)*24);
@@ -4404,9 +4410,12 @@ const splashScr={full:true,t:0,
     ctx.globalAlpha=base;const lw=Math.round(120*ez((t-95)/25));R(cx-lw/2,159,lw,1,GD);
     ctx.globalAlpha=base*cl((t-105)/20);ctx.font='8px '+FONT;ctx.fillStyle=GD;ctx.fillText('T A M U R A   K I K A K U',cx,165);
     ctx.globalAlpha=base*cl((t-140)/25);ctx.fillStyle=INK;ctx.font='10px '+FONT;ctx.fillText('Renovation for Future',cx,200);
-    ctx.globalAlpha=1-fade;R(0,0,W,H,'#000');ctx.globalAlpha=1;ctx.textAlign='left';}};
+    ctx.globalAlpha=1-fade;R(0,0,W,H,'#000');ctx.globalAlpha=1;ctx.textAlign='left';region(0,0,W,H,()=>{vA=true;});}};
+/* 起動：ボタンを 押すと 音が 鳴らせる（ブラウザの 決まり） */
+const bootScr={full:true,t:0,upd(){this.t++;if(this.t>10&&(I.A||I.B||I.pu||I.pd||I.pl||I.pr)){initAudio();splashScr.t=0;setBase(splashScr);}},
+  drw(){R(0,0,W,H,'#000');if((this.t>>5)&1||this.t<20){txt('PUSH START',128,108,'#fcfcfc','center');}txt('タップ または ボタンで はじめる',128,128,'#7c7c7c','center',240);region(0,0,W,H,()=>{vA=true;});}};
 function start(){
-  setBase(splashScr);
+  setBase(bootScr);
   let started=false;const go=()=>{if(!started){started=true;requestAnimationFrame(loop);}};
   try{document.fonts.load('16px '+FONT).then(go,go);}catch(e){go();}
   setTimeout(go,1500);
