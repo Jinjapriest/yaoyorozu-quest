@@ -3816,8 +3816,14 @@ function drawKGod(x,y,t){const top=y-84;
   for(let a=0;a<360;a+=4){const r=26+((a/4)%3===0?2:0),q=a*Math.PI/180;if((a+t)%40<28)R(x+Math.cos(q)*r,top+26+Math.sin(q)*r,1,1,'#7c5c10');}
   anchorG(x,top-5,1,'#7c5c10');
   for(let s=0;s<6;s++){const side=s%2?1:-1,ph=t/20+s;for(let k=0;k<22;k++){const px=x+side*(12+k*1.7),py=top+40+s*6+Math.sin(ph+k*.35)*4+k*.6;R(px,py,3,2,k%5===0?'#5c5c64':'#a4a4ac');if(k%5===2)R(px,py,1,1,'#3c3c44');}}
-  for(let r=0;r<56;r++){const w=10+Math.floor(r*.6);R(x-w/2,top+30+r,w,1,r%6?'#0c0814':'#1c1428');R(x-w/2,top+30+r,1,1,'#3c2860');R(x+w/2-1,top+30+r,1,1,'#3c2860');}
-  R(x-1,top+32,2,52,'#3c2c08');
+  for(let r=0;r<51;r++){const w=10+Math.floor(r*.6);R(x-w/2,top+30+r,w,1,r%6?'#0c0814':'#1c1428');R(x-w/2,top+30+r,1,1,'#3c2860');R(x+w/2-1,top+30+r,1,1,'#3c2860');}
+  R(x-1,top+32,2,48,'#3c2c08');
+  /* 素足（人の 足を 残す） */
+  R(x-9,top+81,6,3,'#c8b098');R(x+3,top+81,6,3,'#c8b098');R(x-10,top+83,7,1,'#a08870');R(x+3,top+83,7,1,'#a08870');
+  /* 袖から のびる 人の 腕と 手：手のひらを 差し伸べる */
+  const lift=Math.round(Math.sin(t/40)*1.5);
+  for(const sd of [-1,1]){for(let k=0;k<12;k++){const ax=x+sd*(6+k*1.3),ay=top+33+k*1.1-(k>8?(k-8)*lift:0);R(ax-2,ay,5,4,k<8?'#0c0814':'#c8b098');R(ax-2,ay,5,1,k<8?'#3c2860':'#d8c0a8');}
+    const hx=x+sd*22,hy=top+44-lift*3;R(hx-3,hy,6,5,'#d8c0a8');R(hx-3,hy+5,6,1,'#a08870');for(let f=0;f<4;f++)R(hx-3+f*2-(sd<0?0:1),hy-3+(f===0||f===3?1:0),1,3,'#d8c0a8');R(sd<0?hx+3:hx-4,hy+1,1,3,'#d8c0a8');}
   /* 人の 顔を 残した 神：目は なく 赤い 溝が 横へ 流れる */
   {const FW=[10,12,14,14,14,14,14,14,14,14,14,13,13,12,11,10,8,6];FW.forEach((fw,r)=>{R(x-fw/2,top+11+r,fw,1,r>13?'#b8a090':'#d8c0a8');});
     R(x-8,top+8,16,5,'#bcbcbc');R(x-6,top+7,12,1,'#d8d8d8');R(x-9,top+10,2,10,'#a4a4a4');R(x+7,top+10,2,10,'#a4a4a4');R(x-5,top+8,10,1,'#fcfcfc');
