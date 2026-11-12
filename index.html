@@ -903,7 +903,7 @@ function fixSave(){
   const d=Object.assign({coins:0,items:{herb:0,b:[0,0,0,0],o:[0,0,0,0],tk:0},chars:{},weapons:{},party:[],pos:{x:VIL[0].x,y:VIL[0].y+1},home:0,visited:{},bless:null,boss:0,auto:false,fast:false,steps:0,tut:0},newExtras());
   for(const k in d)if(G[k]==null)G[k]=d[k];
   if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
-  applyXR();wrapCoins();
+  if(G.ukaiho&&G.ukaiho.rank>=2)G.cap3=1;applyXR();wrapCoins();
   G.party=G.party.filter(id=>CH[id]&&G.chars[id]);
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
   for(const id in G.chars){const c=G.chars[id];if(c.wpn&&!WPD[c.wpn])c.wpn=null;if(c.wpn&&!xrwOk(id,c.wpn))c.wpn=null;if(c.wpn2&&WPD[c.wpn2]&&!xrwOk(id,c.wpn2))c.wpn2=null;if(c.wpn2&&(!WPD[c.wpn2]||!twoSlot(id)))c.wpn2=null;}
@@ -2256,7 +2256,7 @@ function fromSrc(q,cb){const B=G.bank;
 /* 受け取り先（財布 or 普通預金） */
 function toDest(amt,msg){if(amt<=0){dialog(msg);return;}
   choice(`${msg.split('\n')[0]}\n${fmt(amt)}イェソの 受け取り先は？`,['財布へ','普通預金へ'],k=>{if(k===1){G.bank.sav+=amt;save();dialog(msg+'\n→ 普通預金に 入金しました。');}else{G.coins+=amt;save();dialog(msg+'\n→ 財布に 入れました。');}},96);}
-const LVCAP=()=>G&&G.cap2?19999:9999;
+const LVCAP=()=>G&&G.cap3?39999:G&&G.cap2?19999:9999;
 function addExp(o,amt,cap=9999){o.exp+=Math.round(amt);while(o.lv<cap&&o.exp>=need(o.lv)){o.exp-=need(o.lv);o.lv++;}if(o.lv>=cap)o.exp=0;}
 const expMul=()=>1+Math.floor((G.career||0)/15)*.1;
 
@@ -3769,9 +3769,9 @@ function ukaihoWin(pages){
   if(sp.kind==='uorochi'&&K.again){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;K.again=false;K.laps=(K.laps||1)+1;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());
     G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');
     pages.push('裏オロチを ふたたび 打ち倒した！',sp.all?`残りの 裏回峰を 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。',`裏千日回峰行 ${K.laps}回目の 満行！`,'経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。',...[...new Set(msgs)].slice(0,2));return;}
-  if(sp.kind==='uorochi'){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());K.rank=2;
+  if(sp.kind==='uorochi'){const before=K.d,n=sp.all?sp.n:0;K.d=1000;K.doiri=true;const msgs=[];for(let i=0;i<n;i++)msgs.push(...advanceDay());K.rank=2;G.cap3=1;
     G.items.urtk=(G.items.urtk||0)+30;G.items.b[3]+=10000;G.items.o[3]+=10000;sfx('g5');G.ukPend=1;
-    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','さらに 満行の 証として\n好きな XRを ひとつ さずけよう…',...[...new Set(msgs)].slice(0,2));return;}
+    pages.push('裏オロチ「ばかな… 千の 怨念が… 消えて いく……」','裏オロチを 打ち倒した！',sp.all?`残りの 裏回峰と 裏堂入りを 一気に やりとげた。\n（${before} → 1000日　${G.day}日目に なった）`:'裏の 峰々に 静けさが もどった。','裏千日回峰行 満行！','「裏大阿闍梨」の 称号を 得た。\n全能力が ずっと 30% アップ、\n経験値書が ずっと 50% 増える。（表と 重なる）','満行の 祝いに UR確定チケット 30枚\n経験値書（極）×10,000・鍛錬鉱（極）×10,000を もらった。','体の 奥から 神威が あふれてくる…！\nキャラの レベル上限が\n19999 → 39999 に 上がった！','さらに 満行の 証として\n好きな XRを ひとつ さずけよう…',...[...new Set(msgs)].slice(0,2));return;}
   const before=K.d;K.d=Math.min(1000,K.d+sp.n);const msgs=[];for(let i=0;i<sp.n;i++)msgs.push(...advanceDay());
   pages.push(`裏回峰を やりとげた。（${before} → ${K.d}日）\n${G.day}日目に なった。`);
   for(let m=Math.floor(before/100)+1;m<=Math.floor(K.d/100);m++){G.career+=10;if(K.again){G.items.b[3]+=100;G.items.o[3]+=100;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\n経験値書・鍛錬鉱（極）を 100ずつ もらった。`);}else{G.items.urtk=(G.items.urtk||0)+1;pages.push(`裏回峰 ${m*100}日の 節目！\n研修歴 +10（いま ${G.career}回）\nUR確定チケットを 1枚 もらった。`);}}
