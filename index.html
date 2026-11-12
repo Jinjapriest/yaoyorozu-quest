@@ -4181,14 +4181,19 @@ function endingScr(cb){
     ['音楽・効果音','#7c7c7c'],['田村 斎','#fcfcfc',1],['',0],['テストプレイ','#7c7c7c'],['遊んでくれた 友だち のみなさん','#fcfcfc'],['',0],
     ['SPECIAL THANKS','#f8b800'],['八百万の 神々','#fcfcfc'],['そして この 冒険を 遊んでくれた あなた','#fcfcfc'],['',0],['',0],
     [`クリア日数　${G.day}日`,'#bcbcbc'],[`八岐大蛇　Lv${G.boss} 撃破`,'#bcbcbc'],['人間を捨てた神 錨ケンドウ 撃破','#bcbcbc'],[`パーティ　${party.map(id=>CH[id].short||CH[id].name).join('・')}`,'#bcbcbc'],['',0],['',0],
+    ['PRESENTED BY','#bcbcbc'],['__logo__',0],['',0],['',0],['',0],['',0],['',0],['',0],['',0],['',0],
     ['THE END','#f8d878',2],['',0],['…ところで 出国手形は お持ちですか？','#bcbcbc']];
-  const total=L.length*18+150-60;
-  push({full:true,upd(){t++;const sp=(I.holdA||keys.has('KeyZ'))?3:.45;y0+=sp;if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();if(cb)cb();else dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
+  const total=150+L.findIndex(l=>l[0]==='THE END')*18-34;
+  let lgS=0,lgH=0;push({full:true,upd(){t++;const fast=I.holdA||keys.has('KeyZ'),sp=fast?3:.45;{const li=L.findIndex(l=>l[0]==='__logo__'),ly=150+li*18-y0;if(!lgS&&ly<110){lgS=1;sfx('lg_chime');}if(lgS===1&&ly<=4){lgS=2;lgH=fast?0:300;sfx('lg_chord');}}if(lgH>0){lgH--;}else y0=Math.min(total+.01,y0+sp);if(y0>total&&(I.A||I.B||t>60*90)){pop();playBGM('field');save();if(cb)cb();else dialog('（エンディングを 見終えた。\n冒険は まだまだ つづけられます）');}},
     drw(){const g=Math.min(1,y0/400);R(0,0,W,H,'#0c0820');R(0,150,W,90,`rgb(${Math.round(24+200*g)},${Math.round(16+90*g)},${Math.round(40+20*g)})`);pc(128,170,26,`rgba(252,216,120,${.25+.6*g})`);
       for(let k=0;k<5;k++)R(0,150+k*2,W,1,'#0c0820');
       R(0,196,W,44,'#000');R(96,150,6,46,'#a81000');R(154,150,6,46,'#a81000');R(86,146,84,6,'#d82800');R(92,156,72,4,'#a81000');
       party.forEach((id,i)=>{const x=((t*.4+i*30)%300)-30;drawChar(id,Math.round(x),200,(t>>3)&1);});
-      L.forEach(([s,c,sz],i)=>{const y=150+i*18-y0;if(y<-20||y>132)return;if(!s)return;if(sz===2)big(s,128,y,c||'#fcfcfc','center',22);else if(sz===1)big(s,128,y,c||'#fcfcfc','center',14);else txt(s,128,y,c||'#fcfcfc','center',240);});
+      {const li=L.findIndex(l=>l[0]==='__logo__'),y=150+li*18-y0;if(y<132&&y>-170){ctx.save();ctx.beginPath();ctx.rect(0,0,W,132);ctx.clip();
+        R(40,y-2,176,128,'#F6F3EC');ctx.drawImage(logoMark(),92,y);ctx.font='20px '+FONT;ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='#1E2A47';
+        '田村企画'.split('').forEach((ch,k)=>ctx.fillText(ch,86+k*28,y+72));R(70,y+97,116,1,'#9A7B45');ctx.font='8px '+FONT;ctx.fillStyle='#9A7B45';ctx.fillText('T A M U R A   K I K A K U',128,y+101);
+        ctx.fillStyle='#1E2A47';ctx.font='8px '+FONT;ctx.fillText('Renovation for Future',128,y+113);ctx.textAlign='left';ctx.restore();}}
+      L.forEach(([s,c,sz],i)=>{const y=150+i*18-y0;if(y<-20||y>132)return;if(!s||s==='__logo__')return;if(sz===2)big(s,128,y,c||'#fcfcfc','center',22);else if(sz===1)big(s,128,y,c||'#fcfcfc','center',14);else txt(s,128,y,c||'#fcfcfc','center',240);});
       if(y0>total)txt('Zで もどる',128,226,(frame>>4)%2?'#fcfcfc':'#7c7c7c','center');}});}
 function ukaihoWin(pages){
   const K=ukState(),sp=BT.sp;
@@ -4394,6 +4399,9 @@ document.getElementById('sizeTable').innerHTML=SIZES.map(z=>`<tr><td>${z.n}</td>
 if(document.getElementById('rankTable'))document.getElementById('rankTable').innerHTML=RANKS.map((r,i)=>`<tr><td>${i&&RANKS[i-1].lv===r.lv?'＝ ':''}${r.n}</td><td class="n">+${r.bonus}%</td><td class="n">${r.dur}戦</td><td class="n">${r.gift.toLocaleString('ja-JP')}イェソ</td></tr>`).join('');
 
 /* ===================== 起動 ===================== */
+/* 田村企画の 紋（丸に田） */
+let _lm=null;function logoMark(){if(_lm)return _lm;const INK='#1E2A47',GD='#9A7B45',c=document.createElement('canvas');c.width=c.height=72;const g=c.getContext('2d'),P=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);},C=(r,col)=>{for(let dy=-r;dy<=r;dy++){const w=Math.floor(Math.sqrt(r*r-dy*dy+r*.6));P(36-w,36+dy,w*2+1,1,col);}};
+  C(35,INK);C(32,'#F6F3EC');C(29,GD);C(28,'#F6F3EC');for(const [dx,dy] of [[-15,-15],[2,-15],[-15,2],[2,2]])P(36+dx,36+dy,13,13,INK);return _lm=c;}
 /* 起動時の 企業ロゴ（田村企画） */
 const splashScr={full:true,t:0,
   upd(){this.t++;const T=this.t,at=f=>T===Math.round(f*1.55);if(at(18))sfx('lg_rise');if(at(48))sfx('lg_chime');for(let i=0;i<4;i++)if(at(60+i*8))sfx('lg_tick');if(at(95))sfx('lg_line');if(at(120))sfx('lg_glint');if(at(140))sfx('lg_chord');if((this.t>30&&(I.A||I.B))||this.t>=420){titleScr.init();setBase(titleScr);playBGM('title');}},
@@ -4401,9 +4409,7 @@ const splashScr={full:true,t:0,
     const fade=cl(t/20)*(t>240?cl((270-t)/30):1);R(0,0,W,H,'#F6F3EC');
     const base=1,cx=128,f=ez((t-18)/50),cy=86+Math.round((1-f)*24);
     ctx.globalAlpha=base*cl((t-18)/30);
-    if(!splashScr.mk){const c=document.createElement('canvas');c.width=c.height=72;const g=c.getContext('2d'),P=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);},C=(r,col)=>{for(let dy=-r;dy<=r;dy++){const w=Math.floor(Math.sqrt(r*r-dy*dy+r*.6));P(36-w,36+dy,w*2+1,1,col);}};
-      C(35,INK);C(32,'#F6F3EC');C(29,GD);C(28,'#F6F3EC');for(const [dx,dy] of [[-15,-15],[2,-15],[-15,2],[2,2]])P(36+dx,36+dy,13,13,INK);splashScr.mk=c;}
-    ctx.drawImage(splashScr.mk,cx-36,cy-36);
+    ctx.drawImage(logoMark(),cx-36,cy-36);
     if(t>=120&&t<160){const sx=cx-40+(t-120)*2.2;ctx.globalAlpha=base*.55;for(let k=0;k<70;k++){const y=cy-36+k,x=Math.round(sx+(k-35)*.5);if(Math.hypot(x-cx,y-cy)<34)R(x,y,3,1,'#fcfcfc');}}
     ctx.font='22px '+FONT;ctx.textAlign='center';ctx.textBaseline='top';const T='田村企画';
     for(let i=0;i<4;i++){ctx.globalAlpha=base*cl((t-60-i*8)/16);ctx.fillStyle=INK;ctx.fillText(T[i],cx-45+i*30,130);}
