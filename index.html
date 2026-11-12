@@ -3818,6 +3818,9 @@ function drawKGod(x,y,t){const top=y-84;
   for(let s=0;s<6;s++){const side=s%2?1:-1,ph=t/20+s;for(let k=0;k<22;k++){const px=x+side*(12+k*1.7),py=top+40+s*6+Math.sin(ph+k*.35)*4+k*.6;R(px,py,3,2,k%5===0?'#5c5c64':'#a4a4ac');if(k%5===2)R(px,py,1,1,'#3c3c44');}}
   for(let r=0;r<51;r++){const w=10+Math.floor(r*.6);R(x-w/2,top+30+r,w,1,r%6?'#0c0814':'#1c1428');R(x-w/2,top+30+r,1,1,'#3c2860');R(x+w/2-1,top+30+r,1,1,'#3c2860');}
   R(x-1,top+32,2,48,'#3c2c08');
+  /* 体の 中心で 脈打つ 赤い コア */
+  {const cy=top+52,pl=(t>>3)%8<4?1:0;for(let r=9;r>=6;r--){const k=r-6;for(let a2=0;a2<360;a2+=8){const q=a2*Math.PI/180;if((a2/8+t/4|0)%3)R(x+Math.cos(q)*(r+pl)-0.5,cy+Math.sin(q)*(r+pl)-0.5,1,1,['#5c0000','#3c0000','#2c0000','#200000'][k]);}}
+    pc(x,cy,6,'#200000');pc(x,cy,5,'#7c0000');pc(x,cy,4,'#a81000');pc(x,cy,3,pl?'#fc4020':'#d82800');R(x-2,cy-3,2,2,'#fc7460');R(x-1,cy-2,1,1,'#fcfcfc');}
   /* 素足（人の 足を 残す） */
   R(x-9,top+81,6,3,'#c8b098');R(x+3,top+81,6,3,'#c8b098');R(x-10,top+83,7,1,'#a08870');R(x+3,top+83,7,1,'#a08870');
   /* 袖から のびる 人の 腕と 手：手のひらを 差し伸べる */
