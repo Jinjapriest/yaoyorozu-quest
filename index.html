@@ -1898,7 +1898,7 @@ function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
   const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]);
-  const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w===27?6:4))),h=4+4*streets+2;
+  const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w===27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
   for(let x=0;x<w;x++){set(x,0,{t:edge});set(x,h-1,{t:edge});}
@@ -1910,10 +1910,10 @@ function buildTown(vi){
   set(cx,h-1,{t:'exit'});
   const slots=[];
   for(let k=0;k<streets;k++){
-    const sy=6+4*k;for(let x=1;x<w-1;x++)set(x,sy,{t:'s'});
+    const sy=6+5*k;for(let x=1;x<w-1;x++){set(x,sy,{t:'s'});set(x,sy+1,{t:'s'});}
     for(let x=1;x+2<=cx-2;x+=4)slots.push({x,y:sy-2,k});
     for(let x=cx+2;x+2<=w-2;x+=4)slots.push({x,y:sy-2,k});
-    const gy=sy+1;for(let x=1;x<w-1;x++){if(x===cx)continue;const q=r();if(q<.16)set(x,gy,{t:'tree'});else if(q<.3)set(x,gy,{t:'flower'});else if(city&&q<.42)set(x,gy,{t:'lamp'});}
+    const gy=sy+2;for(let x=1;x<w-1;x++){if(x===cx)continue;const q=r();if(q<.16)set(x,gy,{t:'tree'});else if(q<.3)set(x,gy,{t:'flower'});else if(city&&q<.42)set(x,gy,{t:'lamp'});}
   }
   slots.sort((a,b)=>a.k-b.k||Math.abs(a.x+1-cx)-Math.abs(b.x+1-cx));
   slots.forEach((s,i)=>{const kind=i<fac.length?fac[i]:'house';
@@ -1923,8 +1923,8 @@ function buildTown(vi){
   const DI=dinfo(v),LINES=occupied(vi)?[`${DI.boss}さまに 逆らっては いけない…`,`店も 神社も 閉められてしまった。\nだれか ${DI.title}を たおして くれないか…`,'親衛隊「なにを じろじろ 見ている！」',`${DI.hall}は 町の いちばん 奥の 豪華な 建物だ。`]:v.dict?[`${DI.title}が いなくなって 町が 明るく なった！`,'ありがとう！ あなたは 町の 恩人だ！',`${v.shrine}の お祭りも 再開されたよ。`]:v.colo?['魔物コロシアムの 優勝者は 英雄だ！','コロシアムの 決勝の 相手は\n闘魔王 ガルゴスらしい…','挑戦料は 高いが 優勝賞品も すごいぞ。']:v.shugen?['山伏「法螺ヶ岳の 山頂には 奥宮が ある。」','山伏「滝行は 心を 清める。」','峰入り修行は きびしいぞ。 覚悟して いけ。','山道は 魔物が 多い。 気を つけて。']:v.depop?(ruin?(v.depop==='ruin'?['…わしが この村の 最後の ひとりじゃ。\n神社の 神主さまも おらんように なってのう。','魔物さえ こなければ\nみんな 帰って くるかも しれんのう…']:['子どもの 声を 聞かなくなって ひさしいねえ。','神社の お祭りも もう 何年も やっとらんよ。','若い もんは みんな 都会へ 出てしもうた。','集会所で 村の 仕事を 手伝って くれんかね。']):['村が にぎやかに なったねえ！','神主さまが 来てから 毎日が たのしいよ。','ワープの鳥居で 遠くからも 人が 来るんだ。']):NPC_LINES;
   const npcs=[],cols=['#0058f8','#d82800','#00a800','#6844fc','#e45c10','#008888','#fcfcfc'];
   const nN=v.depop?(ruin?(v.depop==='ruin'?1:4):5):2+sz;
-  let tries=0;while(npcs.length<nN&&tries++<300){const k=Math.floor(r()*streets),y=6+4*k,x=1+Math.floor(r()*(w-2));
-    if(Math.abs(x-cx)<1||npcs.some(p=>p.x===x&&p.y===y))continue;
+  let tries=0;while(npcs.length<nN&&tries++<300){const k=Math.floor(r()*streets),y=6+5*k+1,x=1+Math.floor(r()*(w-2));/* 町の人は 道の 下側の 列に 立つ（店の 入口を ふさがない） */
+    if(Math.abs(x-cx)<1||npcs.some(p=>p.x===x&&p.y===y)||(C[y-2]&&C[y-2][x]&&C[y-2][x].t==='door'))continue;
     npcs.push({x,y,col:cols[Math.floor(r()*cols.length)],hair:ruin?'#d8d8d8':['#000000','#503000','#7c7c7c'][Math.floor(r()*3)],line:LINES[npcs.length%LINES.length]});}
   if(ruin)for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const c=C[y][x];if(c.t==='g'&&r()<.12)C[y][x]={t:'flower',weed:1};}
   if(fac.includes('pachi')&&gamblerToday(vi)){for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=C[y][x];if(c.t==='door'&&c.b.kind==='pachi'){const gx=Math.min(w-2,x+2),gy=y+1;
