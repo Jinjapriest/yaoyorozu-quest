@@ -884,7 +884,7 @@ function cstat(id,m){
   if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;}
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
-  const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1);atk*=aj;mag*=aj;def*=aj;
+  const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1)*(typeof honoBuf==='function'&&G.hono?honoBuf():1);atk*=aj;mag*=aj;def*=aj;
   const pm=spearPair(id)?PAIR_MUL:1,ngm=typeof BT!=='undefined'&&BT&&BT.ng&&G.party.includes(id)?1.5:1;
   return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm*ngm*gm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm*ngm*gm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
 }
@@ -1351,14 +1351,14 @@ function openShop(vi){
 }
 
 /* ===================== メニュー ===================== */
-function coinWin(x,y){win(x,y,108,36);txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right');
+function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right',G.coins>=1e9?92:62);
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
 function openMenu(){
   const m=mkMenu(['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','コード入力','せってい','きろく'],{x:8,y:20,w:96});m.rows=12;
   push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();save();return;}if(r==null)return;
       [statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,codeScr,settingsScr,saveScr][r]();},
     drw(a){menuDraw(m,a);coinWin(140,20);win(140,58,108,62);txt(`${G.day}日目`,148,65,'#fcfcfc');txt(`研修歴${G.career}`,240,65,'#bcbcbc','right');
-      txt(G.job?`仕事：${G.job.prog}/${G.job.need}`:'仕事：なし',148,78,'#bcbcbc','left',92);txt(G.meal&&G.meal.left>0?`食事：${G.meal.n}`:'食事：なし',148,91,'#bcbcbc','left',92);txt(`チケット ${G.items.tk}枚`,148,104,'#f8b800','left',92);}});
+      txt(G.job?`仕事：${G.job.prog}/${G.job.need}`:'仕事：なし',148,78,'#bcbcbc','left',92);txt(G.meal&&G.meal.left>0?`食事：${G.meal.n}`:'食事：なし',148,91,'#bcbcbc','left',92);txt(`チケット ${G.items.tk}枚`,148,104,'#f8b800','left',92);if(titleOf()){win(140,122,108,20);txt('称号 '+titleOf(),148,128,'#f8d878','left',92);}}});
 }
 /* ===================== プレゼントコード ===================== */
 const CODE_AL='23456789ABCDEFGHJKLMNPQRSTUVWXYZ',CODE_KEY='yaoyorozu/akiragi/present/2026',P40=1099511627776,P32=4294967296;
@@ -2169,6 +2169,7 @@ function buildTown(vi){
     const b={kind,ruin,c:kind==='house'&&ruin?'#5c5c5c':kind==='house'?['#a81000','#503000','#0058f8','#3c3c3c','#008888'][Math.floor(r()*5)]:FAC[kind].c,city};
     for(let dx=0;dx<3;dx++){set(s.x+dx,s.y,{t:'roof',b,dx});set(s.x+dx,s.y+1,{t:dx===1&&kind!=='house'?'door':'front',b,dx});}});
   if(sz>=2){const fy=h-2;set(cx+3,fy,{t:'fount'});set(cx-3,fy,{t:'fount'});}
+  {const lm=lmkOf(vi),fy=h-2,pos=[cx-3,cx+3,cx-5,cx+5];lm.forEach((id,j)=>{if(pos[j]>0&&pos[j]<w-1)set(pos[j],fy,{t:'lmk',id});});}
   const DI=dinfo(v),LINES=occupied(vi)?[`${DI.boss}さまに 逆らっては いけない…`,`店も 神社も 閉められてしまった。\nだれか ${DI.title}を たおして くれないか…`,'親衛隊「なにを じろじろ 見ている！」',`${DI.hall}は 町の いちばん 奥の 豪華な 建物だ。`]:v.dict?[`${DI.title}が いなくなって 町が 明るく なった！`,'ありがとう！ あなたは 町の 恩人だ！',`${v.shrine}の お祭りも 再開されたよ。`]:v.colo?['魔物コロシアムの 優勝者は 英雄だ！','コロシアムの 決勝の 相手は\n闘魔王 ガルゴスらしい…','挑戦料は 高いが 優勝賞品も すごいぞ。']:v.shugen?['山伏「法螺ヶ岳の 山頂には 奥宮が ある。」','山伏「滝行は 心を 清める。」','峰入り修行は きびしいぞ。 覚悟して いけ。','山道は 魔物が 多い。 気を つけて。']:v.depop?(ruin?(v.depop==='ruin'?['…わしが この村の 最後の ひとりじゃ。\n神社の 神主さまも おらんように なってのう。','魔物さえ こなければ\nみんな 帰って くるかも しれんのう…']:['子どもの 声を 聞かなくなって ひさしいねえ。','神社の お祭りも もう 何年も やっとらんよ。','若い もんは みんな 都会へ 出てしもうた。','集会所で 村の 仕事を 手伝って くれんかね。']):['村が にぎやかに なったねえ！','神主さまが 来てから 毎日が たのしいよ。','ワープの鳥居で 遠くからも 人が 来るんだ。']):NPC_LINES;
   const LN=v.gm==='cap'?gmLines():v.kq?kqLines(vi):LINES;
   const npcs=[],cols=['#0058f8','#d82800','#00a800','#6844fc','#e45c10','#008888','#fcfcfc'];
@@ -2296,7 +2297,7 @@ function drawCell(c,sx,sy,city){
       else if(b.ruin){R(sx+4,sy+4,8,6,'#503000');R(sx+5,sy+6,7,1,'#7c4c10');R(sx+6,sy+4,1,6,'#7c4c10');R(sx+2,sy+11,3,4,'#a4a4a4');}
       else{R(sx+4,sy+4,8,6,'#503000');R(sx+5,sy+5,6,4,'#3cbcfc');R(sx+7,sy+5,1,4,'#503000');}
       break;}
-    case 'sroof':R(sx,sy,16,16,TW&&TW.ruin?'#5c7c6c':'#00a888');R(sx,sy,16,2,'#007860');R(sx,sy+14,16,2,'#007860');if(c.dx===-2)R(sx,sy,4,10,GC);if(c.dx===2)R(sx+12,sy,4,10,GC);
+    case 'sroof':{const hl=TW&&G.hono?G.hono['v'+TW.vi]||0:0;R(sx,sy,16,16,TW&&TW.ruin?'#5c7c6c':hl>=4?'#f8b800':'#00a888');R(sx,sy,16,2,hl>=4?'#a07800':'#007860');R(sx,sy+14,16,2,hl>=3?'#f8b800':'#007860');}if(c.dx===-2)R(sx,sy,4,10,GC);if(c.dx===2)R(sx+12,sy,4,10,GC);
       if(c.dx===0){R(sx+3,sy-2,10,2,'#fcd8a8');pc(sx+8,sy+8,3,'#f8b800');}break;
     case 'shall':R(sx,sy,16,16,TW&&TW.ruin?'#8c5c4c':'#d82800');R(sx+1,sy,2,16,'#a81000');R(sx+13,sy,2,16,'#a81000');R(sx,sy+1,16,2,'#fce0a8');R(sx+4,sy+3,2,3,'#fcfcfc');R(sx+10,sy+3,2,3,'#fcfcfc');break;
     case 'sdoor':R(sx,sy,16,16,TW&&TW.ruin?'#8c5c4c':'#d82800');R(sx,sy+1,16,2,'#fce0a8');R(sx+2,sy+4,12,12,'#503000');for(let x=3;x<14;x+=3)R(sx+x,sy+4,1,12,'#7c4c10');R(sx+7,sy+3,2,6,'#fcfcfc');pc(sx+8,sy+10,2,'#f8b800');break;
@@ -2338,6 +2339,11 @@ function drawCell(c,sx,sy,city){
     case 'ura':{R(sx,sy,16,16,'#4c4c54');if(G.colo){R(sx+1,sy+1,14,14,'#000');for(let k=0;k<4;k++)R(sx+2+k,sy+3+k*3,12-k*2,2,'#2c2c2c');const g=(frame>>3)&1;R(sx+1,sy+1,14,1,g?'#940084':'#6844fc');R(sx+1,sy+14,14,1,g?'#940084':'#6844fc');}
       else{R(sx+1,sy+1,14,14,'#2c2c2c');R(sx+1,sy+1,14,1,'#5c5c5c');R(sx+7,sy+3,2,10,'#000');R(sx+3,sy+7,10,2,'#000');}break;}
     case 'kc':case 'kcdoor':drawKokura(c,sx,sy);break;
+    case 'lmk':{ground();const id=c.id;
+      if(id==='otorii'){R(sx+1,sy+2,2,14,'#d82800');R(sx+13,sy+2,2,14,'#d82800');R(sx-2,sy,20,3,'#d82800');R(sx-2,sy,20,1,'#000');R(sx+1,sy+5,14,2,'#d82800');R(sx+6,sy+3,4,3,'#f8b800');}
+      else if(id==='tenshu'){R(sx+2,sy+11,12,5,'#7c7c7c');R(sx+3,sy+6,10,5,'#fcfcfc');R(sx+1,sy+5,14,2,'#2c3454');R(sx+5,sy+2,6,4,'#fcfcfc');R(sx+3,sy+1,10,2,'#2c3454');R(sx+4,sy,2,1,'#f8b800');R(sx+10,sy,2,1,'#f8b800');R(sx+5,sy+7,2,2,'#f8d878');R(sx+9,sy+7,2,2,'#f8d878');}
+      else if(id==='tower'){R(sx+6,sy,4,16,'#d82800');R(sx+7,sy,2,16,'#fcfcfc');R(sx+4,sy+4,8,3,'#5c5c5c');R(sx+5,sy+5,6,1,(frame>>4)&1?'#f8d878':'#68ccfc');R(sx+3,sy+13,10,3,'#7c7c7c');R(sx+7,sy-3,2,3,'#d82800');}
+      else{R(sx+4,sy+11,8,5,'#7c7c7c');R(sx+6,sy+4,4,7,'#f8b800');pc(sx+8,sy+3,2,'#f8b800');R(sx+5,sy+6,1,3,'#f8b800');R(sx+10,sy+5,2,1,'#f8b800');R(sx+5,sy+13,6,1,'#5c5c5c');}break;}
     case 'kfl':R(sx,sy,16,16,'#bcb49c');R(sx,sy,8,8,'#c8c0a8');R(sx+8,sy+8,8,8,'#c8c0a8');break;
     case 'kstep':R(sx,sy,16,16,'#7c7c7c');R(sx,sy+5,16,1,'#5c5c5c');R(sx,sy+11,16,1,'#5c5c5c');R(sx+2,sy+1,5,3,'#24188c');R(sx+9,sy+7,5,3,'#24188c');break;
     case 'kturf':{R(sx,sy,16,16,'#00a800');R(sx,sy+(c.r?0:8),16,1,'#00b800');const f=(frame*2+c.x*16)%(26*16);if(c.r===1&&(f<16||(f>200&&f<216))){drawHorse(sx+(f%16)-8,sy+3,'#d82800',frame,'#f8b800');}if(c.r===0&&f>96&&f<112)drawHorse(sx+(f%16)-8,sy+3,'#0058f8',frame+2,'#fcfcfc');break;}
@@ -2417,7 +2423,8 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&c.t==='sdoor'&&occupied(TW.vi)){dialog(`鳥居に 鎖が かけられている…\n${dinfo(TW.v).boss}が 神社を 閉ざしたのだ。`);return;}
     if(fresh&&c.t==='sdoor'){const v=TW.v,D=v.depop?dep(TW.vi):null;
       if(D&&!D.revived&&!D.kn.length){dialog([`${v.shrine}は 不活動宗教法人に なっている。\n神職が おらず お祭りも 途絶えている…`,'集会所で 神主を 配置すれば\n祭祀を 再開できる。']);return;}
-      const rk=D&&!D.revived?0:v.rank;choice(`${D&&!D.revived?'不活動宗教法人':RANKS[rk].n}　${v.shrine}\n参拝しますか？`,['参拝する','やめる'],r=>{if(r===0)prayScr(rk,v.shrine,'v'+TW.vi,()=>{});});return;}
+      const rk=D&&!D.revived?0:v.rank,hl=(G.hono||{})['v'+TW.vi]||0,vi_=TW.vi;choice(`${D&&!D.revived?'不活動宗教法人':RANKS[rk].n}　${v.shrine}${hl?`（造営${hl}段階）`:''}\n参拝しますか？`,['参拝する',...(D&&!D.revived?[]:['奉納・造営']),'やめる'],r=>{if(r===0)prayScr(rk,v.shrine,'v'+TW.vi,()=>{});else if(r===1&&!(D&&!D.revived))honoScr(vi_);});return;}
+    if(fresh&&c.t==='lmk'){dialog(c.id==='statue'?`名誉市長の 黄金の 銅像だ。\n台座に「この 町の 恩人」と 刻まれている。`:`あなたが 建てた ${LMK.find(x=>x.id===c.id).n}だ。\n町の 名物に なっている！`);return;}
     if(fresh&&(c.t==='front'||c.t==='roof')&&c.b&&c.b.kind==='house'){if(TW.ship){dialog('船室だ。');return;}reTown(TW.vi);return;}
     if(!this.bt){sfx('bump');this.bt=14;}
   },
@@ -2652,7 +2659,8 @@ function newStock(){const p={},h={};STOCKS.forEach(c=>{if(!c.ipo){p[c.id]=c.p0;h
 function stk(){if(!G.stock)G.stock=newStock();const S=G.stock;if(!S.pres)S.pres={};STOCKS.forEach(c=>{if(!c.ipo&&S.p[c.id]==null){S.p[c.id]=c.p0;S.h[c.id]=[c.p0];}});return S;}
 const isPres=id=>!!(G.stock&&G.stock.pres&&G.stock.pres[id]);
 const canSoukai=c=>stockOwn(c.id)>c.top[1]&&!isPres(c.id);
-const presPay=c=>Math.floor(G.stock.p[c.id]*(c.ipo?20:40));
+const STK_CAP=1e9,PRES_CAP=5e11,PRES_TOTAL=1e12;
+const presPay=c=>Math.min(PRES_CAP,Math.floor(G.stock.p[c.id]*(c.ipo?20:40)));
 const stockOwn=id=>(G.stock&&G.stock.own[id])||0;
 const ownRatio=()=>Math.min(1,stockOwn('tamakane')/TAMA_SHARES);
 const isListed=c=>!c.ipo||(c.ipo==='teiai'?!!G.teiaiStock:c.ipo==='res'?!!(G.res&&G.res[c.rid]&&G.res[c.rid].ipo):!!(G.mine&&G.mine.ipo));
@@ -2669,16 +2677,19 @@ function stockDaily(){
       else if(ev<.05){p*=2.2+rnd();msgs.push(`【速報】帝愛産業 ストップ高！\n新規カジノ船 事業が 発表され\n株価が ${pf(p)}イェソに 急騰！`);}
       else if(ev<.09){p*=.25+rnd()*.15;msgs.push(`【速報】帝愛産業 暴落！\n会長の 黒い 噂が 報じられ\n株価が ${pf(p)}イェソに 急落…`);}
       p=Math.min(1e6,Math.max(1,p));}
-    else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='re'?reFair():c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());}
+    else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='re'?reFair():c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());
+      if(p>=STK_CAP){p=STK_CAP;if(rnd()<.3){p*=.6;msgs.push(`【速報】${c.n} 急落！\n株価が 過熱しすぎて 売りが 殺到…\n株価が ${pf(p)}イェソに 下がった。`);}}}
     else{const tr=c.p0*Math.exp(c.mu*G.day);p=Math.max(c.p0*.15,p*Math.exp(c.vol*gauss()+(Math.log(tr)-Math.log(p))*.02));}
     if(isPres(c.id)&&G.hr&&G.hr[c.id]){const h=G.hr[c.id];p*=1+(h.mor-50)/50*.003+(h.f.mochikabu?.002:0)-(h.strike>0?.01:0);}
     S.p[c.id]=Math.round(p*10)/10;(S.h[c.id]=S.h[c.id]||[]).push(S.p[c.id]);if(S.h[c.id].length>30)S.h[c.id].shift();}
   let pay=0;for(const c of listed()){if(!isPres(c.id))continue;if(stockOwn(c.id)<=c.top[1]){delete S.pres[c.id];msgs.push(`${c.n}の 株主総会で\n${c.top[0]}に 筆頭株主を 奪われ\n社長を 解任された…`);continue;}const pp=presPay(c);pay+=pp+hrDelta(c,pp+(c.my?c.my.lastDiv||0:0),hrMsgs);}
+  if(pay>PRES_TOTAL)pay=PRES_TOTAL;
   msgs.push(...hrMsgs);if(pay<0){const need=-pay,got=debitAuto(need);if(got<need)hrUnpaid(need-got,msgs);pay=0;}
   if(pay>0)G.coins+=pay;if(pay>0||myDiv>0||tokFee>0){msgs.push([pay>0?`社長の 役員報酬 ${fmt(pay)}イェソ`:'',myDiv>0?`自分の 会社の 配当 ${fmt(myDiv)}イェソ`:'',tokFee>0?`仮想通貨の 手数料 ${fmt(tokFee)}イェソ`:''].filter(Boolean).join('\n')+'\nが 入った。');myDiv=0;tokFee=0;}
   if(G.day%KENRI===0){const got=[];
     for(const c of listed()){const n=S.own[c.id]||0;if(n<100)continue;const k=isPres(c.id)?3:n>=1000?2:1;c.give(k);got.push(`${c.sn||c.n}：${c.perk}${k===3?' ×3（社長）':k>1?' ×2（1,000株以上）':''}`);}
     if(got.length)msgs.push('今日は 権利確定日！\n株主優待が とどいた。',...got.reduce((a,l,i)=>{if(i%3===0)a.push(l);else a[a.length-1]+='\n'+l;return a;},[]));}
+  taxDaily(msgs);
   return msgs;
 }
 function stockBuy(c){
@@ -4103,7 +4114,7 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
   if(occupied(vi)){dialog('独裁者の 支配下では\n不動産の 取引は できない…');return;}
   const mine=S.p.filter(p=>p.vi===vi),lots=mine.filter(p=>p.t==='lot'),ak=mine.filter(p=>p.t==='akiya');
   const head=`${v.name}の 不動産（地価 ×${lm<1?lm.toFixed(2):lm}）\n所有 ${mine.length}件　家賃 ${fmt(mine.reduce((a,p)=>a+rentOf(p),0))}/日`+(hatan(vi)?'\n財政破綻：税40%・家賃半分・入居率 低':'');
-  const ops=[{t:'物件を 買う'},{t:`空き地に 建てる（${lots.length}区画）`,dis:!lots.length},{t:`空き家を リフォーム（${ak.length}軒）`,dis:!ak.length},{t:'物件を 売る',dis:!mine.length},{t:'やめる'}];
+  const ops=[{t:'物件を 買う'},{t:`空き地に 建てる（${lots.length}区画）`,dis:!lots.length},{t:`空き家を リフォーム（${ak.length}軒）`,dis:!ak.length},{t:'物件を 売る',dis:!mine.length},{t:'ランドマークを 建てる',col:'#f8b800'},{t:'やめる'}];
   choice(head,ops,k=>{
     if(k===0){const L=['akiya','chuko','office','tower','lot'].filter(t=>reCap(vi,t)>0).map(t=>({t,left:reCap(vi,t)-reOwned(vi,t),price:Math.round(RET[t].base*lm)}));
       listPick(`${v.name}　売り物件`,L.map(o=>({t:RET[o.t].n,r:o.left>0?fmt(o.price):'売約済',dis:o.left<=0,col:o.left>0?null:'#7c7c7c'})),i=>{const o=L[i];if(o.left<=0){dialog('もう 売り物件が ない。');return;}
@@ -4116,6 +4127,7 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
           rePay(o.cost,()=>{const L=lots[0];L.t=o.t;L.paid+=o.cost;L.done=G.day+RET[o.t].days;const iw=iwakuRoll(L,'build');sfx('lvup');save();dialog([`${RET[o.t].n}の 建設が 始まった！`,`${RET[o.t].days}日後に 完成する。`,...(iw?iwakuMsg(L,iw):[])]);});},96);},
         i=>{const o=B[i];return o?`${RET[o.t].n}　工期${RET[o.t].days}日\n家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`:'';});return;}
     if(k===2){const p=ak[0],c=Math.round(REN_COST*Math.max(lm,.5));choice(`空き家を リフォーム\n費用 ${fmt(c)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(c,()=>{p.t='reno';p.paid+=c;const iw=iwakuRoll(p,'reno');sfx('lvup');save();dialog(['空き家が きれいに なった！\n入居者が 決まりやすく なった。',...(iw?iwakuMsg(p,iw):[])]);});},96);return;}
+    if(k===4){lmkScr(vi);return;}
     if(k===3){listPick('売る 物件',mine.map(p=>({t:(p.iw?'【いわく】':'')+RET[p.t].n+(p.done>G.day?'（工事中）':''),r:fmt(Math.floor(p.paid*(p.iw?.3:.8))),col:p.iw?'#fc7460':null})),i=>{const p=mine[i],get=Math.floor(p.paid*(p.iw?.3:.8));
       choice(`${RET[p.t].n}を 売却\n${fmt(get)}イェソ（投資額の ${p.iw?'3割・いわく付き':'8割'}）`,['売る','やめる'],r=>{if(r!==0)return;S.p.splice(S.p.indexOf(p),1);G.coins+=get;sfx('coin');save();dialog(`${RET[p.t].n}を 売却した。\n${fmt(get)}イェソを 受け取った。`);},96);});}
   },150);}
@@ -4666,6 +4678,37 @@ function kjoBump(c){
   if(c.t==='kturf'||c.t==='krail'){dialog('ダートと 芝の 2つの コース。\n遠くで 馬が 走っている！');return true;}
   if(c.t==='kfood'||c.t==='kbooth'){kjoFood(c.t==='kbooth'?'suke':c.shop);return true;}
   return false;}
+/* ===================== お金の 使い道（奉納・ランドマーク・長者番付・税） ===================== */
+const TITLES=[[1e10,'篤志家'],[1e12,'大口寄進者'],[1e13,'名誉氏子総代'],[1e14,'大檀那'],[1e15,'八百万の 大旦那'],[1e16,'国造り 長者'],[1e17,'天地開闢 長者']];
+const titleOf=()=>{let t='';for(const [v,n] of TITLES)if((G.sunk||0)>=v)t=n;return t;};
+function sink(x){const before=titleOf();G.sunk=(G.sunk||0)+x;const now=titleOf();if(now&&now!==before){setTimeout(()=>toast(`称号「${now}」を 手に入れた！`),0);}}
+function chojaScr(){const s_=G.sunk||0,nx=TITLES.find(([v])=>s_<v);
+  dialog([`【長者番付】\n累計 奉納・寄進額 ${fmt(s_)}イェソ\n称号：${titleOf()||'なし'}`,nx?`次の 称号「${nx[1]}」まで\nあと ${fmt(nx[0]-s_)}イェソ`:'すべての 称号を 手に入れた！\nあなたこそ 天下一の 長者だ！',
+    `奉納した 神社 ${Object.keys(G.hono||{}).length}社（造営 合計 ${honoTotal()}段階）\n全能力 +${Math.round((honoBuf()-1)*1000)/10}%（ご神徳）`]);}
+/* 奉納・造営：神社ごとに 段階を 上げる（永続の ご神徳） */
+const HONO_ST=[['石灯籠 奉納',1e10],['大鳥居 奉納（名前入り）',1e11],['社殿 改修',1e12],['社殿 造営',1e13],['式年遷宮',1e14]];
+const honoCost=lv=>lv<HONO_ST.length?HONO_ST[lv][1]:1e14*Math.pow(10,lv-HONO_ST.length+1),honoName=lv=>lv<HONO_ST.length?HONO_ST[lv][0]:`式年遷宮（${lv-HONO_ST.length+2}回目）`;
+const honoTotal=()=>Object.values(G.hono||{}).reduce((a,b)=>a+b,0),honoBuf=()=>1+Math.min(1,honoTotal()*.005);
+function honoScr(vi){G.hono=G.hono||{};const v=VIL[vi],k='v'+vi,lv=G.hono[k]||0,c=honoCost(lv);
+  choice(`${v.shrine}　造営 ${lv}段階\n次：${honoName(lv)}\n奉納金 ${fmt(c)}イェソ`,['奉納する','長者番付を 見る','やめる'],r=>{
+    if(r===1){chojaScr();return;}if(r!==0)return;
+    rePay(c,()=>{G.hono[k]=lv+1;sink(c);sfx('bell');save();
+      dialog([`${v.shrine}に ${honoName(lv)}を 奉納した！`,lv+1>=4?'見事な 社殿が 完成した！\n氏子たちが 涙を 流して 喜んでいる…':lv+1>=2?'境内が いっそう 立派に なった。':'灯籠に あなたの 名前が 刻まれた。',`ご神徳で 全能力 +${Math.round((honoBuf()-1)*1000)/10}%（永続）`]);});},150);}
+/* ランドマーク（家賃なし・見栄と 称号） */
+const LMK=[{id:'otorii',n:'大鳥居',c:1e12},{id:'tenshu',n:'天守閣',c:1e13},{id:'tower',n:'展望タワー',c:1e14},{id:'statue',n:'町を 丸ごと 買い取る（名誉市長の 銅像）',c:1e15}];
+const lmkOf=vi=>((G.lmk||{})['v'+vi])||[];
+function lmkScr(vi){G.lmk=G.lmk||{};const v=VIL[vi],have=lmkOf(vi),L=LMK.filter(x=>!have.includes(x.id));
+  if(!L.length){dialog(`${v.name}には すべての ランドマークが そびえている！\nあなたは この 町の 名誉市長だ。`);return;}
+  listPick(`${v.name}に ランドマークを 建てる`,L.map(x=>({t:x.n,r:fmt(x.c)})),i=>{const x=L[i];
+    choice(`${x.n}を 建てる\n費用 ${fmt(x.c)}イェソ\n（家賃は 入らない。 町の 名物に なる）`,['建てる','やめる'],r=>{if(r!==0)return;
+      rePay(x.c,()=>{(G.lmk['v'+vi]=G.lmk['v'+vi]||[]).push(x.id);sink(x.c);sfx('lvup');save();dialog([`${v.name}に ${x.n.replace(/（.*）/,'')}が 完成した！`,x.id==='statue'?`町の 広場に あなたの 銅像が 建った。\nあなたは ${v.name}の 名誉市長に なった！`:'町の 人たちが 見上げて 歓声を あげている！','（次に 町に 入ると 見られる）']);});},96);},
+    i=>{const x=L[i];return x?(x.id==='statue'?'町の すべてを 買い取り 名誉市長に なる。\n広場に 黄金の 銅像が 建つ':'町の 広場に 建つ 巨大な 名物。\n家賃は 入らない'):'';});}
+/* 累進課税と 税務署の 査察 */
+function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=TH)return;
+  const tax=Math.floor((tot-TH)*.004);let rest=tax;const a=Math.min(G.coins,rest);G.coins-=a;rest-=a;if(rest>0&&G.bank)G.bank.sav-=Math.min(G.bank.sav,rest);
+  if(G.day%10===0)msgs.push(`【超富裕層 課税】10兆イェソを 超える 資産に\n毎日 0.4%の 税金が かかっている。\n今日の 税額 ${fmt(tax)}イェソ`);
+  if(tot>1e14&&rnd()<.03){const ch=Math.floor((tot-1e14)*.2);const b=Math.min(G.coins,ch);G.coins-=b;if(ch>b&&G.bank)G.bank.sav-=Math.min(G.bank.sav,ch-b);
+    msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 場外発売所（馬券・舟券） ===================== */
 let jogaiPrev=null;
 function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
@@ -4713,7 +4756,7 @@ const POT_UR=3.5,POT_XR=4.0,potRoll=()=>{const q=rnd();return q<1/16384?POT_XR:q
 const umaRank=ab=>ab>=3.8?'XR':ab>=3.3?'UR':ab>=2.6?'SS':ab>=2.2?'S':ab>=1.8?'A':ab>=1.4?'B':ab>=1.0?'C':'D';
 const umaCap=H=>H.cap||2.6,umaSex=H=>H.sex||'牡';
 /* 有名種牡馬（お金を 払って 種付けできる） */
-const STUD=[{name:'チョクセンバンチョー',ab:2.4,fee:5e7,d:'直線の 番長。 産駒は 末脚が するどい'},{name:'ドーピングバンザイ',ab:2.9,fee:2e8,d:'圧倒的な 能力。 …ただし 産駒も 検査には ご用心'},{name:'サイキナヲ',ab:0,fee:3e7,d:'産駒の 能力は まったく 読めない 謎の 血統'},{name:'ハリボテエレジー',ab:.5,fee:1e5,d:'負けても 走り続けた 根性を 子に 伝える（かも）'}];
+const STUD=[{name:'ヤオヨロズキング',ab:3.6,fee:1e14,d:'伝説の 種牡馬。 産駒は UR級の 素質を 持つことも'},{name:'チョクセンバンチョー',ab:2.4,fee:5e7,d:'直線の 番長。 産駒は 末脚が するどい'},{name:'ドーピングバンザイ',ab:2.9,fee:2e8,d:'圧倒的な 能力。 …ただし 産駒も 検査には ご用心'},{name:'サイキナヲ',ab:0,fee:3e7,d:'産駒の 能力は まったく 読めない 謎の 血統'},{name:'ハリボテエレジー',ab:.5,fee:1e5,d:'負けても 走り続けた 根性を 子に 伝える（かも）'}];
 function umaFix(){const U=G.uma;if(!U)return;U.brood=U.brood||[];U.horses.forEach(H=>{if(!H.sex)H.sex=rnd()<.5?'牡':'牝';});}
 function umaBirth(after){const U=G.uma,now=U.brood.filter(b=>b.foal&&b.foal.due<=G.day);if(!now.length)return false;const b=now[0],F=b.foal;b.foal=null;
   const go=()=>askText(`${b.name}の 子が 生まれた！ 名前を つけよう`,[{label:`${F.sex}馬　父 ${F.sire}／母 ${b.name}（カタカナ 9文字まで）`,max:9,placeholder:'例：コクラノホシ'}],v=>{
@@ -4727,8 +4770,8 @@ function umaBirth(after){const U=G.uma,now=U.brood.filter(b=>b.foal&&b.foal.due<
 function umaRoom(after){const U=G.uma;umaFix();
   if(U.wait&&U.wait.length&&U.horses.length<3){const H=U.wait.shift();U.horses.push(H);save();dialog(`牧場で 待っていた ${H.name}が 入厩した！`,()=>umaRoom(after));return;}
   if(umaBirth(after))return;
-  const L=[...U.horses.map((H,i)=>({t:(U.entry===i?'◎':'')+H.name,r:`${umaSex(H)} ${umaRank(H.ab)}`+((H.cap||0)>=POT_UR?`（${umaRank(H.cap)}）`:''),col:(H.cap||0)>=POT_XR?((frame>>3)&1?'#f878f8':'#3cbcfc'):(H.cap||0)>=POT_UR?'#f8b800':U.entry===i?'#7ee07e':null})),{t:`繁殖牧場（${U.brood.length}/4頭）`,col:'#f878f8'},...(U.horses.length<3?[{t:'馬を 買う',col:'#f8b800'}]:[]),{t:'もどる'}];
-  listPick('馬主ルーム（厩舎 3頭まで）',L,i=>{if(i<U.horses.length){umaMenu(i,after);return;}const t=L[i].t;if(t.startsWith('繁殖牧場')){broodRoom(after);return;}if(t==='馬を 買う'){umaBuy(after);return;}after&&after();},
+  const L=[...U.horses.map((H,i)=>({t:(U.entry===i?'◎':'')+H.name,r:`${umaSex(H)} ${umaRank(H.ab)}`+((H.cap||0)>=POT_UR?`（${umaRank(H.cap)}）`:''),col:(H.cap||0)>=POT_XR?((frame>>3)&1?'#f878f8':'#3cbcfc'):(H.cap||0)>=POT_UR?'#f8b800':U.entry===i?'#7ee07e':null})),{t:`繁殖牧場（${U.brood.length}/4頭）`,col:'#f878f8'},{t:'セレクトセール（購入）',col:'#3cbcfc'},...(U.horses.length<3?[{t:'馬を 買う',col:'#f8b800'}]:[]),{t:'もどる'}];
+  listPick('馬主ルーム（厩舎 3頭まで）',L,i=>{if(i<U.horses.length){umaMenu(i,after);return;}const t=L[i].t;if(t.startsWith('繁殖牧場')){broodRoom(after);return;}if(t.startsWith('セレクトセール')){saleBuy(after);return;}if(t==='馬を 買う'){umaBuy(after);return;}after&&after();},
     i=>{const H=U.horses[i];return H?`${H.name}（${umaSex(H)}）能力 ${umaRank(H.ab)}（${Math.round(H.ab*100)}／限界 ${Math.round(umaCap(H)*100)}）\n${H.runs||0}戦 ${H.win||0}勝`+(H.g1?`　G1 ${H.g1}勝`:'')+(H.sire?`\n父 ${H.sire}／母 ${H.dam}`:U.entry===i?'\n出走登録中':''):L[i]&&L[i].t.startsWith('繁殖')?'引退した 馬を 繁殖馬に して\n子どもを 産ませよう。 親の 能力を 受け継ぐ！':'自分の 馬を 買って 育て、\nレースに 出して 賞金を かせごう！';});}
 function umaBuy(after){const U=G.uma;
   choice('どの 馬を 買いますか？',['一般馬（1,000万イェソ）','良血馬（1億イェソ）','やめる'],k=>{if(k===2){umaRoom(after);return;}const price=k?1e8:1e7;
@@ -4766,6 +4809,18 @@ function auctionScr(X,onSold,onKeep){const fin=auctionPrice(X),steps=[];let p=Ma
       txt('現在の 価格',150,104,'#bcbcbc','center');txt(fmt(cur.p)+'イェソ',150,120,hit?'#f8b800':'#fcfcfc','center',180);
       steps.slice(Math.max(0,k-4),k+1).forEach((s_,j,a)=>txt(`${s_.b}「${fmt(s_.p)}！」`,24,148+j*14,j===a.length-1?'#fcfcfc':'#7c7c7c','left',210));
       if(hit){txt('カーン！ 落札！',128,222,(frame>>3)&1?'#f8b800':'#fc7460','center');}}});}
+/* セレクトセール（NPCの 出品馬を 買う・超高額） */
+function saleLots(){const r=lcg(G.day*7717+3),out=[];for(let k=0;k<4;k++){const q=r();let pot,price;
+    if(q<.01){pot=POT_XR;price=1e15*(1+r());}else if(q<.05){pot=POT_UR;price=1e14*(1+r());}else if(q<.3){pot=2.6+r()*.4;price=1e12*(1+r()*9);}else{pot=2.0+r()*.6;price=1e11*(1+r()*9);}
+    out.push({name:KH1[Math.floor(r()*KH1.length)]+KH2[Math.floor(r()*KH2.length)]+['','ノコ','ノヒメ','ジュニア'][Math.floor(r()*4)],pot,price:Math.round(price/1e9)*1e9,sex:r()<.5?'牡':'牝',sire:STUD[Math.floor(r()*STUD.length)].name,dam:KH1[Math.floor(r()*KH1.length)]+KH2[Math.floor(r()*KH2.length)]});}return out;}
+function saleBuy(after){const U=G.uma;U.sold=U.sold||{};const L=saleLots().map((x,i)=>({...x,i})).filter(x=>!U.sold[G.day+'_'+x.i]);
+  if(!L.length){dialog('本日の 上場馬は すべて 落札された。\n（また 明日）',()=>umaRoom(after));return;}
+  listPick('セレクトセール　本日の 上場馬',L.map(x=>({t:x.name,r:`${umaRank(x.pot)} ${fmt(x.price)}`,col:x.pot>=POT_XR?((frame>>3)&1?'#f878f8':'#3cbcfc'):x.pot>=POT_UR?'#f8b800':null})),i=>{const x=L[i];
+    if(U.horses.length>=3){dialog('厩舎が いっぱいだ。（3頭まで）',()=>umaRoom(after));return;}
+    choice(`${x.name}（${x.sex}）素質 ${umaRank(x.pot)}\n父 ${x.sire}／母 ${x.dam}\n${fmt(x.price)}イェソで 落札しますか？`,['落札する','やめる'],r=>{if(r!==0){saleBuy(after);return;}
+      rePay(x.price,()=>{U.sold[G.day+'_'+x.i]=1;sink(x.price);U.horses.push({name:x.name,ab:x.pot*.6,cap:x.pot,sex:x.sex,kg:460+Math.floor(rnd()*50),jk:KJ1[Math.floor(rnd()*KJ1.length)]+' '+KJ2[Math.floor(rnd()*KJ2.length)],runs:0,win:0,tr:0,sire:x.sire,dam:x.dam});save();sfx('lvup');
+        dialog(['カーン！ 落札！',`${x.name}が あなたの 厩舎に やってきた！\n素質 ${umaRank(x.pot)}　調教で 育てよう。`],()=>umaRoom(after));});},120);},
+    i=>{const x=L[i];return x?`父 ${x.sire}\n素質 ${umaRank(x.pot)}${x.pot>=POT_UR?'　★超目玉！':''}`:'';});}
 function broodRoom(after){const U=G.uma;
   const L=[...U.brood.map(b=>({t:b.name,r:`${b.sex==='牡'?'種牡馬':'繁殖牝馬'}${b.foal?' 受胎中':''}`,col:b.sex==='牡'?'#3cbcfc':'#f878f8'})),{t:'種付けする',col:'#f8b800'},{t:'もどる'}];
   listPick(`繁殖牧場（${U.brood.length}/4頭）`,L,i=>{if(i<U.brood.length){const b=U.brood[i];
@@ -4779,8 +4834,8 @@ function mate(after){const U=G.uma,mares=U.brood.filter(b=>b.sex==='牝'&&!b.foa
     listPick('父馬を えらぶ',sires.map(x=>({t:(x.own?'':'★')+x.name,r:x.fee?fmt(x.fee):'無料',col:x.own?'#3cbcfc':'#f8b800'})),si=>{const sr=sires[si];
       choice(`母 ${dam.name} × 父 ${sr.name}\n種付け料 ${sr.fee?fmt(sr.fee)+'イェソ':'無料'}\n種付けしますか？`,['種付けする','やめる'],k=>{if(k!==0){broodRoom(after);return;}
         rePay(sr.fee,()=>{const sab=sr.name==='サイキナヲ'?.3+rnd()*2.7:sr.ab;let pot=(sab+dam.ab)/2*(.88+rnd()*.24)+(rnd()<.08?.35:0);
-          if(sr.name==='ハリボテエレジー'&&rnd()<.15)pot+=.8;pot=Math.max(.6,Math.min(3.0,pot));{const sp=potRoll();if(sp)pot=sp;}
-          dam.foal={sire:sr.name,pot,sex:rnd()<.5?'牡':'牝',due:G.day+7,dope:sr.name==='ドーピングバンザイ'||sr.dope};save();sfx('lv');
+          if(sr.name==='ハリボテエレジー'&&rnd()<.15)pot+=.8;pot=Math.max(.6,Math.min(sr.ab>3?3.6:3.0,pot));{const sp=potRoll();if(sp)pot=sp;}
+          sink(sr.fee);dam.foal={sire:sr.name,pot,sex:rnd()<.5?'牡':'牝',due:G.day+7,dope:sr.name==='ドーピングバンザイ'||sr.dope};save();sfx('lv');
           dialog([`${dam.name}に ${sr.name}を 種付けした！`,'7日後に 子馬が 生まれる 予定だ。\n（生まれたら 馬主ルームで 名前を つけよう）'],()=>broodRoom(after));});},96);},
       i=>{const x=sires[i];return x?`${x.name}${x.ab?`　能力 ${umaRank(x.ab)}`:'　能力 ？？？'}\n${x.d}`:'';});});}
 
