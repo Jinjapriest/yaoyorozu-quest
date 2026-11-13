@@ -4014,6 +4014,23 @@ const LAND=[.3,.5,1,2,4,8,15];
 const RET={akiya:{n:'空き家',base:2e6,rent:1e4},reno:{n:'空き家（リフォーム済）',rent:3e4},chuko:{n:'中古住宅',base:8e6,rent:4e4},office:{n:'オフィスビル',base:2e8,rent:1.2e6},tower:{n:'タワマン',base:1e9,rent:6e6},lot:{n:'空き地',base:5e6,rent:0},
   apart:{n:'アパート',build:3e7,rent:1.8e5,min:0,days:3},mansion:{n:'マンション',build:1.5e8,rent:9e5,min:2,days:7},shoubiru:{n:'商業ビル',build:4e8,rent:2.5e6,min:3,days:10},btower:{n:'タワマン（新築）',build:2e9,rent:1.3e7,min:4,days:20}};
 const REN_COST=3e6,RE_KEEP=.85,RE_PAYDAY=10;
+/* いわく付き物件（購入・建設・リフォームの あとに まれに 発生） */
+const IWAKU={buy:{p:.05,k:['夜な夜な 2階から 足音が 聞こえる','前の 住人の 写真が 壁に 貼りついて はがれない','押し入れの 奥に 大量の お札が 貼ってあった']},
+  build:{p:.05,k:['工事中に 古い 祠を 壊してしまった','基礎工事で 古い 井戸が 出てきた','現場で 原因不明の 事故が 相次いだ']},
+  reno:{p:.07,k:['壁を はがすと 内側に 無数の 手形が…','床下から 古い 人形が 出てきた','リフォーム後、 鏡に 知らない 人が 映る']}};
+function iwakuRoll(p,when){const I=IWAKU[when];if(p.iw||rnd()>=I.p)return null;p.iw={k:I.k[Math.floor(rnd()*I.k.length)],day:G.day};return p.iw.k;}
+const iwakuMsg=(p,k)=>['…ぞくっ。 背すじが 冷たくなった。',`${VIL[p.vi].name}の ${RET[p.t].n}：\n${k}`,'【いわく付き物件】に なってしまった…\n家賃が 3割に 下がり 売値も 大きく 下がる。','（神主の 仲間が いれば お祓いが できる。\n開拓所や 物件の 一覧から どうぞ）'];
+const hasKannushi=()=>G.party.some(id=>/^kn\d/.test(id));
+function oharai(p,after){const v=VIL[p.vi],fee=Math.max(1e6,Math.round(p.paid*.03)),kn=hasKannushi();
+  choice(`【いわく付き】${v.name.replace(/^.* /,'')}　${RET[p.t].n}\n「${p.iw.k}」\nお祓いを しますか？`,[kn?'神主の 仲間が お祓いを する（無料）':{t:'自分で お祓い（神主の 仲間が 必要）',dis:true},`近くの 神社に 依頼（${fmt(fee)}イェソ）`,'やめる'],k=>{
+    const done=m=>{p.iw=null;save();sfx('lvup');dialog(m,after);};
+    if(k===0&&kn){if(p.iwt===G.day){dialog('今日は もう 祓詞を 奏上した。\n（明日 また 挑もう）',after);return;}p.iwt=G.day;sfx('magic');
+      if(rnd()<.8)done(['かけまくも かしこき…','神主が 祓詞を 奏上し 大麻（おおぬさ）を 振った。','すうっと 空気が 軽くなった！\nいわくが 祓われた！ 家賃が 元に 戻った。']);
+      else{save();dialog(['かけまくも かしこき…','…ガタガタッ！ 窓が 激しく 揺れた！','祟りが 強すぎて 祓いきれなかった…\n（明日 また 挑もう）'],after);}return;}
+    if(k===1){rePay(fee,()=>done([`${v.shrine||'神社'}の 宮司が 来て\n丁重に お祓いを してくれた。`,'いわくが 祓われた！ 家賃が 元に 戻った。']));return;}
+    after&&after();},150);}
+function iwakuList(){const L=reS().p.filter(p=>p.iw);if(!L.length){dialog('開拓所「いわく付きの 物件は ないよ。\n…いまの ところはね」');return;}
+  listPick(`いわく付き物件 ${L.length}件`,L.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')} ${RET[p.t].n}`,r:'いわく',col:'#fc7460'})),i=>oharai(L[i],()=>iwakuList()),i=>{const p=L[i];return p?`「${p.iw.k}」\n${G.day-p.iw.day}日前から`:'';});}
 const TENANTS=['山田さん','佐藤さん','鈴木さん','高橋さん','田中さん','伊藤さん','渡辺さん','中村さん','小林さん','加藤さん','自称 投資家の 男','売れない バンドマン','カイジ君'];
 /* 滞納者の 取り立て */
 function arList(){return reS().p.filter(p=>p.ar);}
@@ -4046,7 +4063,7 @@ function reS(){if(!G.re)G.re={p:[],pend:0,total:0};return G.re;}
 const landMul=vi=>{const v=VIL[vi],D=v.depop?dep(vi):null;return LAND[Math.min(6,v.size)]*(D&&!D.revived?.2:1);};
 const reCap=(vi,t)=>{const v=VIL[vi],sz=v.size;return{akiya:sz<=1||v.depop?3:1,chuko:sz>=1&&sz<=3?4:sz>=4?2:0,office:sz>=3?sz:0,tower:sz>=5?2:0,lot:2+sz}[t]||0;};
 const reOwned=(vi,t)=>reS().p.filter(p=>p.vi===vi&&(p.t===t||(t==='akiya'&&p.t==='reno')||(t==='lot'&&RET[p.t].build))).length;
-const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi)*(p.fu>G.day?.8:1)*(hatan(p.vi)?.5:1));
+const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi)*(p.fu>G.day?.8:1)*(hatan(p.vi)?.5:1)*(p.iw?.3:1));
 const reDayRent=()=>reS().p.reduce((a,p)=>a+rentOf(p),0);
 function rePay(price,cb){const B=G.bank;
   if(G.coins<price&&B.sav<price){dialog(`お金が たりない。\n（${fmt(price)}イェソ 必要）`);return;}
@@ -4078,16 +4095,16 @@ function reTown(vi){const v=VIL[vi],S=reS(),lm=landMul(vi);
     if(k===0){const L=['akiya','chuko','office','tower','lot'].filter(t=>reCap(vi,t)>0).map(t=>({t,left:reCap(vi,t)-reOwned(vi,t),price:Math.round(RET[t].base*lm)}));
       listPick(`${v.name}　売り物件`,L.map(o=>({t:RET[o.t].n,r:o.left>0?fmt(o.price):'売約済',dis:o.left<=0,col:o.left>0?null:'#7c7c7c'})),i=>{const o=L[i];if(o.left<=0){dialog('もう 売り物件が ない。');return;}
         choice(`${RET[o.t].n}　${fmt(o.price)}イェソ\n${o.t==='lot'?'建物を 建てると 家賃が 入る':`家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`}\n購入しますか？（残り${o.left}件）`,['購入する','やめる'],r=>{if(r!==0)return;
-          rePay(o.price,()=>{S.p.push({vi,t:o.t,paid:o.price,since:G.day});sfx('lvup');dialog([`${v.name}の ${RET[o.t].n}を 購入した！`,o.t==='lot'?'（空き地には アパートや マンションを\n建てられる）':o.t==='akiya'?'（リフォームすると 家賃が 3倍に なる）':'家賃は 10日ごとに 普通預金へ 振り込まれる。']);});},96);},
+          rePay(o.price,()=>{const np={vi,t:o.t,paid:o.price,since:G.day};S.p.push(np);const iw=o.t==='lot'?null:iwakuRoll(np,'buy');sfx('lvup');save();dialog([`${v.name}の ${RET[o.t].n}を 購入した！`,o.t==='lot'?'（空き地には アパートや マンションを\n建てられる）':o.t==='akiya'?'（リフォームすると 家賃が 3倍に なる）':'家賃は 10日ごとに 普通預金へ 振り込まれる。',...(iw?iwakuMsg(np,iw):[])]);});},96);},
         i=>{const o=L[i];return o?`${RET[o.t].n}　残り${o.left}件\n${o.t==='lot'?'建設用の 土地':`家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`}`:'';});return;}
     if(k===1){const B=['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>({t,cost:Math.round(RET[t].build*lm)}));
       listPick('なにを 建てる？',B.map(o=>({t:RET[o.t].n,r:fmt(o.cost)})),i=>{const o=B[i];
         choice(`${RET[o.t].n}を 建設\n建設費 ${fmt(o.cost)}イェソ（工期 ${RET[o.t].days}日）\n完成後 家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`,['建てる','やめる'],r=>{if(r!==0)return;
-          rePay(o.cost,()=>{const L=lots[0];L.t=o.t;L.paid+=o.cost;L.done=G.day+RET[o.t].days;sfx('lvup');dialog([`${RET[o.t].n}の 建設が 始まった！`,`${RET[o.t].days}日後に 完成する。`]);});},96);},
+          rePay(o.cost,()=>{const L=lots[0];L.t=o.t;L.paid+=o.cost;L.done=G.day+RET[o.t].days;const iw=iwakuRoll(L,'build');sfx('lvup');save();dialog([`${RET[o.t].n}の 建設が 始まった！`,`${RET[o.t].days}日後に 完成する。`,...(iw?iwakuMsg(L,iw):[])]);});},96);},
         i=>{const o=B[i];return o?`${RET[o.t].n}　工期${RET[o.t].days}日\n家賃 約${fmt(Math.round(RET[o.t].rent*lm))}イェソ/日`:'';});return;}
-    if(k===2){const p=ak[0],c=Math.round(REN_COST*Math.max(lm,.5));choice(`空き家を リフォーム\n費用 ${fmt(c)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(c,()=>{p.t='reno';p.paid+=c;sfx('lvup');dialog('空き家が きれいに なった！\n入居者が 決まりやすく なった。');});},96);return;}
-    if(k===3){listPick('売る 物件',mine.map(p=>({t:RET[p.t].n+(p.done>G.day?'（工事中）':''),r:fmt(Math.floor(p.paid*.8))})),i=>{const p=mine[i],get=Math.floor(p.paid*.8);
-      choice(`${RET[p.t].n}を 売却\n${fmt(get)}イェソ（投資額の 8割）`,['売る','やめる'],r=>{if(r!==0)return;S.p.splice(S.p.indexOf(p),1);G.coins+=get;sfx('coin');save();dialog(`${RET[p.t].n}を 売却した。\n${fmt(get)}イェソを 受け取った。`);},96);});}
+    if(k===2){const p=ak[0],c=Math.round(REN_COST*Math.max(lm,.5));choice(`空き家を リフォーム\n費用 ${fmt(c)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(c,()=>{p.t='reno';p.paid+=c;const iw=iwakuRoll(p,'reno');sfx('lvup');save();dialog(['空き家が きれいに なった！\n入居者が 決まりやすく なった。',...(iw?iwakuMsg(p,iw):[])]);});},96);return;}
+    if(k===3){listPick('売る 物件',mine.map(p=>({t:(p.iw?'【いわく】':'')+RET[p.t].n+(p.done>G.day?'（工事中）':''),r:fmt(Math.floor(p.paid*(p.iw?.3:.8))),col:p.iw?'#fc7460':null})),i=>{const p=mine[i],get=Math.floor(p.paid*(p.iw?.3:.8));
+      choice(`${RET[p.t].n}を 売却\n${fmt(get)}イェソ（投資額の ${p.iw?'3割・いわく付き':'8割'}）`,['売る','やめる'],r=>{if(r!==0)return;S.p.splice(S.p.indexOf(p),1);G.coins+=get;sfx('coin');save();dialog(`${RET[p.t].n}を 売却した。\n${fmt(get)}イェソを 受け取った。`);},96);});}
   },150);}
 /* メニュー：所有物件の 一覧 */
 const RE_OUT=100000,RE_MIN=5;
@@ -4097,7 +4114,7 @@ function recoDef(){const C=G.reco;return{id:'reco',n:C.n,sn:C.n.slice(0,9),vol:.
 const reRented=()=>reS().p.filter(p=>RET[p.t].rent>0&&!(p.done>G.day)).length;
 function reList(){const S=reS(),nxt=RE_PAYDAY-(G.day%RE_PAYDAY);
   if(!S.p.length){dialog(['所有物件は まだ ない。','町の 民家や ビルに 話しかけると\n売り物件を 見られる。']);return;}
-  listPick(`所有物件 ${S.p.length}件　家賃 ${fmt(reDayRent())}/日`,S.p.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')}　${RET[p.t].n}`,r:p.done>G.day?`工事中あと${p.done-G.day}日`:fmt(rentOf(p))})),()=>{},
+  listPick(`所有物件 ${S.p.length}件　家賃 ${fmt(reDayRent())}/日`,S.p.map(p=>({t:`${p.iw?'【いわく】':''}${VIL[p.vi].name.replace(/^.* /,'')}　${RET[p.t].n}`,r:p.done>G.day?`工事中あと${p.done-G.day}日`:fmt(rentOf(p)),col:p.iw?'#fc7460':null})),i=>{const p=S.p[i];if(p&&p.iw)oharai(p,()=>reList());},
     ()=>`たまっている 家賃 ${fmt(S.pend)}イェソ（${nxt}日後に ${G.reco?'決算':'振込'}）\nこれまでの 受取 ${fmt(S.total)}イェソ\n管理費・税 15%（財政破綻の 村は 40%）`);}
 function reIpo(){const n=reRented();
   if(n<RE_MIN){dialog(['証券会社「上場するには 家賃の 入る 物件が\n'+RE_MIN+'件 以上 必要です」',`（いま ${n}件）`]);return;}
@@ -4115,20 +4132,21 @@ function kaitakuFac(){
   const S=reS(),C=G.reco,ak=S.p.filter(p=>p.t==='akiya'),lots=S.p.filter(p=>p.t==='lot'),n=reRented();
   const akCost=ak.reduce((a,p)=>a+Math.round(REN_COST*Math.max(landMul(p.vi),.5)),0);
   const head=`開拓所　物件 ${S.p.length}件\n家賃 ${fmt(reDayRent())}イェソ/日`+(C?`\n${C.n} 株価 ${pf(stk().p.reco||0)}`:'');
-  choice(head,['所有物件の 一覧','町を えらんで 取引',{t:`家賃滞納の 取り立て（${arList().length}件）`,col:arList().length?'#fc7460':null},{t:`空き家を 一括リフォーム（${ak.length}軒）`,dis:!ak.length},{t:`空き地に 一括建設（${lots.length}区画）`,dis:!lots.length},
+  choice(head,['所有物件の 一覧','町を えらんで 取引',{t:`家賃滞納の 取り立て（${arList().length}件）`,col:arList().length?'#fc7460':null},{t:`空き家を 一括リフォーム（${ak.length}軒）`,dis:!ak.length},{t:`空き地に 一括建設（${lots.length}区画）`,dis:!lots.length},{t:`いわく付き物件の お祓い（${S.p.filter(p=>p.iw).length}件）`,col:S.p.some(p=>p.iw)?'#fc7460':null},
     C?{t:`${C.n.slice(0,8)}（上場済み）`,dis:true}:n>=RE_MIN?'不動産会社を 上場する':{t:`上場（物件 ${RE_MIN}件 以上）`,dis:true},'やめる'],k=>{
     if(k===0){reList();return;}
     if(k===1){const T=VIL.map((v,i)=>i).filter(i=>(G.seen['v'+i]||G.warps.includes(i))&&!VIL[i].tokoyo);
       listPick('どの 町の 不動産？',T.map(i=>{const m=S.p.filter(p=>p.vi===i).length;return{t:VIL[i].name+(hatan(i)?'（破綻）':''),r:m?`所有${m}件`:`地価×${landMul(i)<1?landMul(i).toFixed(2):landMul(i)}`,col:hatan(i)?'#fc7460':m?'#7ee07e':null};}),i=>reTown(T[i]),i=>{const v=VIL[T[i]];return v?`${v.name}（${SIZES[v.size].n}）\n建てられる 最大：${['apart','mansion','shoubiru','btower'].filter(t=>v.size>=RET[t].min).map(t=>RET[t].n).pop()}`:'';});return;}
     if(k===2){collectScr();return;}
-    if(k===3){choice(`空き家 ${ak.length}軒を まとめて リフォーム\n費用 合計 ${fmt(akCost)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(akCost,()=>{ak.forEach(p=>{p.paid+=Math.round(REN_COST*Math.max(landMul(p.vi),.5));p.t='reno';});sfx('lvup');dialog(`空き家 ${ak.length}軒の リフォームが 完了した！`);});},96);return;}
+    if(k===3){choice(`空き家 ${ak.length}軒を まとめて リフォーム\n費用 合計 ${fmt(akCost)}イェソ\n家賃が 3倍に なる`,['リフォームする','やめる'],r=>{if(r===0)rePay(akCost,()=>{const bad=[];ak.forEach(p=>{p.paid+=Math.round(REN_COST*Math.max(landMul(p.vi),.5));p.t='reno';if(iwakuRoll(p,'reno'))bad.push(p);});sfx('lvup');save();dialog([`空き家 ${ak.length}軒の リフォームが 完了した！`,...(bad.length===1?iwakuMsg(bad[0],bad[0].iw.k):bad.length?['…ぞくっ。 背すじが 冷たくなった。',`${bad.length}軒が【いわく付き物件】に なってしまった…\n（開拓所で お祓いが できる）`]:[])]);});},96);return;}
     if(k===4){const B=['apart','mansion','shoubiru','btower'];
       listPick('空き地に まとめて 建てる',B.map(t=>{const ok=lots.filter(p=>VIL[p.vi].size>=RET[t].min);return{t:RET[t].n,r:ok.length?`${ok.length}区画`:'建てられない',dis:!ok.length};}),i=>{const t=B[i],ok=lots.filter(p=>VIL[p.vi].size>=RET[t].min);if(!ok.length)return;
         const cost=ok.reduce((a,p)=>a+Math.round(RET[t].build*landMul(p.vi)),0),rent=ok.reduce((a,p)=>a+Math.round(RET[t].rent*landMul(p.vi)),0);
         choice(`${RET[t].n}を ${ok.length}区画に 建設\n建設費 合計 ${fmt(cost)}イェソ（工期${RET[t].days}日）\n完成後 家賃 約${fmt(rent)}イェソ/日`,['建てる','やめる'],r=>{if(r!==0)return;
-          rePay(cost,()=>{ok.forEach(p=>{p.paid+=Math.round(RET[t].build*landMul(p.vi));p.t=t;p.done=G.day+RET[t].days;});sfx('lvup');dialog(`${ok.length}区画で ${RET[t].n}の 建設が 始まった！\n${RET[t].days}日後に 完成する。`);});},96);},
+          rePay(cost,()=>{const bad=[];ok.forEach(p=>{p.paid+=Math.round(RET[t].build*landMul(p.vi));p.t=t;p.done=G.day+RET[t].days;if(iwakuRoll(p,'build'))bad.push(p);});sfx('lvup');save();dialog([`${ok.length}区画で ${RET[t].n}の 建設が 始まった！\n${RET[t].days}日後に 完成する。`,...(bad.length===1?iwakuMsg(bad[0],bad[0].iw.k):bad.length?['…ぞくっ。 背すじが 冷たくなった。',`${bad.length}区画が【いわく付き物件】に なってしまった…\n（開拓所で お祓いが できる）`]:[])]);});},96);},
         i=>{const t=B[i];return t?`${RET[t].n}：${['どの町でも','中以上の町','大以上の町','都会以上の町'][i]}\n工期 ${RET[t].days}日`:'';});return;}
-    if(k===5&&!C)reIpo();
+    if(k===5){iwakuList();return;}
+    if(k===6&&!C)reIpo();
   },150);}
 function reMenuScr(){
   if(!reOn()){dialog(['不動産は まだ 扱えない。','（グンマー帝国を 解放すると\n「宅地建物取引の 特許状」が もらえる）']);return;}
