@@ -4592,8 +4592,10 @@ function umaFix(){const U=G.uma;if(!U)return;U.brood=U.brood||[];U.horses.forEac
 function umaBirth(after){const U=G.uma,now=U.brood.filter(b=>b.foal&&b.foal.due<=G.day);if(!now.length)return false;const b=now[0],F=b.foal;b.foal=null;
   const go=()=>askText(`${b.name}の 子が 生まれた！ 名前を つけよう`,[{label:`${F.sex}馬　父 ${F.sire}／母 ${b.name}（カタカナ 9文字まで）`,max:9,placeholder:'例：コクラノホシ'}],v=>{
     const nm=v&&v[0]?v[0]:'ナナシノ'+(G.day%100);const H={name:nm,ab:F.pot*.6,cap:F.pot,sex:F.sex,kg:440+Math.floor(rnd()*60),jk:KJ1[Math.floor(rnd()*KJ1.length)]+' '+KJ2[Math.floor(rnd()*KJ2.length)],runs:0,win:0,tr:0,sire:F.sire,dam:b.name,dope:F.dope};
-    if(U.horses.length<3){U.horses.push(H);save();sfx('lv');dialog([`${nm}が 生まれた！（${F.sex}）\n父 ${F.sire}　母 ${b.name}`,`素質 ${umaRank(F.pot)}${F.pot>=2.6?'　…大物の 予感が する！':''}\n調教で 素質の 限界まで 育てよう。`],()=>umaRoom(after));}
-    else{U.wait=U.wait||[];U.wait.push(H);save();dialog([`${nm}が 生まれた！`,'厩舎が いっぱいなので 牧場で 待機中。\n（厩舎が 空くと 入厩する）'],()=>umaRoom(after));}},
+    dialog([`${nm}が 生まれた！（${F.sex}）\n父 ${F.sire}　母 ${b.name}`,`素質 ${umaRank(F.pot)}${F.pot>=2.6?'　…大物の 予感が する！':''}`],()=>choice(`${nm}を どうしますか？`,['自分で 育てる','競売（セレクトセール）に かける'],k=>{
+      if(k===1){auctionScr(H,pr=>{save();dialog(`${nm}を ${fmt(pr)}イェソで 売った！`,()=>umaRoom(after));},()=>keep());return;}keep();},120));
+    const keep=()=>{if(U.horses.length<3){U.horses.push(H);save();sfx('lv');dialog('調教で 素質の 限界まで 育てよう。',()=>umaRoom(after));}
+    else{U.wait=U.wait||[];U.wait.push(H);save();dialog('厩舎が いっぱいなので 牧場で 待機中。\n（厩舎が 空くと 入厩する）',()=>umaRoom(after));}};},
     v=>v[0]&&v[0].length>9?'9文字まで です':'');
   sfx('lv');dialog(`繁殖牧場から 連絡だ！\n${b.name}が 子馬を 産んだ！`,go);return true;}
 function umaRoom(after){const U=G.uma;umaFix();
@@ -4610,7 +4612,8 @@ function umaBuy(after){const U=G.uma;
         dialog([`${v[0]}（${sex}）を 手に入れた！`,`能力 ${umaRank(ab)}（${Math.round(ab*100)}）\n調教で 能力を 上げて レースに 出そう。`],()=>umaRoom(after));});},
       v=>!v[0]?'名前を 入れてください':v[0].length>9?'9文字まで です':U.horses.some(h=>h.name===v[0])?'同じ 名前の 馬が います':'');},96);},120);}
 function umaMenu(i,after){const U=G.uma,H=U.horses[i],can=H.tr!==G.day;
-  choice(`${H.name}（${umaSex(H)}）能力 ${umaRank(H.ab)}（${Math.round(H.ab*100)}）\n${H.runs||0}戦 ${H.win||0}勝　主戦 ${H.jk}`,[can?'調教する（50万イェソ）':'調教（今日は もう 済んだ）',U.entry===i?'出走登録を 取り消す':'次の レースに 出走させる','引退させる','もどる'],k=>{
+  choice(`${H.name}（${umaSex(H)}）能力 ${umaRank(H.ab)}（${Math.round(H.ab*100)}）\n${H.runs||0}戦 ${H.win||0}勝　主戦 ${H.jk}`,[can?'調教する（50万イェソ）':'調教（今日は もう 済んだ）',U.entry===i?'出走登録を 取り消す':'次の レースに 出走させる','引退させる','競売に かける','もどる'],k=>{
+    if(k===3){choice(`${H.name}を 競売（セレクトセール）に\nかけますか？`,['かける','やめる'],r=>{if(r!==0){umaMenu(i,after);return;}auctionScr(H,pr=>{const j=U.horses.indexOf(H);if(j>=0){U.horses.splice(j,1);if(U.entry===j)U.entry=null;else if(U.entry>j)U.entry--;}save();dialog(`${H.name}を ${fmt(pr)}イェソで 売った！\n新しい 馬主の もとで がんばれ！`,()=>{after&&after();umaRoom(after);});},()=>umaMenu(i,after));});return;}
     if(k===0){if(!can){dialog('今日の 調教は もう 済んだ。\n（1日 1回）',()=>umaMenu(i,after));return;}
       if(H.ab>=umaCap(H)){dialog('もう これ以上は 強く ならない…\n素質の 限界まで 仕上がった！',()=>umaMenu(i,after));return;}
       rePay(5e5,()=>{const up=.02+rnd()*.05,old=umaRank(H.ab);H.ab=Math.min(umaCap(H),H.ab+up);H.tr=G.day;save();sfx('lv');dialog([`坂路で みっちり 調教した！\n能力 +${Math.round(up*100)}（${Math.round(H.ab*100)}）`,...(umaRank(H.ab)!==old?[`能力ランクが ${umaRank(H.ab)}に 上がった！`]:[])],()=>umaMenu(i,after));});return;}
@@ -4621,6 +4624,22 @@ function umaMenu(i,after){const U=G.uma,H=U.horses[i],can=H.tr!==G.day;
       if(r===0){U.brood.push({name:H.name,ab:Math.max(H.ab,H.cap?H.ab:H.ab),sex:umaSex(H),win:H.win||0,g1:H.g1||0,dope:H.dope});save();dialog([`${H.name}は 引退して ${umaSex(H)==='牡'?'種牡馬':'繁殖牝馬'}に なった！`,'繁殖牧場で 種付けが できる。'],()=>{after&&after();umaRoom(after);});}
       else{save();dialog(`${H.name}は 牧場で のんびり 暮らすことに なった。`,()=>{after&&after();umaRoom(after);});}},120);return;}
     umaRoom(after);},120);}
+/* 競売（セレクトセール） */
+const BIDDERS=['石油王','パドック屋','帝愛産業','謎の 投資家','老舗 牧場','IT社長','競馬好きの 神主','海外の 馬主','焼きうどん屋の 社長','黒服の 男'];
+function auctionPrice(X){const pot=X.cap||X.ab,base=1e7*Math.pow(Math.max(X.ab,pot*.8),4);let m=.7+rnd()*.7;
+  if(STUD.some(x=>x.name===X.sire))m*=1.3;if(X.dope)m*=.75;if((X.win||0)>0)m*=1+X.win*.1;return Math.round(base*m/1e5)*1e5;}
+function auctionScr(X,onSold,onKeep){const fin=auctionPrice(X),steps=[];let p=Math.max(1e6,Math.round(fin*.15/1e5)*1e5);
+  while(p<fin){steps.push({p,b:BIDDERS[Math.floor(rnd()*BIDDERS.length)]});p=Math.min(fin,Math.round((p*(1.08+rnd()*.25))/1e5)*1e5);}steps.push({p:fin,b:BIDDERS[Math.floor(rnd()*BIDDERS.length)]});
+  let t=0;const per=Math.max(10,Math.floor(220/steps.length));sfx('enc');
+  push({full:true,upd(){t++;if(I.A&&t>20&&t<steps.length*per)t=steps.length*per;if(t>=steps.length*per+70&&(I.A||t>steps.length*per+240)){pop();
+      choice(`${X.name}は ${fmt(fin)}イェソで\n落札された！ 売りますか？`,['売る','取り下げる（手元に 残す）'],k=>{if(k===0){noCount(()=>{G.coins+=fin;});sfx('coin');onSold(fin);}else onKeep();},120);}},
+    drw(){R(0,0,W,H,'#1c1408');R(0,0,W,26,'#3c2800');txt('コクラ セレクトセール',128,8,'#f8b800','center');
+      win(8,32,240,58);txt(`上場馬　${X.name}（${X.sex||'牡'}）`,18,40,'#fcfcfc','left',220);txt(X.sire?`父 ${X.sire}／母 ${X.dam}`:'血統 不明',18,54,'#bcbcbc','left',220);txt(`素質 ${umaRank(X.cap||X.ab)}　能力 ${umaRank(X.ab)}`,18,68,'#7ee07e','left',220);
+      const k=Math.min(steps.length-1,Math.floor(t/per)),cur=steps[k];
+      /* 競売人と 木槌 */R(20,104,24,30,'#24243c');pc(32,100,7,'#fce0a8');R(26,96,12,4,'#3c3c3c');const hit=t>=steps.length*per;R(46,hit?112:104+((t>>2)&1)*3,14,6,'#a05000');R(52,hit?118:110,2,10,'#7c4c10');
+      txt('現在の 価格',150,104,'#bcbcbc','center');txt(fmt(cur.p)+'イェソ',150,120,hit?'#f8b800':'#fcfcfc','center',180);
+      steps.slice(Math.max(0,k-4),k+1).forEach((s_,j,a)=>txt(`${s_.b}「${fmt(s_.p)}！」`,24,148+j*14,j===a.length-1?'#fcfcfc':'#7c7c7c','left',210));
+      if(hit){txt('カーン！ 落札！',128,222,(frame>>3)&1?'#f8b800':'#fc7460','center');}}});}
 function broodRoom(after){const U=G.uma;
   const L=[...U.brood.map(b=>({t:b.name,r:`${b.sex==='牡'?'種牡馬':'繁殖牝馬'}${b.foal?' 受胎中':''}`,col:b.sex==='牡'?'#3cbcfc':'#f878f8'})),{t:'種付けする',col:'#f8b800'},{t:'もどる'}];
   listPick(`繁殖牧場（${U.brood.length}/4頭）`,L,i=>{if(i<U.brood.length){const b=U.brood[i];
