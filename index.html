@@ -477,6 +477,8 @@ const BASE_SKILLS={
   tsukkomi:{name:'ツッコミ',mp:3,target:'enemy',kind:'phys',power:1.7,verb:'いれた'},
   bakusho:{name:'爆笑ネタ',mp:6,target:'allies',kind:'song',power:.6,amount:.3,turns:3,verb:'ひろうした'},
   shanpan:{name:'シャンパンタワー',mp:8,target:'allies',kind:'heal',power:1.3,verb:'ふるまった'},
+  mkntower:{name:'ゴールデン シャンパンタワー',mp:16,target:'allies',kind:'heal',power:2.2,verb:'ふるまった'},
+  mknsmile:{name:'伝説の 神対応',mp:12,target:'enemies',kind:'mag',power:2.3,verb:'ふりまいた'},
   miryo:{name:'魅了の微笑み',mp:5,target:'enemy',kind:'mag',power:1.9,verb:'なげかけた'},
   inaba:{name:'因幡の癒し',mp:14,target:'allies',kind:'heal',power:3.2,revive:true,verb:'さずけた'},
 };
@@ -512,6 +514,7 @@ const BASE_PACK={
     {id:'beatkun',name:'ビート配信者 兄',short:'ビート兄',rarity:'LR',weapon:'any',hp:150,mp:90,atk:30,mag:46,def:28,spd:26,skills:['boooon','beatbox'],look:{head:'cap',hat:'#000000',hair:'#3c3c3c',body:'#fcfcfc',accent:'#d82800',legs:'#24188c',held:'メイス'}},
     {id:'snipekun',name:'狙撃配信者 弟',short:'狙撃弟',rarity:'LR',weapon:'any',hp:155,mp:70,atk:48,mag:20,def:28,spd:30,skills:['snipe','yakiniku'],look:{head:'band',hair:'#3c3c3c',body:'#00a800',accent:'#000000',legs:'#5c5c5c',held:'弓'}},
     {id:'yarimasu',name:'やりますねぇ先輩',short:'やりますねぇ',rarity:'LR',weapon:'any',hp:165,mp:70,atk:44,mag:22,def:32,spd:24,skills:['senpaiage','yarimasu'],look:{head:'band',hair:'#f8b800',body:'#00a800',accent:'#d82800',legs:'#fcfcfc',held:'両手剣'}},
+    {id:'mikan',name:'超売れっ子キャバ嬢 東みかん',short:'東みかん',rarity:'LR',special:'hostess',weapon:'any',hp:150,mp:100,atk:28,mag:50,def:26,spd:32,skills:['mkntower','mknsmile','shanpan'],look:{head:'hostess',hair:'#f87800',body:'#fcfcfc',accent:'#f8b800',legs:'#fcfcfc',held:'扇'}},
     {id:'bard',name:'日サロ帰りのシンガー',short:'シンガー',rarity:'LR',weapon:'any',hp:150,mp:80,atk:40,mag:42,def:30,spd:22,skills:['niji','ougon','meh'],look:{head:'bard',skin:'#a0582c',hat:'#d82800',body:'rainbow',accent:'#f8b800',legs:'#24188c',held:'神器'}},
   ],
   weapons:[
@@ -545,6 +548,7 @@ const BASE_PACK={
     {id:'pu_new2',name:'新キャラ 第2弾ピックアップ',type:'char',pickup:['samurai','comedian','hostess']},
     {id:'pu_katana',name:'名刀ピックアップ',type:'weapon',pickup:['w_murasame','w_wazamono']},
     {id:'pu_shinpo',name:'神宝ピックアップ（神専用）',type:'weapon',pickup:['w_nuboko','w_habakiri','w_futsu','w_ikuyumi']},
+    {id:'pu_mikan',name:'超売れっ子キャバ嬢 東みかん ピックアップ（LR）',type:'char',pickup:['mikan','hostess']},
     {id:'pu_beat',name:'配信者兄弟ピックアップ（LR）',type:'char',pickup:['beatkun','snipekun']},
     {id:'pu_beatw',name:'配信者兄弟の専用武器ピックアップ',type:'weapon',pickup:['w_beatmic','w_yakisnipe']},
     {id:'pu_milktea',name:'ミルクティーピックアップ（先輩専用）',type:'weapon',pickup:['w_milktea']},
@@ -5121,6 +5125,11 @@ const KAN_NM={cab:['クラブ 月下美人','クラブ ルミエール','クラ�
   karaoke:['カラオケ うたげ','カラオケ 八百万','マイクの森','歌うたいの館','カラオケ 天岩戸'],snack:['スナック 夜明け','スナック のぞみ','スナック 灯','スナック 美智子','スナック ゆかり','スナック 港'],
   host:['クラブ 夜王','クラブ 天下','クラブ ROYAL','クラブ 雅王','クラブ 月光'],izakaya:['居酒屋 八百万','炉端 まつり','大衆酒場 灯台','やきとり 鳥居','海鮮酒場 えびす']};
 const CAST_N=['あいり','ゆな','れいな','みく','さくら','ひかる','まりあ','えみり','ありさ','ののか','りな','しずく','あげは','つばき','かれん','みゆう','せいら','ゆきの','らん','きらら','るな','あすか','ひめか','もえ'],CAST_MAX=10;
+/* 看板キャスト（ガチャの キャラを キャバクラに 出勤させる） */
+const KSTAR_M={n:'東みかん',mul:1.5,rep:.3,pow:30,buzz:3,teach:3,d:'店の 売上 1.5倍・評判 +0.3\nほかの キャバ嬢の 指名力 +3\nSNSで 話題に なりやすい（3倍）'};
+const kstarOf=id=>!id||!G.chars[id]||!CH[id]?null:id==='mikan'?KSTAR_M:/^hostess/.test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
+const kstarIds=()=>Object.keys(G.chars).filter(id=>kstarOf(id)).sort((a,b)=>(b==='mikan')-(a==='mikan')||CH[b].rar-CH[a].rar);
+const kstarPow=(L)=>{const S=kstarOf(L.star);return S?Math.round(S.pow*(1+.1*Math.min(10,(G.chars[L.star].dup||0)))):0;};
 const kanHrs=t=>{const[a,b]=KAN[t].open;return`${a}時〜${b>24?'翌'+(b-24):b}時`;};
 const kanOpen=t=>{const[a,b]=KAN[t].open,h=nowMin()/60,hh=h<5?h+24:h;return hh>=a&&hh<b;};
 const KAN_LOTS=25;
@@ -5138,12 +5147,14 @@ const kanSucc=(vi,L)=>Math.round((KAN[L.t].setup+KAN[L.t].base*60*L.rep)*landMul
 function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
   for(const k in G.kan){const vi=+k.slice(1),lm=landMul(vi),tx=taxRate(vi);
     G.kan[k].lots.forEach(L=>{if(!L.own||!L.t)return;const K=KAN[L.t];if(L.buzz>0)L.buzz--;
-      const mul=L.rep*(1+.12*(L.lv||0))*(L.buzz>0?1.5:1);
+      const ST=L.t==='cab'?kstarOf(L.star):null;if(L.star&&!ST)L.star=null;
+      const mul=(L.rep+(ST?ST.rep:0))*(1+.12*(L.lv||0))*(L.buzz>0?1.5:1)*(ST?ST.mul:1);
       let gross=K.base*lm*mul*(1+(rnd()-.5)*2*K.vol)*(L.t==='cab'?.3:1),cost=(K.rent+K.wage)*lm;
-      if(L.t==='cab'){const out=[];(L.cast||[]).forEach(c=>{c.days++;let x=c.pow/10*4e6*lm*mul*(.6+rnd()*.8);if(rnd()<.03)x*=3;x=Math.round(x);c.sales+=x;gross+=x;cost+=c.wage;if(c.days>20&&rnd()<.003)out.push(c);});
+      if(L.t==='cab'){const out=[];(L.cast||[]).forEach(c=>{c.days++;let x=(c.pow+(ST?ST.teach:0))/10*4e6*lm*mul*(.6+rnd()*.8);if(rnd()<.03)x*=3;x=Math.round(x);c.sales+=x;gross+=x;cost+=c.wage;if(c.days>20&&rnd()<.003)out.push(c);});
+        if(ST){let x=kstarPow(L)/10*4e6*lm*mul*(.8+rnd()*.4);if(L.star==='mikan'&&rnd()<.01){x*=5;msgs.push(`【${L.nm}】 東みかんの バースデー イベント！\n店の 前に 長蛇の 列！\nこの日の 売上は 5倍に なった！`);}x=Math.round(x);L.starSales=(L.starSales||0)+x;gross+=x;}
         out.forEach(c=>{L.cast.splice(L.cast.indexOf(c),1);msgs.push(`【${L.nm}】 キャバ嬢の ${c.n}が\n${rnd()<.5?'他店に 引き抜かれて しまった…':'寿退店 した！ おめでとう！'}`);});}
       const e=rnd();
-      if(e<.006){L.buzz=10;msgs.push(`【${L.nm}】 SNSで 話題に なった！\n10日間 売上 1.5倍！`);}
+      if(e<.006*(ST?ST.buzz:1)){L.buzz=10;msgs.push(`【${L.nm}】 SNSで 話題に なった！\n10日間 売上 1.5倍！`);}
       else if(e<.01){L.rep=Math.max(.4,Math.round((L.rep-.1)*100)/100);msgs.push(`【${L.nm}】 悪い 口コミが 広まった…\n評判が 下がった。`);}
       else if(e<.014){L.rep=Math.min(2.5,Math.round((L.rep+.08)*100)/100);msgs.push(`【${L.nm}】 常連客が 増えてきた！\n評判が 上がった。`);}
       if(L.since!=null&&G.day-L.since<=30&&L.rep<1)L.rep=Math.min(1,Math.round((L.rep+.007)*1000)/1000);
@@ -5240,7 +5251,14 @@ function kanOwn(vi,i){const L=kanSt(vi).lots[i],K=KAN[L.t],lm=landMul(vi);
       choice(`「${L.nm}」を 事業譲渡する\n${fmt(get)}イェソで 売れる（投資額の 6割）`,['売る','やめる'],r=>{if(r!==0){kanOwn(vi,i);return;}L.own=0;L.cast=[];noCount(()=>{G.coins+=get;});sfx('coin');save();dialog(`「${L.nm}」を 手放した。\n${fmt(get)}イェソを 受け取った。`);},96);return;}
   },150);}
 function castScr(vi,i){const L=kanSt(vi).lots[i];L.cast=L.cast||[];
-  choice(`「${L.nm}」 在籍 キャバ嬢 ${L.cast.length}/${CAST_MAX}人`,['面接する（新人を 採用）','在籍 キャバ嬢','売上 ランキング','もどる'],k=>{
+  const st=kstarOf(L.star);
+  choice(`「${L.nm}」 在籍 キャバ嬢 ${L.cast.length}/${CAST_MAX}人\n看板キャスト：${st?st.n:'なし'}`,['面接する（新人を 採用）','在籍 キャバ嬢','売上 ランキング',{t:'看板キャストを 出勤させる',col:'#f8b800'},'もどる'],k=>{
+    if(k===3){const ids=kstarIds();if(!ids.length){dialog(['看板キャストに なれる キャラが いない。','（ガチャの キャバ嬢・\n超売れっ子キャバ嬢 東みかん（LR）が 出勤できる）'],()=>castScr(vi,i));return;}
+      listPick('だれを 出勤させる？（1店に 1人）',[...ids.map(id=>({t:CH[id].name,r:RAR[CH[id].rar].n,col:id==='mikan'?'#f8b800':null})),{t:'休ませる（出勤なし）',col:'#7c7c7c'}],j=>{
+        if(j>=ids.length){L.star=null;save();dialog('看板キャストを 休ませた。',()=>castScr(vi,i));return;}const id=ids[j];
+        for(const k2 in G.kan)G.kan[k2].lots.forEach(o=>{if(o.star===id)o.star=null;});L.star=id;save();sfx('lvup');
+        dialog(id==='mikan'?['東みかん「えっ、 ここで 働けるの！？\nうれしい〜！ がんばっちゃうね♡」',`超売れっ子キャバ嬢 東みかんが\n「${L.nm}」に 出勤した！`,'お店の 前に 行列が できはじめた…！']:[`${CH[id].name}が 「${L.nm}」に 出勤した！`],()=>castScr(vi,i));},
+        j=>{const id=ids[j];const S=id&&kstarOf(id);return S?`${CH[id].name}\n${S.d}\n指名力 ${Math.round(S.pow*(1+.1*Math.min(10,(G.chars[id].dup||0))))}（重ねるほど UP）`:'看板キャストを 外す';});return;}
     if(k===0){if(L.cast.length>=CAST_MAX){dialog('もう 在籍が いっぱいだ。',()=>castScr(vi,i));return;}
       if(L.itv===G.day){dialog('今日の 面接は もう 終わった。\n（明日 また 応募者が 来る）',()=>castScr(vi,i));return;}
       const r=lcg(G.day*977+vi*31+i*7),lm=landMul(vi),A=[0,1,2].map(()=>mkCast(r,lm));
@@ -5255,9 +5273,9 @@ function castScr(vi,i){const L=kanSt(vi).lots[i];L.cast=L.cast||[];
             rePay(cost,()=>{c.pow++;c.wage=Math.round(c.wage*1.08);save();dialog(`${c.n}「ありがとう ございます！\nもっと がんばります！」`,()=>castScr(vi,i));});},96);return;}
           if(r2===1){L.cast.splice(L.cast.indexOf(c),1);save();dialog(`${c.n}は お店を 卒業した。\n${c.n}「今まで ありがとう ございました！」`,()=>castScr(vi,i));return;}castScr(vi,i);},120);},
         j=>{const c=L.cast[j];return c?castLine(c):'';});return;}
-    if(k===2){if(!L.cast.length){dialog('在籍している キャバ嬢は いない。',()=>castScr(vi,i));return;}const S=[...L.cast].sort((a,b)=>b.sales-a.sales),pg=[];
+    if(k===2){if(!L.cast.length){dialog(kstarOf(L.star)?`【看板】${kstarOf(L.star).n}\n売上 ${fmt(L.starSales||0)}イェソ`:'在籍している キャバ嬢は いない。',()=>castScr(vi,i));return;}const S=[...L.cast].sort((a,b)=>b.sales-a.sales),pg=[];
       S.slice(0,9).forEach((c,k2)=>{const l=`${k2+1}位 ${c.lg?'★':''}${c.n}　${fmt(c.sales)}`;if(k2%3===0)pg.push(l);else pg[pg.length-1]+='\n'+l;});
-      dialog(['【売上 ランキング】',...pg,`今月の No.1は ${S[0].n}！`],()=>castScr(vi,i));return;}
+      const sl=kstarOf(L.star)?[`【看板】${kstarOf(L.star).n}\n売上 ${fmt(L.starSales||0)}イェソ\n（殿堂入り）`]:[];dialog(['【売上 ランキング】',...sl,...pg,`今月の No.1は ${S[0].n}！`],()=>castScr(vi,i));return;}
   },150);}
 /* お店の 中（テナントに 入れる） */
 const KFLC={host:['#141414','#242424'],izakaya:['#7c4c10','#8c5c20'],cab:['#5c0028','#740034'],lounge:['#1c1c3c','#24244c'],gay:['#3c1c00','#4c2808'],concafe:['#f8d8e8','#fce8f0'],karaoke:['#24243c','#2c2c4c'],snack:['#3c2400','#4c3008'],none:['#7c7c7c','#8c8c8c']};
@@ -5268,6 +5286,7 @@ function buildKanShop(vi,i){const L=kanSt(vi).lots[i],t=L.t||'none',w=13,h=10,C=
   if(t==='cab'||t==='lounge'||t==='concafe'||t==='host'){C[0][4]={t:'kchand',k:t};C[0][8]={t:'kchand',k:t};seat(2,2);seat(8,2);seat(2,5);seat(8,5);
     npcs.push({x:7,y:8,col:t==='concafe'?'#fcfcfc':'#000000',hair:t==='concafe'?'#f8b800':'#3c3c3c',kan:'visit',line:''});
     if(t==='cab'){const cs=(L.cast||[]).slice(0,6),P=[[2,3],[4,3],[8,3],[10,3],[2,6],[4,6]];cs.forEach((c,k)=>npcs.push({x:P[k][0],y:P[k][1],col:['#f878f8','#fcfcfc','#d82800','#a4b4fc','#f8d878','#7ee0fc'][k],hair:k%2?'#f8b800':'#7c4c10',cast:c.n,line:`${c.lg?'★':''}${c.n}「${['いらっしゃいませ〜！','今日も 来てくれたの？ うれしい！','オーナー、 お疲れさまです♪','次は 指名 してね！','シャンパン… 入れちゃう？','がんばって No.1 めざします！'][k]}」`}));}
+    if(t==='cab'&&kstarOf(L.star)){const id=L.star,lk=CH[id].look||{};npcs.push({x:6,y:4,col:lk.body||'#fcfcfc',hair:lk.hair||'#f87800',line:id==='mikan'?['東みかん「いらっしゃいませ〜♡\n今日も 来てくれて ありがとう！」','東みかん「オーナー、 今月も\nNo.1 とっちゃうからね！」','東みかん「シャンパン 入れたら\nとびきりの 神対応 しちゃう♡」'][Math.floor(rnd()*3)]:`${CH[id].name}「いらっしゃいませ！」`});}
     if(t==='host')npcs.push({x:3,y:4,col:'#000000',hair:'#f8d878',line:'ホスト「いらっしゃいませ！\n今夜は 最高の 夜に しましょう！」'},{x:9,y:4,col:'#fcfcfc',hair:'#bcbcbc',line:'ホスト「代表が お待ちしてます！」'});
     if(t==='lounge')npcs.push({x:3,y:4,col:'#a4b4fc',hair:'#000000',line:'ホステス「ごゆっくり どうぞ。\nママも すぐ 参りますわ」'});
     if(t==='concafe')npcs.push({x:9,y:4,col:'#fcfcfc',hair:'#f878f8',line:'メイド「ご主人さま、\n本日も おつかれさまです♪」'});}
