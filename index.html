@@ -2130,7 +2130,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -2146,7 +2146,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -2343,9 +2343,13 @@ function drawCell(c,sx,sy,city){
     case 'kturf':{R(sx,sy,16,16,'#00a800');R(sx,sy+(c.r?0:8),16,1,'#00b800');const f=(frame*2+c.x*16)%(26*16);if(c.r===1&&(f<16||(f>200&&f<216))){drawHorse(sx+(f%16)-8,sy+3,'#d82800',frame,'#f8b800');}if(c.r===0&&f>96&&f<112)drawHorse(sx+(f%16)-8,sy+3,'#0058f8',frame+2,'#fcfcfc');break;}
     case 'krail':R(sx,sy,16,16,'#00a800');R(sx,sy+6,16,3,'#fcfcfc');R(sx+2,sy+6,2,8,'#fcfcfc');R(sx+10,sy+6,2,8,'#fcfcfc');if(c.goal){R(sx+6,sy-14,3,22,'#d82800');R(sx+3,sy-16,9,4,'#fcfcfc');}break;
     case 'kwall':R(sx,sy,16,16,'#3c3c3c');R(sx,sy,16,3,'#00a800');R(sx,sy+13,16,3,'#5c5c5c');for(let x=2;x<16;x+=5)R(sx+x,sy+5,3,6,'#24243c');break;
-    case 'kwin':R(sx,sy,16,16,'#503000');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#3cbcfc');R(sx+5,sy+10,6,6,'#a05000');R(sx+1,sy+12,14,1,'#f8b800');txtS('券',sx+8,sy+3,'#000','center');break;
+    case 'kwin':R(sx,sy,16,16,'#503000');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#3cbcfc');R(sx+5,sy+10,6,6,'#a05000');R(sx+1,sy+12,14,1,'#f8b800');txtS('馬',sx+8,sy+3,'#000','center');break;
     case 'kboard':{R(sx,sy,16,16,'#000');R(sx,sy,16,1,'#5c5c5c');const lt=((frame>>4)+c.k)%3;for(let y=2;y<14;y+=4)R(sx+2,sy+y,12,2,lt===(y>>2)%3?'#f8b800':'#7ee07e');if(c.k===0)R(sx,sy,1,16,'#5c5c5c');if(c.k===4)R(sx+15,sy,1,16,'#5c5c5c');break;}
     case 'kpad':{R(sx,sy,16,16,'#00a800');if(c.e)R(sx,sy+(c.e===1?0:13),16,3,'#fcfcfc');if(c.e===0){const gx=(frame>>1)%96;if(Math.floor(gx/16)===c.dx)drawHorse(sx+(gx%16)-6,sy+2,'#f878f8',frame,'#f878f8');}break;}
+    case 'tvmon':{R(sx,sy,16,16,'#3c3c3c');R(sx+1,sy+2,14,11,'#000');const bt=((frame>>8)+c.k)%2;R(sx+2,sy+3,12,9,bt?'#0058f8':'#00a800');R(sx+2,sy+7,12,1,bt?'#3cbcfc':'#fcfcfc');
+      const q=((frame>>1)+c.k*7)%14;if(bt){R(sx+2+q,sy+5,3,2,'#fcfcfc');R(sx+2+((q+5)%12),sy+9,3,2,'#f8b800');}else{R(sx+2+q,sy+4,3,2,'#7c4c10');R(sx+2+((q+4)%12),sy+9,3,2,'#7c4c10');}R(sx+6,sy+13,4,3,'#3c3c3c');break;}
+    case 'bwin':R(sx,sy,16,16,'#003c8c');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#68ccfc');R(sx+5,sy+10,6,6,'#0058f8');R(sx+1,sy+12,14,1,'#fcfcfc');txtS('舟',sx+8,sy+3,'#000','center');break;
+    case 'kseat':R(sx,sy,16,16,'#bcb49c');for(const x of [1,9]){R(sx+x,sy+3,6,6,'#d82800');R(sx+x,sy+9,6,3,'#a81000');R(sx+x+1,sy+12,1,3,'#3c3c3c');R(sx+x+4,sy+12,1,3,'#3c3c3c');}break;
     case 'kbooth':{R(sx,sy,16,16,'#bcb49c');R(sx,sy,16,5,'#f87800');R(sx,sy+5,16,1,'#a05000');R(sx+1,sy+6,14,9,'#fcfcfc');R(sx+1,sy+12,14,3,'#f8b800');txtS(['う','ど','ん'][c.dx],sx+8,sy-1,'#fcfcfc','center');if(c.dx===1){R(sx+5,sy+7,6,4,'#a05000');R(sx+6,sy+8,4,2,'#f8d878');}else{R(sx+4,sy+7,8,3,'#5c5c5c');}if(c.dx===0)R(sx,sy,1,16,'#a05000');if(c.dx===2)R(sx+15,sy,1,16,'#a05000');break;}
     case 'kfood':if(c.shop==='ramen'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#000');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+2,sy+5,12,3,'#d82800');R(sx+3,sy+9,10,2,'#fcfcfc');txtS(c.dx?'メ':'ラ',sx+8,sy-1,'#fcfcfc','center');if(c.dx){R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');}else{R(sx+4,sy+8,8,3,'#fcfcfc');R(sx+5,sy+6,1,2,'#bcbcbc');R(sx+9,sy+5,1,3,'#bcbcbc');}R(sx+1,sy+12,14,4,'#503000');break;}
       R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,4,c.dx?'#d82800':'#fcfcfc');R(sx+1,sy+4,14,8,'#a05000');R(sx+3,sy+5,10,4,'#3c3c3c');R(sx+4,sy+6,8,2,'#f8b800');if(!c.dx)txtS('焼',sx+8,sy,'#000','center');else txtS('う',sx+8,sy,'#fcfcfc','center');break;
@@ -2388,7 +2392,7 @@ function drawNPC(n,x,y,f){if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':
 const townScr={full:true,mv:null,bt:0,
   upd(){
     if(this.bt>0)this.bt--;
-    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else leaveTown();}}return;}
+    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.jogai)exitJogai();else leaveTown();}}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0,fresh=I.pu||I.pd||I.pl||I.pr||ptrFresh;ptrFresh=false;
     if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
@@ -2402,6 +2406,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&c.t==='trift'){gimRiftTalk(c);return;}
     if(fresh&&TW.ship&&shipBump(c))return;
     if(fresh&&TW.kjo&&kjoBump(c))return;
+    if(fresh&&TW.jogai&&jogaiBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
     if(fresh&&(c.t==='kcdoor'||c.t==='kc'||c.t==='moat'||c.t==='nobori'||c.t==='sakura')){if(c.t==='kcdoor')kqFac('kqjo');else dialog(c.t==='kc'?(kqS().ch===3?'五層の 天守に 黒い 雲が 渦を 巻いている…':kqS().ch>=4?'金の 鯱が 夜空に かがやく\n五層の 天守だ。 町の 誇りだ！':'白壁と 金の 飾りが まぶしい\n五層の 天守 コクラ城だ。'):c.t==='moat'?'お堀には 鯉が 泳いでいる。':c.t==='nobori'?'のぼりに「コクラ城」と 書かれている。':'城の 桜が 咲きほこっている。');return;}
     if(fresh&&c.t==='ura'){if(G.colo)uraFac();else dialog('黒い 石の 扉が 地面に はめこまれている。\n固く 閉ざされていて びくとも しない…');return;}
@@ -2423,7 +2428,7 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
-    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo?120:88);if(!TW.ship&&!TW.kjo)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
+    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right');}
   }
@@ -2446,7 +2451,7 @@ function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   switch(kind){case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -4459,8 +4464,8 @@ function raceCard(vi){
 function raceProb(boats,order){let tot=boats.reduce((a,b)=>a+b.w,0),p=1;for(const i of order){p*=boats[i].w/tot;tot-=boats[i].w;}return p;}
 const raceOdds=(boats,order)=>Math.max(1.0,Math.round(.75/raceProb(boats,order)*10)/10);
 function raceResult(boats){const left=[0,1,2,3,4,5],out=[];while(left.length){const tot=left.reduce((a,i)=>a+boats[i].w,0);let x=rnd()*tot,k=0;for(;k<left.length-1;k++){x-=boats[left[k]].w;if(x<0)break;}out.push(left.splice(k,1)[0]);}return out;}
-function raceFac(){
-  const vi=curVil,v=VIL[vi],bets=[];let card=raceCard(vi);
+function raceFac(vi0){
+  const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[];let card=raceCard(vi);
   const BT_=[['単勝',1],['2連単',2],['3連単',3]];
   const m=mkMenu([],{x:4,y:150,w:132,rows:6,rh:13});
   const items=()=>['単勝を 買う','2連単を 買う','3連単を 買う',`レース スタート（${bets.length}点）`,'出走表の 説明','でる'];m.items=items();
@@ -4547,7 +4552,7 @@ function drawHorse(x,y,col,f,cap){x=Math.round(x);y=Math.round(y);const L=(f>>2)
   R(x+1,y+3,11,5,'#7c4c10');R(x+10,y+1,4,4,'#7c4c10');R(x+13,y+2,2,2,'#7c4c10');R(x+11,y,2,2,'#5c3000');R(x,y+3,2,3,'#3c2000');
   R(x+2+(L?0:1),y+8,1,3,'#5c3000');R(x+5-(L?1:0),y+8,1,3,'#5c3000');R(x+8+(L?1:0),y+8,1,3,'#5c3000');R(x+11-(L?0:1),y+8,1,3,'#5c3000');
   R(x+5,y-1,4,4,col);R(x+6,y-3,3,2,cap);R(x+5,y+3,3,2,'#fcfcfc');}
-function keibaFac(){const vi=curVil,v=VIL[vi],bets=[];let card=keibaCard(vi);
+function keibaFac(vi0){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[];let card=keibaCard(vi);
   const kRareNote=()=>{const h=card.horses.find(x=>x.rare!=null);if(h){G.keibaSeen=G.keibaSeen||{};G.keibaSeen[h.name]=1;save();toast(`★激レア馬 ${h.name}が 出走！`);}};kRareNote();
   const BT_=['単勝','複勝','馬連','3連単'];
   const m=mkMenu([],{x:4,y:166,w:132,rows:5,rh:13});
@@ -4630,6 +4635,30 @@ function kjoBump(c){
   if(c.t==='kturf'||c.t==='krail'){dialog('ダートと 芝の 2つの コース。\n遠くで 馬が 走っている！');return true;}
   if(c.t==='kfood'||c.t==='kbooth'){kjoFood(c.t==='kbooth'?'suke':c.shop);return true;}
   return false;}
+/* ===================== 場外発売所（馬券・舟券） ===================== */
+let jogaiPrev=null;
+function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'kwall'};C[h-1][x]={t:'kwall'};}for(let y=0;y<h;y++){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}
+  for(let k=0;k<7;k++)C[1][5+k]={t:'tvmon',k};
+  for(let k=0;k<3;k++){C[4][2+k]={t:'kwin',k};C[4][12+k]={t:'bwin',k};}
+  for(let k=0;k<3;k++){C[3][6+k]={t:'kboard',k:k+1};}
+  for(const y of [7,9])for(let x=4;x<=12;x++)if(x!==8)C[y][x]={t:'kseat'};
+  C[h-1][8]={t:'exit'};
+  const r=lcg(vi*577+G.day*31),npcs=[{x:3,y:5,col:'#503000',hair:'#3c3c3c',line:'係員「こちらは 馬券の 窓口。\nコクラ競馬場の レースが 買えますよ」'},{x:13,y:5,col:'#0058f8',hair:'#000000',line:'係員「こちらは 舟券の 窓口。\n各地の ボートレース場の レースが 買えます」'},
+    {x:6,y:6,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「モニターの 前が いちばん 落ちつくわい」'},{x:11,y:10,col:'#00a800',hair:'#7c4c10',line:'客「1号艇から 流すのが 基本たい」'},{x:5,y:10,col:'#d82800',hair:'#000000',yoso:1,line:''}];
+  if(r()<.12)npcs.push({x:14,y:9,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
+  return{jogai:true,title:`場外発売所（${VIL[vi].name.replace(/^.* /,'')}）`,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
+function enterJogai(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
+function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;setBase(townScr);}
+const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
+function jogaiBump(c){
+  if(c.t==='kwin'){keibaFac(KOKURA());return true;}
+  if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>VIL[i].port&&!VIL[i].depop);
+    listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:`第${(G.races&&G.races['v'+i])||1}R`})),k=>raceFac(P[k]));return true;}
+  if(c.t==='tvmon'){dialog('モニターに 各地の レースが 映っている。\n競馬と ボートレースが 交互に 流れる。');return true;}
+  if(c.t==='kboard'){const cd=keibaCard(KOKURA());dialog([`コクラ 次は ${cd.g1?'G1 タムニィ杯':'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
+  if(c.t==='kseat'){dialog('観戦用の いすだ。 新聞が 置きっぱなしに なっている。');return true;}
+  return false;}
 /* 競馬場グルメ */
 const KJO_FOOD={yaki:{n:'焼きうどん屋台',m:[{n:'焼きうどん',p:30,heal:.6,d:'仲間全員の HPを 6割 回復'},{n:'焼きうどん 大盛り',p:80,atk:.2,dur:6,d:'攻撃 +20%（6戦）'},{n:'焼きうどん 玉子のせ',p:160,all:.15,dur:8,d:'全能力 +15%（8戦）'}],q:'焼きうどん屋「ソース 多めにしとくけん！」'},
   ramen:{n:'オオヒラヤマラーメン',m:[{n:'とんこつラーメン',p:50,heal:1,d:'仲間全員の HPを 全回復'},{n:'ラーメン＋替え玉',p:150,atk:.25,dur:8,d:'攻撃 +25%（8戦）'},{n:'全部のせ 特製ラーメン',p:600,all:.25,exp:.3,dur:10,d:'全能力 +25%・経験値書 +30%（10戦）'}],q:'大将「バリカタ・カタ・ふつう・やわ… どれでも 言いんしゃい！」'},
@@ -4640,7 +4669,7 @@ function kjoFood(k){const F=KJO_FOOD[k];
     else if(x.mp){G.party.forEach(id=>{const st=cstat(id),c=G.chars[id];c.mp=st.mp;});dialog([F.q,`${x.n}を たべた。 だしが しみる…！\nみんなの MPが 全回復した。`]);}
     else{G.meal={n:x.n,atk:x.atk||0,all:x.all||0,exp:x.exp||0,left:x.dur};G.party.forEach(fixHp);dialog([F.q,`${x.n}を たべた。 うまい！\n${x.d}`]);}
     save();},sel=>{const x=F.m[sel];return x?x.d+(G.meal&&G.meal.left>0?`\nいまの 食事効果：${G.meal.n}（残り${G.meal.left}戦）`:''):'';});}
-function yosoTalk(){const cd=keibaCard(curVil),pick=cd.horses.map((h,i)=>i).sort((a,b)=>cd.horses[a].pop-cd.horses[b].pop)[Math.floor(rnd()*3)];
+function yosoTalk(){const cd=keibaCard(KOKURA()),pick=cd.horses.map((h,i)=>i).sort((a,b)=>cd.horses[a].pop-cd.horses[b].pop)[Math.floor(rnd()*3)];
   dialog([`予想屋「次の ${cd.g1?'タムニィ杯':'レース'}は ${pick+1}番 ${cd.horses[pick].name}で 決まりや！」`,'「…外れても 文句は 受けつけんけどな」']);}
 function loserTalk(n){G.kjoLoser=G.kjoLoser||{};
   if(G.kjoLoser.day===G.day){dialog('大負けした 賭郎「…ほっといてくれ。\nおれは もう 空っぽだ…」');return;}
