@@ -751,11 +751,11 @@ const CAPR={x0:120,y0:13,x1:174,y1:38};
   const YM=[['ジングウコウゴウ','首都 マホロバ',128,25,1,'神功皇后神社','カルスト台地と 鍾乳洞の 町'],['シモノセキ','ジングウコウゴウ',121,30,4,'赤間神宮','ふく料理で 名高い 島の 西の 港町'],['イイヤマ','ジングウコウゴウ',124,18,1,'飯山八幡宮','棚田と 湯の 香る 北の 町'],
     ['ショウゴウ','シモノセキ',124,35,2,'松江八幡宮','港と 工場の 町'],['ウベ','ショウゴウ',131,36,3,'琴崎八幡宮','野外彫刻が 並ぶ 町'],['ハギ','首都 マホロバ',134,15,2,'松陰神社','城下町の 面影が 残る 古都'],
     ['アキラギ','ハギ',137,20,0,'明木神社','往還の 宿場の 面影を 残す 山あいの 村。|全てが 始まった 地。\n万物が 生まれた 地。'],['アブ','ハギ',143,14,0,'大歳神社','日本海を のぞむ 静かな 町'],['ホウフ','首都 マホロバ',148,35,3,'防府天満宮','天満宮の 門前町'],
-    ['トイシ','ホウフ',156,32,3,'遠石八幡宮','工場夜景が 広がる 町'],['クダマツ','トイシ',160,36,2,'降松神社','ものづくりの 町'],['アサエ','クダマツ',164,34,2,'浅江神社','白い 砂浜の 町'],
+    ['トイシ','ホウフ',156,32,3,'遠石八幡宮','工場夜景と 競艇の 海辺の 町'],['クダマツ','トイシ',160,36,2,'降松神社','ものづくりの 町'],['アサエ','クダマツ',164,34,2,'浅江神社','白い 砂浜の 町'],
     ['タカマツ','アサエ',166,30,1,'高松八幡宮','田園が 広がる 町'],['シロタ','アサエ',168,37,2,'代田八幡宮','白壁と 金魚ちょうちんの 町'],['シダイ','シロタ',162,38,0,'志駄岸神社','瀬戸内の 小さな 漁村'],
     ['ナガオ','シロタ',172,36,1,'長尾八幡宮','みかんの 島'],['シラヤマヒメ','タカマツ',171,23,3,'白山比咩神社','五連の 木橋が 架かる 城下町'],['セタ','シラヤマヒメ',172,17,0,'瀬田八幡宮','島の 東の はずれの 小さな 町']];
   const YRK={'ウベ':3,'ホウフ':3,'トイシ':3,'シラヤマヒメ':2,'ショウゴウ':2,'ハギ':3,'クダマツ':1,'アサエ':1,'シロタ':3,'ジングウコウゴウ':3};
-  YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:n,shrine:sh,rank:YRK[n]!=null?YRK[n]:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f),yama:1,rec:'＝平均',desc:d}));}
+  YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:n,shrine:sh,rank:YRK[n]!=null?YRK[n]:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f),yama:1,rec:'＝平均',desc:d,...(n==='トイシ'?{kyotei:1}:{})}));}
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
@@ -857,6 +857,7 @@ function genMap(){
   /* マホロバ競馬場（中央競馬）：首都の すぐ 東 */
   {const c=VIL.find(v=>v.capital);for(let x=c.x+1;x<MJO.x;x++){const t=tileAt(x,MJO.y);if(!isTownT(t)&&t!==T.SHR)setT(x,MJO.y,T.ROAD);}
     for(let dy=-1;dy<=1;dy++)for(let dx=0;dx<=1;dx++){const t=tileAt(MJO.x+dx,MJO.y+dy);if(t===T.WATER||t===T.SEA||t===T.MOUNT)setT(MJO.x+dx,MJO.y+dy,T.GRASS);}setT(MJO.x,MJO.y,T.KEIBAJO);}
+  {/* トイシ：海辺の 町（南西に 海） */const v=VIL.find(x=>x.kyotei);if(v)for(let y=v.y+2;y<=v.y+6;y++)for(let x=v.x-6;x<=v.x-2;x++){const t=tileAt(x,y);if((t===T.GRASS||t===T.FOREST)&&Math.hypot((x-v.x+1)*.8,y-v.y-6)<5.2)setT(x,y,T.SEA);}}
   /* 首都高速 大橋：首都から 南へ グンマーの 外縁地方まで */
   {const c=VIL.find(v=>v.capital);for(let y=c.y+1;y<GOUT.y0+2;y++){const t=tileAt(c.x,y);if(isTownT(t)||t===T.SHR)continue;setT(c.x,y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
   /* コクラ競馬場：コクラの すぐ 東 */
@@ -2220,7 +2221,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:v.kyotei?['race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -4987,7 +4988,7 @@ function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p
 const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
 function jogaiBump(c){
   if(c.t==='kwin'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('どの 競馬場の 馬券を 買いますか？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaCard(i).sp?keibaCard(i).gname:`第${(G.keiba&&G.keiba['v'+i])||1}R`})),k=>keibaFac(L[k]));return true;}
-  if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>VIL[i].port&&!VIL[i].depop);
+  if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>(VIL[i].port||VIL[i].kyotei)&&!VIL[i].depop);
     listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:`第${(G.races&&G.races['v'+i])||1}R`})),k=>raceFac(P[k]));return true;}
   if(c.t==='tvmon'){dialog('モニターに 各地の レースが 映っている。\n競馬と ボートレースが 交互に 流れる。');return true;}
   if(c.t==='kboard'){const cd=keibaCard(KOKURA());dialog([`コクラ 次は ${cd.sp?cd.gname:'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
