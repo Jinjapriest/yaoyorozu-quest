@@ -2448,6 +2448,11 @@ function drawCell(c,sx,sy,city){
     case 'kanst':R(sx,sy,16,16,'#2c2c3c');R(sx,sy+15,16,1,'#24242c');R(sx+15,sy,1,16,'#24242c');break;
     case 'kanwall':{R(sx,sy,16,16,'#18182c');const n=isNight();for(let k=0;k<4;k++){const lit=((c.x||0)*7+k*3+(frame>>7))%5<2;R(sx+2+(k%2)*7,sy+2+(k>>1)*7,5,4,n&&lit?'#f8d878':'#3c3c5c');}break;}
     case 'kshop':kanShopCell(c,sx,sy);break;
+    case 'kantower':{R(sx,sy,16,16,'#2c2c3c');R(sx+4,sy,8,16,'#18182c');const cs=['#f878f8','#7ee0fc','#f8d878','#7ee07e'],f=(frame>>3)%4;
+      if(c.part===0){R(sx+2,sy+1,12,9,'#000');R(sx+2,sy+1,12,1,cs[f]);R(sx+2,sy+9,12,1,cs[(f+1)%4]);R(sx+2,sy+1,1,9,cs[(f+2)%4]);R(sx+13,sy+1,1,9,cs[(f+3)%4]);txt('歓',sx+8,sy+2,cs[f],'center');}
+      else for(let k=0;k<4;k++)R(sx+5,sy+1+k*4,6,2,cs[(f+k)%4]);break;}
+    case 'kanann':{R(sx,sy,16,16,'#18182c');if(c.part===0){R(sx,sy+3,16,10,'#f8d878');if(c.dx===2)txt('無料案内所',sx-8,sy+4,'#d82800','center',46);}else{R(sx,sy,16,16,'#3c3c5c');R(sx+2,sy+2,12,12,c.dx===1?'#f8d878':'#24242c');}break;}
+    case 'kanarch':{R(sx,sy,16,16,'#18182c');const f=(frame>>4)&1;R(sx,sy+2,16,2,f?'#f878f8':'#7ee0fc');R(sx,sy+12,16,2,f?'#7ee0fc':'#f878f8');if(c.x===18)txt('八百万 歓楽街',sx-40,sy+4,'#f8d878','center',100);break;}
     case 'kanfl':case 'kiwall':case 'kchand':case 'ksofa':case 'ktable':case 'kbar':case 'kroom':case 'koffice':kanShopDraw(c,sx,sy);break;
     case 'trift':R(sx,sy,16,16,'#1c0010');{const f=(frame>>3)%4;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,5,f&1?'#a80020':'#6800a8');pc(sx+8,sy+8,3,'#d82800');pc(sx+8,sy+8,1+(f>>1),'#fcfcfc');}break;
     case 's':case 'exit':R(sx,sy,16,16,city?'#6c6c6c':'#fcd8a8');if(!city){R(sx+5,sy+6,1,1,'#e4a858');R(sx+12,sy+12,1,1,'#e4a858');}else{R(sx,sy,16,1,'#7c7c7c');}
@@ -5069,16 +5074,23 @@ const KAN={cab:{n:'キャバクラ',sh:'CLUB',col:'#f878f8',setup:6e8,rent:3e6,b
   gay:{n:'ゲイバー',sh:'BAR',col:'#fc9838',setup:1.2e8,rent:8e5,base:4e6,wage:1e6,vol:.08,open:[20,29],cust:5e5},
   concafe:{n:'コンカフェ',sh:'CAFE',col:'#7ee0fc',setup:1.5e8,rent:1e6,base:5e6,wage:1.5e6,vol:.4,open:[11,23],cust:4e5},
   karaoke:{n:'カラオケ',sh:'KARAOKE',col:'#f8d878',setup:3e8,rent:2e6,base:8e6,wage:2e6,vol:.1,open:[10,29],cust:2e5},
-  snack:{n:'スナック',sh:'SNACK',col:'#d878f8',setup:6e7,rent:4e5,base:2e6,wage:5e5,vol:.1,open:[19,28],cust:3e5}};
+  snack:{n:'スナック',sh:'SNACK',col:'#d878f8',setup:6e7,rent:4e5,base:2e6,wage:5e5,vol:.1,open:[19,28],cust:3e5},
+  host:{n:'ホストクラブ',sh:'HOST',col:'#f8b800',setup:5e8,rent:2.5e6,base:1.3e7,wage:4.5e6,vol:.3,open:[20,29],cust:2.5e6},
+  izakaya:{n:'居酒屋',sh:'居酒屋',col:'#fc7460',setup:8e7,rent:6e5,base:3e6,wage:9e5,vol:.08,open:[17,26],cust:1e5}};
 const KANK=Object.keys(KAN);
-const KAN_NM={cab:['クラブ 月下美人','クラブ ルミエール','クラブ 胡蝶','クラブ ヴィーナス','シャングリラ'],lounge:['ラウンジ 雅','ラウンジ ミラージュ','ラウンジ 碧','ラウンジ エデン'],
-  gay:['ママの店 ひまわり','バー 薔薇の園','バー 夜明けの虹','バー 天照'],concafe:['にゃんにゃん堂','めいどの国','ぴゅあ★きゃっと','妖精の森カフェ'],
-  karaoke:['カラオケ うたげ','カラオケ 八百万','マイクの森','歌うたいの館'],snack:['スナック 夜明け','スナック のぞみ','スナック 灯','スナック 美智子']};
+const KAN_NM={cab:['クラブ 月下美人','クラブ ルミエール','クラブ 胡蝶','クラブ ヴィーナス','シャングリラ','クラブ 紅'],lounge:['ラウンジ 雅','ラウンジ ミラージュ','ラウンジ 碧','ラウンジ エデン','ラウンジ 朧月'],
+  gay:['ママの店 ひまわり','バー 薔薇の園','バー 夜明けの虹','バー 天照','バー 乙姫'],concafe:['にゃんにゃん堂','めいどの国','ぴゅあ★きゃっと','妖精の森カフェ','巫女カフェ 神楽'],
+  karaoke:['カラオケ うたげ','カラオケ 八百万','マイクの森','歌うたいの館','カラオケ 天岩戸'],snack:['スナック 夜明け','スナック のぞみ','スナック 灯','スナック 美智子','スナック ゆかり','スナック 港'],
+  host:['クラブ 夜王','クラブ 天下','クラブ ROYAL','クラブ 雅王','クラブ 月光'],izakaya:['居酒屋 八百万','炉端 まつり','大衆酒場 灯台','やきとり 鳥居','海鮮酒場 えびす']};
 const CAST_N=['あいり','ゆな','れいな','みく','さくら','ひかる','まりあ','えみり','ありさ','ののか','りな','しずく','あげは','つばき','かれん','みゆう','せいら','ゆきの','らん','きらら','るな','あすか','ひめか','もえ'],CAST_MAX=10;
 const kanHrs=t=>{const[a,b]=KAN[t].open;return`${a}時〜${b>24?'翌'+(b-24):b}時`;};
 const kanOpen=t=>{const[a,b]=KAN[t].open,h=nowMin()/60,hh=h<5?h+24:h;return hh>=a&&hh<b;};
-function kanSt(vi){G.kan=G.kan||{};const k='v'+vi;if(!G.kan[k]){const r=lcg(vi*4421+17),T=[...KANK].sort(()=>r()-.5),va=new Set();while(va.size<2)va.add(Math.floor(r()*6));
-  G.kan[k]={lots:T.map((t,i)=>va.has(i)?{t:null}:{t,own:0,nm:KAN_NM[t][Math.floor(r()*KAN_NM[t].length)],rep:Math.round((.85+r()*.5)*100)/100,lv:Math.floor(r()*3)})};}return G.kan[k];}
+const KAN_LOTS=25;
+function kanName(S,t,r){const used=new Set(S.lots.map(l=>l.nm)),L=KAN_NM[t].filter(n=>!used.has(n));if(L.length)return L[Math.floor(r()*L.length)];const b=KAN_NM[t][Math.floor(r()*KAN_NM[t].length)];let k=2;while(used.has(`${b} ${k}号店`))k++;return`${b} ${k}号店`;}
+function kanSt(vi){G.kan=G.kan||{};const k='v'+vi;if(!G.kan[k]){const r=lcg(vi*4421+17),T=['cab','lounge','gay','concafe','karaoke','snack'].sort(()=>r()-.5),va=new Set();while(va.size<2)va.add(Math.floor(r()*6));
+  G.kan[k]={lots:T.map((t,i)=>va.has(i)?{t:null}:{t,own:0,nm:KAN_NM[t][Math.floor(r()*KAN_NM[t].length)],rep:Math.round((.85+r()*.5)*100)/100,lv:Math.floor(r()*3)})};}
+  const S=G.kan[k];while(S.lots.length<KAN_LOTS){const j=S.lots.length,r=lcg(vi*4421+97+j*131);r();const t=KANK[Math.floor(r()*KANK.length)];
+    S.lots.push(r()<.28?{t:null}:{t,own:0,nm:kanName(S,t,r),rep:Math.round((.8+r()*.6)*100)/100,lv:Math.floor(r()*3)});}return S;}
 function mkCast(r,lm){const st=()=>1+Math.floor(Math.pow(r(),1.3)*5),lg=r()<.02;
   const c={n:CAST_N[Math.floor(r()*CAST_N.length)],age:20+Math.floor(r()*9),look:Math.min(5,st()+(lg?2:0)),talk:Math.min(5,st()+(lg?2:0)),sake:st(),lg,sales:0,days:0};
   c.pow=c.look*2+c.talk*2+c.sake+(lg?12:0);c.wage=Math.round(c.pow*2.5e5*lm);c.fee=Math.round(c.pow*5e6*lm);return c;}
@@ -5102,18 +5114,35 @@ function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
   if(G.day%10===0&&G.kanAcc){msgs.push(`【歓楽街の 決算】 この 10日の 収支\n${G.kanAcc>=0?'+':''}${fmt(G.kanAcc)}イェソ\n（毎日 普通預金に 反映済み）`);G.kanAcc=0;}
   return msgs;}
 /* 歓楽街の 中 */
-function buildKanraku(vi){const w=19,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kanst'});}
-  for(let x=0;x<w;x++){C[0][x]={t:'kanwall',x};C[h-1][x]={t:'kanwall',x:x+3};}for(let y=0;y<h;y++){C[y][0]={t:'kanwall',x:y};C[y][w-1]={t:'kanwall',x:y+5};}
-  for(const y of [1,2])for(let x=1;x<w-1;x++)C[y][x]={t:'kanwall',x:x+y};
-  for(const y of [9,10])for(let x=1;x<w-1;x++)if(x<8||x>10)C[y][x]={t:'kanwall',x:x+y};
-  [[1,1],[8,1],[15,1],[1,9],[4,9],[12,9]].forEach(([x0,y0],L)=>{for(let dx=0;dx<3;dx++){C[y0][x0+dx]={t:'kshop',L,dx,part:'sign'};C[y0+1][x0+dx]={t:'kshop',L,dx,part:'front'};}});
-  C[3][5]={t:'lamp'};C[3][12]={t:'lamp'};C[8][14]={t:'lamp'};C[8][4]={t:'lamp'};
-  C[h-1][9]={t:'exit'};
-  const n=isNight(),npcs=[{x:6,y:5,col:'#000000',hair:'#bcbcbc',line:n?'呼び込み「お兄さん、 1セット いかがっすか〜！\n今なら 指名料 無料っすよ！」':'呼び込み「…まだ 準備中っす。\n夜に また 来てくださいよ」'},
-    {x:13,y:6,col:'#24188c',hair:'#f8d878',line:n?'酔っぱらい「ういっく… もう 一軒 いくぞぉ〜」':'掃除の おじさん「夜の あとは ゴミが すごいんじゃ」'},
-    {x:3,y:7,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'},
-    {x:16,y:4,col:'#f878f8',hair:'#f8b800',line:n?'キャバ嬢「今日は 同伴 なんだ〜。\nあ、 今度 お店にも 来てね！」':'若い 女性「夜は この 街で 働いてるの。\n昼は 寝る 時間よ」'}];
-  return{kanIn:true,title:`${VIL[vi].name.replace(/^.* /,'')} 歓楽街`,vi,v:VIL[vi],w,h,cx:9,C,npcs,city:true,sz:VIL[vi].size,px:9,py:h-2,top:0};}
+function buildKanraku(vi){const w=31,h=21,C=[];kanSt(vi);for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kanst'});}
+  const wall=(x,y)=>{C[y][x]={t:'kanwall',x:x*3+y};};
+  for(let x=0;x<w;x++){wall(x,0);wall(x,h-1);}for(let y=0;y<h;y++){wall(0,y);wall(w-1,y);}
+  /* 建物の 列（看板＋店先 2段）：A・B1・B2・C1・C2 */
+  const ROWS=[1,6,8,13,15],SEG=[1,4,11,17,23,26];
+  for(const y0 of ROWS)for(let x=1;x<w-1;x++)if(![9,15,21].includes(x)||y0===1){wall(x,y0);wall(x,y0+1);}
+  const P=[];/* 既存の 6区画は 1列目に */
+  for(const x0 of SEG)P.push([x0,1]);
+  for(const y0 of [6,8])for(const x0 of [1,4,23,26])P.push([x0,y0]);
+  for(const x0 of [1,4,17,23,26])P.push([x0,13]);
+  for(const x0 of [1,4,11,17,23,26])P.push([x0,15]);
+  P.forEach(([x0,y0],L)=>{for(let dx=0;dx<3;dx++){C[y0][x0+dx]={t:'kshop',L,dx,part:'sign'};C[y0+1][x0+dx]={t:'kshop',L,dx,part:'front'};}});
+  /* 中央広場（ネオンタワー・噴水） */
+  for(let y=6;y<=9;y++)for(let x=10;x<=20;x++)C[y][x]={t:'kanst'};
+  C[7][15]={t:'kantower',part:0};C[8][15]={t:'kantower',part:1};C[7][12]={t:'fount'};C[7][18]={t:'fount'};
+  /* 無料案内所 */for(let dx=0;dx<3;dx++){C[13][11+dx]={t:'kanann',dx,part:0};C[14][11+dx]={t:'kanann',dx,part:1};}
+  /* 交番は C1 の 右端 */
+  /* 街灯 */for(const [x,y] of [[3,5],[12,5],[18,5],[27,5],[6,10],[24,10],[3,17],[12,17],[18,17],[27,17]])C[y][x]={t:'lamp'};
+  /* 入口の ネオンゲート */for(let x=12;x<=18;x++)C[h-1][x]={t:'kanarch',x};C[h-1][15]={t:'exit'};
+  const n=isNight(),r=lcg(G.day*733+vi*17+(n?1:0)),npcs=[
+    {x:14,y:18,col:'#000000',hair:'#bcbcbc',line:n?'呼び込み「お兄さん、 1セット いかがっすか〜！\n今なら 指名料 無料っすよ！」':'呼び込み「…まだ 準備中っす。\n夜に また 来てくださいよ」'},
+    {x:16,y:11,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'}];
+  const DAY=['掃除の おじさん「夜の あとは ゴミが すごいんじゃ」','若い 女性「夜は この 街で 働いてるの。\n昼は 寝る 時間よ」','配達員「おしぼりと 氷の 配達っす！」','観光客「昼の 歓楽街って 静かなんだね」'];
+  const NIGHT=['酔っぱらい「ういっく… もう 一軒 いくぞぉ〜」','キャバ嬢「今日は 同伴 なんだ〜。\nあ、 今度 お店にも 来てね！」','ホスト「姫〜！ 今夜も 会いに 来てくれたの？」','サラリーマン「部長の 二次会… 長いなあ」',
+    '会社員「終電… 逃した…」','女子大生「カラオケ オールしよ〜！」','おじさん「このへんの スナックは 全部 行ったぞ」','客引き「居酒屋 どうっすか！ 飲み放題 あるっす！」','観光客「ネオンが すごい！ 写真 撮ろう！」','黒服「…いい 街だろ。 夜は これからだ」'];
+  const pool=n?NIGHT:DAY,cnt=n?12:4,cols=['#d82800','#0058f8','#f878f8','#00a800','#f8b800','#fcfcfc','#7c4c10','#24188c'];
+  for(let k=0,tries=0;k<cnt&&tries<200;tries++){const x=1+Math.floor(r()*(w-2)),y=1+Math.floor(r()*(h-2));if(C[y][x].t!=='kanst'||npcs.some(p=>p.x===x&&p.y===y)||(x===15&&y>=17))continue;
+    npcs.push({x,y,col:cols[Math.floor(r()*cols.length)],hair:['#000000','#7c4c10','#f8b800','#bcbcbc'][Math.floor(r()*4)],line:pool[Math.floor(r()*pool.length)]});k++;}
+  return{kanIn:true,title:`${VIL[vi].name.replace(/^.* /,'')} 歓楽街`,vi,v:VIL[vi],w,h,cx:15,C,npcs,city:true,sz:VIL[vi].size,px:15,py:h-2,top:0};}
 function enterKanraku(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKanraku(curVil);kanSt(curVil);townScr.mv=null;setBase(townScr);sfx('bell');toast(isNight()?'ネオンが まぶしい 夜の 歓楽街だ':'昼の 歓楽街は 静まりかえっている');}
 function kanShopCell(c,sx,sy){const L=TW&&TW.kanIn?kanSt(TW.vi).lots[c.L]:null;if(!L)return;const K=L.t?KAN[L.t]:null,n=isNight();
   if(c.part==='sign'){R(sx,sy,16,16,'#101018');
@@ -5126,6 +5155,10 @@ function kanShopCell(c,sx,sy){const L=TW&&TW.kanIn?kanSt(TW.vi).lots[c.L]:null;i
   if(c.dx===1){R(sx+4,sy+4,8,12,op?'#f8d878':'#24242c');if(op)R(sx+7,sy+9,2,2,'#a05000');}
   else{R(sx+2,sy+5,12,7,'#24242c');if(op){R(sx+3,sy+6,10,5,K.col);ctx.globalAlpha=.55;R(sx+3,sy+6,10,5,'#000');ctx.globalAlpha=1;}}}
 function kanBump(c){if(c.t==='kshop'){kanEnter(TW.vi,c.L);return true;}
+  if(c.t==='kantower'){dialog('歓楽街の シンボル「ネオンタワー」だ。\n夜になると 七色に 光る。');return true;}
+  if(c.t==='kanarch'){dialog('「八百万 歓楽街」の ネオンゲートだ。');return true;}
+  if(c.t==='kanann'){const S=kanSt(TW.vi);listPick('無料案内所「どの お店に しますか？」',S.lots.map((L,i)=>({t:L.t?L.nm:'（空き店舗）',r:L.t?(L.own?'★あなた':KAN[L.t].n):'募集中',col:L.own?'#f8b800':!L.t?'#7c7c7c':kanOpen(L.t)?null:'#7c7c7c'})),()=>{},
+      i=>{const L=S.lots[i];return L?L.t?`${KAN[L.t].n}「${L.nm}」\n営業 ${kanHrs(L.t)}　${kanOpen(L.t)?'営業中':'準備中'}\n評判 ${'★'.repeat(Math.max(1,Math.min(5,Math.round(L.rep*2.5))))}`:'テナント 募集中の 空き店舗':'';});return true;}
   if(c.t==='kanwall'){dialog(isNight()?'雑居ビルの 窓に 明かりが ともっている。':'雑居ビルだ。 昼間は ひっそり している。');return true;}return false;}
 function kanLot(vi,i){const L=kanSt(vi).lots[i];
   if(!L.t){if(!reOn()){dialog(['「テナント募集中」の 貼り紙が ある。','（不動産業が 解放されると 契約できる）']);return;}
@@ -5182,19 +5215,20 @@ function castScr(vi,i){const L=kanSt(vi).lots[i];L.cast=L.cast||[];
       dialog(['【売上 ランキング】',...pg,`今月の No.1は ${S[0].n}！`],()=>castScr(vi,i));return;}
   },150);}
 /* お店の 中（テナントに 入れる） */
-const KFLC={cab:['#5c0028','#740034'],lounge:['#1c1c3c','#24244c'],gay:['#3c1c00','#4c2808'],concafe:['#f8d8e8','#fce8f0'],karaoke:['#24243c','#2c2c4c'],snack:['#3c2400','#4c3008'],none:['#7c7c7c','#8c8c8c']};
+const KFLC={host:['#141414','#242424'],izakaya:['#7c4c10','#8c5c20'],cab:['#5c0028','#740034'],lounge:['#1c1c3c','#24244c'],gay:['#3c1c00','#4c2808'],concafe:['#f8d8e8','#fce8f0'],karaoke:['#24243c','#2c2c4c'],snack:['#3c2400','#4c3008'],none:['#7c7c7c','#8c8c8c']};
 function buildKanShop(vi,i){const L=kanSt(vi).lots[i],t=L.t||'none',w=13,h=10,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kanfl',k:t,x,y});}
   for(let x=0;x<w;x++){C[0][x]={t:'kiwall',k:t};C[h-1][x]={t:'kiwall',k:t};}for(let y=0;y<h;y++){C[y][0]={t:'kiwall',k:t};C[y][w-1]={t:'kiwall',k:t};}
   C[h-1][6]={t:'exit'};const npcs=[],own=!!L.own;
   const seat=(x0,y0)=>{for(let dx=0;dx<3;dx++)C[y0][x0+dx]={t:'ksofa',dx,k:t};C[y0+1][x0+1]={t:'ktable',k:t};};
-  if(t==='cab'||t==='lounge'||t==='concafe'){C[0][4]={t:'kchand',k:t};C[0][8]={t:'kchand',k:t};seat(2,2);seat(8,2);seat(2,5);seat(8,5);
+  if(t==='cab'||t==='lounge'||t==='concafe'||t==='host'){C[0][4]={t:'kchand',k:t};C[0][8]={t:'kchand',k:t};seat(2,2);seat(8,2);seat(2,5);seat(8,5);
     npcs.push({x:7,y:8,col:t==='concafe'?'#fcfcfc':'#000000',hair:t==='concafe'?'#f8b800':'#3c3c3c',kan:'visit',line:''});
     if(t==='cab'){const cs=(L.cast||[]).slice(0,6),P=[[2,3],[4,3],[8,3],[10,3],[2,6],[4,6]];cs.forEach((c,k)=>npcs.push({x:P[k][0],y:P[k][1],col:['#f878f8','#fcfcfc','#d82800','#a4b4fc','#f8d878','#7ee0fc'][k],hair:k%2?'#f8b800':'#7c4c10',cast:c.n,line:`${c.lg?'★':''}${c.n}「${['いらっしゃいませ〜！','今日も 来てくれたの？ うれしい！','オーナー、 お疲れさまです♪','次は 指名 してね！','シャンパン… 入れちゃう？','がんばって No.1 めざします！'][k]}」`}));}
+    if(t==='host')npcs.push({x:3,y:4,col:'#000000',hair:'#f8d878',line:'ホスト「いらっしゃいませ！\n今夜は 最高の 夜に しましょう！」'},{x:9,y:4,col:'#fcfcfc',hair:'#bcbcbc',line:'ホスト「代表が お待ちしてます！」'});
     if(t==='lounge')npcs.push({x:3,y:4,col:'#a4b4fc',hair:'#000000',line:'ホステス「ごゆっくり どうぞ。\nママも すぐ 参りますわ」'});
     if(t==='concafe')npcs.push({x:9,y:4,col:'#fcfcfc',hair:'#f878f8',line:'メイド「ご主人さま、\n本日も おつかれさまです♪」'});}
-  else if(t==='gay'||t==='snack'){for(let x=2;x<=10;x++)C[3][x]={t:'kbar',k:t};seat(2,5);seat(8,5);
-    npcs.push({x:6,y:2,col:t==='gay'?'#d82800':'#a05000',hair:t==='gay'?'#f8d878':'#000000',kan:'mama',line:''});
-    npcs.push({x:3,y:4,col:'#24188c',hair:'#7c7c7c',line:t==='gay'?'常連客「ここの ママの 話を 聞くと\n元気が 出るんだよ」':'常連客「この 店に 来ると\n実家に 帰った 気が するんだよなあ」'});}
+  else if(t==='gay'||t==='snack'||t==='izakaya'){for(let x=2;x<=10;x++)C[3][x]={t:'kbar',k:t};seat(2,5);seat(8,5);
+    npcs.push({x:6,y:2,col:t==='gay'?'#d82800':t==='izakaya'?'#fcfcfc':'#a05000',hair:t==='gay'?'#f8d878':'#000000',kan:'mama',line:''});
+    npcs.push({x:3,y:4,col:'#24188c',hair:'#7c7c7c',line:t==='gay'?'常連客「ここの ママの 話を 聞くと\n元気が 出るんだよ」':t==='izakaya'?'会社員「とりあえず 生！\n…あ、 もう 3杯目か」':'常連客「この 店に 来ると\n実家に 帰った 気が するんだよなあ」'});}
   else if(t==='karaoke'){for(const x of [2,4,6,8,10])C[0][x]={t:'kroom',k:t,n:(x/2)};for(let x=8;x<=10;x++)C[6][x]={t:'kbar',k:t};
     npcs.push({x:9,y:5,col:'#f87800',hair:'#000000',kan:'visit',line:''});npcs.push({x:3,y:4,col:'#00a800',hair:'#7c4c10',line:'学生「フリータイム、 朝まで いくっしょ！」'});}
   else{npcs.push({x:6,y:4,col:'#503000',hair:'#5c5c5c',kan:'tenant',line:''});C[2][2]={t:'ktable',k:t};}
@@ -5209,8 +5243,8 @@ function exitKanShop(){const p=kanShopPrev;kanShopPrev=null;if(!p){exitJogai();r
 function kanNpc(npc){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
   if(npc.kan==='tenant'){if(!reOn()){dialog(['不動産屋「ここは テナント 募集中です」','（不動産業が 解放されると 契約できる）']);return;}dialog(['不動産屋「この 物件で お店を 開きますか？」'],()=>kanTenant(vi,i));return;}
   if(!L.t)return;const K=KAN[L.t];
-  if(!kanOpen(L.t)){dialog(L.own?`${npc.kan==='mama'?'ママ':'スタッフ'}「オーナー、 おはようございます。\n開店は ${K.open[0]}時からです」`:'「…まだ 準備中です」');return;}
-  const greet={cab:'黒服「いらっしゃいませ。\nご指名は ございますか？」',lounge:'黒服「いらっしゃいませ。 お席へ ご案内いたします」',concafe:'メイド「おかえりなさいませ、 ご主人さま♪」',karaoke:'受付「いらっしゃいませ！\nお時間は どうなさいますか？」',gay:'ママ「あら〜 いらっしゃい！\nなに 飲む？」',snack:'ママ「いらっしゃい。\nゆっくり していきなさいね」'}[L.t];
+  if(!kanOpen(L.t)){dialog(L.own?`${npc.kan==='mama'?(L.t==='izakaya'?'大将':'ママ'):'スタッフ'}「オーナー、 おはようございます。\n開店は ${K.open[0]}時からです」`:'「…まだ 準備中です」');return;}
+  const greet={cab:'黒服「いらっしゃいませ。\nご指名は ございますか？」',lounge:'黒服「いらっしゃいませ。 お席へ ご案内いたします」',concafe:'メイド「おかえりなさいませ、 ご主人さま♪」',karaoke:'受付「いらっしゃいませ！\nお時間は どうなさいますか？」',gay:'ママ「あら〜 いらっしゃい！\nなに 飲む？」',snack:'ママ「いらっしゃい。\nゆっくり していきなさいね」',host:'内勤「いらっしゃいませ！\n初回の お客さまですね？」',izakaya:'大将「へい らっしゃい！\nカウンター どうぞ！」'}[L.t];
   dialog(greet,()=>kanVisit(vi,i));}
 function kanShopBump(c){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
   if(c.t==='koffice'){kanOwn(vi,i);return true;}
@@ -5250,6 +5284,11 @@ function kanVisit(vi,i){const L=kanSt(vi).lots[i],K=KAN[L.t],lm=landMul(vi);
     karaoke:[['1時間 歌う',p,()=>{const sc=60+Math.floor(rnd()*41),sg=KARA_SONG[Math.floor(rnd()*KARA_SONG.length)];if(sc>=100)G.items.urtk=(G.items.urtk||0)+1;
         return[`「${sg}」を 熱唱した！`,`採点：${sc}点${sc>=100?'！！ 満点だ！':sc>=90?'！ うまい！':'。'}`,...(sc>=100?['満点 賞品として\nUR確定チケット ×1を もらった！']:[]),'スッキリした！ HP・MPが 回復した！'];},()=>fullHeal()],
       ['フリータイム（朝まで）',p*4,()=>['仲間と 朝まで 歌い明かした！','声が かれたが 気分は 最高！\nHP・MPが 回復した！（5戦 2割増し）'],()=>{fullHeal();mood(5);}]],
+    host:[['初回 料金',p,()=>['ホストたちが ずらりと 並んで 出迎えた！','トークで 大いに 盛り上がった！\n気分が 上がった！（3戦 経験値書 2割増し）'],()=>mood(3)],
+      ['シャンパンコール',p*10,()=>['「素敵な 姫から シャンパン いただきました〜！」','ホスト全員の シャンパンコールが ひびく！\nHP・MPが 回復し 気分 最高！（6戦 2割増し）'],()=>{mood(6);fullHeal();}],
+      ['エンジェル タワー',p*100,()=>['天まで とどく シャンパンタワーが 完成した！','店の 歴史に 名を 刻んだ！\nHP・MPが 回復し 気分は 絶頂！（10戦 2割増し）'],()=>{mood(10);fullHeal();}]],
+    izakaya:[['生ビールと 焼き鳥',p,()=>['大将「へい、 生 いっちょう！」','キンキンの 生ビールと 焼きたての 焼き鳥！\nHP・MPが 回復した！'],()=>fullHeal()],
+      ['宴会コース（飲み放題）',p*5,()=>['仲間と 乾杯！ 宴会が 始まった！','大いに 飲み 食べ 語り合った！\nHP・MPが 回復し 気分が 上がった！（3戦 2割増し）'],()=>{fullHeal();mood(3);}]],
     snack:[['ボトルを 入れる',p,()=>['ママ「あら、 いらっしゃい。\nいつもの で いい？」','常連 気分で くつろいだ。\nHP・MPが 回復した！'],()=>fullHeal()],
       ['ママと デュエット',p*2,()=>['ママと 昭和の 名曲を デュエット！','常連客から 拍手が わいた！\n気分が 上がった！（3戦 2割増し）'],()=>{fullHeal();mood(3);}]]}[L.t];
   choice(`${K.n}「${L.nm}」\nどう 楽しむ？`,[...M.map(m=>`${m[0]}（${own?'無料':fmt(m[1])}）`),'やめる'],k=>{if(k<0||!M[k])return;const m=M[k];go(cs(m[1]),m[2](),m[3]);},150);}
