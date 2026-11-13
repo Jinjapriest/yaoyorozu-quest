@@ -2863,11 +2863,11 @@ function stk(){if(!G.stock)G.stock=newStock();const S=G.stock;if(!S.pres)S.pres=
 const isPres=id=>!!(G.stock&&G.stock.pres&&G.stock.pres[id]);
 const canSoukai=c=>stockOwn(c.id)>c.top[1]&&!isPres(c.id);
 const STK_CAP=1e9,PRES_CAP=5e11,PRES_TOTAL=1e12;
-const presPay=c=>Math.min(PRES_CAP,Math.floor(G.stock.p[c.id]*(c.ipo?20:40)));
+const presPay=c=>Math.min(PRES_CAP,Math.floor(G.stock.p[c.id]*(c.ipo?20:40)*(1+.1*subN(c.id))));
 const stockOwn=id=>(G.stock&&G.stock.own[id])||0;
 const ownRatio=()=>Math.min(1,stockOwn('tamakane')/TAMA_SHARES);
 const isListed=c=>!c.ipo||(c.ipo==='teiai'?!!G.teiaiStock:c.ipo==='res'?!!(G.res&&G.res[c.rid]&&G.res[c.rid].ipo):!!(G.mine&&G.mine.ipo));
-const listed=()=>STOCKS.filter(isListed).concat(G.myco?myList():[]).concat(G.reco?[recoDef()]:[]);
+const listed=()=>STOCKS.filter(c=>isListed(c)&&!(G.stock&&G.stock.mg&&G.stock.mg[c.id])).concat(G.myco?myList():[]).concat(G.reco?[recoDef()]:[]);
 const resRatio=rid=>Math.min(1,stockOwn('res_'+rid)/RES_SHARES);
 function resFair(rid){const M=G.res&&G.res[rid];if(!M)return 50;return RES_LV[rid][M.lv].coin*1.3*100/RES_SHARES;}
 function tamaFair(){const M=G.mine;if(!M)return 50;return MINE_LV[M.lv].coin*1.3*(M.boost>0?1.2:1)/100;}
@@ -2876,21 +2876,22 @@ function stockDaily(){
   const S=stk(),msgs=[],hrMsgs=[];
   for(const c of listed()){let p=S.p[c.id];if(p==null)continue;
     if(c.ipo==='teiai'){let ev=rnd();p=p*Math.exp(c.vol*gauss()+.004);
-      if(ev<.01){const own=S.own.teiai||0;msgs.push('【速報】帝愛産業 上場廃止！','粉飾決算と 地下施設の 違法労働が 発覚…\n帝愛産業の 株は 紙くずに なった。'+(own?`\n持っていた ${fmt(own)}株が 消えた…`:''));S.own.teiai=0;S.cost.teiai=0;delete S.pres.teiai;p=c.p0;S.h.teiai=[];}
+      if(ev<.01){const own=S.own.teiai||0;msgs.push('【速報】帝愛産業 上場廃止！','粉飾決算と 地下施設の 違法労働が 発覚…\n帝愛産業の 株は 紙くずに なった。'+(own?`\n持っていた ${fmt(own)}株が 消えた…`:''));S.own.teiai=0;S.cost.teiai=0;delete S.pres.teiai;if(S.sub){delete S.sub.teiai;for(const x in S.sub)if(S.sub[x]==='teiai')delete S.sub[x];}p=c.p0;S.h.teiai=[];}
       else if(ev<.05){p*=2.2+rnd();msgs.push(`【速報】帝愛産業 ストップ高！\n新規カジノ船 事業が 発表され\n株価が ${pf(p)}イェソに 急騰！`);}
       else if(ev<.09){p*=.25+rnd()*.15;msgs.push(`【速報】帝愛産業 暴落！\n会長の 黒い 噂が 報じられ\n株価が ${pf(p)}イェソに 急落…`);}
       p=Math.min(1e6,Math.max(1,p));}
     else if(c.ipo||c.my){const f=c.my?myFair(c.my):c.ipo==='re'?reFair():c.ipo==='res'?resFair(c.rid):tamaFair();p=Math.max(1,p+(f-p)*.08+p*c.vol*gauss());
       if(p>=STK_CAP){p=STK_CAP;if(rnd()<.3){p*=.6;msgs.push(`【速報】${c.n} 急落！\n株価が 過熱しすぎて 売りが 殺到…\n株価が ${pf(p)}イェソに 下がった。`);}}}
     else{const tr=c.p0*Math.exp(c.mu*G.day);p=Math.max(c.p0*.15,p*Math.exp(c.vol*gauss()+(Math.log(tr)-Math.log(p))*.02));}
+    {const ns=subN(c.id);if(ns&&isPres(c.id))p*=1+.001*ns;}
     if(isPres(c.id)&&G.hr&&G.hr[c.id]){const h=G.hr[c.id];p*=1+(h.mor-50)/50*.003+(h.f.mochikabu?.002:0)-(h.strike>0?.01:0);}
     S.p[c.id]=Math.round(p*10)/10;(S.h[c.id]=S.h[c.id]||[]).push(S.p[c.id]);if(S.h[c.id].length>30)S.h[c.id].shift();}
-  let pay=0;for(const c of listed()){if(!isPres(c.id))continue;if(stockOwn(c.id)<=c.top[1]){delete S.pres[c.id];msgs.push(`${c.n}の 株主総会で\n${c.top[0]}に 筆頭株主を 奪われ\n社長を 解任された…`);continue;}const pp=presPay(c);pay+=pp+hrDelta(c,pp+(c.my?c.my.lastDiv||0:0),hrMsgs);}
+  let pay=0;for(const c of listed()){if(!isPres(c.id))continue;if(stockOwn(c.id)<=c.top[1]&&!isSubOk(c.id)){delete S.pres[c.id];msgs.push(`${c.n}の 株主総会で\n${c.top[0]}に 筆頭株主を 奪われ\n社長を 解任された…`);continue;}const pp=presPay(c);pay+=pp+hrDelta(c,pp+(c.my?c.my.lastDiv||0:0),hrMsgs);}
   if(pay>PRES_TOTAL)pay=PRES_TOTAL;
   msgs.push(...hrMsgs);if(pay<0){const need=-pay,got=debitAuto(need);if(got<need)hrUnpaid(need-got,msgs);pay=0;}
   if(pay>0)G.coins+=pay;if(pay>0||myDiv>0||tokFee>0){msgs.push([pay>0?`社長の 役員報酬 ${fmt(pay)}イェソ`:'',myDiv>0?`自分の 会社の 配当 ${fmt(myDiv)}イェソ`:'',tokFee>0?`仮想通貨の 手数料 ${fmt(tokFee)}イェソ`:''].filter(Boolean).join('\n')+'\nが 入った。');myDiv=0;tokFee=0;}
   if(G.day%KENRI===0){const got=[];
-    for(const c of listed()){const n=S.own[c.id]||0;if(n<100)continue;const k=isPres(c.id)?3:n>=1000?2:1;c.give(k);got.push(`${c.sn||c.n}：${c.perk}${k===3?' ×3（社長）':k>1?' ×2（1,000株以上）':''}`);}
+    for(const c of listed()){const n=S.own[c.id]||0;if(n<100)continue;const k=isPres(c.id)?3:n>=1000?2:1;c.give(k);mgOf(c.id).forEach(m=>m.give(k));got.push(`${c.sn||c.n}：${[c.perk,...mgOf(c.id).map(m=>m.perk)].join('・')}${k===3?' ×3（社長）':k>1?' ×2（1,000株以上）':''}`);}
     if(got.length)msgs.push('今日は 権利確定日！\n株主優待が とどいた。',...got.reduce((a,l,i)=>{if(i%3===0)a.push(l);else a[a.length-1]+='\n'+l;return a;},[]));}
   taxDaily(msgs);polDaily(msgs);
   return msgs;
@@ -2922,8 +2923,8 @@ function stockFac(){
         if(seq.join()===CODE.join()){G.teiaiStock=1;if(S.p.teiai==null){S.p.teiai=3000;S.h.teiai=[3000];}m.items=items();m.sel=listed().findIndex(c=>c.id==='teiai');sfx('g5');save();
           dialog(['…場内の 照明が 一瞬 消えた。','黒服「お客様… 裏の 銘柄に ご興味が？」','「帝愛産業。 値動きは 1日で 倍にも 4分の1にも なる。\n株主優待は UR確定チケットと 100万イェソ」','「ただし… ある日 突然 紙くずに なることも\nございます。 お気を つけて」']);return;}}}
       const r=menuUpd(m);if(r==='cancel'||r===m.items.length-1){pop();save();return;}if(r==null)return;
-      const c=listed()[r],ops=['買う','売る'];if(canSoukai(c))ops.push('株主総会を開く');else if(isPres(c.id))ops.push('社長室');ops.push('やめる');
-      choice(`${c.n}\n株主優待（100株以上）\n${c.perk}`,ops,k=>{const o=ops[k];if(o==='買う')stockBuy(c);if(o==='売る')stockSell(c);if(o==='株主総会を開く')soukai(c);if(o==='社長室')presRoom(c);},104);},
+      const c=listed()[r],ops=['買う','売る'];if(canSoukai(c))ops.push('株主総会を開く');else if(isPres(c.id))ops.push('社長室');if(isPres(c.id)&&presN()>=MA_NEED)ops.push('M&A');ops.push('やめる');
+      choice(`${c.n}\n株主優待（100株以上）\n${c.perk}`,ops,k=>{const o=ops[k];if(o==='買う')stockBuy(c);if(o==='売る')stockSell(c);if(o==='株主総会を開く')soukai(c);if(o==='社長室')presRoom(c);if(o==='M&A')maScr(c);},104);},
     drw(a){R(0,0,W,H,'#000');txt(`${VIL[curVil]?VIL[curVil].name:''} 証券取引所`,8,5,'#00e8b8','left',150);txt(`${G.day}日目`,196,5,'#bcbcbc','right');
       menuDraw(m,a);
       const tot=listed().reduce((s2,c)=>s2+(S.own[c.id]||0)*S.p[c.id],0);
@@ -2942,7 +2943,7 @@ function stockFac(){
       txt('株主優待（100株〜）',128,164,'#7ee07e','left',118);
       const pk=c.perk.split('・');pk.forEach((l,i)=>txt(l,132,177+i*12,'#fcfcfc','left',114));
       txt(own>=1000?'1,000株以上：優待 2倍！':own>=100?'優待の 権利あり':'あと '+fmt(100-own)+'株で 優待',128,206,own>=100?'#f8b800':'#7c7c7c','left',118);
-      if(isPres(c.id))txt('★ あなたが 社長',128,220,'#f8b800','left',118);else if(own>c.top[1])txt('筆頭株主！ 総会を 開ける',128,220,(frame>>4)&1?'#f8b800':'#fce0a8','left',118);else txt(`筆頭 ${c.top[0]}`,128,220,'#7c7c7c','left',118);
+      if(isPres(c.id))txt(G.stock.sub&&G.stock.sub[c.id]?'★ 社長（子会社）':subN(c.id)?`★ 社長（子会社${subN(c.id)}社）`:'★ あなたが 社長',128,220,'#f8b800','left',118);else if(own>c.top[1])txt('筆頭株主！ 総会を 開ける',128,220,(frame>>4)&1?'#f8b800':'#fce0a8','left',118);else txt(`筆頭 ${c.top[0]}`,128,220,'#7c7c7c','left',118);
     }});
 }
 function soukai(c){
@@ -2952,6 +2953,40 @@ function soukai(c){
     G.stock.pres[c.id]=G.day;sfx('lvup');save();
     dialog(['賛成多数で 可決！',`あなたは ${c.n}の\n代表取締役社長に 就任した！`,`社長特典：毎日 役員報酬\n（いまの株価で 約${fmt(presPay(c))}イェソ／日）\n株主優待が 3倍になる`,`持株が ${c.top[0]}（${fmt(c.top[1])}株）以下に\nなると 解任されるので 注意！`]);});
 }
+/* ===================== M&A（社長 3社 以上で 解放：子会社化・吸収合併） ===================== */
+const MA_NEED=3;
+const presN=()=>listed().filter(c=>isPres(c.id)).length;
+const subN=id=>{const S=G&&G.stock;return S&&S.sub?Object.values(S.sub).filter(x=>x===id).length:0;};
+const isSubOk=id=>{const S=G.stock;return !!(S&&S.sub&&S.sub[id]&&isPres(S.sub[id]));};
+const mgOf=id=>{const S=G&&G.stock;return S&&S.mg?STOCKS.filter(x=>S.mg[x.id]===id):[];};
+const maRegular=c=>!c.ipo&&!c.my;
+function maScr(P){const S=stk();S.sub=S.sub||{};S.mg=S.mg||{};
+  if(presN()<MA_NEED){dialog([`M&Aは 社長を 務める 会社が\n${MA_NEED}社 以上に なると 解放される。`,`（いま ${presN()}社）`]);return;}
+  if(S.sub[P.id]){dialog(`${P.n}は ${listed().find(c=>c.id===S.sub[P.id])?.n||'親会社'}の\n子会社だ。 M&Aは 親会社から 行おう。`);return;}
+  const subs=listed().filter(c=>S.sub[c.id]===P.id),mgs=mgOf(P.id);
+  const ops=['子会社化する','吸収合併する','グループを 見る','ホールディングス名を 決める','やめる'];
+  choice(`${P.n}　M&A\n${S.hdn?'【'+S.hdn+'】\n':''}子会社 ${subs.length}社　合併済み ${mgs.length}社`,ops,k=>{
+    if(k===0){const L=listed().filter(c=>c.id!==P.id&&isPres(c.id)&&!S.sub[c.id]&&!listed().some(x=>S.sub[x.id]===c.id));
+      if(!L.length){dialog('子会社に できる 会社が ない。\n（社長を 務める 会社が 対象）',()=>maScr(P));return;}
+      listPick('どの 会社を 子会社に する？',L.map(c=>({t:c.sn||c.n,r:pf(S.p[c.id])})),i=>{const T=L[i],fee=Math.max(1e6,Math.round((T.out||1e5)*S.p[T.id]*.01));
+        choice(`${T.n}を\n${P.n}の 子会社に する\n手続き費用 ${fmt(fee)}イェソ`,['子会社化する','やめる'],r=>{if(r!==0){maScr(P);return;}
+          rePay(fee,()=>{S.sub[T.id]=P.id;sfx('lvup');save();dialog(['取締役会で 承認された！',`${T.n}は ${P.n}の\n子会社に なった！`,'・子会社の 社長の 座は 親会社が 守る\n（筆頭株主を 奪われても 解任されない）','・親会社の 株価が 毎日 少しずつ 上がり\n役員報酬も 子会社 1社ごとに +10%'],()=>maScr(P));});},96);},
+        i=>{const T=L[i];return T?`${T.n}\n株価 ${pf(S.p[T.id])}イェソ\n持株 ${fmt(stockOwn(T.id))}株`:'';});return;}
+    if(k===1){if(!maRegular(P)){dialog('この 会社は 吸収合併の\n存続会社に できない。\n（上場企業 どうしで 行おう）',()=>maScr(P));return;}
+      const L=listed().filter(c=>c.id!==P.id&&maRegular(c)&&isPres(c.id)&&!listed().some(x=>S.sub[x.id]===c.id));
+      if(!L.length){dialog('合併 できる 会社が ない。\n（社長を 務める 一般の 上場企業が 対象）',()=>maScr(P));return;}
+      listPick('どの 会社を 吸収合併する？',L.map(c=>({t:c.sn||c.n,r:pf(S.p[c.id])})),i=>{const T=L[i],pP=S.p[P.id],pT=S.p[T.id],ownT=stockOwn(T.id),newSh=Math.floor(ownT*pT*.95/pP),room=Math.max(0,P.out-P.top[1]-stockOwn(P.id)),get=Math.min(newSh,room),cash=Math.floor((newSh-get)*pP),fee=Math.max(1e6,Math.round(T.out*pT*.02));
+        choice(`${P.n}が ${T.n}を 吸収合併\n持株 ${fmt(ownT)}株 → ${P.sn||P.n} ${fmt(get)}株${cash?`\n＋合併交付金 ${fmt(cash)}イェソ`:''}\n手続き費用 ${fmt(fee)}イェソ`,['合併する','やめる'],r=>{if(r!==0){maScr(P);return;}
+          rePay(fee,()=>{const capP=P.out*pP,capT=T.out*pT;S.own[P.id]=stockOwn(P.id)+get;S.cost[P.id]=(S.cost[P.id]||0)+(S.cost[T.id]||0);if(cash)noCount(()=>{G.coins+=cash;});
+            delete S.own[T.id];delete S.cost[T.id];delete S.pres[T.id];delete S.sub[T.id];S.mg[T.id]=P.id;for(const x in S.sub)if(S.sub[x]===T.id)S.sub[x]=P.id;for(const x in S.mg)if(S.mg[x]===T.id)S.mg[x]=P.id;
+            S.p[P.id]=Math.round(pP*(1+.3*Math.min(1,capT/capP))*10)/10;(S.h[P.id]=S.h[P.id]||[]).push(S.p[P.id]);sfx('g5');save();
+            dialog(['合併 契約が 締結された！',`${T.n}は ${P.n}に\n吸収合併され 上場廃止に なった。`,`合併の 相乗効果で\n${P.sn||P.n}の 株価が ${pf(S.p[P.id])}イェソに 上昇！`,`${T.sn||T.n}の 株主優待（${T.perk}）も\n${P.sn||P.n}の 優待に 引き継がれた。`],()=>maScr(P));});},96);},
+        i=>{const T=L[i];return T?`${T.n}\n株価 ${pf(S.p[T.id])}イェソ\n持株 ${fmt(stockOwn(T.id))}株\n優待：${T.perk}`:'';});return;}
+    if(k===2){const pg=[`【${S.hdn||P.n+' グループ'}】\n親会社 ${P.n}\n株価 ${pf(S.p[P.id])}イェソ`];
+      if(subs.length)pg.push('子会社：\n'+subs.map(c=>`・${c.sn||c.n}`).join('\n'));if(mgs.length)pg.push('吸収合併した 会社：\n'+mgs.map(c=>`・${c.sn||c.n}（${c.perk}）`).join('\n'));
+      if(!subs.length&&!mgs.length)pg.push('まだ 子会社も 合併した 会社も ない。');pg.push(`役員報酬 1日 約${fmt(presPay(P))}イェソ`);dialog(pg,()=>maScr(P));return;}
+    if(k===3){askText('ホールディングスの 名前',[{label:'名前（14文字まで）',placeholder:'例：八百万ホールディングス',max:14}],v=>{if(!v)return;const nm=String(v[0]||'').trim();if(nm){S.hdn=nm;save();toast(`「${nm}」を 設立した`);}maScr(P);});return;}
+  },150);}
 function presRoom(c){hrMenu(c);}
 function presRoomInfo(c){
   dialog([`${c.n} 社長室`,`秘書「社長、おつかれさまです。\n就任 ${G.day-G.stock.pres[c.id]}日目 です」`,`役員報酬 1日 約${fmt(presPay(c))}イェソ\n（株価が 上がると 増えます）\n株主優待は 3倍`,`持株 ${fmt(stockOwn(c.id))}株\n${c.top[0]} ${fmt(c.top[1])}株より\n少なくなると 解任されます`]);
