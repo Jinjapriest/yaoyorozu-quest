@@ -2620,7 +2620,17 @@ function innFac(){
 /* レストラン */
 const MEALS=[{n:'おにぎり定食',p:20,heal:.5,d:'仲間全員の HPを 半分 回復'},{n:'力うどん',p:45,atk:.15,dur:5,d:'攻撃 +15%（5戦）'},{n:'精進料理',p:60,exp:.25,dur:5,d:'経験値書 +25%（5戦）'},
   {n:'鯛めし御膳',p:150,all:.1,dur:8,min:2,d:'全能力 +10%（8戦）'},{n:'特上懐石',p:500,all:.2,exp:.3,dur:10,min:4,d:'全能力 +20%・経験値書 +30%（10戦）'},{n:'満漢全席',p:1500,all:.3,exp:.5,dur:12,min:5,d:'全能力 +30%・経験値書 +50%（12戦）'}];
+/* マホロバの島の 食堂（町ごとに みほり峠・どんどん・長崎ちゃんめん） */
+const YAMA_REST=[{n:'みほり峠',m:[{n:'定食',p:20,heal:.5,d:'仲間全員の HPを 半分 回復'},{n:'豚みそ丼',p:45,atk:.15,dur:5,d:'攻撃 +15%（5戦）'},{n:'とり天 定食',p:150,all:.1,dur:8,d:'全能力 +10%（8戦）'}],q:'店員「ご飯 大盛り 無料ですよ〜」'},
+  {n:'どんどん',m:[{n:'かけうどん',p:15,heal:.5,d:'仲間全員の HPを 半分 回復'},{n:'肉うどん',p:45,atk:.15,dur:5,d:'攻撃 +15%（5戦）'},{n:'天ぷらうどん＋いなり',p:150,all:.1,exp:.15,dur:8,d:'全能力 +10%・経験値書 +15%（8戦）'}],q:'店員「やわらかめの 麺が 自慢です！」'},
+  {n:'長崎ちゃんめん',m:[{n:'ちゃんめん',p:30,heal:1,d:'仲間全員の HPを 全回復'},{n:'皿うどん',p:60,atk:.2,dur:6,d:'攻撃 +20%（6戦）'},{n:'ちゃんめん大盛り＋ぎょうざ',p:200,all:.15,exp:.2,dur:10,d:'全能力 +15%・経験値書 +20%（10戦）'}],q:'店員「野菜たっぷり、 あったまって いってね！」'}];
+const yamaRestOf=vi=>YAMA_REST[(vi*7+3)%3];
 function restFac(){
+  if(VIL[curVil].yama){const F=yamaRestOf(curVil);
+    listPick(`${F.n}｜ご注文は？`,F.m.map(x=>({t:x.n,r:fmt(tierCost(x.p))+'イェソ',dis:G.coins<tierCost(x.p)})),i=>{const x=F.m[i],p=tierCost(x.p);if(G.coins<p)return;G.coins-=p;sfx('heal');
+      if(x.heal){G.party.forEach(id=>{const st=cstat(id),c=G.chars[id];if(c.hp>0)c.hp=Math.min(st.hp,c.hp+Math.round(st.hp*x.heal));});dialog([F.q,`${x.n}を たべた。 うまい！\nみんなの HPが 回復した。`]);}
+      else{G.meal={n:x.n,atk:x.atk||0,all:x.all||0,exp:x.exp||0,left:x.dur};G.party.forEach(fixHp);dialog([F.q,`${x.n}を たべた。 うまい！\n${x.d}`]);}
+      save();},sel=>{const x=F.m[sel];return x?x.d+(G.meal&&G.meal.left>0?`\nいまの 食事効果：${G.meal.n}（残り${G.meal.left}戦）`:''):'';});return;}
   const list=MEALS.filter(x=>(x.min||0)<=VIL[curVil].size);
   listPick('レストラン｜ご注文は？',list.map(x=>({t:x.n,r:fmt(tierCost(x.p))+'イェソ',dis:G.coins<tierCost(x.p)})),i=>{
     const x=list[i],p=tierCost(x.p);if(G.coins<p)return;G.coins-=p;sfx('heal');
