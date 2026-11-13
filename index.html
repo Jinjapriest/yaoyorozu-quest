@@ -2582,6 +2582,8 @@ const townScr={full:true,mv:null,bt:0,
   upd(){
     if(this.bt>0)this.bt--;
     if(!this.mv&&dayQShow())return;
+    /* 出入りの 直後は 方向キーを 一度 離すまで 動かない（出入りの ループ防止） */
+    if(this.lock&&!this.mv){if(I.u||I.d||I.l||I.r||fieldPtr)return;this.lock=0;}
     if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(!TW.ship)timeAdd(1);if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.kanShop)exitKanShop();else if(TW.jogai||TW.diet||TW.kanIn)exitJogai();else leaveTown();}}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0,fresh=I.pu||I.pd||I.pl||I.pr||ptrFresh;ptrFresh=false;
@@ -5179,7 +5181,7 @@ function buildKanraku(vi){const w=31,h=21,C=[];kanSt(vi);for(let y=0;y<h;y++){C.
   for(let k=0,tries=0;k<cnt&&tries<200;tries++){const x=1+Math.floor(r()*(w-2)),y=1+Math.floor(r()*(h-2));if(C[y][x].t!=='kanst'||npcs.some(p=>p.x===x&&p.y===y)||(x===15&&y>=17))continue;
     npcs.push({x,y,col:cols[Math.floor(r()*cols.length)],hair:['#000000','#7c4c10','#f8b800','#bcbcbc'][Math.floor(r()*4)],line:pool[Math.floor(r()*pool.length)]});k++;}
   return{kanIn:true,title:`${VIL[vi].name.replace(/^.* /,'')} 歓楽街`,vi,v:VIL[vi],w,h,cx:15,C,npcs,city:true,sz:VIL[vi].size,px:15,py:h-2,top:0};}
-function enterKanraku(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKanraku(curVil);kanSt(curVil);townScr.mv=null;setBase(townScr);sfx('bell');toast(isNight()?'ネオンが まぶしい 夜の 歓楽街だ':'昼の 歓楽街は 静まりかえっている');}
+function enterKanraku(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKanraku(curVil);kanSt(curVil);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast(isNight()?'ネオンが まぶしい 夜の 歓楽街だ':'昼の 歓楽街は 静まりかえっている');}
 /* 町の 中の 歓楽街の 入口：ネオンの 門 */
 function kanGateCell(c,sx,sy,low,city,glow){const GC=city?'#a4a4a4':'#e4c890';if(!glow)R(sx,sy,16,16,GC);const f=(frame>>4)&1,n1=f?'#f878f8':'#7ee0fc',n2=f?'#7ee0fc':'#f878f8';
   if(!low){/* 上段：笠木と 看板 */R(sx,sy+2,16,4,'#3c3c3c');R(sx,sy+2,16,1,n1);R(sx,sy+5,16,1,n2);R(sx,sy+7,16,7,'#18182c');R(sx,sy+7,16,1,'#f8d878');R(sx,sy+13,16,1,'#f8d878');
@@ -5280,9 +5282,9 @@ function buildKanShop(vi,i){const L=kanSt(vi).lots[i],t=L.t||'none',w=13,h=10,C=
 let kanShopPrev=null;
 function kanEnter(vi,i){const L=kanSt(vi).lots[i];
   if(L.t&&!L.own&&!kanOpen(L.t)){dialog(`「${L.nm}」は 準備中だ。\n（営業 ${kanHrs(L.t)}）`);return;}
-  kanShopPrev={TW,px:TW.px,py:TW.py};TW=buildKanShop(vi,i);townScr.mv=null;setBase(townScr);sfx('bell');
+  kanShopPrev={TW,px:TW.px,py:TW.py};TW=buildKanShop(vi,i);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');
   toast(L.t?(L.own?`オーナー として ${L.nm}に 入った`:`${KAN[L.t].n}「${L.nm}」に 入った`):'空き店舗に 入った');}
-function exitKanShop(){const p=kanShopPrev;kanShopPrev=null;if(!p){exitJogai();return;}TW=p.TW;TW.px=p.px;TW.py=p.py;townScr.mv=null;setBase(townScr);}
+function exitKanShop(){const p=kanShopPrev;kanShopPrev=null;if(!p){exitJogai();return;}TW=p.TW;TW.px=p.px;TW.py=p.py;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 function kanNpc(npc){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
   if(npc.kan==='tenant'){if(!reOn()){dialog(['不動産屋「ここは テナント 募集中です」','（不動産業が 解放されると 契約できる）']);return;}dialog(['不動産屋「この 物件で お店を 開きますか？」'],()=>kanTenant(vi,i));return;}
   if(!L.t)return;const K=KAN[L.t];
@@ -5348,8 +5350,8 @@ function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push
     {x:6,y:6,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「モニターの 前が いちばん 落ちつくわい」'},{x:11,y:10,col:'#00a800',hair:'#7c4c10',line:'客「1号艇から 流すのが 基本たい」'},{x:5,y:10,col:'#d82800',hair:'#000000',yoso:1,line:''}];
   if(r()<.12)npcs.push({x:14,y:9,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
   return{jogai:true,title:`場外発売所（${VIL[vi].name.replace(/^.* /,'')}）`,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
-function enterJogai(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
-function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;setBase(townScr);}
+function enterJogai(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
+function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
 function jogaiBump(c){
   if(c.t==='kwin'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('どの 競馬場の 馬券を 買いますか？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaCard(i).sp?keibaCard(i).gname:`第${(G.keiba&&G.keiba['v'+i])||1}R`})),k=>keibaFac(L[k]));return true;}
