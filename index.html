@@ -1459,7 +1459,8 @@ const CODE_KIND=[
   {n:()=>'SR以上確定チケット',give:(g,a)=>G.items.srtk+=a,u:'枚'},
   {n:()=>'UR確定チケット',give:(g,a)=>G.items.urtk+=a,u:'枚'},
   {n:()=>'好きな 神か 仏陀',give:()=>{},u:'体',pick:true},
-  {n:()=>'XR ガイウスの槍（希望の槍）',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gaius');},u:'本'}];
+  {n:()=>'XR ガイウスの槍（希望の槍）',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gaius');},u:'本'},
+  {n:()=>'【不動産融資キャンペーン】 イェソ',give:(g,a)=>{G.coins+=a*1e4;},u:'イェソ',mul:1e4}];
 function makeCode(kind,grade,amount,serial){const pl=kind*68719476736+grade*17179869184+amount*16384+serial,ck=cChk(pl),c=cEnc(xor40(pl,cMask(ck)))+cEnc(ck);return c.match(/.{4}/g).join('-');}
 function readCode(raw){const t=String(raw).toUpperCase().replace(/[^0-9A-Z]/g,'');if(t.length!==16||[...t].some(c=>!CODE_AL.includes(c)))return null;
   const ck=cDec(t.slice(8)),pl=xor40(cDec(t.slice(0,8)),cMask(ck));if(cChk(pl)!==ck)return null;
