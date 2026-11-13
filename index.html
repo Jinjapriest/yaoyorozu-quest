@@ -2462,13 +2462,13 @@ function drawCell(c,sx,sy,city){
     case 'flower':ground();if(c.weed){[[3,9],[7,6],[11,10],[5,13]].forEach(([x,y])=>{R(sx+x,sy+y,1,4,'#00a800');R(sx+x+1,sy+y-1,1,3,'#58d854');});break;}[[3,4,'#d82800'],[10,3,'#f8b800'],[6,10,'#f878f8'],[12,11,'#d82800']].forEach(([x,y,k])=>{R(sx+x,sy+y,2,2,k);R(sx+x,sy+y+2,1,2,'#00a800');});break;
     case 'lamp':ground();R(sx+7,sy+4,2,11,'#3c3c3c');R(sx+5,sy+1,6,4,'#3c3c3c');R(sx+6,sy+2,4,2,'#fce0a8');R(sx+5,sy+14,6,2,'#3c3c3c');break;
     case 'fount':ground();pc(sx+8,sy+9,6,'#bcbcbc');pc(sx+8,sy+9,4,'#3cbcfc');R(sx+7,sy+3,2,5,'#a4e4fc');R(sx+6,sy+2+((frame>>4)&1),4,1,'#fcfcfc');break;
-    case 'roof':{const b=c.b;
+    case 'roof':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,0,city);break;}{const b=c.b;
       if(b.city&&b.kind==='house'){R(sx,sy,16,16,'#7c7c8c');for(let y=2;y<16;y+=4)for(let x=2;x<16;x+=5)R(sx+x,sy+y,3,2,'#a4e4fc');break;}
       ground();R(sx,sy+3,16,13,b.c);R(sx,sy+3,16,1,'#000');for(let y=6;y<16;y+=3)R(sx,sy+y,16,1,'rgba(0,0,0,.25)');if(b.ruin&&b.kind==='house'&&c.dx!==1){R(sx+4,sy+6,5,4,'#000');R(sx+6,sy+5,2,1,'#000');}
       if(c.dx===0)R(sx,sy+3,2,6,GC);if(c.dx===2)R(sx+14,sy+3,2,6,GC);
       if(c.dx===1&&b.kind!=='house'){R(sx+2,sy+4,12,11,'#fce0a8');R(sx+2,sy+4,12,1,'#000');txt(FAC[b.kind].s,sx+8,sy+6,'#000','center');}
       break;}
-    case 'front':case 'door':{const b=c.b;
+    case 'front':case 'door':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,1,city);break;}{const b=c.b;
       if(b.city&&b.kind==='house'){R(sx,sy,16,16,'#7c7c8c');for(let y=2;y<14;y+=4)for(let x=2;x<16;x+=5)R(sx+x,sy+y,3,2,'#fce0a8');R(sx,sy+15,16,1,'#3c3c3c');break;}
       R(sx,sy,16,16,b.city?'#d8d8d8':'#fce0a8');R(sx,sy+15,16,1,'#a05000');
       if(c.t==='door'){R(sx+3,sy+3,10,13,'#503000');R(sx+3,sy+3,10,4,b.c);R(sx+7,sy+3,1,4,'#fcfcfc');R(sx+11,sy+10,1,2,'#f8b800');}
@@ -2625,6 +2625,7 @@ const townScr={full:true,mv:null,bt:0,
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
     if(!TW.ship&&!TW.jogai&&!TW.diet&&!TW.kanShop){const a=nightShade(TW.kanIn?.6:1);if(a>.2)for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(!c)continue;const X=tx*16-cam.x,Y=ty*16-cam.y;
       if(c.t==='lamp'){ctx.globalAlpha=.3;pc(X+8,Y+4,8,'#fce0a8');ctx.globalAlpha=1;R(X+6,Y+2,4,2,'#fce0a8');}else if(TW.kanIn&&c.t==='kshop')drawCell(c,X,Y,true);
+      else if(c.b&&c.b.kind==='kanraku'&&(c.t==='roof'||c.t==='front'||c.t==='door'))kanGateCell(c,X,Y,c.t==='roof'?0:1,TW.city,1);
       else if(c.t==='door'&&c.b&&c.b.kind!=='house'){ctx.globalAlpha=.35;R(X+3,Y+2,10,14,'#f8d878');ctx.globalAlpha=1;}}}
     if(!TW.ship&&!TW.jogai&&!TW.diet)clockBadge();
     win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai||TW.diet||TW.kanIn||TW.kanShop?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai&&!TW.diet&&!TW.kanIn&&!TW.kanShop)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
@@ -5144,6 +5145,13 @@ function buildKanraku(vi){const w=31,h=21,C=[];kanSt(vi);for(let y=0;y<h;y++){C.
     npcs.push({x,y,col:cols[Math.floor(r()*cols.length)],hair:['#000000','#7c4c10','#f8b800','#bcbcbc'][Math.floor(r()*4)],line:pool[Math.floor(r()*pool.length)]});k++;}
   return{kanIn:true,title:`${VIL[vi].name.replace(/^.* /,'')} 歓楽街`,vi,v:VIL[vi],w,h,cx:15,C,npcs,city:true,sz:VIL[vi].size,px:15,py:h-2,top:0};}
 function enterKanraku(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKanraku(curVil);kanSt(curVil);townScr.mv=null;setBase(townScr);sfx('bell');toast(isNight()?'ネオンが まぶしい 夜の 歓楽街だ':'昼の 歓楽街は 静まりかえっている');}
+/* 町の 中の 歓楽街の 入口：ネオンの 門 */
+function kanGateCell(c,sx,sy,low,city,glow){const GC=city?'#a4a4a4':'#e4c890';if(!glow)R(sx,sy,16,16,GC);const f=(frame>>4)&1,n1=f?'#f878f8':'#7ee0fc',n2=f?'#7ee0fc':'#f878f8';
+  if(!low){/* 上段：笠木と 看板 */R(sx,sy+2,16,4,'#3c3c3c');R(sx,sy+2,16,1,n1);R(sx,sy+5,16,1,n2);R(sx,sy+7,16,7,'#18182c');R(sx,sy+7,16,1,'#f8d878');R(sx,sy+13,16,1,'#f8d878');
+    if(c.dx===0)R(sx+1,sy+6,3,10,'#3c3c3c');if(c.dx===2){R(sx+12,sy+6,3,10,'#3c3c3c');txt('歓楽街',sx-8,sy+7,(frame>>5)%4?'#f8d878':'#f878f8','center',40);}}
+  else{/* 下段：柱と 通り抜け */if(c.dx===0){R(sx+1,sy,3,16,'#3c3c3c');R(sx+2,sy,1,16,n1);}else if(c.dx===2){R(sx+12,sy,3,16,'#3c3c3c');R(sx+13,sy,1,16,n2);}
+    else{R(sx,sy,16,16,'#2c2c3c');for(let k=0;k<3;k++)R(sx+2+k*5,sy+4+((frame>>3)+k)%3*3,2,2,['#f878f8','#7ee0fc','#f8d878'][k]);}}
+  if(c.dx===2&&!low)return;}
 function kanShopCell(c,sx,sy){const L=TW&&TW.kanIn?kanSt(TW.vi).lots[c.L]:null;if(!L)return;const K=L.t?KAN[L.t]:null,n=isNight();
   if(c.part==='sign'){R(sx,sy,16,16,'#101018');
     if(!K){R(sx,sy+5,16,6,'#5c5c5c');if(c.dx===2)txt('空き店舗',sx-8,sy+5,'#bcbcbc','center',44);return;}
