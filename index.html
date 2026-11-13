@@ -1782,7 +1782,7 @@ function mkBoss(){const lv=G.boss,M=Math.pow(1.8,8)*orochiGrow(lv,1.6,1.12);
   return{name:'八岐大蛇'+(lv?` Lv${lv+1}`:''),shape:'orochi',c1:'#006800',c2:'#a4e4a4',maxhp:Math.round(400*M),hp:Math.round(400*M),atk:Math.round(18*M),mag:Math.round(14*M),def:Math.round(10*M),spd:Math.round(10*5*Math.pow(1.1,lv)),boss:true,alive:true,flash:0,die:0,t:8,w:120,h:80};}
 /* インフレ対策：高レベル帯ほど 敵を 強く。 ガイウスの槍・双槍・奉納の ご神徳を 持つほど 敵も 強くなる */
 function infMul(){const L=G.party.reduce((a,id)=>a+(G.chars[id]?G.chars[id].lv:1),0)/Math.max(1,G.party.length);
-  const b=L<25000?1:L<35000?1.1:1.2,ga=G.party.some(id=>hasGaius(id))?1.6:1,sp=G.party.some(id=>spearPair(id))?1.4:1;
+  const b=L<25000?1:1.1,ga=G.party.some(id=>hasGaius(id))?1.4:1,sp=G.party.some(id=>spearPair(id))?1.25:1;
   return b*ga*sp*(typeof honoBuf==='function'&&G.hono?Math.sqrt(honoBuf()):1);}
 function startBattle(boss,rift=null,sp=null){
   stopBGM();sfx('enc');
@@ -1824,7 +1824,7 @@ function startBattle(boss,rift=null,sp=null){
   else if(rift!=null){const kq=VIL[nearestVil(G.pos.x,G.pos.y)].kq,n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(t,kq?KQ_EN[ri(0,KQ_EN.length-1)]:ETIER[t][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*(kq?KQ_F:(FIELD_F[t]||1)));e.rift=true;en.push(e);}}
   else if(VIL[nearestVil(G.pos.x,G.pos.y)].kq){const n=ri(2,4);for(let k=0;k<n;k++){const e=mkEnemy(12,KQ_EN[ri(0,KQ_EN.length-1)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*KQ_F*(1+.08*G.rifts.length));en.push(e);}}
   else{const n=Math.min(4,ri(1,2+Math.floor(t/3))+(rnd()<.3?1:0)),sc=(1+.08*G.rifts.length)*(FIELD_F[t]||1);for(let k=0;k<n;k++){const e=mkEnemy(t,ETIER[t][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*sc);en.push(e);}}
-  {const im=infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
+  {const im=sp&&sp.st==='minus'?(infMul()>1?1.1:1):infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
@@ -4828,7 +4828,7 @@ function lmkScr(vi){G.lmk=G.lmk||{};const v=VIL[vi],have=lmkOf(vi),L=LMK.filter(
 /* 累進課税と 税務署の 査察 */
 function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=TH)return;
   const tax=Math.floor((tot-TH)*.004*polMul('kin'));let rest=tax;const a=Math.min(G.coins,rest);G.coins-=a;rest-=a;if(rest>0&&G.bank)G.bank.sav-=Math.min(G.bank.sav,rest);
-  if(G.day%10===0)msgs.push(`【超富裕層 課税】10兆イェソを 超える 資産に\n毎日 0.4%の 税金が かかっている。\n今日の 税額 ${fmt(tax)}イェソ`);
+  msgs.push(`【超富裕層 課税】資産が 10兆イェソを 超えているので\n超えた 分の 0.4%を 納税した。\n税額 ${fmt(tax)}イェソ`);
   if(tot>1e14&&rnd()<.03*polMul('kin')){const ch=Math.floor((tot-1e14)*.2);const b=Math.min(G.coins,ch);G.coins-=b;if(ch>b&&G.bank)G.bank.sav-=Math.min(G.bank.sav,ch-b);
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
@@ -4870,7 +4870,7 @@ function polScr(){const P=G.pol;
   const nx=POL_EVERY-(G.day-(P.lastEl||P.day)),zn=Object.values(P.zoku||{}).reduce((a,b)=>a+b,0);
   const head=`${P.n}${P.pm?'（与党）':''}　${P.seats}/${POL_SEATS}議席${P.pm?`\n首相：${P.pmn?P.pmn.n+'（'+PM_TRAIT[P.pmn.t].n+'）':'未指名'}`:''}\n政治資金 ${fmt(P.fund)}${P.ura?`　裏金 ${fmt(P.ura)}`:''}\n総選挙まで ${nx}日${G.shinseiren?'　神政連推薦':''}${P.scan>G.day?'　【スキャンダル中】':''}`;
   const ops=[...(P.pm?[P.pmn?'首相を 交代させる':{t:'首相を 指名する',col:'#f8b800'}]:[]),...(G.shinseiren?[P.ssr===P.lastEl?{t:'神道政治連盟の 大会（出席済み）',dis:true}:{t:'神道政治連盟の 大会に 出る',col:'#f8d878'}]:[]),'選挙運動に お金を 使う','政治資金パーティーを ひらく',`族議員（${zn}人）`,P.ura>0?'裏金を 動かす':{t:'裏金を 動かす（なし）',dis:true},'支持率を 見る',...(P.pm?[`政策を えらぶ（${P.policy?POLICY[P.policy].n:'なし'}）`,'解散総選挙']:[]),'党を 解散する','もどる'];
-  choice(head,ops,k=>{const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
+  choice(head,ops,k=>{if(k<0||!ops[k])return;const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
     if(lab.startsWith('神道政治連盟の 大会に')){P.ssr=P.lastEl;P.camp=(P.camp||0)+3e13;save();sfx('bell');
       dialog(['神道政治連盟 全国大会',`会長「本日は ${P.n}の 先生に\nお越し いただきました！」`,'全国の 神職・総代が 大きな 拍手で\nあなたを 迎えた！','神社界の 推薦を 受けた！\n（次の 選挙で 支持率が 上がる）'],polScr);return;}
     if(lab.startsWith('首相を')){const Cs=P.cands||[];if(!Cs.length){dialog('指名できる 議員が いない…',polScr);return;}
