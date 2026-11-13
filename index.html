@@ -479,6 +479,12 @@ const BASE_SKILLS={
   shanpan:{name:'シャンパンタワー',mp:8,target:'allies',kind:'heal',power:1.3,verb:'ふるまった'},
   mkntower:{name:'ゴールデン シャンパンタワー',mp:16,target:'allies',kind:'heal',power:2.2,verb:'ふるまった'},
   mknsmile:{name:'伝説の 神対応',mp:12,target:'enemies',kind:'mag',power:2.3,verb:'ふりまいた'},
+  hs_help:{name:'ヘルプ席',mp:3,target:'allies',kind:'buff',stat:'def',amount:.3,turns:3,verb:'つないだ'},
+  hs_douhan:{name:'同伴出勤',mp:5,target:'allies',kind:'buff',stat:'atk',amount:.4,turns:3,verb:'はたした'},
+  hs_shimei:{name:'本指名',mp:7,target:'enemy',kind:'mag',power:2.6,verb:'勝ちとった'},
+  hs_bottle:{name:'ドンペリ ゴールド',mp:10,target:'allies',kind:'heal',power:1.8,verb:'おろした'},
+  hs_after:{name:'アフターの お誘い',mp:9,target:'enemies',kind:'debuff',amount:.4,turns:3,verb:'しかけた'},
+  hs_no1:{name:'No.1の 風格',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'見せつけた'},
   miryo:{name:'魅了の微笑み',mp:5,target:'enemy',kind:'mag',power:1.9,verb:'なげかけた'},
   inaba:{name:'因幡の癒し',mp:14,target:'allies',kind:'heal',power:3.2,revive:true,verb:'さずけた'},
 };
@@ -567,7 +573,10 @@ const BASE_PACK={
         hp:Math.round(c.hp*k),mp:Math.round(c.mp*k),atk:Math.round(c.atk*k),mag:Math.round(c.mag*k),def:Math.round(c.def*k),spd:Math.round(c.spd*(1+(k-1)*.5)),
         skillPower:+((c.skillPower||1)*SPx[r]/SPx[r0]).toFixed(3),
         look:Object.assign({},c.look,{accent:r>=3?'#f8b800':r===2?'#f878f8':c.look.accent},r===4&&!kn?{legs:'#fcfcfc'}:{},r===0&&!kn?{accent:'#7c7c7c'}:{})}));}}
-  const at=BASE_PACK.chars.findIndex(c=>c.id==='kami');BASE_PACK.chars.splice(at,0,...add);})();
+  const at=BASE_PACK.chars.findIndex(c=>c.id==='kami');BASE_PACK.chars.splice(at,0,...add);
+  /* キャバ嬢は レアリティごとに スキルが ちがう */
+  const HS={hostess_n:['hs_help','shanpan'],hostess_r:['hs_help','shanpan','hs_douhan'],hostess:['shanpan','miryo','hs_shimei'],hostess_ssr:['hs_bottle','hs_shimei','hs_after'],hostess_ur:['hs_bottle','hs_no1','hs_after']};
+  for(const c of BASE_PACK.chars)if(HS[c.id])c.skills=HS[c.id];})();
 const SAMPLE_PACK={
   format:'yaoyorozu-pack-1',name:'サンプル：忍者',
   skills:{
