@@ -728,6 +728,10 @@ const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137},KJO={x:12
   VIL.push({x:118,y:127,name:'トバタの村',shrine:'提灯八幡宮',rank:3,tier:12,size:1,from:A,kq:1,rec:KQ_REC,kqf:['kqyagura'],desc:'夏に 千の 提灯が ともる 祭りの 村'});
   VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東に ワカトゥオー橋が 架かる'});
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:2,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
+/* 首都 マホロバ（北東の 海に 浮かぶ 首都圏・議会が ある） */
+const CAPR={x0:128,y0:14,x1:158,y1:40};
+{const KJ=VIL.findIndex(v=>v.name==='鯨浜');VIL.push({x:143,y:26,name:'首都 マホロバ',shrine:'中央大神宮',rank:8,tier:10,size:6,from:KJ,capital:1,desc:'国会議事堂が そびえる この国の 首都'});}
+const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
 const hatan=vi=>{const v=VIL[vi];if(!v||!v.hatan)return false;const D=G&&G.depop&&G.depop['v'+vi];return !(D&&D.revived);};
@@ -782,6 +786,10 @@ function genMap(){
     for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
       const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y)+(g4(x,y)-.5)*5;if(edge<0)continue;
       const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.72?T.MOUNT:e<.2?T.WATER:g3(x,y)>.6?T.FOREST:T.GRASS);}}
+  {const g1=mkNoise(401,9,MW),g2=mkNoise(409,4,MW),g3=mkNoise(419,6,MW),g4=mkNoise(421,5,MW),N=CAPR;
+    for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
+      const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y)+(g4(x,y)-.5)*5;if(edge<0)continue;
+      const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.8?T.MOUNT:e<.15?T.WATER:g3(x,y)>.65?T.FOREST:T.GRASS);}}
   const pts=[...VIL.filter(v=>v.from==null&&!v.island),CAVE];
   for(let i=0;i<pts.length-1;i++){
     const a=pts[i],b=pts[i+1],path=[];
@@ -821,6 +829,8 @@ function genMap(){
   /* 皿倉山：ヤハタの 南、町の 外の 山 */
   {const h=VIL.find(v=>v.name==='鉄の町 ヤハタ');for(let y=h.y+1;y<SARA.y;y++){const t=tileAt(h.x,y);if(!isTownT(t)&&t!==T.SHR)setT(h.x,y,T.YAMA);}let x=h.x;while(x!==SARA.x){x+=Math.sign(SARA.x-x);setT(x,SARA.y-1,T.YAMA);}
     for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++){const t=tileAt(SARA.x+dx,SARA.y+dy);if(t!==T.YAMA&&t!==T.ROAD&&!isTownT(t))setT(SARA.x+dx,SARA.y+dy,T.MOUNT);}setT(SARA.x,SARA.y-1,T.YAMA);setT(SARA.x,SARA.y,T.KQSPOT);}
+  /* 首都高速 大橋：首都から 南へ グンマーの 外縁地方まで */
+  {const c=VIL.find(v=>v.capital);for(let y=c.y+1;y<GOUT.y0+2;y++){const t=tileAt(c.x,y);if(isTownT(t)||t===T.SHR)continue;setT(c.x,y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
   /* コクラ競馬場：コクラの すぐ 東 */
   {const k=VIL.find(v=>v.name==='城下町 コクラ');for(let x=k.x+1;x<KJO.x;x++){const t=tileAt(x,KJO.y);if(!isTownT(t)&&t!==T.SHR)setT(x,KJO.y,T.ROAD);}
     for(let dy=-1;dy<=1;dy++)for(let dx=0;dx<=1;dx++){const t=tileAt(KJO.x+dx,KJO.y+dy);if(t===T.WATER||t===T.SEA||t===T.MOUNT)setT(KJO.x+dx,KJO.y+dy,T.GRASS);}setT(KJO.x,KJO.y,T.KEIBAJO);}
@@ -1312,7 +1322,7 @@ function onStep(pv){
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
   G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
-  if(G.steps>3&&rnd()<rate){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
+  if(G.steps>3&&rnd()<rate&&!inCAP(x,y)){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
 }
 
 /* ===================== 村・神社・道具屋 ===================== */
@@ -2130,9 +2140,9 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep']);
+const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -2146,7 +2156,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -2233,6 +2243,19 @@ function buildTown(vi){
       {x:cx+2,y:7,col:'#3c3c3c',hair:'#000000',guard:1,line:occ?`親衛隊「金の 扉の 奥に ${DI.title}さまが おられる。」`:`案内係「${DI.hall}は 資料館に なりました。\n金の 扉から どうぞ。」`});
     C.unshift(...Z);top=P;H2=h+P;
   }
+  if(v.capital){/* 国会議事堂：首都の いちばん奥 */
+    const P=12,Z=[];for(let y=0;y<P;y++){Z.push([]);for(let x=0;x<w;x++)Z[y].push({t:'pz'});}
+    const zs=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<P)Z[y][x]=o;};
+    for(let x=0;x<w;x++)zs(x,0,{t:'wall'});for(let y=0;y<P;y++){zs(0,y,{t:'wall'});zs(w-1,y,{t:'wall'});}
+    for(let dy=0;dy<9;dy++)for(let dx=-7;dx<=7;dx++)zs(cx+dx,1+dy,dy===8&&dx===0?{t:'dietdoor'}:{t:'diet',dx,dy});
+    for(let y=P-2;y<P;y++)zs(cx,y,{t:'pz',carpet:1});
+    for(const sx of [-1,1]){zs(cx+sx*9,3,{t:'flag'});zs(cx+sx*9,4,{t:'flag',pole:1});zs(cx+sx*11,3,{t:'flag'});zs(cx+sx*11,4,{t:'flag',pole:1});zs(cx+sx*10,7,{t:'fount'});for(const lx of [3,6])zs(cx+sx*lx,P-1,{t:'plamp'});}
+    for(let x=0;x<w;x++)C[0][x]={t:'wall'};
+    for(const gx of [4,w-5]){C[0][gx]={t:'gate'};for(let y=1;y<6;y++){const c=C[y][gx];if(c.t==='g'||c.t==='tree'||c.t==='flower')C[y][gx]={t:'s'};}for(let y=1;y<P;y++)if(Z[y][gx].t!=='flag')zs(gx,y,{t:'pz'});}
+    for(const n of npcs)n.y+=P;
+    npcs.push({x:cx-2,y:P-1,col:'#24188c',hair:'#000000',guard:1,line:'衛視「国会議事堂へ ようこそ。\n正面の 扉から 本会議場へ どうぞ」'},{x:cx+2,y:P-1,col:'#24188c',hair:'#000000',guard:1,line:G.pol?`衛視「${G.pol.n}の 先生ですね。\n${G.pol.pm?'党首、 お疲れさまです！':'どうぞ お通りください'}」`:'衛視「政党を 立ち上げれば\nあなたも この 議場で 戦えますよ」'});
+    C.unshift(...Z);top=P;H2=h+P;
+  }
   if(v.castle){/* コクラ城：城下町の いちばん奥に そびえる 五層の 天守 */
     const P=12,Z=[];for(let y=0;y<P;y++){Z.push([]);for(let x=0;x<w;x++)Z[y].push({t:'pz'});}
     const zs=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<P)Z[y][x]=o;};
@@ -2271,6 +2294,71 @@ function drawKokura(c,sx,sy){const dx=c.t==='kcdoor'?0:c.dx,dy=c.t==='kcdoor'?8:
   if(dy===6){if(ad>=5){if(ad===5)R(sx,sy,16,16,'#4c4c54');wall(6,1);if(ad===5)R(sx,sy,2,16,'#d8d8d8');return;}roof(4);return;}
   ishi();if(c.t==='kcdoor'){R(sx+1,sy+1,14,15,'#3c2000');R(sx+1,sy,14,2,'#24243c');R(sx+2,sy+2,12,14,'#7c4c10');R(sx+7,sy+2,2,14,'#3c2000');for(const [x,y] of [[4,5],[11,5],[4,11],[11,11],[6,8],[9,8]])R(sx+x,sy+y,1,1,G);R(sx+2,sy+2,12,1,G);}
 }
+/* 国会議事堂（外観：dx -7〜7, dy 0〜8） */
+function drawDiet(c,sx,sy){const dx=c.t==='dietdoor'?0:c.dx,dy=c.t==='dietdoor'?8:c.dy,ad=Math.abs(dx),ST='#e0d8c8',ST2='#bcb4a4',SH='#8c8474',G_='#f8b800';
+  const sky=()=>{R(sx,sy,16,16,'#4c4c54');};
+  if(dy<=3){/* 中央塔：段々の 屋根 */const hw=[0,1,1,2][dy];if(ad>hw){sky();return;}
+    if(dy===0){sky();R(sx+6,sy+2,4,14,ST2);R(sx+7,sy-6,2,8,'#7c7c7c');R(sx+9,sy-6,6,4,'#fcfcfc');pc(sx+12,sy-4,1,'#d82800');R(sx+5,sy+1,6,2,G_);return;}
+    if(dy===1){R(sx,sy,16,16,ad?'#4c4c54':ST2);if(!ad){R(sx+2,sy+2,12,14,ST2);R(sx+4,sy+4,8,12,SH);R(sx+5,sy+6,6,8,'#24243c');R(sx+2,sy+2,12,1,G_);}else{R(sx+(dx<0?8:0),sy+8,8,8,ST2);}return;}
+    if(dy===2){R(sx,sy,16,16,ST2);for(let y=3;y<16;y+=4)R(sx,sy+y,16,1,SH);if(ad===1)R(sx+(dx<0?0:12),sy,4,16,'#4c4c54');R(sx+5,sy+5,6,6,'#24243c');R(sx+6,sy+6,4,4,(frame>>5)&1?'#f8d878':'#fce0a8');return;}
+    R(sx,sy,16,16,ST);R(sx,sy,16,2,G_);for(let x=1;x<16;x+=5)R(sx+x,sy+4,2,12,ST2);if(ad===2)R(sx+(dx<0?0:8),sy,8,4,'#4c4c54');return;}
+  /* 本体：両翼と 列柱 */
+  if(dy===4){R(sx,sy,16,16,'#4c4c54');R(sx,sy+8,16,8,ST);R(sx,sy+8,16,2,G_);if(ad<=2){R(sx,sy,16,16,ST);R(sx,sy,16,2,G_);}R(sx,sy+14,16,2,SH);return;}
+  R(sx,sy,16,16,ST);
+  if(dy===5||dy===6){for(let x=2;x<16;x+=6){R(sx+x,sy,3,16,'#fcfcfc');R(sx+x+3,sy,1,16,ST2);}if(dy===5){R(sx+1,sy+4,4,6,'#24243c');R(sx+11,sy+4,4,6,'#24243c');R(sx+2,sy+5,2,4,((frame>>5)+ad)%3?'#f8d878':'#fce0a8');R(sx+12,sy+5,2,4,'#f8d878');}if(ad===7)R(sx+(dx<0?0:14),sy,2,16,SH);return;}
+  if(dy===7){R(sx,sy,16,3,G_);for(let x=0;x<16;x+=4)R(sx+x,sy+3,3,13,'#fcfcfc');R(sx,sy+15,16,1,SH);return;}
+  /* dy8：階段と 扉 */R(sx,sy,16,16,ST2);for(let y=2;y<16;y+=3)R(sx,sy+y,16,1,SH);
+  if(c.t==='dietdoor'){R(sx+2,sy,12,16,'#503000');R(sx+3,sy+1,10,15,'#7c4c10');R(sx+7,sy+1,2,15,G_);R(sx+2,sy,12,2,G_);R(sx+5,sy+8,1,2,G_);R(sx+10,sy+8,1,2,G_);}
+  else if(ad<=2)R(sx,sy+10,16,6,'#d82800');}
+/* 本会議場（内装） */
+function drawDietIn(c,sx,sy){const G_='#f8b800';
+  if(c.t==='dwall'){R(sx,sy,16,16,'#503000');R(sx,sy+12,16,4,'#7c4c10');R(sx,sy+11,16,1,G_);if(c.k===0){pc(sx+8,sy+5,5,G_);pc(sx+8,sy+5,3,'#d82800');}if(c.k===2){R(sx+5,sy,6,2,G_);R(sx+4,sy+2,8,1,'#fce0a8');for(let k=0;k<4;k++)R(sx+4+k*2,sy+3,1,2+((frame>>4)+k)%2,'#fce0a8');}return;}
+  if(c.t==='dspk'){R(sx,sy,16,16,'#7c4c10');R(sx,sy,16,3,G_);R(sx+2,sy+4,12,8,'#a05000');R(sx+3,sy+5,10,1,G_);R(sx,sy+13,16,3,'#503000');return;}
+  if(c.t==='dpod'){R(sx,sy,16,16,'#d82800');R(sx+3,sy+2,10,12,'#7c4c10');R(sx+3,sy+2,10,2,G_);R(sx+6,sy,4,3,'#5c5c5c');R(sx+7,sy-2,2,2,'#3c3c3c');return;}
+  if(c.t==='dcarp'){R(sx,sy,16,16,'#a81000');R(sx+1,sy,1,16,G_);R(sx+14,sy,1,16,G_);return;}
+  if(c.t==='drail'){R(sx,sy,16,16,'#d82800');R(sx,sy+4,16,3,'#7c4c10');R(sx,sy+4,16,1,G_);for(let x=1;x<16;x+=5)R(sx+x,sy+7,2,9,'#7c4c10');return;}
+  /* 議席 */R(sx,sy,16,16,'#d82800');R(sx,sy+12,16,4,'#7c4c10');R(sx,sy+12,16,1,G_);const col=c.mine?'#7ee07e':c.p===1?'#3cbcfc':c.p===2?'#fc7460':'#bcbcbc';
+  for(const x of [1,9]){R(sx+x,sy+2,6,7,'#3c2000');R(sx+x+1,sy+3,4,5,col);}}
+let dietPrev=null;
+function buildDiet(){const vi=curVil,w=21,h=17,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'dcarp'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'dwall',k:x===10?0:x%5===2?2:1};C[h-1][x]={t:'kwall'};}for(let y=0;y<h;y++){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}
+  for(let dx=-2;dx<=2;dx++)C[1][10+dx]={t:'dspk'};C[3][10]={t:'dpod'};
+  const P=G.pol,mine=P?Math.round((P.seats||0)/POL_SEATS*100):0,order=[];for(let k=0;k<100;k++)order.push(k<mine?'m':k<mine+Math.round((100-mine)*.55)?1:k<mine+Math.round((100-mine)*.85)?2:3);
+  let n=0;for(let y=5;y<=13;y+=2)for(let x=2;x<=18;x++){if(x===10||x===6||x===14)continue;const o=order[Math.min(99,Math.floor(n*100/70))];C[y][x]=o==='m'?{t:'dseat',mine:1}:{t:'dseat',p:o};n++;}
+  for(let x=1;x<w-1;x++)C[15][x]={t:'drail'};C[15][10]={t:'dcarp'};C[h-1][10]={t:'exit'};
+  const npcs=[{x:12,y:2,col:'#000000',hair:'#bcbcbc',line:'議長「静粛に！ 静粛に！」'},{x:8,y:2,col:'#3c3c3c',hair:'#000000',line:'事務総長「本会議場へ ようこそ。\n演壇では 演説が できます」'},
+    {x:3,y:16,col:'#24188c',hair:'#000000',line:'衛視「傍聴席は お静かに」'},{x:17,y:14,col:'#7c7c7c',hair:'#3c3c3c',line:'記者「次の 総選挙、 どうなりますかね…」'},{x:4,y:14,col:'#00a800',hair:'#7c4c10',line:'議員「族議員の 先生方は 業界に 強いからなあ」'}];
+  return{diet:true,title:'国会議事堂 本会議場',vi,v:VIL[vi],w,h,cx:10,C,npcs,city:true,sz:VIL[vi].size,px:10,py:h-2,top:0};}
+function enterDiet(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildDiet();townScr.mv=null;setBase(townScr);sfx('bell');toast('本会議場に 入った');}
+function dietBump(c){const P=G.pol;
+  if(c.t==='dspk'){if(P)polScr();else dialog('議長「議員でない 方は\n議長席に 近づかないで ください」');return true;}
+  if(c.t==='dpod'){if(!P||!P.seats){dialog('演壇だ。\n議席を 持つ 政党の 議員だけが 演説できる。');return true;}
+    if(P.speech===P.lastEl){dialog('今期の 演説は もう 済ませた。\n（次の 総選挙の あとに また できる）');return true;}
+    P.speech=P.lastEl;P.camp=(P.camp||0)+1e13;save();sfx('lvup');
+    dialog(P.pm&&P.pmn?[`${P.pmn.n}首相「施政方針演説を 申し上げます！」`,`${P.policy?`「${POLICY[P.policy].n}」を 柱に`:'国民の 皆さまと 共に'}\nこの 国を 前へ 進めて まいります！`,'議場から 大きな 拍手が わき起こった！\n（支持率が 上がった）']:[`${P.n}「代表質問を 行います！」`,'「総理の 答弁は 不誠実で ありますッ！」','鋭い 質問が テレビで 話題に なった！\n（支持率が 上がった）']);return true;}
+  if(c.t==='dseat'){dialog(c.mine?`${P.n}の 議席だ。\n議員バッジが 金色に 光っている。`:`${c.p===1?NPC_PARTY[0]:c.p===2?NPC_PARTY[1]:'その他の 会派'}の 議席だ。`);return true;}
+  if(c.t==='drail'){dialog('傍聴席との 仕切りだ。');return true;}
+  if(c.t==='dwall'){dialog(c.k===0?'議場の 正面に 大きな 紋章が 掲げられている。':'金色の シャンデリアが 議場を 照らしている。');return true;}
+  return false;}
+/* 役所（村役場・町役場・市役所・都庁）と 地方議会 */
+const OFFICE=sz=>sz>=6?['都庁','都議会']:sz>=3?['市役所','市議会']:sz>=2?['町役場','町議会']:['村役場','村議会'];
+function yakushoFac(vi){const v=VIL[vi],[on,gn]=v.gm==='cap'?['帝都庁','帝都議会']:OFFICE(v.size),kl=((G.kouji||{})['v'+vi])||0;
+  const HN=v.gm==='cap'?'帝都知事':v.size>=6?'都知事':v.size>=3?'市長':v.size>=2?'町長':'村長',MY=(G.mayor||{})['v'+vi];
+  choice(`${v.name.replace(/^.* /,'')} ${on}　${HN}：${MY?MY.n+'（'+MY_TRAIT[MY.t].n+'）':'空席'}\n「ようこそ。 ご用件は？」`,[`${HN}を 選ぶ`,`${gn}を 傍聴する`,`陳情する（公共事業 ${kl}/5）`,'ふるさと納税','やめる'],k=>{
+    if(k===0){const N=[8,10,14,20,30,40,60][Math.min(6,v.size)],P=G.pol,ri=POL_REG.findIndex(R=>R.f(v)),my=P?Math.min(N,Math.round(N*polSup(Math.max(0,ri))*1.2)):0;
+      if(!P||my*2<N){dialog([`${HN}は ${gn}の 多数派が 選ぶ。`,P?`${P.n}は ${gn}で ${my}/${N}議席。\n過半数が 必要だ。（地盤を 固めよう）`:'政党を 立ち上げて 地盤を 固めよう。']);return;}
+      const Cs=npcPols(3,vi*977+(P.lastEl||0),MY_TRAIT);
+      listPick(`${gn}で 当選した 議員から ${HN}を 選ぶ`,Cs.map(c=>({t:c.n,r:MY_TRAIT[c.t].n})),i=>{const c=Cs[i];G.mayor=G.mayor||{};G.mayor['v'+vi]=c;save();sfx('lvup');dialog([`${c.n}が ${v.name.replace(/^.* /,'')}の ${HN}に 就任した！`,`${MY_TRAIT[c.t].n}：${MY_TRAIT[c.t].d}`]);},
+        i=>{const c=Cs[i];return c?`${c.n}（${c.age}歳・当選${c.win}回）\n${MY_TRAIT[c.t].n}：${MY_TRAIT[c.t].d}`:'';});return;}
+    k--;
+    if(k===0){const N=[8,10,14,20,30,40,60][Math.min(6,v.size)],P=G.pol,ri=POL_REG.findIndex(R=>R.f(v)),my=P?Math.min(N,Math.round(N*polSup(Math.max(0,ri))*1.2)):0,a=Math.round((N-my)*.5),b=Math.round((N-my)*.3),c_=N-my-a-b;
+      const topic=hatan(vi)?'財政再建 計画':v.depop?'人口減少と 神社の 後継者':kl?'公共事業の 予算':['商店街の 活性化','道路の 補修','観光客の 誘致','子育て 支援'][(G.day+vi)%4];
+      dialog([`${gn}（定数 ${N}）\n${P?`${P.n} ${my}　`:''}保守系 ${a}　革新系 ${b}　無所属 ${c_}`,`本日の 議題：「${topic}」`,`議員A「${topic}に ついて 質問します！」\n議員B「異議あり！」`,'…議論は 夜まで 続いた。']);return;}
+    if(k===1){if(kl>=5){dialog('公共事業は もう 十分に 行き届いている。\n（陳情は 5回まで）');return;}const c=Math.round(1e11*Math.pow(10,kl));
+      choice(`${on}に 公共事業を 陳情する\n費用 ${fmt(c)}イェソ（寄付）\n効果：地価 +10%（家賃 アップ）`,['陳情する','やめる'],r=>{if(r!==0)return;rePay(c,()=>{G.kouji=G.kouji||{};G.kouji['v'+vi]=kl+1;sink(c);sfx('lvup');save();dialog([`${['道路','橋','公園','駅前 再開発','新庁舎'][kl]}の 工事が 始まった！`,`${v.name}の 地価が 上がった！（+${(kl+1)*10}%）`]);});},96);return;}
+    if(k===2){G.furu=G.furu||{};if(G.furu['v'+vi]===G.day){dialog('ふるさと納税は 1つの 町に 1日 1回まで。');return;}
+      choice(`${v.name.replace(/^.* /,'')}に ふるさと納税\n1兆イェソ 寄付すると\n返礼品：経験値祝詞・極上鉱石 ×10`,['寄付する','やめる'],r=>{if(r!==0)return;rePay(1e12,()=>{G.furu['v'+vi]=G.day;sink(1e12);G.items.b[4]=(G.items.b[4]||0)+10;G.items.o[4]=(G.items.o[4]||0)+10;sfx('coin');save();dialog([`${v.name}に ふるさと納税を した！`,'返礼品が 届いた！\n経験値祝詞 ×10・極上鉱石 ×10']);});},96);return;}
+  },150);}
 function drawCell(c,sx,sy,city){
   const GC=city?'#a4a4a4':'#e4c890';
   const ground=()=>{R(sx,sy,16,16,GC);if(city){R(sx,sy+15,16,1,'#8c8c8c');R(sx+15,sy,1,16,'#8c8c8c');}else{R(sx+3,sy+4,1,1,'#c8a058');R(sx+11,sy+10,1,1,'#c8a058');}};
@@ -2339,6 +2427,8 @@ function drawCell(c,sx,sy,city){
     case 'ura':{R(sx,sy,16,16,'#4c4c54');if(G.colo){R(sx+1,sy+1,14,14,'#000');for(let k=0;k<4;k++)R(sx+2+k,sy+3+k*3,12-k*2,2,'#2c2c2c');const g=(frame>>3)&1;R(sx+1,sy+1,14,1,g?'#940084':'#6844fc');R(sx+1,sy+14,14,1,g?'#940084':'#6844fc');}
       else{R(sx+1,sy+1,14,14,'#2c2c2c');R(sx+1,sy+1,14,1,'#5c5c5c');R(sx+7,sy+3,2,10,'#000');R(sx+3,sy+7,10,2,'#000');}break;}
     case 'kc':case 'kcdoor':drawKokura(c,sx,sy);break;
+    case 'diet':case 'dietdoor':drawDiet(c,sx,sy);break;
+    case 'dwall':case 'dspk':case 'dpod':case 'dseat':case 'dcarp':case 'drail':drawDietIn(c,sx,sy);break;
     case 'lmk':{ground();const id=c.id;
       if(id==='otorii'){R(sx+1,sy+2,2,14,'#d82800');R(sx+13,sy+2,2,14,'#d82800');R(sx-2,sy,20,3,'#d82800');R(sx-2,sy,20,1,'#000');R(sx+1,sy+5,14,2,'#d82800');R(sx+6,sy+3,4,3,'#f8b800');}
       else if(id==='tenshu'){R(sx+2,sy+11,12,5,'#7c7c7c');R(sx+3,sy+6,10,5,'#fcfcfc');R(sx+1,sy+5,14,2,'#2c3454');R(sx+5,sy+2,6,4,'#fcfcfc');R(sx+3,sy+1,10,2,'#2c3454');R(sx+4,sy,2,1,'#f8b800');R(sx+10,sy,2,1,'#f8b800');R(sx+5,sy+7,2,2,'#f8d878');R(sx+9,sy+7,2,2,'#f8d878');}
@@ -2398,7 +2488,7 @@ function drawNPC(n,x,y,f){if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':
 const townScr={full:true,mv:null,bt:0,
   upd(){
     if(this.bt>0)this.bt--;
-    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.jogai)exitJogai();else leaveTown();}}return;}
+    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.jogai||TW.diet)exitJogai();else leaveTown();}}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0,fresh=I.pu||I.pd||I.pl||I.pr||ptrFresh;ptrFresh=false;
     if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
@@ -2414,6 +2504,8 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&TW.kjo&&kjoBump(c))return;
     if(fresh&&TW.jogai&&jogaiBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
+    if(fresh&&(c.t==='dietdoor'||c.t==='diet')){if(c.t==='dietdoor')enterDiet();else dialog('白い 花崗岩で できた 壮麗な 国会議事堂だ。\n中央の 塔の 上で 国旗が はためいている。');return;}
+    if(fresh&&TW.diet&&dietBump(c))return;
     if(fresh&&(c.t==='kcdoor'||c.t==='kc'||c.t==='moat'||c.t==='nobori'||c.t==='sakura')){if(c.t==='kcdoor')kqFac('kqjo');else dialog(c.t==='kc'?(kqS().ch===3?'五層の 天守に 黒い 雲が 渦を 巻いている…':kqS().ch>=4?'金の 鯱が 夜空に かがやく\n五層の 天守だ。 町の 誇りだ！':'白壁と 金の 飾りが まぶしい\n五層の 天守 コクラ城だ。'):c.t==='moat'?'お堀には 鯉が 泳いでいる。':c.t==='nobori'?'のぼりに「コクラ城」と 書かれている。':'城の 桜が 咲きほこっている。');return;}
     if(fresh&&c.t==='ura'){if(G.colo)uraFac();else dialog('黒い 石の 扉が 地面に はめこまれている。\n固く 閉ざされていて びくとも しない…');return;}
     if(fresh&&(c.t==='cstatue'||c.t==='brazier'||c.t==='cflag')){dialog(c.t==='cstatue'?'歴代 優勝者の 黄金像だ。'+(G.colo?'\n台座に あなたの 名前も 刻まれている！':''):c.t==='brazier'?'聖火が ごうごうと 燃えている。':'闘技場の 旗が はためいている。');return;}
@@ -2435,7 +2527,7 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
-    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
+    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai||TW.diet?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai&&!TW.diet)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{const dw=G.day>=1000?44:36;txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',124-dw);}
   }
@@ -2453,12 +2545,12 @@ function enterVillage(i,atShrine){
   save();if(msgs.length)dialog(msgs);
 }
 function leaveTown(){TW=null;startField();}
-const tierCost=b=>Math.ceil(b*Math.pow(1.7,VIL[curVil].tier)*(1-SIZES[VIL[curVil].size].off/100)*(hatan(curVil)?1.5:1));
+const tierCost=b=>Math.ceil(b*Math.pow(1.7,VIL[curVil].tier)*(1-SIZES[VIL[curVil].size].off/100)*(hatan(curVil)?1.5:1)*((G.mayor||{})['v'+curVil]&&G.mayor['v'+curVil].t===1?.9:1));
 function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   switch(kind){case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -4084,7 +4176,7 @@ function arAct(p){const A=p.ar,amt=A.amt,v=VIL[p.vi];
   },150);}
 const reOn=()=>!!(G&&G.gm&&G.gm.ch>=7);
 function reS(){if(!G.re)G.re={p:[],pend:0,total:0};return G.re;}
-const landMul=vi=>{const v=VIL[vi],D=v.depop?dep(vi):null;return LAND[Math.min(6,v.size)]*(D&&!D.revived?.2:1);};
+const landMul=vi=>{const v=VIL[vi],D=v.depop?dep(vi):null;return LAND[Math.min(6,v.size)]*(D&&!D.revived?.2:1)*(1+.1*(((G&&G.kouji)||{})['v'+vi]||0))*(((G&&G.mayor)||{})['v'+vi]&&G.mayor['v'+vi].t===0?1.1:1);};
 const reCap=(vi,t)=>{const v=VIL[vi],sz=v.size;return{akiya:sz<=1||v.depop?3:1,chuko:sz>=1&&sz<=3?4:sz>=4?2:0,office:sz>=3?sz:0,tower:sz>=5?2:0,lot:2+sz}[t]||0;};
 const reOwned=(vi,t)=>reS().p.filter(p=>p.vi===vi&&(p.t===t||(t==='akiya'&&p.t==='reno')||(t==='lot'&&RET[p.t].build))).length;
 const rentOf=p=>p.done&&p.done>G.day?0:Math.round(RET[p.t].rent*landMul(p.vi)*(p.fu>G.day?.8:1)*(hatan(p.vi)?.5:1)*(p.iw?.3:1));
@@ -4689,7 +4781,7 @@ function chojaScr(){const s_=G.sunk||0,nx=TITLES.find(([v])=>s_<v);
 const HONO_ST=[['石灯籠 奉納',1e10],['大鳥居 奉納（名前入り）',1e11],['社殿 改修',1e12],['社殿 造営',1e13],['式年遷宮',1e14]];
 const honoCost=lv=>Math.round((lv<HONO_ST.length?HONO_ST[lv][1]:1e14*Math.pow(10,lv-HONO_ST.length+1))*polMul('jin')),honoName=lv=>lv<HONO_ST.length?HONO_ST[lv][0]:`式年遷宮（${lv-HONO_ST.length+2}回目）`;
 const honoTotal=()=>Object.values(G.hono||{}).reduce((a,b)=>a+b,0),honoBuf=()=>1+Math.min(1,honoTotal()*.005);
-function honoScr(vi){G.hono=G.hono||{};const v=VIL[vi],k='v'+vi,lv=G.hono[k]||0,c=honoCost(lv);
+function honoScr(vi){G.hono=G.hono||{};const v=VIL[vi],k='v'+vi,lv=G.hono[k]||0,c=Math.round(honoCost(lv)*((G.mayor||{})[k]&&G.mayor[k].t===2?.8:1));
   choice(`${v.shrine}　造営 ${lv}段階\n次：${honoName(lv)}\n奉納金 ${fmt(c)}イェソ`,['奉納する','長者番付を 見る','やめる'],r=>{
     if(r===1){chojaScr();return;}if(r!==0)return;
     rePay(c,()=>{G.hono[k]=lv+1;sink(c);sfx('bell');save();
@@ -4711,27 +4803,32 @@ function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
 const POL_SEATS=300,POL_MAJ=151,POL_EVERY=50;
-const POL_REG=[{n:'本土',s:200,f:v=>!v.kq&&!v.gm},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
+const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.capital},{n:'首都',s:20,f:v=>!!v.capital},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
 const NPC_PARTY=['自由八百万党','民衆の 会','帝国再興党','無所属'];
 const ZOKU={ken:{n:'建設族',d:'建設費 -10%'},jin:{n:'神社族',d:'奉納・造営 -10%'},uma:{n:'競馬族',d:'馬主の 賞金 +30%'},kin:{n:'金融族',d:'超富裕層課税・査察 -20%'}};
 const POLICY={tax:{n:'富裕層 減税',d:'超富裕層課税・査察が 半分',k:'kin',m:.5},jin:{n:'神社 振興',d:'奉納・造営 -30%',k:'jin',m:.7},ken:{n:'国土 強靭化',d:'建設費 -30%',k:'ken',m:.7},uma:{n:'競馬 振興',d:'馬主の 賞金 2倍',k:'uma',m:2}};
+/* 当選した NPC 議員（首相・首長は この中から 自分で 選ぶ） */
+const NPC_SEI=['桜井','高峰','柳田','石動','大河内','葛城','藤堂','早乙女','黒須','御子柴','久我','鷹司','東雲','真柴','雨宮','九条','綾瀬','氷室'],NPC_MEI=['一郎','誠','博文','雅子','真理','剛','聡','恵','隆','玲奈','大輔','美咲','健','朋子'];
+const PM_TRAIT=[{n:'財政通',d:'超富裕層課税・査察 -20%',k:'kin',m:.8},{n:'国土派',d:'建設費 -20%',k:'ken',m:.8},{n:'敬神家',d:'奉納・造営 -20%',k:'jin',m:.8},{n:'競馬好き',d:'馬主の 賞金 +50%',k:'uma',m:1.5},{n:'金に 汚い',d:'パーティー収入 1.5倍・スキャンダル 2倍',k:'kane',m:1}];
+const MY_TRAIT=[{n:'開発派',d:'地価 +10%'},{n:'観光派',d:'店の 値段 -10%'},{n:'敬神家',d:'この 町の 奉納 -20%'},{n:'清廉派',d:'特に なし（不祥事が ない）'}];
+function npcPols(n,seed,traits){const r=lcg(seed),used=new Set(),out=[];while(out.length<n){const nm=NPC_SEI[Math.floor(r()*NPC_SEI.length)]+' '+NPC_MEI[Math.floor(r()*NPC_MEI.length)];if(used.has(nm))continue;used.add(nm);out.push({n:nm,t:Math.floor(r()*traits.length),age:35+Math.floor(r()*40),win:1+Math.floor(r()*8)});}return out;}
 function polMul(k){const P=G&&G.pol;if(!P)return 1;const z=(P.zoku&&P.zoku[k])||0;let m=k==='uma'?1+.3*z:Math.max(.4,1-(k==='kin'?.2:.1)*z);
-  if(P.pm&&P.policy&&POLICY[P.policy].k===k)m*=POLICY[P.policy].m;return m;}
+  if(P.pm&&P.policy&&POLICY[P.policy].k===k)m*=POLICY[P.policy].m;if(P.pm&&P.pmn&&PM_TRAIT[P.pmn.t].k===k)m*=PM_TRAIT[P.pmn.t].m;return m;}
 function polSup(ri){const P=G.pol,R=POL_REG[ri],vis=VIL.map((v,i)=>i).filter(i=>R.f(VIL[i]));
   const prop=reS().p.filter(p=>vis.includes(p.vi)).length,hono=vis.reduce((a,i)=>a+((G.hono||{})['v'+i]||0),0),lmk=vis.reduce((a,i)=>a+lmkOf(i).length,0);
   let sp=.02+prop*.004+hono*.012+lmk*.025+(P.camp?Math.max(0,Math.log10(P.camp/1e11))*.06:0)+Object.values(P.zoku||{}).reduce((a,b)=>a+b,0)*.01+(P.pm?.05:0)+(P.seats||0)/POL_SEATS*.1;
   if(P.scan>G.day)sp-=.15;return Math.max(.005,Math.min(.75,sp));}
 function polElection(msgs,why){const P=G.pol,res=[];let tot=0;
   POL_REG.forEach((R,ri)=>{const sp=polSup(ri)*(.85+rnd()*.3),n=Math.min(R.s,Math.round(R.s*sp));tot+=n;res.push(`${R.n}：${n}/${R.s}議席（得票 ${Math.round(sp*100)}%）`);});
-  const was=P.pm;P.seats=tot;P.camp=0;P.lastEl=G.day;P.pm=tot>=POL_MAJ;if(!P.pm)P.policy=null;
+  const was=P.pm;P.seats=tot;P.camp=0;P.lastEl=G.day;P.pm=tot>=POL_MAJ;if(!P.pm){P.policy=null;P.pmn=null;}P.cands=tot?npcPols(Math.min(6,Math.max(3,Math.ceil(tot/30))),G.day*131+tot,PM_TRAIT):[];if(P.pmn&&!P.cands.some(c=>c.n===P.pmn.n))P.cands.unshift(P.pmn);
   const rest=POL_SEATS-tot,big=Math.round(rest*.55),mid=Math.round(rest*.3),sm=rest-big-mid;
   msgs.push(`【${why||'総選挙'}】 開票速報！`,`${P.n}：${tot}議席\n`+res.join('\n'),`${NPC_PARTY[0]} ${big}　${NPC_PARTY[1]} ${mid}\n${NPC_PARTY[2]}・無所属 ${sm}`);
-  if(P.pm)msgs.push(was?`${P.n}が 過半数を 維持！\nあなたは 首相を 続投する！`:`${P.n}が 過半数（${POL_MAJ}議席）を 獲得！！\nあなたは 首相に 就任した！`,'（政治メニューで 政策を 選べる）');
-  else if(was)msgs.push('過半数を 割り込んだ…\nあなたは 首相を 辞任した。');
+  if(P.pm)msgs.push(was?`${P.n}が 過半数を 維持！\n政権を 続投する！`:`${P.n}が 過半数（${POL_MAJ}議席）を 獲得！！\n政権与党に なった！`,'党首の あなたが 当選した 議員の 中から\n首相を 指名しよう。（政治メニュー）');
+  else if(was)msgs.push(`過半数を 割り込んだ…\n${P.pmn?P.pmn.n+'内閣は 総辞職した。':'政権を 失った。'}`);
   else msgs.push(tot?`${tot}議席を 獲得した。 過半数まで あと ${POL_MAJ-tot}議席。`:'1議席も 取れなかった…');
   if(tot>=10)P.zokuMax=Math.floor(tot/10);}
 function polDaily(msgs){const P=G.pol;if(!P)return;
-  if(P.ura>0){const risk=.004+Math.min(.05,P.ura/2e14);if(rnd()<risk){const u=P.ura;P.ura=0;P.scan=G.day+30;msgs.push('【スクープ】週刊誌が 報じた！',`「${P.n}に 裏金 ${fmt(u)}イェソ」\n派閥の 秘書が 事情を 聞かれている…`,'裏金は 没収された。\n支持率が 30日間 大きく 下がる…');if(P.pm&&rnd()<.5){P.pm=false;P.policy=null;msgs.push('責任を 取って 首相を 辞任した…');}}}
+  if(P.ura>0){const risk=(.004+Math.min(.05,P.ura/2e14))*(P.pmn&&PM_TRAIT[P.pmn.t].k==='kane'?2:1);if(rnd()<risk){const u=P.ura;P.ura=0;P.scan=G.day+30;msgs.push('【スクープ】週刊誌が 報じた！',`「${P.n}に 裏金 ${fmt(u)}イェソ」\n派閥の 秘書が 事情を 聞かれている…`,'裏金は 没収された。\n支持率が 30日間 大きく 下がる…');if(P.pm&&P.pmn&&rnd()<.5){msgs.push(`${P.pmn.n}首相が 責任を 取って 辞任した…\n（新しい 首相を 指名しよう）`);P.pmn=null;}}}
   const zk=Object.values(P.zoku||{}).reduce((a,b)=>a+b,0);if(zk)P.fund+=zk*2e10;
   if(G.day-(P.lastEl||P.day)>=POL_EVERY)polElection(msgs,'任期満了 総選挙');}
 function polScr(){const P=G.pol;
@@ -4740,14 +4837,18 @@ function polScr(){const P=G.pol;
         dialog([`「${v[0]}」を 立ち上げた！`,`${POL_EVERY}日ごとに 総選挙が ある。\n不動産・奉納・ランドマークの 多い 地域ほど\n地盤が 強く 票が 集まる。`,'選挙運動に お金を つぎこむと\n支持率が 上がる。']);});},
         v=>!v[0]?'党名を 入れてください':NPC_PARTY.includes(v[0])?'その 党名は 使えません':'');},96);return;}
   const nx=POL_EVERY-(G.day-(P.lastEl||P.day)),zn=Object.values(P.zoku||{}).reduce((a,b)=>a+b,0);
-  const head=`${P.n}${P.pm?'（与党）':''}　${P.seats}/${POL_SEATS}議席\n政治資金 ${fmt(P.fund)}${P.ura?`　裏金 ${fmt(P.ura)}`:''}\n総選挙まで ${nx}日${P.scan>G.day?'　【スキャンダル中】':''}`;
-  const ops=['選挙運動に お金を 使う','政治資金パーティーを ひらく',`族議員（${zn}人）`,P.ura>0?'裏金を 動かす':{t:'裏金を 動かす（なし）',dis:true},'支持率を 見る',...(P.pm?[`政策を えらぶ（${P.policy?POLICY[P.policy].n:'なし'}）`,'解散総選挙']:[]),'党を 解散する','もどる'];
+  const head=`${P.n}${P.pm?'（与党）':''}　${P.seats}/${POL_SEATS}議席${P.pm?`\n首相：${P.pmn?P.pmn.n+'（'+PM_TRAIT[P.pmn.t].n+'）':'未指名'}`:''}\n政治資金 ${fmt(P.fund)}${P.ura?`　裏金 ${fmt(P.ura)}`:''}\n総選挙まで ${nx}日${P.scan>G.day?'　【スキャンダル中】':''}`;
+  const ops=[...(P.pm?[P.pmn?'首相を 交代させる':{t:'首相を 指名する',col:'#f8b800'}]:[]),'選挙運動に お金を 使う','政治資金パーティーを ひらく',`族議員（${zn}人）`,P.ura>0?'裏金を 動かす':{t:'裏金を 動かす（なし）',dis:true},'支持率を 見る',...(P.pm?[`政策を えらぶ（${P.policy?POLICY[P.policy].n:'なし'}）`,'解散総選挙']:[]),'党を 解散する','もどる'];
   choice(head,ops,k=>{const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
+    if(lab.startsWith('首相を')){const Cs=P.cands||[];if(!Cs.length){dialog('指名できる 議員が いない…',polScr);return;}
+      listPick('当選した 議員から 首相を 指名',Cs.map(c=>({t:c.n,r:PM_TRAIT[c.t].n,col:P.pmn&&P.pmn.n===c.n?'#7ee07e':null})),i=>{const c=Cs[i];P.pmn=c;save();sfx('lvup');
+        dialog([`党首の あなたは ${c.n}を 首相に 指名した。`,`国会で 首班指名 選挙が 行われ…\n${c.n}が 第${(G.pmCount=(G.pmCount||0)+1)}代 首相に 選ばれた！`,`${c.n}首相（${PM_TRAIT[c.t].n}）\n効果：${PM_TRAIT[c.t].d}`],polScr);},
+        i=>{const c=Cs[i];return c?`${c.n}（${c.age}歳・当選${c.win}回）\n${PM_TRAIT[c.t].n}：${PM_TRAIT[c.t].d}`:'';});return;}
     if(lab.startsWith('選挙運動')){const A=[1e12,1e13,1e14,1e15];
       listPick('選挙運動（ポスター・演説会・CM）',A.map(a=>({t:fmt(a)+'イェソ',r:P.fund>=a?'政治資金から':'自腹'})),i=>{const a=A[i];const go=()=>{P.camp=(P.camp||0)+a;sink(a);sfx('lvup');save();dialog(['街頭演説・ポスター・テレビCMで\n大々的に 選挙運動を した！',`選挙運動費 累計 ${fmt(P.camp)}イェソ\n（次の 選挙まで 支持率に 効く）`],polScr);};
         if(P.fund>=a){P.fund-=a;go();}else rePay(a,go);},i=>'10倍 使うごとに 支持率が 約6% 上がる。\n選挙が 終わると リセット。');return;}
     if(lab.startsWith('政治資金')){if(P.party===G.day||(P.partyD&&G.day-P.partyD<10)){dialog(`パーティーは 10日に 1回まで。\n（あと ${10-(G.day-P.partyD)}日）`,polScr);return;}
-      const rev=Math.round(1e11*(1+(P.seats||0)/10)*(P.pm?3:1)*(.8+rnd()*.4));P.partyD=G.day;
+      const rev=Math.round(1e11*(1+(P.seats||0)/10)*(P.pm?3:1)*(P.pmn&&PM_TRAIT[P.pmn.t].k==='kane'?1.5:1)*(.8+rnd()*.4));P.partyD=G.day;
       choice(`${P.n} 政治資金パーティー\n会費 2万イェソ × 大勢の 企業・団体\n収入 見込み ${fmt(rev)}イェソ`,['すべて 政治資金に 入れる','2割を キックバック（裏金）に する'],r=>{const kb=r===1?Math.round(rev*.2):0;P.fund+=rev-kb;P.ura=(P.ura||0)+kb;save();sfx('coin');
         dialog(['ホテルの 大宴会場で パーティーを ひらいた！\n企業の 社長たちが 名刺を 配っている…',`政治資金 +${fmt(rev-kb)}イェソ`+(kb?`\n裏金 +${fmt(kb)}イェソ（記載せず…）`:''),...(kb?['（裏金は バレると スキャンダルに なる。\n多いほど 危ない）']:[])],polScr);});return;}
     if(lab.startsWith('族議員')){const zmax=P.zokuMax||0;
@@ -4759,8 +4860,8 @@ function polScr(){const P=G.pol;
       if(r===0){if(rnd()<.25){const u=P.ura;P.ura=0;P.scan=G.day+30;save();dialog(['…移そうとした ところを\n記者に 撮られた！',`裏金 ${fmt(u)}イェソは 没収、\n30日間 支持率が 大きく 下がる…`],polScr);return;}noCount(()=>{G.coins+=P.ura;});dialog(`裏金 ${fmt(P.ura)}イェソを こっそり 財布に 移した…\n（税金は かからない）`,polScr);P.ura=0;save();return;}
       if(r===1){P.fund+=P.ura;P.ura=0;save();dialog('裏金を 収支報告書に 記載し\n政治資金に 戻した。 これで 安心だ。',polScr);return;}polScr();},120);return;}
     if(lab.startsWith('支持率')){dialog(POL_REG.map((R,ri)=>`${R.n}（${R.s}議席）支持率 ${Math.round(polSup(ri)*100)}%`).join('\n')+`\n選挙運動費 ${fmt(P.camp||0)}`,polScr);return;}
-    if(lab.startsWith('政策')){const K=Object.keys(POLICY);listPick('首相として 政策を えらぶ',K.map(k=>({t:POLICY[k].n,r:P.policy===k?'実施中':'',col:P.policy===k?'#7ee07e':null})),i=>{P.policy=K[i];save();sfx('lvup');dialog([`閣議決定！「${POLICY[K[i]].n}」`,POLICY[K[i]].d],polScr);},i=>{const q=POLICY[K[i]];return q?q.d:'';});return;}
-    if(lab==='解散総選挙'){choice('衆議院を 解散して\n総選挙に 打って出ますか？',['解散する','やめる'],r=>{if(r!==0){polScr();return;}const ms=['首相「本日 衆議院を 解散いたしました！」'];polElection(ms,'解散総選挙');save();dialog(ms,polScr);},96);return;}
+    if(lab.startsWith('政策')){if(!P.pmn){dialog('まず 首相を 指名しよう。',polScr);return;}const K=Object.keys(POLICY);listPick('首相として 政策を えらぶ',K.map(k=>({t:POLICY[k].n,r:P.policy===k?'実施中':'',col:P.policy===k?'#7ee07e':null})),i=>{P.policy=K[i];save();sfx('lvup');dialog([`${P.pmn.n}内閣が 閣議決定！「${POLICY[K[i]].n}」`,POLICY[K[i]].d],polScr);},i=>{const q=POLICY[K[i]];return q?q.d:'';});return;}
+    if(lab==='解散総選挙'){if(!P.pmn){dialog('解散できるのは 首相だけだ。\nまず 首相を 指名しよう。',polScr);return;}choice('首相に 衆議院を 解散させて\n総選挙に 打って出ますか？',['解散する','やめる'],r=>{if(r!==0){polScr();return;}const ms=[`${P.pmn.n}首相「本日 衆議院を 解散いたしました！」`];polElection(ms,'解散総選挙');save();dialog(ms,polScr);},96);return;}
     if(lab==='党を 解散する'){choice(`${P.n}を 解散しますか？\n（議席・族議員・政治資金は 消える）`,['解散する','やめる'],r=>{if(r===0){G.pol=null;save();dialog('政党を 解散した。');}else polScr();},96);return;}
   },150);}
 /* ===================== 場外発売所（馬券・舟券） ===================== */
