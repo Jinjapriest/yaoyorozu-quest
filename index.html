@@ -4784,8 +4784,8 @@ const honoTotal=()=>Object.values(G.hono||{}).reduce((a,b)=>a+b,0),honoBuf=()=>1
 function honoScr(vi){G.hono=G.hono||{};const v=VIL[vi],k='v'+vi,lv=G.hono[k]||0,c=Math.round(honoCost(lv)*((G.mayor||{})[k]&&G.mayor[k].t===2?.8:1));
   choice(`${v.shrine}　造営 ${lv}段階\n次：${honoName(lv)}\n奉納金 ${fmt(c)}イェソ`,['奉納する','長者番付を 見る','やめる'],r=>{
     if(r===1){chojaScr();return;}if(r!==0)return;
-    rePay(c,()=>{G.hono[k]=lv+1;sink(c);sfx('bell');save();
-      dialog([`${v.shrine}に ${honoName(lv)}を 奉納した！`,lv+1>=4?'見事な 社殿が 完成した！\n氏子たちが 涙を 流して 喜んでいる…':lv+1>=2?'境内が いっそう 立派に なった。':'灯籠に あなたの 名前が 刻まれた。',`ご神徳で 全能力 +${Math.round((honoBuf()-1)*1000)/10}%（永続）`]);});},150);}
+    rePay(c,()=>{G.hono[k]=lv+1;sink(c);G.honoSunk=(G.honoSunk||0)+c;sfx('bell');const ssr=!G.shinseiren&&G.honoSunk>=1e10;if(ssr)G.shinseiren={day:G.day};save();
+      dialog([`${v.shrine}に ${honoName(lv)}を 奉納した！`,lv+1>=4?'見事な 社殿が 完成した！\n氏子たちが 涙を 流して 喜んでいる…':lv+1>=2?'境内が いっそう 立派に なった。':'灯籠に あなたの 名前が 刻まれた。',`ご神徳で 全能力 +${Math.round((honoBuf()-1)*1000)/10}%（永続）`,...(ssr?['【長者番付に 名前が 載った！】','あなたの 奉納に 感銘を 受けた\n全国の 神社関係者が 立ち上がった！','「神道政治連盟」が 設立された！','神社からの 支持が 集まりやすくなる。\n（政党を 立ち上げると 推薦を 受けられる）']:[])]);});},150);}
 /* ランドマーク（家賃なし・見栄と 称号） */
 const LMK=[{id:'otorii',n:'大鳥居',c:1e12},{id:'tenshu',n:'天守閣',c:1e13},{id:'tower',n:'展望タワー',c:1e14},{id:'statue',n:'町を 丸ごと 買い取る（名誉市長の 銅像）',c:1e15}];
 const lmkOf=vi=>((G.lmk||{})['v'+vi])||[];
@@ -4817,6 +4817,7 @@ function polMul(k){const P=G&&G.pol;if(!P)return 1;const z=(P.zoku&&P.zoku[k])||
 function polSup(ri){const P=G.pol,R=POL_REG[ri],vis=VIL.map((v,i)=>i).filter(i=>R.f(VIL[i]));
   const prop=reS().p.filter(p=>vis.includes(p.vi)).length,hono=vis.reduce((a,i)=>a+((G.hono||{})['v'+i]||0),0),lmk=vis.reduce((a,i)=>a+lmkOf(i).length,0);
   let sp=.02+prop*.004+hono*.012+lmk*.025+(P.camp?Math.max(0,Math.log10(P.camp/1e11))*.06:0)+Object.values(P.zoku||{}).reduce((a,b)=>a+b,0)*.01+(P.pm?.05:0)+(P.seats||0)/POL_SEATS*.1;
+  if(G.shinseiren)sp+=.05+hono*.012;
   if(P.scan>G.day)sp-=.15;return Math.max(.005,Math.min(.75,sp));}
 function polElection(msgs,why){const P=G.pol,res=[];let tot=0;
   POL_REG.forEach((R,ri)=>{const sp=polSup(ri)*(.85+rnd()*.3),n=Math.min(R.s,Math.round(R.s*sp));tot+=n;res.push(`${R.n}：${n}/${R.s}議席（得票 ${Math.round(sp*100)}%）`);});
@@ -4837,9 +4838,11 @@ function polScr(){const P=G.pol;
         dialog([`「${v[0]}」を 立ち上げた！`,`${POL_EVERY}日ごとに 総選挙が ある。\n不動産・奉納・ランドマークの 多い 地域ほど\n地盤が 強く 票が 集まる。`,'選挙運動に お金を つぎこむと\n支持率が 上がる。']);});},
         v=>!v[0]?'党名を 入れてください':NPC_PARTY.includes(v[0])?'その 党名は 使えません':'');},96);return;}
   const nx=POL_EVERY-(G.day-(P.lastEl||P.day)),zn=Object.values(P.zoku||{}).reduce((a,b)=>a+b,0);
-  const head=`${P.n}${P.pm?'（与党）':''}　${P.seats}/${POL_SEATS}議席${P.pm?`\n首相：${P.pmn?P.pmn.n+'（'+PM_TRAIT[P.pmn.t].n+'）':'未指名'}`:''}\n政治資金 ${fmt(P.fund)}${P.ura?`　裏金 ${fmt(P.ura)}`:''}\n総選挙まで ${nx}日${P.scan>G.day?'　【スキャンダル中】':''}`;
-  const ops=[...(P.pm?[P.pmn?'首相を 交代させる':{t:'首相を 指名する',col:'#f8b800'}]:[]),'選挙運動に お金を 使う','政治資金パーティーを ひらく',`族議員（${zn}人）`,P.ura>0?'裏金を 動かす':{t:'裏金を 動かす（なし）',dis:true},'支持率を 見る',...(P.pm?[`政策を えらぶ（${P.policy?POLICY[P.policy].n:'なし'}）`,'解散総選挙']:[]),'党を 解散する','もどる'];
+  const head=`${P.n}${P.pm?'（与党）':''}　${P.seats}/${POL_SEATS}議席${P.pm?`\n首相：${P.pmn?P.pmn.n+'（'+PM_TRAIT[P.pmn.t].n+'）':'未指名'}`:''}\n政治資金 ${fmt(P.fund)}${P.ura?`　裏金 ${fmt(P.ura)}`:''}\n総選挙まで ${nx}日${G.shinseiren?'　神政連推薦':''}${P.scan>G.day?'　【スキャンダル中】':''}`;
+  const ops=[...(P.pm?[P.pmn?'首相を 交代させる':{t:'首相を 指名する',col:'#f8b800'}]:[]),...(G.shinseiren?[P.ssr===P.lastEl?{t:'神道政治連盟の 大会（出席済み）',dis:true}:{t:'神道政治連盟の 大会に 出る',col:'#f8d878'}]:[]),'選挙運動に お金を 使う','政治資金パーティーを ひらく',`族議員（${zn}人）`,P.ura>0?'裏金を 動かす':{t:'裏金を 動かす（なし）',dis:true},'支持率を 見る',...(P.pm?[`政策を えらぶ（${P.policy?POLICY[P.policy].n:'なし'}）`,'解散総選挙']:[]),'党を 解散する','もどる'];
   choice(head,ops,k=>{const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
+    if(lab.startsWith('神道政治連盟の 大会に')){P.ssr=P.lastEl;P.camp=(P.camp||0)+3e13;save();sfx('bell');
+      dialog(['神道政治連盟 全国大会',`会長「本日は ${P.n}の 先生に\nお越し いただきました！」`,'全国の 神職・総代が 大きな 拍手で\nあなたを 迎えた！','神社界の 推薦を 受けた！\n（次の 選挙で 支持率が 上がる）'],polScr);return;}
     if(lab.startsWith('首相を')){const Cs=P.cands||[];if(!Cs.length){dialog('指名できる 議員が いない…',polScr);return;}
       listPick('当選した 議員から 首相を 指名',Cs.map(c=>({t:c.n,r:PM_TRAIT[c.t].n,col:P.pmn&&P.pmn.n===c.n?'#7ee07e':null})),i=>{const c=Cs[i];P.pmn=c;save();sfx('lvup');
         dialog([`党首の あなたは ${c.n}を 首相に 指名した。`,`国会で 首班指名 選挙が 行われ…\n${c.n}が 第${(G.pmCount=(G.pmCount||0)+1)}代 首相に 選ばれた！`,`${c.n}首相（${PM_TRAIT[c.t].n}）\n効果：${PM_TRAIT[c.t].d}`],polScr);},
