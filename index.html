@@ -221,6 +221,19 @@ function pe(cx,cy,rx,ry,col){for(let dy=-ry;dy<=ry;dy++){const w=Math.floor(rx*M
 const rnd=Math.random,ri=(a,b)=>a+Math.floor(rnd()*(b-a+1)),clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const fmt=n=>Math.floor(n).toLocaleString('ja-JP');
 let frame=0,G=null;
+/* ===================== 朝と 夜（時刻） ===================== */
+const DAYMIN=1440;
+const nowMin=()=>G&&G.mn!=null?G.mn:360;
+const clockStr=()=>{const m=nowMin();return`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;};
+const todName=()=>{const h=nowMin()/60;return h<5?'深夜':h<10?'朝':h<16?'昼':h<19?'夕方':'夜';};
+const isNight=()=>{const h=nowMin()/60;return h<5||h>=19;};
+function timeAdd(m){if(!G)return;G.mn=nowMin()+m;if(G.mn>=DAYMIN){G.mn-=DAYMIN;const msgs=advanceDay();G.dayQ=[`日付が 変わった。（${G.day}日目）`,...msgs];save();}}
+function dayQShow(){if(G&&G.dayQ){const q=G.dayQ;G.dayQ=null;dialog(q);return true;}return false;}
+function nightShade(f=1){const h=nowMin()/60;let c=null,a=0;
+  if(h<4.5){c='#000428';a=.5;}else if(h<6){c='#100838';a=.06+.44*(6-h)/1.5;}else if(h<7){c='#f8a878';a=.1*(7-h);}
+  else if(h>=16.5&&h<18.5){c='#f86800';a=.16*(h-16.5)/2;}else if(h>=18.5&&h<19.5){c='#301050';a=.16+.26*(h-18.5);}else if(h>=19.5){c='#000838';a=.42+.08*Math.min(1,(h-19.5)/4);}
+  a*=f;if(c&&a>0){ctx.globalAlpha=a;R(0,0,W,H,c);ctx.globalAlpha=1;}return a;}
+function clockBadge(){const n=isNight();win(196,21,56,28);txt(clockStr(),224,27,n?'#a4b4fc':'#f8d878','center');txt(todName(),224,38,'#bcbcbc','center');}
 
 /* ===================== サウンド ===================== */
 let AC=null,master=null,muted=false,nbuf=null;
@@ -1313,6 +1326,7 @@ function beginNew(){
 const fieldScr={full:true,mv:null,bt:0,idle:0,
   upd(){
     if(this.bt>0)this.bt--;
+    if(!this.mv&&dayQShow())return;
     if(this.mv){this.mv.t+=2;if(this.mv.t>=16){const pv={x:G.pos.x,y:G.pos.y};G.pos.x=this.mv.x1;G.pos.y=this.mv.y1;this.mv=null;onStep(pv);}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0;if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
@@ -1326,7 +1340,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++)drawTile(tileAt(tx,ty),tx*16-camX,ty*16-camY);
     for(const q of G.rifts){const sx=q.x*16-camX,sy=q.y*16-camY;if(sx<-16||sy<-16||sx>W||sy>H)continue;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,4,'#6800a8');
       for(let k=0;k<6;k++){const an=k/6*Math.PI*2+frame*.1;R(Math.round(sx+8+Math.cos(an)*5),Math.round(sy+8+Math.sin(an)*5),2,2,k%2?'#d82800':'#f878f8');}}
-    drawChar(G.party[0],120,112,(frame>>3)&1);
+    drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();
     const vi=nearestVil(G.pos.x,G.pos.y),v=VIL[vi],t=v.tier;
     const bl=G.bless&&G.bless.left>0;win(4,4,128,bl?56:44);
     txt(`${v.name} 周辺`,12,10,'#fcfcfc','left',112);
@@ -1336,7 +1350,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
   }
 };
 function startField(){setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
-function onStep(pv){
+function onStep(pv){timeAdd(5);
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
@@ -1350,7 +1364,7 @@ function onStep(pv){
   if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。（Lv${G.boss+1}/${OROCHI_MAX}）\n挑みますか？（目安Lv${G.boss>=14?'19999以上':Math.min(19999,Math.round(820*Math.pow(1.5,G.boss)))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
-  G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
+  G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length)*(isNight()?1.25:1);
   if(G.steps>3&&rnd()<rate){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
 }
 
@@ -2145,7 +2159,7 @@ function winBattle(){
   const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.sp&&BT.sp.kind==='gunma'?12:BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:1;
   /* 高難易度コンテンツは 経験値書・鍛錬鉱が 10倍 */
   const HX=BT.sp&&(['kaiho','doiri','ukaiho','udoiri','uorochi','tokoyo','colo','ura','gimwild','gimrift','gunma'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
-  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*(G.ukaiho&&G.ukaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
+  const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(isNight()&&!BT.sp&&!BT.boss&&BT.rift==null?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*(G.ukaiho&&G.ukaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
   let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
   bk.forEach((n,k)=>G.items.b[k]+=n);ok.forEach((n,k)=>G.items.o[k]+=n);
@@ -2205,9 +2219,9 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp']);
+const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -2221,7 +2235,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:v.kyotei?['race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=4&&!v.depop&&!v.tokoyo?['kanraku']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:v.kyotei?['race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -2431,6 +2445,10 @@ function drawCell(c,sx,sy,city){
   const ground=()=>{R(sx,sy,16,16,GC);if(city){R(sx,sy+15,16,1,'#8c8c8c');R(sx+15,sy,1,16,'#8c8c8c');}else{R(sx+3,sy+4,1,1,'#c8a058');R(sx+11,sy+10,1,1,'#c8a058');}};
   switch(c.t){
     case 'g':ground();break;
+    case 'kanst':R(sx,sy,16,16,'#2c2c3c');R(sx,sy+15,16,1,'#24242c');R(sx+15,sy,1,16,'#24242c');break;
+    case 'kanwall':{R(sx,sy,16,16,'#18182c');const n=isNight();for(let k=0;k<4;k++){const lit=((c.x||0)*7+k*3+(frame>>7))%5<2;R(sx+2+(k%2)*7,sy+2+(k>>1)*7,5,4,n&&lit?'#f8d878':'#3c3c5c');}break;}
+    case 'kshop':kanShopCell(c,sx,sy);break;
+    case 'kanfl':case 'kiwall':case 'kchand':case 'ksofa':case 'ktable':case 'kbar':case 'kroom':case 'koffice':kanShopDraw(c,sx,sy);break;
     case 'trift':R(sx,sy,16,16,'#1c0010');{const f=(frame>>3)%4;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,5,f&1?'#a80020':'#6800a8');pc(sx+8,sy+8,3,'#d82800');pc(sx+8,sy+8,1+(f>>1),'#fcfcfc');}break;
     case 's':case 'exit':R(sx,sy,16,16,city?'#6c6c6c':'#fcd8a8');if(!city){R(sx+5,sy+6,1,1,'#e4a858');R(sx+12,sy+12,1,1,'#e4a858');}else{R(sx,sy,16,1,'#7c7c7c');}
       if(c.t==='exit'){R(sx+5,sy+4,6,1,'#f8b800');R(sx+6,sy+5,4,1,'#f8b800');R(sx+7,sy+6,2,1,'#f8b800');}break;
@@ -2558,14 +2576,15 @@ function drawNPC(n,x,y,f){if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':
 const townScr={full:true,mv:null,bt:0,
   upd(){
     if(this.bt>0)this.bt--;
-    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.jogai||TW.diet)exitJogai();else leaveTown();}}return;}
+    if(!this.mv&&dayQShow())return;
+    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(!TW.ship)timeAdd(1);if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.kanShop)exitKanShop();else if(TW.jogai||TW.diet||TW.kanIn)exitJogai();else leaveTown();}}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0,fresh=I.pu||I.pd||I.pl||I.pr||ptrFresh;ptrFresh=false;
     if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);}return;}
+    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);}return;}
     if(!c)return;
     if(TPASS.has(c.t)){this.mv={x1:nx,y1:ny,dx,dy,t:0};return;}
     if(fresh&&c.t==='door'){openFac(c.b.kind);return;}
@@ -2573,6 +2592,8 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&TW.ship&&shipBump(c))return;
     if(fresh&&TW.kjo&&kjoBump(c))return;
     if(fresh&&TW.jogai&&jogaiBump(c))return;
+    if(fresh&&TW.kanIn&&kanBump(c))return;
+    if(fresh&&TW.kanShop&&kanShopBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
     if(fresh&&(c.t==='dietdoor'||c.t==='diet')){if(c.t==='dietdoor')enterDiet();else dialog('白い 花崗岩で できた 壮麗な 国会議事堂だ。\n中央の 塔の 上で 国旗が はためいている。');return;}
     if(fresh&&TW.diet&&dietBump(c))return;
@@ -2597,7 +2618,11 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
-    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai||TW.diet?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai&&!TW.diet)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
+    if(!TW.ship&&!TW.jogai&&!TW.diet&&!TW.kanShop){const a=nightShade(TW.kanIn?.6:1);if(a>.2)for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(!c)continue;const X=tx*16-cam.x,Y=ty*16-cam.y;
+      if(c.t==='lamp'){ctx.globalAlpha=.3;pc(X+8,Y+4,8,'#fce0a8');ctx.globalAlpha=1;R(X+6,Y+2,4,2,'#fce0a8');}else if(TW.kanIn&&c.t==='kshop')drawCell(c,X,Y,true);
+      else if(c.t==='door'&&c.b&&c.b.kind!=='house'){ctx.globalAlpha=.35;R(X+3,Y+2,10,14,'#f8d878');ctx.globalAlpha=1;}}}
+    if(!TW.ship&&!TW.jogai&&!TW.diet)clockBadge();
+    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai||TW.diet||TW.kanIn||TW.kanShop?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai&&!TW.diet&&!TW.kanIn&&!TW.kanShop)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{const dw=G.day>=1000?44:36;txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',124-dw);}
   }
@@ -2621,7 +2646,7 @@ function openFac(kind){
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
   if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
-  switch(kind){case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
+  switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
   const m=mkMenu(items,{x:4,y:20,w:248,rows:Math.min(11,items.length),title});
@@ -2659,7 +2684,7 @@ function innFac(){
   choice(free?`宿坊へ ようこそ。\nTCBカード会員さまは 宿泊 無料です。\n朝のお勤めで 3戦 経験値書が 2割増し。`:`宿坊へ ようこそ。 ひと晩 ${fmt(cost)}イェソです。\n朝のお勤めを すると 3戦のあいだ\n経験値書が 2割 多く 手に入ります。`,['泊まる','やめる'],r=>{
     if(r!==0)return;if(G.coins<cost){dialog('イェソが たりないようですね。');return;}
     payFor(cost,()=>{sfx('bell');let t=0;
-    push({full:true,upd(){t++;if(t>=110||(I.A&&t>20)){pop();const msgs=advanceDay();fullHeal();G.morning=3;save();sfx('lvup');
+    push({full:true,upd(){t++;if(t>=110||(I.A&&t>20)){pop();const late=nowMin()<6*60,msgs=late?[]:advanceDay();G.mn=6*60;fullHeal();G.morning=3;save();sfx('lvup');
         dialog([`おはようございます。 ${G.day}日目の 朝です。\n朝のお勤めを すませた。\nHP・MPが すべて 回復した。`,...msgs]);}},
       drw(){R(0,0,W,H,'#000010');for(let k=0;k<3;k++){const y=110-((t*.6+k*20)%60);txt('Z',120+k*10,y,'#a4e4fc');}txt('おやすみなさい…',128,150,'#bcbcbc','center');}});},'宿坊 ひと晩');
   });
@@ -3170,7 +3195,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily());
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
@@ -5038,6 +5063,196 @@ function polScr(){const P=G.pol;
     if(lab==='解散総選挙'){if(!P.pmn){dialog('解散できるのは 首相だけだ。\nまず 首相を 指名しよう。',polScr);return;}choice('首相に 衆議院を 解散させて\n総選挙に 打って出ますか？',['解散する','やめる'],r=>{if(r!==0){polScr();return;}const ms=[`${P.pmn.n}首相「本日 衆議院を 解散いたしました！」`];polElection(ms,'解散総選挙');save();dialog(ms,polScr);},96);return;}
     if(lab==='党を 解散する'){choice(`${P.n}を 解散しますか？\n（議席・族議員・政治資金は 消える）`,['解散する','やめる'],r=>{if(r===0){G.pol=null;save();dialog('政党を 解散した。');}else polScr();},96);return;}
   },150);}
+/* ===================== 歓楽街（都会 以上の 町） ===================== */
+const KAN={cab:{n:'キャバクラ',sh:'CLUB',col:'#f878f8',setup:6e8,rent:3e6,base:1.2e7,wage:4e6,vol:.25,open:[18,29],cust:3e6},
+  lounge:{n:'ラウンジ',sh:'LOUNGE',col:'#a4b4fc',setup:4e8,rent:2.5e6,base:1.1e7,wage:3e6,vol:.15,open:[19,29],cust:2e6},
+  gay:{n:'ゲイバー',sh:'BAR',col:'#fc9838',setup:1.2e8,rent:8e5,base:4e6,wage:1e6,vol:.08,open:[20,29],cust:5e5},
+  concafe:{n:'コンカフェ',sh:'CAFE',col:'#7ee0fc',setup:1.5e8,rent:1e6,base:5e6,wage:1.5e6,vol:.4,open:[11,23],cust:4e5},
+  karaoke:{n:'カラオケ',sh:'KARAOKE',col:'#f8d878',setup:3e8,rent:2e6,base:8e6,wage:2e6,vol:.1,open:[10,29],cust:2e5},
+  snack:{n:'スナック',sh:'SNACK',col:'#d878f8',setup:6e7,rent:4e5,base:2e6,wage:5e5,vol:.1,open:[19,28],cust:3e5}};
+const KANK=Object.keys(KAN);
+const KAN_NM={cab:['クラブ 月下美人','クラブ ルミエール','クラブ 胡蝶','クラブ ヴィーナス','シャングリラ'],lounge:['ラウンジ 雅','ラウンジ ミラージュ','ラウンジ 碧','ラウンジ エデン'],
+  gay:['ママの店 ひまわり','バー 薔薇の園','バー 夜明けの虹','バー 天照'],concafe:['にゃんにゃん堂','めいどの国','ぴゅあ★きゃっと','妖精の森カフェ'],
+  karaoke:['カラオケ うたげ','カラオケ 八百万','マイクの森','歌うたいの館'],snack:['スナック 夜明け','スナック のぞみ','スナック 灯','スナック 美智子']};
+const CAST_N=['あいり','ゆな','れいな','みく','さくら','ひかる','まりあ','えみり','ありさ','ののか','りな','しずく','あげは','つばき','かれん','みゆう','せいら','ゆきの','らん','きらら','るな','あすか','ひめか','もえ'],CAST_MAX=10;
+const kanHrs=t=>{const[a,b]=KAN[t].open;return`${a}時〜${b>24?'翌'+(b-24):b}時`;};
+const kanOpen=t=>{const[a,b]=KAN[t].open,h=nowMin()/60,hh=h<5?h+24:h;return hh>=a&&hh<b;};
+function kanSt(vi){G.kan=G.kan||{};const k='v'+vi;if(!G.kan[k]){const r=lcg(vi*4421+17),T=[...KANK].sort(()=>r()-.5),va=new Set();while(va.size<2)va.add(Math.floor(r()*6));
+  G.kan[k]={lots:T.map((t,i)=>va.has(i)?{t:null}:{t,own:0,nm:KAN_NM[t][Math.floor(r()*KAN_NM[t].length)],rep:Math.round((.85+r()*.5)*100)/100,lv:Math.floor(r()*3)})};}return G.kan[k];}
+function mkCast(r,lm){const st=()=>1+Math.floor(Math.pow(r(),1.3)*5),lg=r()<.02;
+  const c={n:CAST_N[Math.floor(r()*CAST_N.length)],age:20+Math.floor(r()*9),look:Math.min(5,st()+(lg?2:0)),talk:Math.min(5,st()+(lg?2:0)),sake:st(),lg,sales:0,days:0};
+  c.pow=c.look*2+c.talk*2+c.sake+(lg?12:0);c.wage=Math.round(c.pow*2.5e5*lm);c.fee=Math.round(c.pow*5e6*lm);return c;}
+const castLine=c=>`${c.lg?'★伝説 ':''}${c.n}（${c.age}）\nルックス${'●'.repeat(c.look)} トーク${'●'.repeat(c.talk)} お酒${'●'.repeat(c.sake)}\n指名力 ${c.pow}　日給 ${fmt(c.wage)}　売上 ${fmt(c.sales)}`;
+const kanSucc=(vi,L)=>Math.round((KAN[L.t].setup+KAN[L.t].base*60*L.rep)*landMul(vi)*(1+.15*(L.lv||0)));
+/* 毎日の 収支（普通預金へ） */
+function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
+  for(const k in G.kan){const vi=+k.slice(1),lm=landMul(vi),tx=taxRate(vi);
+    G.kan[k].lots.forEach(L=>{if(!L.own||!L.t)return;const K=KAN[L.t];if(L.buzz>0)L.buzz--;
+      const mul=L.rep*(1+.12*(L.lv||0))*(L.buzz>0?1.5:1);
+      let gross=K.base*lm*mul*(1+(rnd()-.5)*2*K.vol)*(L.t==='cab'?.3:1),cost=(K.rent+K.wage)*lm;
+      if(L.t==='cab'){const out=[];(L.cast||[]).forEach(c=>{c.days++;let x=c.pow/10*4e6*lm*mul*(.6+rnd()*.8);if(rnd()<.03)x*=3;x=Math.round(x);c.sales+=x;gross+=x;cost+=c.wage;if(c.days>20&&rnd()<.003)out.push(c);});
+        out.forEach(c=>{L.cast.splice(L.cast.indexOf(c),1);msgs.push(`【${L.nm}】 キャバ嬢の ${c.n}が\n${rnd()<.5?'他店に 引き抜かれて しまった…':'寿退店 した！ おめでとう！'}`);});}
+      const e=rnd();
+      if(e<.006){L.buzz=10;msgs.push(`【${L.nm}】 SNSで 話題に なった！\n10日間 売上 1.5倍！`);}
+      else if(e<.01){L.rep=Math.max(.4,Math.round((L.rep-.1)*100)/100);msgs.push(`【${L.nm}】 悪い 口コミが 広まった…\n評判が 下がった。`);}
+      else if(e<.014){L.rep=Math.min(2.5,Math.round((L.rep+.08)*100)/100);msgs.push(`【${L.nm}】 常連客が 増えてきた！\n評判が 上がった。`);}
+      if(L.since!=null&&G.day-L.since<=30&&L.rep<1)L.rep=Math.min(1,Math.round((L.rep+.007)*1000)/1000);
+      let p=gross-cost;if(p>0)p*=1-tx;p=Math.round(p);L.last=p;L.tot=(L.tot||0)+p;net+=p;});}
+  if(net&&G.bank){G.bank.sav=Math.max(0,G.bank.sav+net);G.kanAcc=(G.kanAcc||0)+net;}
+  if(G.day%10===0&&G.kanAcc){msgs.push(`【歓楽街の 決算】 この 10日の 収支\n${G.kanAcc>=0?'+':''}${fmt(G.kanAcc)}イェソ\n（毎日 普通預金に 反映済み）`);G.kanAcc=0;}
+  return msgs;}
+/* 歓楽街の 中 */
+function buildKanraku(vi){const w=19,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kanst'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'kanwall',x};C[h-1][x]={t:'kanwall',x:x+3};}for(let y=0;y<h;y++){C[y][0]={t:'kanwall',x:y};C[y][w-1]={t:'kanwall',x:y+5};}
+  for(const y of [1,2])for(let x=1;x<w-1;x++)C[y][x]={t:'kanwall',x:x+y};
+  for(const y of [9,10])for(let x=1;x<w-1;x++)if(x<8||x>10)C[y][x]={t:'kanwall',x:x+y};
+  [[1,1],[8,1],[15,1],[1,9],[4,9],[12,9]].forEach(([x0,y0],L)=>{for(let dx=0;dx<3;dx++){C[y0][x0+dx]={t:'kshop',L,dx,part:'sign'};C[y0+1][x0+dx]={t:'kshop',L,dx,part:'front'};}});
+  C[3][5]={t:'lamp'};C[3][12]={t:'lamp'};C[8][14]={t:'lamp'};C[8][4]={t:'lamp'};
+  C[h-1][9]={t:'exit'};
+  const n=isNight(),npcs=[{x:6,y:5,col:'#000000',hair:'#bcbcbc',line:n?'呼び込み「お兄さん、 1セット いかがっすか〜！\n今なら 指名料 無料っすよ！」':'呼び込み「…まだ 準備中っす。\n夜に また 来てくださいよ」'},
+    {x:13,y:6,col:'#24188c',hair:'#f8d878',line:n?'酔っぱらい「ういっく… もう 一軒 いくぞぉ〜」':'掃除の おじさん「夜の あとは ゴミが すごいんじゃ」'},
+    {x:3,y:7,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'},
+    {x:16,y:4,col:'#f878f8',hair:'#f8b800',line:n?'キャバ嬢「今日は 同伴 なんだ〜。\nあ、 今度 お店にも 来てね！」':'若い 女性「夜は この 街で 働いてるの。\n昼は 寝る 時間よ」'}];
+  return{kanIn:true,title:`${VIL[vi].name.replace(/^.* /,'')} 歓楽街`,vi,v:VIL[vi],w,h,cx:9,C,npcs,city:true,sz:VIL[vi].size,px:9,py:h-2,top:0};}
+function enterKanraku(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKanraku(curVil);kanSt(curVil);townScr.mv=null;setBase(townScr);sfx('bell');toast(isNight()?'ネオンが まぶしい 夜の 歓楽街だ':'昼の 歓楽街は 静まりかえっている');}
+function kanShopCell(c,sx,sy){const L=TW&&TW.kanIn?kanSt(TW.vi).lots[c.L]:null;if(!L)return;const K=L.t?KAN[L.t]:null,n=isNight();
+  if(c.part==='sign'){R(sx,sy,16,16,'#101018');
+    if(!K){R(sx,sy+5,16,6,'#5c5c5c');if(c.dx===2)txt('空き店舗',sx-8,sy+5,'#bcbcbc','center',44);return;}
+    const lit=kanOpen(L.t)&&(n||L.t==='karaoke'||L.t==='concafe'),on=lit&&((frame>>5)+c.L)%9!==0,col=on?K.col:'#4c4c5c';
+    R(sx,sy+3,16,1,col);R(sx,sy+12,16,1,col);if(c.dx===0)R(sx,sy+3,1,10,col);if(c.dx===2)R(sx+15,sy+3,1,10,col);
+    if(c.dx===2){txt(K.sh,sx-8,sy+4,on?'#fcfcfc':'#8c8c9c','center',42);if(L.own)txt('★',sx+10,sy+4,'#f8b800','center');}return;}
+  if(!K){R(sx,sy,16,16,'#7c7c7c');for(let y=2;y<16;y+=3)R(sx,sy+y,16,1,'#5c5c5c');if(c.dx===1){R(sx+1,sy+4,14,8,'#fcfcfc');txt('募集',sx+8,sy+4,'#d82800','center',14);}return;}
+  R(sx,sy,16,16,'#3c2c3c');R(sx,sy,16,2,K.col);const op=kanOpen(L.t);
+  if(c.dx===1){R(sx+4,sy+4,8,12,op?'#f8d878':'#24242c');if(op)R(sx+7,sy+9,2,2,'#a05000');}
+  else{R(sx+2,sy+5,12,7,'#24242c');if(op){R(sx+3,sy+6,10,5,K.col);ctx.globalAlpha=.55;R(sx+3,sy+6,10,5,'#000');ctx.globalAlpha=1;}}}
+function kanBump(c){if(c.t==='kshop'){kanEnter(TW.vi,c.L);return true;}
+  if(c.t==='kanwall'){dialog(isNight()?'雑居ビルの 窓に 明かりが ともっている。':'雑居ビルだ。 昼間は ひっそり している。');return true;}return false;}
+function kanLot(vi,i){const L=kanSt(vi).lots[i];
+  if(!L.t){if(!reOn()){dialog(['「テナント募集中」の 貼り紙が ある。','（不動産業が 解放されると 契約できる）']);return;}
+    dialog(['「テナント募集中」','不動産屋「ここで 店を 開くなら\n業態を 選んでくださいね」'],()=>kanTenant(vi,i));return;}
+  if(L.own){kanOwn(vi,i);return;}
+  const K=KAN[L.t],price=kanSucc(vi,L),ops=['客として 入る',...(reOn()?[`事業継承で 買う（${fmt(price)}）`]:[]),'やめる'];
+  choice(`${K.n}「${L.nm}」\n評判 ${'★'.repeat(Math.max(1,Math.min(5,Math.round(L.rep*2.5))))}　${kanOpen(L.t)?'営業中':'準備中'}（${kanHrs(L.t)}）`,ops,k=>{
+    if(k===0)kanVisit(vi,i);else if(k===1&&ops.length===3)kanBuy(vi,i,price);},150);}
+function kanTenant(vi,i){const lm=landMul(vi);
+  listPick('どの 業態で 出店する？',KANK.map(t=>({t:KAN[t].n,r:fmt(Math.round(KAN[t].setup*lm))})),k=>{const t=KANK[k],K=KAN[t],cost=Math.round(K.setup*lm);
+    choice(`${K.n}を 出店（テナント契約）\n保証金・内装費 ${fmt(cost)}イェソ\n家賃 ${fmt(Math.round(K.rent*lm))}／日　人件費 ${fmt(Math.round(K.wage*lm))}／日`,['契約する','やめる'],r=>{if(r!==0)return;
+      askText('お店の 名前を 決めてください',[{label:'店名（12文字まで）',placeholder:KAN_NM[t][0],max:12}],v=>{if(!v)return;const nm=String(v[0]||'').trim()||KAN_NM[t][Math.floor(rnd()*KAN_NM[t].length)];
+        rePay(cost,()=>{const L=kanSt(vi).lots[i];Object.assign(L,{t,own:1,nm,rep:.8,lv:0,cast:[],since:G.day,tot:0,last:0,paid:cost,buzz:0});sfx('lvup');save();
+          dialog([`テナント契約 完了！\n${K.n}「${nm}」を オープンした！`,'開店 直後は 評判が 低め。\n30日ほどで 客が 定着する。',...(t==='cab'?['キャバクラは キャバ嬢が いないと\n売上が 伸びない。\n（店に 話しかけて 面接しよう）']:[]),'毎日の 収支は 普通預金に 入る。\n（赤字の 日は 引かれる）']);});});},96);},
+    k=>{const t=KANK[k];if(!t)return'';const K=KAN[t];return`${K.n}　営業 ${kanHrs(t)}\n家賃 ${fmt(Math.round(K.rent*lm))}／日\n売上の 目安 ${fmt(Math.round(K.base*lm*(t==='cab'?.3:1)))}／日${t==='cab'?'＋キャバ嬢':''}`;});}
+function kanBuy(vi,i,price){const L=kanSt(vi).lots[i],K=KAN[L.t];
+  choice(`事業継承：${K.n}「${L.nm}」\n${fmt(price)}イェソ\nスタッフ・常連客ごと 引き継ぐ`,['買う','やめる'],r=>{if(r!==0)return;
+    rePay(price,()=>{Object.assign(L,{own:1,since:G.day-60,tot:0,last:0,paid:price,buzz:0});
+      if(L.t==='cab'){const rr=lcg(G.day*13+vi*7+i),lm=landMul(vi);L.cast=[];const n=3+Math.floor(rr()*3);for(let k=0;k<n;k++)L.cast.push(mkCast(rr,lm));}
+      sfx('lvup');save();dialog([`${K.n}「${L.nm}」を\n事業継承で 手に入れた！`,'前の オーナー「あとは 頼みましたよ」',...(L.t==='cab'?[`在籍 キャバ嬢 ${L.cast.length}人も 引き継いだ。`]:[])]);});},96);}
+function kanOwn(vi,i){const L=kanSt(vi).lots[i],K=KAN[L.t],lm=landMul(vi);
+  const head=`【オーナー】${K.n}「${L.nm}」\n評判 ${L.rep.toFixed(2)}　内装Lv${L.lv||0}${L.buzz>0?'　話題沸騰中！':''}\n前日の 収支 ${(L.last||0)>=0?'+':''}${fmt(L.last||0)}`;
+  const ops=['経営状況',...(L.t==='cab'?[{t:'キャバ嬢の 管理',col:'#f878f8'}]:[]),'内装を 改装する','客として 入る','店名を 変える','手放す','やめる'];
+  choice(head,ops,k=>{if(k<0||!ops[k])return;const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
+    if(lab==='経営状況'){const days=Math.max(0,G.day-(L.since||G.day));dialog([`${K.n}「${L.nm}」\n営業 ${days}日目　評判 ${L.rep.toFixed(2)}\n累計 収支 ${(L.tot||0)>=0?'+':''}${fmt(L.tot||0)}イェソ`,
+      `家賃 ${fmt(Math.round(K.rent*lm))}／日\n人件費 ${fmt(Math.round(K.wage*lm))}／日`+(L.t==='cab'?`\nキャバ嬢 ${L.cast.length}人（日給 計 ${fmt(L.cast.reduce((a,c)=>a+c.wage,0))}）`:''),'評判は 改装・口コミ・SNSで 変わる。\n内装Lvごとに 売上 +12%。'],()=>kanOwn(vi,i));return;}
+    if(lab==='キャバ嬢の 管理'){castScr(vi,i);return;}
+    if(lab==='内装を 改装する'){if((L.lv||0)>=5){dialog('もう 最高級の 内装だ。',()=>kanOwn(vi,i));return;}const c=Math.round(K.setup*lm*.4*((L.lv||0)+1));
+      choice(`内装を 改装する（Lv${L.lv||0}→${(L.lv||0)+1}）\n費用 ${fmt(c)}イェソ\n売上 +12%・評判 少し アップ`,['改装する','やめる'],r=>{if(r!==0){kanOwn(vi,i);return;}
+        rePay(c,()=>{L.lv=(L.lv||0)+1;L.rep=Math.min(2.5,Math.round((L.rep+.1)*100)/100);L.paid=(L.paid||0)+c;sfx('lvup');save();dialog(`改装 完了！ 内装Lv${L.lv}に なった。`,()=>kanOwn(vi,i));});},96);return;}
+    if(lab==='客として 入る'){kanVisit(vi,i);return;}
+    if(lab==='店名を 変える'){askText('新しい 店名',[{label:'店名（12文字まで）',placeholder:L.nm,max:12}],v=>{if(!v)return;const nm=String(v[0]||'').trim();if(nm){L.nm=nm;save();toast(`店名を「${nm}」に 変えた`);}});return;}
+    if(lab==='手放す'){const get=Math.round((L.paid||K.setup*lm)*.6);
+      choice(`「${L.nm}」を 事業譲渡する\n${fmt(get)}イェソで 売れる（投資額の 6割）`,['売る','やめる'],r=>{if(r!==0){kanOwn(vi,i);return;}L.own=0;L.cast=[];noCount(()=>{G.coins+=get;});sfx('coin');save();dialog(`「${L.nm}」を 手放した。\n${fmt(get)}イェソを 受け取った。`);},96);return;}
+  },150);}
+function castScr(vi,i){const L=kanSt(vi).lots[i];L.cast=L.cast||[];
+  choice(`「${L.nm}」 在籍 キャバ嬢 ${L.cast.length}/${CAST_MAX}人`,['面接する（新人を 採用）','在籍 キャバ嬢','売上 ランキング','もどる'],k=>{
+    if(k===0){if(L.cast.length>=CAST_MAX){dialog('もう 在籍が いっぱいだ。',()=>castScr(vi,i));return;}
+      if(L.itv===G.day){dialog('今日の 面接は もう 終わった。\n（明日 また 応募者が 来る）',()=>castScr(vi,i));return;}
+      const r=lcg(G.day*977+vi*31+i*7),lm=landMul(vi),A=[0,1,2].map(()=>mkCast(r,lm));
+      listPick('今日の 応募者（1日 1人 採用できる）',A.map(c=>({t:(c.lg?'★':'')+c.n,r:'指名力 '+c.pow,col:c.lg?'#f8b800':null})),j=>{const c=A[j];
+        choice(`${c.n}を 採用しますか？\n入店祝い金 ${fmt(c.fee)}イェソ\n日給 ${fmt(c.wage)}イェソ`,['採用する','やめる'],r2=>{if(r2!==0){castScr(vi,i);return;}
+          rePay(c.fee,()=>{L.cast.push(c);L.itv=G.day;sfx('lvup');save();dialog([c.lg?`★伝説の キャバ嬢 ${c.n}が 入店した！！`:`${c.n}が 入店した！`,`${c.n}「よろしく お願いしまーす！」`],()=>castScr(vi,i));});},96);},
+        j=>{const c=A[j];return c?castLine(c):'';});return;}
+    if(k===1){if(!L.cast.length){dialog('在籍している キャバ嬢は いない。',()=>castScr(vi,i));return;}
+      listPick('在籍 キャバ嬢',L.cast.map(c=>({t:(c.lg?'★':'')+c.n,r:'指名力 '+c.pow,col:c.lg?'#f8b800':null})),j=>{const c=L.cast[j];
+        choice(`${c.n}　在籍 ${c.days}日\n指名力 ${c.pow}　日給 ${fmt(c.wage)}`,['昇給する（指名力 +1）','卒業させる','もどる'],r2=>{
+          if(r2===0){const cost=c.wage*10;choice(`昇給して やる気を 上げる\n費用 ${fmt(cost)}イェソ（日給も 8% 上がる）`,['昇給する','やめる'],r3=>{if(r3!==0){castScr(vi,i);return;}
+            rePay(cost,()=>{c.pow++;c.wage=Math.round(c.wage*1.08);save();dialog(`${c.n}「ありがとう ございます！\nもっと がんばります！」`,()=>castScr(vi,i));});},96);return;}
+          if(r2===1){L.cast.splice(L.cast.indexOf(c),1);save();dialog(`${c.n}は お店を 卒業した。\n${c.n}「今まで ありがとう ございました！」`,()=>castScr(vi,i));return;}castScr(vi,i);},120);},
+        j=>{const c=L.cast[j];return c?castLine(c):'';});return;}
+    if(k===2){if(!L.cast.length){dialog('在籍している キャバ嬢は いない。',()=>castScr(vi,i));return;}const S=[...L.cast].sort((a,b)=>b.sales-a.sales),pg=[];
+      S.slice(0,9).forEach((c,k2)=>{const l=`${k2+1}位 ${c.lg?'★':''}${c.n}　${fmt(c.sales)}`;if(k2%3===0)pg.push(l);else pg[pg.length-1]+='\n'+l;});
+      dialog(['【売上 ランキング】',...pg,`今月の No.1は ${S[0].n}！`],()=>castScr(vi,i));return;}
+  },150);}
+/* お店の 中（テナントに 入れる） */
+const KFLC={cab:['#5c0028','#740034'],lounge:['#1c1c3c','#24244c'],gay:['#3c1c00','#4c2808'],concafe:['#f8d8e8','#fce8f0'],karaoke:['#24243c','#2c2c4c'],snack:['#3c2400','#4c3008'],none:['#7c7c7c','#8c8c8c']};
+function buildKanShop(vi,i){const L=kanSt(vi).lots[i],t=L.t||'none',w=13,h=10,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kanfl',k:t,x,y});}
+  for(let x=0;x<w;x++){C[0][x]={t:'kiwall',k:t};C[h-1][x]={t:'kiwall',k:t};}for(let y=0;y<h;y++){C[y][0]={t:'kiwall',k:t};C[y][w-1]={t:'kiwall',k:t};}
+  C[h-1][6]={t:'exit'};const npcs=[],own=!!L.own;
+  const seat=(x0,y0)=>{for(let dx=0;dx<3;dx++)C[y0][x0+dx]={t:'ksofa',dx,k:t};C[y0+1][x0+1]={t:'ktable',k:t};};
+  if(t==='cab'||t==='lounge'||t==='concafe'){C[0][4]={t:'kchand',k:t};C[0][8]={t:'kchand',k:t};seat(2,2);seat(8,2);seat(2,5);seat(8,5);
+    npcs.push({x:7,y:8,col:t==='concafe'?'#fcfcfc':'#000000',hair:t==='concafe'?'#f8b800':'#3c3c3c',kan:'visit',line:''});
+    if(t==='cab'){const cs=(L.cast||[]).slice(0,6),P=[[2,3],[4,3],[8,3],[10,3],[2,6],[4,6]];cs.forEach((c,k)=>npcs.push({x:P[k][0],y:P[k][1],col:['#f878f8','#fcfcfc','#d82800','#a4b4fc','#f8d878','#7ee0fc'][k],hair:k%2?'#f8b800':'#7c4c10',cast:c.n,line:`${c.lg?'★':''}${c.n}「${['いらっしゃいませ〜！','今日も 来てくれたの？ うれしい！','オーナー、 お疲れさまです♪','次は 指名 してね！','シャンパン… 入れちゃう？','がんばって No.1 めざします！'][k]}」`}));}
+    if(t==='lounge')npcs.push({x:3,y:4,col:'#a4b4fc',hair:'#000000',line:'ホステス「ごゆっくり どうぞ。\nママも すぐ 参りますわ」'});
+    if(t==='concafe')npcs.push({x:9,y:4,col:'#fcfcfc',hair:'#f878f8',line:'メイド「ご主人さま、\n本日も おつかれさまです♪」'});}
+  else if(t==='gay'||t==='snack'){for(let x=2;x<=10;x++)C[3][x]={t:'kbar',k:t};seat(2,5);seat(8,5);
+    npcs.push({x:6,y:2,col:t==='gay'?'#d82800':'#a05000',hair:t==='gay'?'#f8d878':'#000000',kan:'mama',line:''});
+    npcs.push({x:3,y:4,col:'#24188c',hair:'#7c7c7c',line:t==='gay'?'常連客「ここの ママの 話を 聞くと\n元気が 出るんだよ」':'常連客「この 店に 来ると\n実家に 帰った 気が するんだよなあ」'});}
+  else if(t==='karaoke'){for(const x of [2,4,6,8,10])C[0][x]={t:'kroom',k:t,n:(x/2)};for(let x=8;x<=10;x++)C[6][x]={t:'kbar',k:t};
+    npcs.push({x:9,y:5,col:'#f87800',hair:'#000000',kan:'visit',line:''});npcs.push({x:3,y:4,col:'#00a800',hair:'#7c4c10',line:'学生「フリータイム、 朝まで いくっしょ！」'});}
+  else{npcs.push({x:6,y:4,col:'#503000',hair:'#5c5c5c',kan:'tenant',line:''});C[2][2]={t:'ktable',k:t};}
+  if(own)C[0][11]={t:'koffice',k:t};
+  return{kanShop:true,lot:i,title:L.t?`${KAN[L.t].n}「${L.nm}」`:'空き店舗',vi,v:VIL[vi],w,h,cx:6,C,npcs,city:true,sz:VIL[vi].size,px:6,py:h-2,top:0};}
+let kanShopPrev=null;
+function kanEnter(vi,i){const L=kanSt(vi).lots[i];
+  if(L.t&&!L.own&&!kanOpen(L.t)){dialog(`「${L.nm}」は 準備中だ。\n（営業 ${kanHrs(L.t)}）`);return;}
+  kanShopPrev={TW,px:TW.px,py:TW.py};TW=buildKanShop(vi,i);townScr.mv=null;setBase(townScr);sfx('bell');
+  toast(L.t?(L.own?`オーナー として ${L.nm}に 入った`:`${KAN[L.t].n}「${L.nm}」に 入った`):'空き店舗に 入った');}
+function exitKanShop(){const p=kanShopPrev;kanShopPrev=null;if(!p){exitJogai();return;}TW=p.TW;TW.px=p.px;TW.py=p.py;townScr.mv=null;setBase(townScr);}
+function kanNpc(npc){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
+  if(npc.kan==='tenant'){if(!reOn()){dialog(['不動産屋「ここは テナント 募集中です」','（不動産業が 解放されると 契約できる）']);return;}dialog(['不動産屋「この 物件で お店を 開きますか？」'],()=>kanTenant(vi,i));return;}
+  if(!L.t)return;const K=KAN[L.t];
+  if(!kanOpen(L.t)){dialog(L.own?`${npc.kan==='mama'?'ママ':'スタッフ'}「オーナー、 おはようございます。\n開店は ${K.open[0]}時からです」`:'「…まだ 準備中です」');return;}
+  const greet={cab:'黒服「いらっしゃいませ。\nご指名は ございますか？」',lounge:'黒服「いらっしゃいませ。 お席へ ご案内いたします」',concafe:'メイド「おかえりなさいませ、 ご主人さま♪」',karaoke:'受付「いらっしゃいませ！\nお時間は どうなさいますか？」',gay:'ママ「あら〜 いらっしゃい！\nなに 飲む？」',snack:'ママ「いらっしゃい。\nゆっくり していきなさいね」'}[L.t];
+  dialog(greet,()=>kanVisit(vi,i));}
+function kanShopBump(c){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
+  if(c.t==='koffice'){kanOwn(vi,i);return true;}
+  if(c.t==='kbar'){if(L.t)kanNpc({kan:'visit'});return true;}
+  if(c.t==='kroom'){if(L.t==='karaoke'){if(!kanOpen('karaoke')){dialog('「…まだ 準備中です」');return true;}dialog(`${c.n}番 ルーム。\n中から 歌声が 聞こえる…`,()=>kanVisit(vi,i));}return true;}
+  if(c.t==='ksofa'||c.t==='ktable'){dialog(L.t==='cab'||L.t==='lounge'?'ふかふかの ソファ席だ。\nテーブルに グラスが 並んでいる。':'テーブル席だ。');return true;}
+  if(c.t==='kchand'){dialog('きらびやかな シャンデリアだ。');return true;}
+  return false;}
+function kanShopDraw(c,sx,sy){const P=KFLC[c.k]||KFLC.none,K=KAN[c.k];
+  switch(c.t){
+    case 'kanfl':R(sx,sy,16,16,P[0]);if(((c.x+c.y)&1)===0)R(sx+2,sy+2,12,12,P[1]);break;
+    case 'kiwall':R(sx,sy,16,16,c.k==='concafe'?'#f8b8d8':'#24101c');R(sx,sy+12,16,2,K?K.col:'#5c5c5c');R(sx,sy+14,16,2,'#000');break;
+    case 'kchand':R(sx,sy,16,16,c.k==='concafe'?'#f8b8d8':'#24101c');R(sx+7,sy,2,4,'#f8b800');R(sx+3,sy+4,10,3,'#f8b800');for(let k=0;k<4;k++)R(sx+3+k*3,sy+7+((frame>>4)+k)%2,1,3,'#fcfcfc');break;
+    case 'ksofa':R(sx,sy+3,16,12,'#a80020');R(sx,sy+3,16,3,'#d82800');if(c.dx===0)R(sx,sy+3,3,12,'#740014');if(c.dx===2)R(sx+13,sy+3,3,12,'#740014');break;
+    case 'ktable':R(sx+2,sy+4,12,8,'#3c2400');R(sx+3,sy+5,10,6,'#7c4c10');R(sx+5,sy+3,2,4,'#a4e4fc');R(sx+9,sy+3,2,4,'#f8d878');break;
+    case 'kbar':R(sx,sy,16,16,'#503000');R(sx,sy,16,4,'#a05000');R(sx,sy+4,16,1,'#f8b800');R(sx+3,sy+8,2,6,'#7c4c10');R(sx+11,sy+8,2,6,'#7c4c10');break;
+    case 'kroom':R(sx,sy,16,16,'#24101c');R(sx+2,sy+2,12,14,'#3c3c5c');R(sx+4,sy+4,8,5,((frame>>4)+c.n)%3?'#f878f8':'#7ee0fc');txt(String(c.n),sx+8,sy+9,'#fcfcfc','center');break;
+    case 'koffice':R(sx,sy,16,16,'#24101c');R(sx+3,sy+2,10,14,'#5c5c5c');R(sx+3,sy+4,10,5,'#fcfcfc');txt('STAFF',sx+8,sy+4,'#000','center',10);R(sx+10,sy+11,2,2,'#f8b800');break;}}
+/* 客として 遊ぶ（お金の 使い道） */
+const GAY_ADV=['ママ「人生 なんて ね、 ガチャと 同じよ。\n引くまで 結果は わからないの」','ママ「落ち込む ひまが あったら\n鍛錬場で 汗 流しなさい！」','ママ「あんた いい顔 してるわよ。\n自信 持ちなさい」','ママ「お金は 使ってこそ 生きるのよ。\n…だから ここで 使って いきなさい♡」','ママ「本当に 強い 人はね、\n負けた 日の 夜に 笑える 人よ」'];
+const KARA_SONG=['八百万クエストの テーマ','ふるさとの 鳥居','恋の 大祓','夜明けの 参道','ガチャ 回して 涙 ぽろり'];
+function kanVisit(vi,i){const L=kanSt(vi).lots[i],K=KAN[L.t],lm=landMul(vi);
+  if(!kanOpen(L.t)){dialog(`「${L.nm}」は 準備中だ。\n（営業 ${kanHrs(L.t)}）`);return;}
+  const own=!!L.own,p=Math.round(K.cust*lm),cs=x=>own?0:x,cn=()=>L.cast&&L.cast.length?L.cast[Math.floor(rnd()*L.cast.length)].n:CAST_N[Math.floor(rnd()*CAST_N.length)];
+  const go=(cost,pages,eff)=>{const run=()=>{timeAdd(60);if(eff)eff();save();dialog(own?[...pages,'（オーナー なので 無料）']:pages);};if(cost>0)rePay(cost,run);else run();};
+  const mood=n=>{G.morning=Math.max(G.morning||0,n);};
+  const M={cab:[['セット料金',p,()=>{const n=cn();return[`${n}「いらっしゃいませ〜！\n${L.nm}へ ようこそ！」`,`${n}と 楽しく 話した。\n…気分が 上がった！（3戦 経験値書 2割増し）`];},()=>mood(3)],
+      ['シャンパンを 入れる',p*10,()=>{const n=cn();return[`${n}「え〜！ ありがとう〜！」`,'ポンッ！ 店内に シャンパンコールが ひびく！','気分 最高！（5戦 経験値書 2割増し）'];},()=>mood(5)],
+      ['シャンパンタワー',p*100,()=>['黄金の シャンパンタワーが そびえ立つ！',`${cn()}「すごーい！！ 伝説に なっちゃう！」`,'店内が 大歓声に 包まれた！\nHP・MPが 回復し 気分は 絶頂！（10戦 2割増し）'],()=>{mood(10);fullHeal();}]],
+    lounge:[['セット料金',p,()=>['落ち着いた 照明と ピアノの 音色…','ママ「ゆっくり していってくださいね」\n…気分が 上がった！（3戦 経験値書 2割増し）'],()=>mood(3)],
+      ['高級 ブランデーを 入れる',p*20,()=>['琥珀色の ブランデーが グラスに 注がれる。','ママ「お目が 高いわね」\n心が 満たされた！（6戦 2割増し）'],()=>{mood(6);fullHeal();}]],
+    gay:[['飲む',p,()=>['「いらっしゃ〜い！ あら、 いい男！」','楽しい トークで 笑い 疲れた。\nHP・MPが 回復した！'],()=>fullHeal()],
+      ['ママに 人生相談',p*2,()=>['「なになに？ ママに 話して ごらん」',GAY_ADV[Math.floor(rnd()*GAY_ADV.length)],'心が 軽くなった！ HP・MPが 回復し\n気分が 上がった！（3戦 2割増し）'],()=>{fullHeal();mood(3);}]],
+    concafe:[['入店（チャージ）',p,()=>[`「おかえりなさいませ〜！\n${L.nm}へ ようこそ♪」`,'かわいい 店内で ひと休みした。'],null],
+      ['オムライス（おまじない付き）',p*2,()=>['「おいしくな〜れ♪ 萌え萌え きゅん♪」','オムライスに ケチャップで\nハートが 描かれた！','HP・MPが 回復した！'],()=>fullHeal()],
+      ['記念チェキを 撮る',p*3,()=>[`${cn()}と チェキを 撮った！`,'いい 思い出に なった。\n気分が 上がった！（3戦 2割増し）'],()=>mood(3)]],
+    karaoke:[['1時間 歌う',p,()=>{const sc=60+Math.floor(rnd()*41),sg=KARA_SONG[Math.floor(rnd()*KARA_SONG.length)];if(sc>=100)G.items.urtk=(G.items.urtk||0)+1;
+        return[`「${sg}」を 熱唱した！`,`採点：${sc}点${sc>=100?'！！ 満点だ！':sc>=90?'！ うまい！':'。'}`,...(sc>=100?['満点 賞品として\nUR確定チケット ×1を もらった！']:[]),'スッキリした！ HP・MPが 回復した！'];},()=>fullHeal()],
+      ['フリータイム（朝まで）',p*4,()=>['仲間と 朝まで 歌い明かした！','声が かれたが 気分は 最高！\nHP・MPが 回復した！（5戦 2割増し）'],()=>{fullHeal();mood(5);}]],
+    snack:[['ボトルを 入れる',p,()=>['ママ「あら、 いらっしゃい。\nいつもの で いい？」','常連 気分で くつろいだ。\nHP・MPが 回復した！'],()=>fullHeal()],
+      ['ママと デュエット',p*2,()=>['ママと 昭和の 名曲を デュエット！','常連客から 拍手が わいた！\n気分が 上がった！（3戦 2割増し）'],()=>{fullHeal();mood(3);}]]}[L.t];
+  choice(`${K.n}「${L.nm}」\nどう 楽しむ？`,[...M.map(m=>`${m[0]}（${own?'無料':fmt(m[1])}）`),'やめる'],k=>{if(k<0||!M[k])return;const m=M[k];go(cs(m[1]),m[2](),m[3]);},150);}
 /* ===================== 場外発売所（馬券・舟券） ===================== */
 let jogaiPrev=null;
 function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
