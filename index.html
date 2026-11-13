@@ -2449,8 +2449,10 @@ function drawCell(c,sx,sy,city){
       const q=((frame>>1)+c.k*7)%14;if(bt){R(sx+2+q,sy+5,3,2,'#fcfcfc');R(sx+2+((q+5)%12),sy+9,3,2,'#f8b800');}else{R(sx+2+q,sy+4,3,2,'#7c4c10');R(sx+2+((q+4)%12),sy+9,3,2,'#7c4c10');}R(sx+6,sy+13,4,3,'#3c3c3c');break;}
     case 'bwin':R(sx,sy,16,16,'#003c8c');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#68ccfc');R(sx+5,sy+10,6,6,'#0058f8');R(sx+1,sy+12,14,1,'#fcfcfc');txtS('舟',sx+8,sy+3,'#000','center');break;
     case 'kseat':R(sx,sy,16,16,'#bcb49c');for(const x of [1,9]){R(sx+x,sy+3,6,6,'#d82800');R(sx+x,sy+9,6,3,'#a81000');R(sx+x+1,sy+12,1,3,'#3c3c3c');R(sx+x+4,sy+12,1,3,'#3c3c3c');}break;
-    case 'kbooth':{R(sx,sy,16,16,'#bcb49c');R(sx,sy,16,5,'#f87800');R(sx,sy+5,16,1,'#a05000');R(sx+1,sy+6,14,9,'#fcfcfc');R(sx+1,sy+12,14,3,'#f8b800');txtS(['う','ど','ん'][c.dx],sx+8,sy-1,'#fcfcfc','center');if(c.dx===1){R(sx+5,sy+7,6,4,'#a05000');R(sx+6,sy+8,4,2,'#f8d878');}else{R(sx+4,sy+7,8,3,'#5c5c5c');}if(c.dx===0)R(sx,sy,1,16,'#a05000');if(c.dx===2)R(sx+15,sy,1,16,'#a05000');break;}
-    case 'kfood':if(c.shop==='ramen'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#000');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+2,sy+5,12,3,'#d82800');R(sx+3,sy+9,10,2,'#fcfcfc');txtS(c.dx?'メ':'ラ',sx+8,sy-1,'#fcfcfc','center');if(c.dx){R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');}else{R(sx+4,sy+8,8,3,'#fcfcfc');R(sx+5,sy+6,1,2,'#bcbcbc');R(sx+9,sy+5,1,3,'#bcbcbc');}R(sx+1,sy+12,14,4,'#503000');break;}
+    case 'kbooth':{const ab=c.shop==='abura';R(sx,sy,16,16,'#bcb49c');R(sx,sy,16,5,ab?'#000000':'#f87800');R(sx,sy+5,16,1,ab?'#d82800':'#a05000');R(sx+1,sy+6,14,9,'#fcfcfc');R(sx+1,sy+12,14,3,ab?'#d82800':'#f8b800');txtS((ab?['脂','蕎','麦']:['う','ど','ん'])[c.dx],sx+8,sy-1,ab?'#f8b800':'#fcfcfc','center');if(c.dx===1){R(sx+5,sy+7,6,4,'#a05000');R(sx+6,sy+8,4,2,'#f8d878');}else{R(sx+4,sy+7,8,3,'#5c5c5c');}if(c.dx===0)R(sx,sy,1,16,'#a05000');if(c.dx===2)R(sx+15,sy,1,16,'#a05000');break;}
+    case 'kfood':if(c.shop==='tako'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,c.dx?'#f8b800':'#d82800');R(sx+1,sy+5,14,7,'#a05000');R(sx+3,sy+6,10,4,'#3c3c3c');for(let k=0;k<3;k++)pc(sx+5+k*3,sy+8,1,'#e45c10');txtS(c.dx?'こ':'た',sx+8,sy-1,'#fcfcfc','center');R(sx+1,sy+12,14,4,'#503000');break;}
+      if(c.shop==='tori'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#3c3c3c');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+3,sy+8,10,2,'#d82800');for(let k=0;k<3;k++)R(sx+4+k*3,sy+6,1,4,'#bcbcbc');if((frame>>3)&1)R(sx+5,sy+2+((frame>>2)&1),6,2,'#bcbcbc');txtS(c.dx?'鳥':'焼',sx+8,sy-1,'#fcfcfc','center');if(c.dx)R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');R(sx+1,sy+12,14,4,'#503000');break;}
+      if(c.shop==='ramen'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#000');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+2,sy+5,12,3,'#d82800');R(sx+3,sy+9,10,2,'#fcfcfc');txtS(c.dx?'メ':'ラ',sx+8,sy-1,'#fcfcfc','center');if(c.dx){R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');}else{R(sx+4,sy+8,8,3,'#fcfcfc');R(sx+5,sy+6,1,2,'#bcbcbc');R(sx+9,sy+5,1,3,'#bcbcbc');}R(sx+1,sy+12,14,4,'#503000');break;}
       R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,4,c.dx?'#d82800':'#fcfcfc');R(sx+1,sy+4,14,8,'#a05000');R(sx+3,sy+5,10,4,'#3c3c3c');R(sx+4,sy+6,8,2,'#f8b800');if(!c.dx)txtS('焼',sx+8,sy,'#000','center');else txtS('う',sx+8,sy,'#fcfcfc','center');break;
     case 'kown':R(sx,sy,16,16,'#3c2800');R(sx+3,sy+2,10,14,'#7c4c10');R(sx+3,sy+2,10,2,'#f8b800');R(sx+10,sy+9,2,2,'#f8b800');break;
     case 'moat':R(sx,sy,16,16,'#0038a8');R(sx,sy,16,3,'#8c8c8c');R(sx,sy+3,16,1,'#5c5c5c');for(let k=0;k<3;k++)R(sx+((k*6+(frame>>3)+c.dx*3)%14),sy+6+k*3,3,1,'#3cbcfc');if(((frame>>4)+c.dx)%5===0)R(sx+5,sy+9,4,2,'#f878f8');break;
@@ -4769,15 +4771,18 @@ function buildKeibajo(vi0){const w=21,h=17,C=[];for(let y=0;y<h;y++){C.push([]);
   for(let k=0;k<5;k++)C[7][2+k]={t:'kwin',k};for(let k=0;k<5;k++){C[6][13+k]={t:'kboard',k};C[7][13+k]={t:'kboard',k:k+5};}
   C[7][9]={t:'kown'};
   for(let dy=0;dy<4;dy++)for(let dx=0;dx<6;dx++)C[10+dy][13+dx]={t:'kpad',dx,e:dy===0?1:dy===3?2:(dy===1?0:3)};
-  C[12][2]={t:'kfood',dx:0,shop:'yaki'};C[12][3]={t:'kfood',dx:1,shop:'yaki'};C[10][2]={t:'kfood',dx:0,shop:'ramen'};C[10][3]={t:'kfood',dx:1,shop:'ramen'};
-  for(let dx=0;dx<3;dx++)C[13][6+dx]={t:'kbooth',dx};
+  const cap_=vi0!=null&&VIL[vi0].capital,sA=cap_?'tako':'yaki',sB=cap_?'tori':'ramen',sC=cap_?'abura':'suke';
+  C[12][2]={t:'kfood',dx:0,shop:sA};C[12][3]={t:'kfood',dx:1,shop:sA};C[10][2]={t:'kfood',dx:0,shop:sB};C[10][3]={t:'kfood',dx:1,shop:sB};
+  for(let dx=0;dx<3;dx++)C[13][6+dx]={t:'kbooth',dx,shop:sC};
   C[h-1][10]={t:'exit'};C[h-1][9]={t:'kwall'};C[h-1][11]={t:'kwall'};
   const vi=vi0!=null?vi0:VIL.findIndex(v=>v.name==='城下町 コクラ'),r=lcg(G.day*389+71+vi);
   const npcs=[{x:4,y:8,col:'#503000',hair:'#3c3c3c',line:VIL[vi].capital?'窓口の 係員「中央競馬 マホロバへ ようこそ。\nG1 イツク杯は 10レースごと、\n年末には G1 アリウマ記念が あります」':'窓口の 係員「馬券の お求めは 窓口で どうぞ。\nG1 タムニィ杯は 10レースごとです」'},
     {x:15,y:9,col:'#24188c',hair:'#000000',line:'パドックの 客「馬の 毛づやを 見るんよ。\n…まあ 結局は 勘やけどね」'},
     {x:6,y:4,col:'#d82800',hair:'#7c4c10',line:'観客「いけーっ！ そのまま！ そのまま！」'},{x:12,y:3,col:'#00a800',hair:'#000000',line:'観客「ハリボテエレジーが 勝つ日を 見るまで\nおれは 死ねんっちゃ」'},
+    ...(VIL[vi].capital?[{x:4,y:12,col:'#d82800',hair:'#000000',line:'カッツゥの 金たこ「外は カリッ、 中は トロッ！\n金たこ、 焼きたて ですよ〜！」'},{x:4,y:10,col:'#fcfcfc',hair:'#3c3c3c',line:'焼き鳥フジイの 大将「炭火で じっくり。\nタレか 塩か… 両方 いっとく？」'},
+    {x:9,y:13,col:'#3c3c3c',hair:'#000000',line:'脂蕎麦 可支軒の 店員「油そばは 酢と ラー油を\nかけて よーく 混ぜて どうぞ！」'}]:[
     {x:4,y:12,col:'#fcfcfc',hair:'#5c5c5c',line:'焼きうどん屋「競馬の おともに 焼きうどん！\nソースの 香りで 運も 上がるよ！」'},{x:4,y:10,col:'#d82800',hair:'#000000',line:'ラーメン屋の 大将「サラクラヤマラーメン、\nとんこつ 一筋 50年たい！」'},
-    {x:9,y:13,col:'#f87800',hair:'#3c3c3c',line:'スケサムウドゥンの 店員「ごぼ天うどん、\nいかがですか〜！ おでんも ありますよ！」'},
+    {x:9,y:13,col:'#f87800',hair:'#3c3c3c',line:'スケサムウドゥンの 店員「ごぼ天うどん、\nいかがですか〜！ おでんも ありますよ！」'}]),
     {x:8,y:10,col:'#7c7c7c',hair:'#bcbcbc',yoso:1,line:''}];
   if(r()<.18)npcs.push({x:11,y:12,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
   return{kjo:true,title:VIL[vi].capital?'マホロバ競馬場（中央競馬）':'コクラ競馬場',vi,v:VIL[vi],w,h,cx:10,C,npcs,city:true,sz:VIL[vi].size,px:10,py:h-2,top:0};}
@@ -4788,7 +4793,7 @@ function kjoBump(c){
   if(c.t==='kboard'){const cd=keibaCard(curVil);dialog([`次は ${cd.sp?cd.gname:'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}\n2番人気 ${cd.horses.find(h=>h.pop===2).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
   if(c.t==='kpad'){const cd=keibaCard(curVil);const h=cd.horses[Math.floor(rnd()*8)];dialog(`パドックを 周回する 馬たち。\n${h.name}が ${['気合 じゅうぶんだ','少し イレこんでいる','落ちついて 歩いている','あくびを している'][Math.floor(rnd()*4)]}。`);return true;}
   if(c.t==='kturf'||c.t==='krail'){dialog('ダートと 芝の 2つの コース。\n遠くで 馬が 走っている！');return true;}
-  if(c.t==='kfood'||c.t==='kbooth'){kjoFood(c.t==='kbooth'?'suke':c.shop);return true;}
+  if(c.t==='kfood'||c.t==='kbooth'){kjoFood(c.shop||'suke');return true;}
   return false;}
 /* ===================== お金の 使い道（奉納・ランドマーク・長者番付・税） ===================== */
 const TITLES=[[1e10,'篤志家'],[1e12,'大口寄進者'],[1e13,'名誉氏子総代'],[1e14,'大檀那'],[1e15,'八百万の 大旦那'],[1e16,'国造り 長者'],[1e17,'天地開闢 長者']];
@@ -4914,6 +4919,9 @@ function jogaiBump(c){
 /* 競馬場グルメ */
 const KJO_FOOD={yaki:{n:'焼きうどん屋台',m:[{n:'焼きうどん',p:30,heal:.6,d:'仲間全員の HPを 6割 回復'},{n:'焼きうどん 大盛り',p:80,atk:.2,dur:6,d:'攻撃 +20%（6戦）'},{n:'焼きうどん 玉子のせ',p:160,all:.15,dur:8,d:'全能力 +15%（8戦）'}],q:'焼きうどん屋「ソース 多めにしとくけん！」'},
   ramen:{n:'サラクラヤマラーメン',m:[{n:'とんこつラーメン',p:50,heal:1,d:'仲間全員の HPを 全回復'},{n:'ラーメン＋替え玉',p:150,atk:.25,dur:8,d:'攻撃 +25%（8戦）'},{n:'全部のせ 特製ラーメン',p:600,all:.25,exp:.3,dur:10,d:'全能力 +25%・経験値書 +30%（10戦）'}],q:'大将「バリカタ・カタ・ふつう・やわ… どれでも 言いんしゃい！」'},
+  tako:{n:'カッツゥの 金たこ',m:[{n:'たこ焼き 8個',p:30,heal:.6,d:'仲間全員の HPを 6割 回復'},{n:'ねぎだこ',p:80,atk:.2,dur:6,d:'攻撃 +20%（6戦）'},{n:'金たこ 全部のせ',p:220,all:.2,exp:.1,dur:8,d:'全能力 +20%・経験値書 +10%（8戦）'}],q:'店員「熱いから 気をつけて！ ハフハフして どうぞ」'},
+  tori:{n:'焼き鳥フジイ',m:[{n:'焼き鳥 盛り合わせ',p:60,heal:1,d:'仲間全員の HPを 全回復'},{n:'ぼんじり・皮・つくね',p:150,atk:.25,dur:8,d:'攻撃 +25%（8戦）'},{n:'特上 地鶏 コース',p:600,all:.25,dur:10,d:'全能力 +25%（10戦）'}],q:'大将「秘伝の タレ、 継ぎ足して 30年だよ」'},
+  abura:{n:'脂蕎麦 可支軒',m:[{n:'油そば 並',p:40,heal:.6,d:'仲間全員の HPを 6割 回復'},{n:'油そば 大盛り＋温玉',p:120,atk:.25,dur:8,d:'攻撃 +25%（8戦）'},{n:'全部のせ 油そば',p:500,all:.2,exp:.3,dur:10,d:'全能力 +20%・経験値書 +30%（10戦）'},{n:'追い飯',p:60,mp:1,d:'仲間全員の MPを 全回復'}],q:'店員「麺は 底から よーく 混ぜてくださいね！」'},
   suke:{n:'スケサムウドゥン',m:[{n:'かしわおにぎり',p:20,heal:.5,d:'仲間全員の HPを 半分 回復'},{n:'ごぼ天うどん',p:60,atk:.2,dur:6,d:'攻撃 +20%（6戦）'},{n:'肉ごぼ天うどん',p:200,all:.2,dur:10,d:'全能力 +20%（10戦）'},{n:'ぼたもち',p:120,exp:.4,dur:6,d:'経験値書 +40%（6戦）'},{n:'おでん 盛り合わせ',p:90,mp:1,d:'仲間全員の MPを 全回復'}],q:'店員「うどんの おともに ぼたもち、 どうですか〜！」'}};
 function kjoFood(k){const F=KJO_FOOD[k];
   listPick(`${F.n}｜ご注文は？`,F.m.map(x=>({t:x.n,r:fmt(tierCost(x.p))+'イェソ',dis:G.coins<tierCost(x.p)})),i=>{const x=F.m[i],p=tierCost(x.p);if(G.coins<p)return;G.coins-=p;sfx('heal');
