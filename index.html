@@ -729,8 +729,16 @@ const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137},KJO={x:12
   VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東に ワカトゥオー橋が 架かる'});
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:2,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
 /* 首都 マホロバ（北東の 海に 浮かぶ 首都圏・議会が ある） */
-const CAPR={x0:128,y0:14,x1:158,y1:40};
-{const KJ=VIL.findIndex(v=>v.name==='鯨浜');VIL.push({x:143,y:26,name:'首都 マホロバ',shrine:'中央大神宮',rank:8,tier:10,size:6,from:KJ,capital:1,desc:'国会議事堂が そびえる この国の 首都'});}
+const CAPR={x0:120,y0:13,x1:174,y1:38};
+{const KJ=VIL.findIndex(v=>v.name==='鯨浜');VIL.push({x:143,y:26,name:'首都 マホロバ',shrine:'中央大神宮',rank:8,tier:10,size:6,from:KJ,capital:1,yama:1,rec:'＝平均',desc:'国会議事堂が そびえる この国の 首都'});
+  /* マホロバの島の 市町村（カタカナ） */
+  const YM=[['ミネ','首都 マホロバ',128,25,1,'秋吉八幡宮','カルスト台地と 鍾乳洞の 町'],['シモノセキ','ミネ',121,30,4,'赤間神宮','ふく料理で 名高い 島の 西の 港町'],['ナガト','ミネ',124,18,1,'元乃隅神社','棚田と 湯の 香る 北の 町'],
+    ['サンヨウオノダ','シモノセキ',124,35,2,'住吉神社','港と 工場の 町'],['ウベ','サンヨウオノダ',131,36,3,'琴崎八幡宮','野外彫刻が 並ぶ 町'],['ハギ','首都 マホロバ',134,15,2,'松陰神社','城下町の 面影が 残る 古都'],
+    ['アキラギ','ハギ',137,20,0,'明木神社','往還の 宿場の 面影を 残す 山あいの 村'],['アブ','ハギ',143,14,0,'大歳神社','日本海を のぞむ 静かな 町'],['ホウフ','首都 マホロバ',148,35,3,'防府天満宮','天満宮の 門前町'],
+    ['シュウナン','ホウフ',156,32,3,'遠石八幡宮','工場夜景が 広がる 町'],['クダマツ','シュウナン',160,36,2,'花岡八幡宮','ものづくりの 町'],['ヒカリ','クダマツ',164,34,2,'室積八幡宮','白い 砂浜の 町'],
+    ['タブセ','ヒカリ',166,30,1,'田布施八幡宮','田園が 広がる 町'],['ヤナイ','ヒカリ',168,37,2,'柳井天満宮','白壁と 金魚ちょうちんの 町'],['カミノセキ','ヤナイ',162,38,0,'上関八幡宮','瀬戸内の 小さな 漁村'],
+    ['スオウオオシマ','ヤナイ',172,36,1,'大島八幡宮','みかんの 島'],['イワクニ','タブセ',171,23,3,'吉香神社','五連の 木橋が 架かる 城下町'],['ワキ','イワクニ',172,17,0,'和木八幡宮','島の 東の はずれの 小さな 町']];
+  YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:n,shrine:sh,rank:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f),yama:1,rec:'＝平均',desc:d}));}
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
@@ -789,7 +797,7 @@ function genMap(){
   {const g1=mkNoise(401,9,MW),g2=mkNoise(409,4,MW),g3=mkNoise(419,6,MW),g4=mkNoise(421,5,MW),N=CAPR;
     for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
       const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y)+(g4(x,y)-.5)*5;if(edge<0)continue;
-      const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.8?T.MOUNT:e<.15?T.WATER:g3(x,y)>.65?T.FOREST:T.GRASS);}}
+      if(((x-117)/10)**2+((y-44)/8)**2<1)continue;const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.8?T.MOUNT:e<.15?T.WATER:g3(x,y)>.65?T.FOREST:T.GRASS);}}
   const pts=[...VIL.filter(v=>v.from==null&&!v.island),CAVE];
   for(let i=0;i<pts.length-1;i++){
     const a=pts[i],b=pts[i+1],path=[];
@@ -1325,7 +1333,7 @@ function onStep(pv){
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
   G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length);
-  if(G.steps>3&&rnd()<rate&&!inCAP(x,y)){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
+  if(G.steps>3&&rnd()<rate){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
 }
 
 /* ===================== 村・神社・道具屋 ===================== */
@@ -1780,6 +1788,9 @@ function mkEnemy(t,def){const [name,shape,c1,c2]=def,b=ESH[shape],M=Math.pow(1.8
 const orochiGrow=(lv,a,b)=>Math.pow(a,Math.min(lv,14))*Math.pow(b,Math.max(0,lv-14));
 function mkBoss(){const lv=G.boss,M=Math.pow(1.8,8)*orochiGrow(lv,1.6,1.12);
   return{name:'八岐大蛇'+(lv?` Lv${lv+1}`:''),shape:'orochi',c1:'#006800',c2:'#a4e4a4',maxhp:Math.round(400*M),hp:Math.round(400*M),atk:Math.round(18*M),mag:Math.round(14*M),def:Math.round(10*M),spd:Math.round(10*5*Math.pow(1.1,lv)),boss:true,alive:true,flash:0,die:0,t:8,w:120,h:80};}
+/* マホロバの島：パーティの 平均レベルで 魔物の 強さが 変わる */
+function yamaTier(){const L=G.party.reduce((a,id)=>a+(G.chars[id]?G.chars[id].lv:1),0)/Math.max(1,G.party.length);let t=0;
+  for(let k=0;k<REC.length;k++)if(REC[k]<=L&&REC[k]>=REC[t])t=k;return{t,f:(FIELD_F[t]||1)*Math.max(1,Math.min(2,Math.sqrt(L/REC[t])))};}
 /* インフレ対策：高レベル帯ほど 敵を 強く。 ガイウスの槍・双槍・奉納の ご神徳を 持つほど 敵も 強くなる */
 function infMul(){const L=G.party.reduce((a,id)=>a+(G.chars[id]?G.chars[id].lv:1),0)/Math.max(1,G.party.length);
   const b=L<25000?1:1.1,ga=G.party.some(id=>hasGaius(id))?1.4:1,sp=G.party.some(id=>spearPair(id))?1.25:1;
@@ -1821,7 +1832,9 @@ function startBattle(boss,rift=null,sp=null){
       for(let k=0;k<2;k++){const e=mkEnemy(12,ETIER[10][0]);e.name='わだつみの眷属';en.push(e);}}
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*TOKO_F);}
   else if(sp&&sp.kind==='mine'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(9,ETIER[9][ri(0,2)]);e.name='山の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*1.3);en.push(e);}}
+  else if(rift!=null&&VIL[nearestVil(G.pos.x,G.pos.y)].yama){const{t:yt,f:yf}=yamaTier(),n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(yt,ETIER[yt][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*yf);e.rift=true;en.push(e);}}
   else if(rift!=null){const kq=VIL[nearestVil(G.pos.x,G.pos.y)].kq,n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(t,kq?KQ_EN[ri(0,KQ_EN.length-1)]:ETIER[t][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*(kq?KQ_F:(FIELD_F[t]||1)));e.rift=true;en.push(e);}}
+  else if(VIL[nearestVil(G.pos.x,G.pos.y)].yama){const{t:yt,f:yf}=yamaTier(),n=ri(2,4);for(let k=0;k<n;k++){const e=mkEnemy(yt,ETIER[yt][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*yf*(1+.08*G.rifts.length));en.push(e);}}
   else if(VIL[nearestVil(G.pos.x,G.pos.y)].kq){const n=ri(2,4);for(let k=0;k<n;k++){const e=mkEnemy(12,KQ_EN[ri(0,KQ_EN.length-1)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*KQ_F*(1+.08*G.rifts.length));en.push(e);}}
   else{const n=Math.min(4,ri(1,2+Math.floor(t/3))+(rnd()<.3?1:0)),sc=(1+.08*G.rifts.length)*(FIELD_F[t]||1);for(let k=0;k<n;k++){const e=mkEnemy(t,ETIER[t][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*sc);en.push(e);}}
   {const im=sp&&sp.st==='minus'?(infMul()>1?1.1:1):infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
@@ -4833,7 +4846,7 @@ function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
 const POL_SEATS=300,POL_MAJ=151,POL_EVERY=50;
-const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.capital},{n:'首都',s:20,f:v=>!!v.capital},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
+const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.yama},{n:'マホロバ',s:20,f:v=>!!v.yama},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
 const NPC_PARTY=['自由八百万党','民衆の 会','帝国再興党','無所属'];
 const ZOKU={ken:{n:'建設族',d:'建設費 -10%'},jin:{n:'神社族',d:'奉納・造営 -10%'},uma:{n:'競馬族',d:'馬主の 賞金 +30%'},kin:{n:'金融族',d:'超富裕層課税・査察 -20%'}};
 const POLICY={tax:{n:'富裕層 減税',d:'超富裕層課税・査察が 半分',k:'kin',m:.5},jin:{n:'神社 振興',d:'奉納・造営 -30%',k:'jin',m:.7},ken:{n:'国土 強靭化',d:'建設費 -30%',k:'ken',m:.7},uma:{n:'競馬 振興',d:'馬主の 賞金 2倍',k:'uma',m:2}};
