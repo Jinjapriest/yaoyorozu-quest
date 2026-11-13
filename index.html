@@ -625,8 +625,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=142,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -720,11 +720,11 @@ const GOUT={x0:130,y0:64,x1:186,y1:99};
   VIL.push({x:172,y:72,name:'廃線沿いの村',shrine:'鉄道神社',rank:1,tier:12,size:0,from:K+3,depop:'ruin',target:150,desc:'帝国の 鉄道が 止まり 人が 去った 村'});
   VIL.push({x:158,y:94,name:'峠の集落',shrine:'峠の神の祠',rank:1,tier:12,size:0,from:K,depop:'aging',target:150,desc:'壁の 影に なり 日の 当たらない 集落'});}
 /* 修羅の町 キタキュウ（グンマーへの つなぎの 大陸・推奨Lv22222） */
-const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222;
+const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137};
 {const NOR=VIL.findIndex(v=>v.name==='ノルデン港'),A=VIL.length;
   VIL.push({x:111,y:127,name:'ワカマツ浜',shrine:'恵比須神社',rank:3,tier:12,size:1,from:NOR,kq:1,rec:KQ_REC,desc:'旧大陸から 橋で つながる 潮風の 浜町'});
-  VIL.push({x:113,y:133,name:'鉄の町 ヤハタ',shrine:'鉄祖神社',rank:4,tier:12,size:4,from:A,kq:1,rec:KQ_REC,kqf:['kqtetsu','kqcable'],desc:'高炉の 火が 絶えない 鉄の 町'});
-  VIL.push({x:123,y:132,name:'城下町 コクラ',shrine:'城山八坂神社',rank:6,tier:12,size:5,from:A+1,kq:1,rec:KQ_REC,kqf:['kqbugyo','kqjo'],desc:'コクラ城を 中心に 栄える キタキュウの 都'});
+  VIL.push({x:113,y:133,name:'鉄の町 ヤハタ',shrine:'鉄祖神社',rank:4,tier:12,size:4,from:A,kq:1,rec:KQ_REC,kqf:['kqtetsu'],desc:'高炉の 火が 絶えない 鉄の 町'});
+  VIL.push({x:123,y:132,name:'城下町 コクラ',shrine:'城山八坂神社',rank:6,tier:12,size:5,from:A+1,kq:1,rec:KQ_REC,castle:1,kqf:['kqbugyo'],desc:'コクラ城を 中心に 栄える キタキュウの 都'});
   VIL.push({x:118,y:127,name:'トバタの村',shrine:'提灯八幡宮',rank:3,tier:12,size:1,from:A,kq:1,rec:KQ_REC,kqf:['kqyagura'],desc:'夏に 千の 提灯が ともる 祭りの 村'});
   VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東に ワカトゥオー橋が 架かる'});
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:2,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
@@ -818,6 +818,9 @@ function genMap(){
       while(y!==g.y){y+=Math.sign(g.y-y);const t=tileAt(x,y);if(!isTownT(t)&&t!==T.SHR&&t!==T.WALL)setT(x,y,t===T.WATER?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}
       for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const t=tileAt(g.x+dx,g.y+dy);if(t!==T.ROAD&&t!==T.BRIDGE&&t!==T.YAMA&&!isTownT(t)&&t!==T.WALL)setT(g.x+dx,g.y+dy,T.MOUNT);}
       setT(g.x,g.y,T.GSEAL);}}
+  /* 皿倉山：ヤハタの 南、町の 外の 山 */
+  {const h=VIL.find(v=>v.name==='鉄の町 ヤハタ');for(let y=h.y+1;y<SARA.y;y++){const t=tileAt(h.x,y);if(!isTownT(t)&&t!==T.SHR)setT(h.x,y,T.YAMA);}let x=h.x;while(x!==SARA.x){x+=Math.sign(SARA.x-x);setT(x,SARA.y-1,T.YAMA);}
+    for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++){const t=tileAt(SARA.x+dx,SARA.y+dy);if(t!==T.YAMA&&t!==T.ROAD&&!isTownT(t))setT(SARA.x+dx,SARA.y+dy,T.MOUNT);}setT(SARA.x,SARA.y-1,T.YAMA);setT(SARA.x,SARA.y,T.KQSPOT);}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -852,6 +855,9 @@ TILES[T.SHR]=[mkTile(P=>{grassBase(P);P(6,7,4,4,'#a05000');P(5,6,6,1,'#503000');
 TILES[T.CAVE]=[mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=1+r;P(8-Math.ceil(w/2),2+r,w,1,'#7c7c7c');}P(5,9,6,6,'#000000');P(6,8,4,1,'#000000');P(4,14,8,1,'#d82800');})];
 TILES[T.WALL]=[mkTile(P=>{P(0,0,16,16,'#5c5c64');for(let y=0;y<16;y+=4){P(0,y,16,1,'#3c3c44');for(let x=(y/4)%2?0:4;x<16;x+=8)P(x,y,1,4,'#3c3c44');}P(0,0,16,2,'#8c8c94');P(2,0,3,1,'#f8b800');P(10,0,3,1,'#f8b800');})];
 TILES[T.GGATE]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c44');P(0,0,16,3,'#8c8c94');P(2,3,12,13,'#000');P(3,4,10,12,'#24188c');P(7,4,2,12,'#f8b800');P(1,0,2,16,'#5c5c64');P(13,0,2,16,'#5c5c64');P(f?2:12,1,2,2,'#d82800');}));
+TILES[T.KQSPOT]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#000030');for(let y=0;y<14;y++){const hw=Math.min(8,Math.floor(y*0.62)+1);P(8-hw,2+y,hw*2,1,y<3?'#5c5c5c':'#24402c');}
+  P(7,1,2,2,f?'#fcfcfc':'#f8d878');P(6,0,1,1,'#f8d878');P(9,0,1,1,'#f8d878');for(let k=0;k<7;k++)P(2+k,13-k,1,1,'#bcbcbc');P(f?4:5,f?10:9,3,2,'#d82800');
+  for(let k=0;k<6;k++)P(1+((k*5)%14),14+(k%2),1,1,['#f8d878','#3cbcfc','#fcfcfc'][k%3]);}));
 TILES[T.GSEAL]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c3c');P(2,4,12,12,'#5c5c5c');P(4,1,8,3,'#7c7c7c');P(5,8,6,8,'#000');P(2,4,12,1,'#bcbcbc');P(6,10,4,1,f?'#d82800':'#f8b800');P(1,13,14,1,'#f8b800');P(1,14,14,1,'#000');for(let x=1;x<15;x+=4)P(x,13,2,1,'#000');}));
 function drawTile(t,x,y){const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a.length],x,y);}
 
@@ -1290,6 +1296,7 @@ function onStep(pv){
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
+  if(t===T.KQSPOT){kqFac('kqcable');return;}
   if(isTownT(t)){enterVillage(VIL.findIndex(v=>v.x===x&&v.y===y));return;}
   {const rr=RES.find(r=>r.x===x&&r.y===y);if(rr){resScr(rr.id);return;}}
   if(t===T.MINE){mineScr();return;}
@@ -2119,7 +2126,7 @@ const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
   kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck']);
+const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -2219,11 +2226,43 @@ function buildTown(vi){
       {x:cx+2,y:7,col:'#3c3c3c',hair:'#000000',guard:1,line:occ?`親衛隊「金の 扉の 奥に ${DI.title}さまが おられる。」`:`案内係「${DI.hall}は 資料館に なりました。\n金の 扉から どうぞ。」`});
     C.unshift(...Z);top=P;H2=h+P;
   }
+  if(v.castle){/* コクラ城：城下町の いちばん奥に そびえる 五層の 天守 */
+    const P=12,Z=[];for(let y=0;y<P;y++){Z.push([]);for(let x=0;x<w;x++)Z[y].push({t:'pz'});}
+    const zs=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<P)Z[y][x]=o;};
+    for(let x=0;x<w;x++)zs(x,0,{t:'wall'});for(let y=0;y<P;y++){zs(0,y,{t:'wall'});zs(w-1,y,{t:'wall'});}
+    for(let dy=0;dy<9;dy++)for(let dx=-6;dx<=6;dx++)zs(cx+dx,1+dy,dy===8&&dx===0?{t:'kcdoor'}:{t:'kc',dx,dy});
+    for(let x=1;x<w-1;x++){const d=Math.abs(x-cx);if(d<=7)zs(x,P-2,d===0?{t:'kbr'}:{t:'moat',dx:x-cx});}
+    for(let y=1;y<P-2;y++)for(let x=1;x<w-1;x++){const d=Math.abs(x-cx);if(d>=8&&x!==4&&x!==w-5&&((x+y)%3!==0))zs(x,y,{t:'sakura'});}
+    for(const sx of [-1,1]){zs(cx+sx*8,P-2,{t:'plamp'});zs(cx+sx*10,P-2,{t:'nobori'});}
+    for(let x=0;x<w;x++)C[0][x]={t:'wall'};
+    for(const gx of [4,w-5]){C[0][gx]={t:'gate'};for(let y=1;y<6;y++){const c=C[y][gx];if(c.t==='g'||c.t==='tree'||c.t==='flower')C[y][gx]={t:'s'};}for(let y=1;y<P;y++)zs(gx,y,{t:'pz'});}
+    for(const n of npcs)n.y+=P;
+    C.unshift(...Z);top=P;H2=h+P;
+  }
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
   if(v.dict&&v.dict.gim&&occupied(vi)){const O=G.gimOcc['v'+vi]||{},closed=O.closed||[],rr=lcg(vi*131+(O.day||1)*17);let n=0,tries=0;const want=4+Math.min(4,sz);
     while(n<want&&tries++<400){const x=1+Math.floor(rr()*(w-2)),y=top+4+Math.floor(rr()*(h-6));const c=C[y]&&C[y][x];if(!c||(c.t!=='s'&&c.t!=='g'&&c.t!=='flower')||x===cx)continue;
       if(npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;const k=x+','+(y-top);if(closed.includes(k)){n++;continue;}C[y][x]={t:'trift',k};n++;}}
   return{vi,v,w,h:H2,cx,C,npcs,city,sz,px:cx,py:H2-2,ruin,top};
+}
+/* コクラ城の 天守（1マスずつ 描く・dx -6〜6, dy 0〜8） */
+function drawKokura(c,sx,sy){const dx=c.t==='kcdoor'?0:c.dx,dy=c.t==='kcdoor'?8:c.dy,ad=Math.abs(dx),st=kqS(),dark=st.ch===3,G='#f8b800',DG='#a07800',RF=dark?'#1c1c2c':'#2c3454',RF2=dark?'#2c2c3c':'#3c4c74',WL=dark?'#bcbcbc':'#f8f8f8',LIT=dark?'#5c2c2c':((frame>>5)+ad+dy)%7?'#f8d878':'#fcfcfc';
+  const sky=()=>{R(sx,sy,16,16,dark?'#1c0c14':'#4c4c54');if(!dark&&(ad*7+dy*3)%5===0)R(sx+(ad*5)%13,sy+(dy*7)%13,1,1,'#fcfcfc');if(dark){const f=(frame>>2)+ad*5+dy*3;R(sx+(f%14),sy+((f>>2)%12),6,2,'#3c1c2c');}};
+  const roof=(hw,shachi)=>{if(ad>hw){sky();return;}sky();const edge=ad===hw;R(sx,sy+5,16,9,RF);R(sx,sy+5,16,2,RF2);for(let x=1;x<16;x+=3)R(sx+x,sy+7,1,6,'#1c2034');R(sx,sy+13,16,2,G);R(sx,sy+15,16,1,DG);
+    if(edge){const L=dx<0;R(sx+(L?0:8),sy+5,8,8,dark?'#1c0c14':'#4c4c54');for(let k=0;k<8;k++)R(sx+(L?7-k:8+k),sy+12-Math.floor(k*1.1),1,Math.floor(k*1.1)+1,RF);R(sx+(L?0:13),sy+3,3,2,G);R(sx+(L?0:14),sy+2,2,1,G);}
+    if(dx===0&&!shachi){R(sx+3,sy+1,10,4,RF2);R(sx+4,sy,8,1,G);R(sx+5,sy+2,6,10,WL);R(sx+5,sy+2,6,1,G);pc(sx+8,sy+7,2,G);R(sx+7,sy+6,2,2,dark?'#5c0000':'#d82800');}
+    if(shachi&&ad===1){const L=dx<0;R(sx+(L?9:3),sy+1,4,4,G);R(sx+(L?8:6),sy,2,2,G);R(sx+(L?12:2),sy+0,2,3,G);pc(sx+(L?10:5),sy+2,0,'#000');}
+    if(shachi&&dx===0){R(sx,sy+4,16,1,G);}};
+  const wall=(hw,win)=>{if(ad>hw){sky();return;}R(sx,sy,16,16,WL);R(sx,sy+10,16,6,'#24243c');R(sx,sy+10,16,1,'#000');for(let x=2;x<16;x+=4)R(sx+x,sy+11,1,5,'#3c3c54');
+    if(win){R(sx+2,sy+3,4,5,'#24243c');R(sx+10,sy+3,4,5,'#24243c');R(sx+3,sy+4,2,3,LIT);R(sx+11,sy+4,2,3,LIT);}
+    if(ad===hw){R(sx+(dx<0?0:14),sy,2,16,'#d8d8d8');}if(dx===0&&dy===1){R(sx+4,sy+2,8,6,G);R(sx+5,sy+3,6,4,DG);R(sx+7,sy+3,2,4,G);}};
+  const ishi=()=>{const L=dx<0;R(sx,sy,16,16,'#7c7c7c');for(let y=0;y<16;y+=4){R(sx,sy+y,16,1,'#5c5c5c');for(let x=((y/4)%2)*5;x<16;x+=8)R(sx+x,sy+y,1,4,'#5c5c5c');}R(sx+2,sy+1,4,2,'#9c9c9c');R(sx+9,sy+9,5,2,'#9c9c9c');
+    if(ad===6){const top=dy===7;for(let y=0;y<16;y++){const cut=top?Math.max(0,8-Math.floor(y/2)):Math.max(0,4-Math.floor(y/4));R(sx+(L?0:16-cut),sy+y,cut,1,'#4c4c54');}}
+    if(dy===7)R(sx,sy,16,2,'#5c5c5c');};
+  if(dy===0){roof(1,1);return;}if(dy===1){wall(1,1);return;}if(dy===2){roof(2);return;}if(dy===3){wall(2,1);return;}if(dy===4){roof(3);return;}
+  if(dy===5){if(ad>=5){roof(6);if(ad===5){R(sx,sy+5,2,9,dark?'#1c0c14':'#4c4c54');}return;}wall(3,1);return;}
+  if(dy===6){if(ad>=5){if(ad===5)R(sx,sy,16,16,'#4c4c54');wall(6,1);if(ad===5)R(sx,sy,2,16,'#d8d8d8');return;}roof(4);return;}
+  ishi();if(c.t==='kcdoor'){R(sx+1,sy+1,14,15,'#3c2000');R(sx+1,sy,14,2,'#24243c');R(sx+2,sy+2,12,14,'#7c4c10');R(sx+7,sy+2,2,14,'#3c2000');for(const [x,y] of [[4,5],[11,5],[4,11],[11,11],[6,8],[9,8]])R(sx+x,sy+y,1,1,G);R(sx+2,sy+2,12,1,G);}
 }
 function drawCell(c,sx,sy,city){
   const GC=city?'#a4a4a4':'#e4c890';
@@ -2292,6 +2331,12 @@ function drawCell(c,sx,sy,city){
     case 'cflag':{const w2=(frame>>4)&1;R(sx,sy,16,16,'#4c4c54');R(sx+3,sy,2,16,'#f8b800');if(!c.pole){R(sx+5,sy+1,10-w2,9,'#a81000');R(sx+5,sy+9,9+w2,2,'#a81000');R(sx+8,sy+3,4,4,'#f8b800');R(sx+9,sy+2,2,6,'#f8b800');pc(sx+4,sy,1,'#f8b800');}else R(sx+1,sy+14,6,2,'#a07800');break;}
     case 'ura':{R(sx,sy,16,16,'#4c4c54');if(G.colo){R(sx+1,sy+1,14,14,'#000');for(let k=0;k<4;k++)R(sx+2+k,sy+3+k*3,12-k*2,2,'#2c2c2c');const g=(frame>>3)&1;R(sx+1,sy+1,14,1,g?'#940084':'#6844fc');R(sx+1,sy+14,14,1,g?'#940084':'#6844fc');}
       else{R(sx+1,sy+1,14,14,'#2c2c2c');R(sx+1,sy+1,14,1,'#5c5c5c');R(sx+7,sy+3,2,10,'#000');R(sx+3,sy+7,10,2,'#000');}break;}
+    case 'kc':case 'kcdoor':drawKokura(c,sx,sy);break;
+    case 'moat':R(sx,sy,16,16,'#0038a8');R(sx,sy,16,3,'#8c8c8c');R(sx,sy+3,16,1,'#5c5c5c');for(let k=0;k<3;k++)R(sx+((k*6+(frame>>3)+c.dx*3)%14),sy+6+k*3,3,1,'#3cbcfc');if(((frame>>4)+c.dx)%5===0)R(sx+5,sy+9,4,2,'#f878f8');break;
+    case 'kbr':R(sx,sy,16,16,'#0038a8');R(sx+2,sy,12,16,'#a05000');for(let y=1;y<16;y+=3)R(sx+2,sy+y,12,1,'#7c4c10');R(sx,sy,3,16,'#d82800');R(sx+13,sy,3,16,'#d82800');R(sx,sy+2,3,2,'#f8b800');R(sx+13,sy+2,3,2,'#f8b800');R(sx,sy+12,3,2,'#f8b800');R(sx+13,sy+12,3,2,'#f8b800');break;
+    case 'sakura':R(sx,sy,16,16,'#4c4c54');R(sx+7,sy+10,2,6,'#7c4c10');R(sx+2,sy+2,12,8,'#f878f8');R(sx+4,sy+1,8,2,'#fcbcfc');R(sx+3,sy+4,3,3,'#fcbcfc');R(sx+10,sy+5,3,2,'#fcbcfc');R(sx+1,sy+6,2,2,'#f878f8');R(sx+13,sy+4,2,3,'#f878f8');
+      {const f=(frame>>3)+sx;R(sx+(f*5)%16,sy+11+(f%4),1,1,'#fcbcfc');}break;
+    case 'nobori':R(sx,sy,16,16,'#4c4c54');R(sx+4,sy,2,16,'#3c3c3c');R(sx+6,sy+1,7,13,'#d82800');R(sx+6,sy+1,7,2,'#fcfcfc');R(sx+8,sy+5,3,3,'#f8b800');R(sx+8,sy+10,3,2,'#fcfcfc');R(sx+3,sy+14,4,2,'#3c3c3c');break;
     case 'pz':R(sx,sy,16,16,'#4c4c54');R(sx,sy,8,8,'#5c5c64');R(sx+8,sy+8,8,8,'#5c5c64');R(sx,sy+15,16,1,'#3c3c44');
       if(c.carpet){R(sx+3,sy,10,16,'#a81000');R(sx+3,sy,1,16,'#f8b800');R(sx+12,sy,1,16,'#f8b800');R(sx+7,sy+6,2,2,'#f8b800');}break;
     case 'gate':R(sx,sy,16,16,'#4c4c54');R(sx,sy,3,16,'#f8b800');R(sx+13,sy,3,16,'#f8b800');R(sx,sy,16,2,'#f8b800');R(sx+1,sy-3,2,3,'#f8b800');R(sx+13,sy-3,2,3,'#f8b800');break;
@@ -2339,6 +2384,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&c.t==='trift'){gimRiftTalk(c);return;}
     if(fresh&&TW.ship&&shipBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
+    if(fresh&&(c.t==='kcdoor'||c.t==='kc'||c.t==='moat'||c.t==='nobori'||c.t==='sakura')){if(c.t==='kcdoor')kqFac('kqjo');else dialog(c.t==='kc'?(kqS().ch===3?'五層の 天守に 黒い 雲が 渦を 巻いている…':kqS().ch>=4?'金の 鯱が 夜空に かがやく\n五層の 天守だ。 町の 誇りだ！':'白壁と 金の 飾りが まぶしい\n五層の 天守 コクラ城だ。'):c.t==='moat'?'お堀には 鯉が 泳いでいる。':c.t==='nobori'?'のぼりに「コクラ城」と 書かれている。':'城の 桜が 咲きほこっている。');return;}
     if(fresh&&c.t==='ura'){if(G.colo)uraFac();else dialog('黒い 石の 扉が 地面に はめこまれている。\n固く 閉ざされていて びくとも しない…');return;}
     if(fresh&&(c.t==='cstatue'||c.t==='brazier'||c.t==='cflag')){dialog(c.t==='cstatue'?'歴代 優勝者の 黄金像だ。'+(G.colo?'\n台座に あなたの 名前も 刻まれている！':''):c.t==='brazier'?'聖火が ごうごうと 燃えている。':'闘技場の 旗が はためいている。');return;}
     if(fresh&&(c.t==='pdoor'||c.t==='palace')&&TW.v.gm==='cap'){if(c.t==='pdoor')teijoFac();else dialog(gmS().ch===6?'灯りの 消えた 帝城だ。\n物音 ひとつ しない…':'白と 金で できた 壮麗な 帝城だ。\n窓の 灯りが 夜通し 消えない。');return;}
@@ -4226,7 +4272,7 @@ const KQB={
   tetsu:{n:'鉄鬼 クロガネ',where:'ヤハタ製鉄所の 高炉',m:[['ようこうスライム','blob','#d82800','#f8b800'],['てっこつがいこつ','bones','#7c7c7c','#fc7460']],g:['鉄鬼 クロガネ','oni','#3c3c3c','#d82800'],f:.55,
     intro:'東田の 高炉が 赤く 脈打っている…',
     post:['クロガネ「…熱く なりすぎとったわ。\n鉄は 冷まして 鍛えるもんやったな。」','高炉の 赤い 光が 落ちついた。\n修羅の 霧が ひとつ 晴れた！']},
-  yakei:{n:'百億の夜景 サラクラ',where:'サラクラ山の 山頂',m:[['やけいこうもり','bat','#24188c','#f8d878'],['ケーブルからくり','bones','#5c5c5c','#3cbcfc']],g:['百億の夜景 サラクラ','spirit','#000058','#f8d878'],f:.58,
+  yakei:{n:'百億の夜景 サラクラ',where:'サラクラ山の 山頂（ヤハタの 南）',m:[['やけいこうもり','bat','#24188c','#f8d878'],['ケーブルからくり','bones','#5c5c5c','#3cbcfc']],g:['百億の夜景 サラクラ','spirit','#000058','#f8d878'],f:.58,
     intro:'ケーブルカーを 降りると\n街の 灯りが 渦を 巻いていた…',
     post:['サラクラ「…夜景は 争う ための 灯りじゃ なかった。\nひとつひとつが だれかの 家の 灯りやった。」','山頂から 見える 街の 灯りが\nやさしい 色に 戻った！']},
   chochin:{n:'千灯の修羅 ヤマカサ',where:'トバタの 提灯櫓',m:[['ちょうちんおばけ','spirit','#d82800','#f8d878'],['やまかさぼうれい','spirit','#fcfcfc','#d82800']],g:['千灯の修羅 ヤマカサ','oni','#d82800','#f8d878'],f:.6,
@@ -4242,7 +4288,7 @@ function kqIntro(){const st=kqS();st.ch=1;
   return['…空気が ピリピリ している。','町の人「よそもんかい？ 気ぃつけり。\nこの キタキュウは いま 修羅の 霧に\nおおわれとるっちゃ。」','「霧を 吸うと だれでも 気が 荒くなって\nケンカっ早く なってしまうんよ。\nほんとは みんな 人情の ある 町なんやけど…」','「くわしい ことは 城下町 コクラの\n奉行所で 聞いてみり。」','（キタキュウの 推奨レベルは Lv22222）'];}
 function kqLines(vi){const ch=kqS().ch,v=VIL[vi];
   if(ch>=4)return['霧が 晴れて 町に 笑い声が 戻ったっちゃ！','あんたが 修羅を 鎮めてくれたん？\nありがとね！ 焼きうどん 食べていき！','仕事帰りの 角打ちが いちばんよ。\n立ったまま 一杯 やるんが キタキュウ流たい。','東の モジから ワカトゥオー橋を 渡ると\nグンマー帝国やね。 気ぃつけて 行きり！','成人式は 袴で 派手に 決めるっちゃ！\n…見た目は 派手でも 中身は まじめなんよ。'];
-  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の ワカトゥオー橋を 渡れば\nグンマー帝国。 でも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは フクエノナオヤン！\n袴は 重いけど 心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？'];}
+  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の ワカトゥオー橋を 渡れば\nグンマー帝国。 でも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは フクエノナオヤン！\n袴は 重いけど 心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？',...(v.name.includes('ヤハタ')?['サラクラ山は 町を 出て 南に そびえとるよ。\n山頂から 見る 夜景が 自慢なんよ。']:[])];}
 function startKq(st,extra){startGm(st,extra);}
 function kqFac(kind){const st=kqS();
   if(kind==='kqkanmon'){dialog(st.ch>=4?['案内所「霧が 晴れて ワカトゥオー橋も\nにぎやかに なったよ。」','「東へ 渡れば グンマー帝国の 外縁地方。\n帝国の 推奨レベルは Lv29999 たい。」']:['案内所「ここは ワカトゥオー橋の 案内所。\n東へ 橋を 渡れば\nグンマー帝国の 外縁地方たい。」','「でも 帝国は 推奨Lv29999。\nまずは キタキュウの 修羅を 鎮めて 腕を 磨きり。」','（キタキュウの 推奨レベルは Lv22222）']);return;}
@@ -4253,7 +4299,7 @@ function kqFac(kind){const st=kqS();
     dialog(['奉行「キタキュウの 恩人じゃ！\n町の みなが 感謝しておるぞ。」','「東の モジから ワカトゥオー橋を 渡れば\nグンマー帝国じゃ。 目安は Lv29999。\nここで しっかり 鍛えて いきなされ。」']);return;}
   const bid={kqtetsu:'tetsu',kqcable:'yakei',kqyagura:'chochin'}[kind];
   if(bid){const B=KQB[bid];
-    if(st.ch<2){dialog(kind==='kqtetsu'?['製鉄所の 門は 閉ざされている。','作業員「高炉が おかしいんよ…\nくわしいことは コクラの 奉行所に 聞きり。」']:kind==='kqcable'?['ケーブルカーは 運休中だ。','係員「山頂に 黒い 霧が かかっとって…\nコクラの 奉行所に 相談してみり。」']:['提灯櫓の 灯りが 昼も 燃え続けている…','村人「コクラの 奉行所に 行ってみり。」']);return;}
+    if(st.ch<2){dialog(kind==='kqtetsu'?['製鉄所の 門は 閉ざされている。','作業員「高炉が おかしいんよ…\nくわしいことは コクラの 奉行所に 聞きり。」']:kind==='kqcable'?['サラクラ山の 登山口に 着いた。','ケーブルカーは 運休中だ。\n係員「山頂に 黒い 霧が かかっとって…\nコクラの 奉行所に 相談してみり。」']:['提灯櫓の 灯りが 昼も 燃え続けている…','村人「コクラの 奉行所に 行ってみり。」']);return;}
     if(st.s[bid]){dialog(B.post.slice(-1).concat(['（この 修羅は もう 鎮めた）']));return;}
     choice(`${B.where}\n${B.n}が 待ち構えている。\n挑みますか？（3連戦・推奨Lv22222）`,['挑む','やめる'],r=>{if(r===0)startKq('kqb',{id:bid});},96);return;}
   if(kind==='kqjo'){
