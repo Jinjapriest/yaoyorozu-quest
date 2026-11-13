@@ -4022,13 +4022,32 @@ function iwakuRoll(p,when){const I=IWAKU[when];if(p.iw||rnd()>=I.p)return null;p
 const iwakuMsg=(p,k)=>['…ぞくっ。 背すじが 冷たくなった。',`${VIL[p.vi].name}の ${RET[p.t].n}：\n${k}`,'【いわく付き物件】に なってしまった…\n家賃が 3割に 下がり 売値も 大きく 下がる。','（神主の 仲間が いれば お祓いが できる。\n開拓所や 物件の 一覧から どうぞ）'];
 const hasKannushi=()=>G.party.some(id=>/^kn\d/.test(id));
 function oharai(p,after){const v=VIL[p.vi],fee=Math.max(1e6,Math.round(p.paid*.03)),kn=hasKannushi();
-  choice(`【いわく付き】${v.name.replace(/^.* /,'')}　${RET[p.t].n}\n「${p.iw.k}」\nお祓いを しますか？`,[kn?'神主の 仲間が お祓いを する（無料）':{t:'自分で お祓い（神主の 仲間が 必要）',dis:true},`近くの 神社に 依頼（${fmt(fee)}イェソ）`,'やめる'],k=>{
+  choice(`【いわく付き】${v.name.replace(/^.* /,'')}　${RET[p.t].n}\n「${p.iw.k}」\nお祓いを しますか？`,[kn?'神主の 仲間が お祓いを する（無料）':{t:'自分で お祓い（神主の 仲間が 必要）',dis:true},`近くの 神社に 依頼（${fmt(fee)}イェソ）`,'霊媒師に 除霊を 依頼','やめる'],k=>{
+    if(k===2){mediumPick(p,after);return;}
     const done=m=>{p.iw=null;save();sfx('lvup');dialog(m,after);};
     if(k===0&&kn){if(p.iwt===G.day){dialog('今日は もう 祓詞を 奏上した。\n（明日 また 挑もう）',after);return;}p.iwt=G.day;sfx('magic');
       if(rnd()<.8)done(['かけまくも かしこき…','神主が 祓詞を 奏上し 大麻（おおぬさ）を 振った。','すうっと 空気が 軽くなった！\nいわくが 祓われた！ 家賃が 元に 戻った。']);
       else{save();dialog(['かけまくも かしこき…','…ガタガタッ！ 窓が 激しく 揺れた！','祟りが 強すぎて 祓いきれなかった…\n（明日 また 挑もう）'],after);}return;}
     if(k===1){rePay(fee,()=>done([`${v.shrine||'神社'}の 宮司が 来て\n丁重に お祓いを してくれた。`,'いわくが 祓われた！ 家賃が 元に 戻った。']));return;}
     after&&after();},150);}
+/* 霊媒師に 除霊を 依頼 */
+const MEDIUMS=[{n:'神主',f:.05,ok:.95,a:['神主が 祓詞を 奏上し\n大麻（おおぬさ）を 左右左と 振った。'],ng:['…祟りが 思いのほか 強かった。\n「後日 改めて 伺います」']},
+  {n:'神主もどき',f:.01,ok:.4,a:['白い 服の 男が それっぽい 言葉を 唱えた。'],ng:['…祝詞の 途中で 噛んだ。\n「かけまくも… かけ… かけうどん…」','何も 起きなかった。 男は 帰っていった。']},
+  {n:'陰陽師',f:.06,ok:.9,a:['陰陽師が 五芒星を 描き\n式神を 放った！'],ng:['式神が 押し負けた…\n「…手強い。 また 来ます」']},
+  {n:'陰陽師もどき',f:.015,ok:.35,a:['狩衣 っぽい 服の 男が\n紙の 人形を ばらまいた。'],ng:['紙の 人形が 風で 全部 飛んでいった。','…男も 走って 追いかけていった。']},
+  {n:'お坊さん',f:.04,ok:.9,a:['お坊さんが 読経を 始めた。\n木魚の 音が 響く…'],ng:['…霊は 成仏を こばんだ。\n「また 四十九日後に…」']},
+  {n:'お坊さんもどき',f:.01,ok:.35,a:['坊主頭の 男が お経を 唱え始めた。'],ng:['…お経が 途中から ラップに なった。\n「なむなむ YO！ ほとけ チェケラ！」','霊は 帰らなかった。']},
+  {n:'心霊系ユーチューバー',f:0,ok:.2,yt:1,a:['「どうも〜！ 今日は ガチの\n事故物件に 来ちゃいました〜！」','カメラを 回しながら 除霊（？）を 始めた。'],ng:['「…え、 今 なんか 聞こえませんでした？」\n「ちょ、 ガチで ヤバいって！！」','ユーチューバーは 悲鳴を あげて 逃げていった。']}];
+function mediumPick(p,after){const v=VIL[p.vi];
+  listPick('どの 霊媒師に 依頼する？',MEDIUMS.map(m=>({t:m.n,r:m.f?fmt(Math.max(1e5,Math.round(p.paid*m.f))):'無料',col:m.yt?'#fc7460':/もどき/.test(m.n)?'#7c7c7c':null})),i=>{const m=MEDIUMS[i],fee=m.f?Math.max(1e5,Math.round(p.paid*m.f)):0;
+    const go=()=>{sfx('magic');const ok=rnd()<m.ok,pg=[...m.a];
+      if(ok){p.iw=null;pg.push('…すうっと 空気が 軽くなった！\nいわくが 祓われた！ 家賃が 元に 戻った。');if(m.yt)pg.push('「除霊 成功 しちゃいました〜！」\n…本当に 祓えてしまった。');sfx('lvup');}
+      else pg.push(...m.ng,'除霊は 失敗した…');
+      if(m.yt){if(rnd()<.5){const ad=Math.max(1e5,Math.round(p.paid*.02));noCount(()=>{G.coins+=ad;});pg.push(`後日、 動画が バズった！\n撮影協力費 ${fmt(ad)}イェソを もらった。`);}
+        if(!ok&&rnd()<.3){const o=reS().p.find(q=>q!==p&&q.vi===p.vi&&!q.iw&&q.t!=='lot');if(o){o.iw={k:'動画に 映り込んだ 霊が 引っ越してきた',day:G.day};pg.push(`…しかも 霊を 怒らせてしまい\n${v.name.replace(/^.* /,'')}の ${RET[o.t].n}にも いわくが 広がった！`);}}}
+      save();dialog(pg,after);};
+    choice(`${m.n}に 除霊を 依頼する\n費用 ${fee?fmt(fee)+'イェソ':'無料（撮影 させてね）'}\n成功率 ${m.ok>=.9?'高い':m.ok>=.4?'ふつう…？':'あやしい'}`,['依頼する','やめる'],r=>{if(r!==0){after&&after();return;}if(fee)rePay(fee,go);else go();},96);},
+    i=>{const m=MEDIUMS[i];return m?(m.yt?'撮影 させてくれるなら 無料！\n…ただし 腕前は 期待しないで。 バズれば 謝礼も？':/もどき/.test(m.n)?'格安。 …本物かどうかは あやしい。':`本物の ${m.n}。 確かな 腕前。`):'';});}
 function iwakuList(){const L=reS().p.filter(p=>p.iw);if(!L.length){dialog('開拓所「いわく付きの 物件は ないよ。\n…いまの ところはね」');return;}
   listPick(`いわく付き物件 ${L.length}件`,L.map(p=>({t:`${VIL[p.vi].name.replace(/^.* /,'')} ${RET[p.t].n}`,r:'いわく',col:'#fc7460'})),i=>oharai(L[i],()=>iwakuList()),i=>{const p=L[i];return p?`「${p.iw.k}」\n${G.day-p.iw.day}日前から`:'';});}
 const TENANTS=['山田さん','佐藤さん','鈴木さん','高橋さん','田中さん','伊藤さん','渡辺さん','中村さん','小林さん','加藤さん','自称 投資家の 男','売れない バンドマン','カイジ君'];
