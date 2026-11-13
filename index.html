@@ -424,6 +424,7 @@ const BASE_SKILLS={
   unabarising:{name:'ウナバライジング',mp:60,target:'enemies',kind:'xr',verb:'巻き起こした'},
   nightparry:{name:'ナイトパーリィ',mp:60,target:'allies',kind:'xr',verb:'はじめた'},
   addimpact:{name:'アディショナルインパクト',mp:60,target:'enemies',kind:'xr',verb:'はなった'},
+  neongenesis:{name:'neonGenesis',mp:120,target:'enemies',kind:'xr',verb:'はなった'},
   kunizukuri:{name:'国造ラッシュ',mp:60,target:'allies',kind:'xr',verb:'発動した'},
   kuniumi:{name:'国生み',mp:60,target:'allies',kind:'xr',verb:'はじめた'},
   yomotsu:{name:'黄泉津大神',mp:60,target:'enemies',kind:'xr',verb:'名のった'},
@@ -497,7 +498,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_futonorito','太祝詞','UR','祝詞',90],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -619,7 +620,8 @@ function rebuild(){
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy);
+const NOGACHA=['w_gaius'];
+const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=142,MAINW=64,MH0=56;
@@ -855,8 +857,8 @@ function cstat(id,m){
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
   const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1);atk*=aj;mag*=aj;def*=aj;
-  const pm=spearPair(id)?PAIR_MUL:1;
-  return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
+  const pm=spearPair(id)?PAIR_MUL:1,ngm=typeof BT!=='undefined'&&BT&&BT.ng&&G.party.includes(id)?1.5:1;
+  return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm*ngm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm*ngm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
 }
 function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=clamp(c.mp,0,s.mp);}
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
@@ -864,7 +866,7 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id))b=b.concat(['addimpact']);return b;};
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);return b;};
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
 const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
@@ -888,6 +890,7 @@ function wcopyReg(){if(!G||!G.weapons)return;for(const k in G.weapons){if(!k.inc
   WPD[k]=Object.assign({},d,{id:k,name:d.name+(WSUF[n]||'・'+n),copy:1,_base:{name:d.name}});if(GOD_BOOST[b])GOD_BOOST[k]=GOD_BOOST[b];}}
 function addCopy(id){let n=2;while(G.weapons[id+'~'+n])n++;const k=id+'~'+n;G.weapons[k]={lv:1,exp:0,dup:0};wcopyReg();return k;}
 let wQ=[],pullBulk=false;
+const ngReady=id=>{const c=G&&G.chars[id];if(!c||!G.party.includes(id))return false;if(![baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius'))return false;if(typeof BT!=='undefined'&&BT&&BT.ngUsed)return false;return G.party.some(p=>spearPair(p));};
 const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[baseW(c.wpn),baseW(c.wpn2)];return a.includes('w_longinus')&&a.includes('w_cassius');};
 const PAIR_MUL=2.75;
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
@@ -1754,7 +1757,7 @@ function startBattle(boss,rift=null,sp=null){
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
-  BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};
+  BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
@@ -1820,7 +1823,12 @@ function pAct(i){
       case 'buff':P_(()=>{if(!ok.v)return null;BT.pt.forEach(t=>{if(sk.st==='d'){t.db=sk.turns;t.dv=sk.amt;}else{t.ab=sk.turns;t.av=sk.amt;}});
         return `みかたの ${sk.st==='d'?'守備力':'攻撃力'}が あがった！`;});break;
       case 'mprec':P_(()=>{if(!ok.v)return null;sfx('heal');NOW(BT.pt.filter(isAlive).map(t=>()=>{const tc=G.chars[t.id],mx=cstat(t.id,t).mp,v=Math.min(mx-tc.mp,Math.round(mx*(t===m?.15:.35)));tc.mp+=v;return `${CH[t.id].short}の MPが ${fmt(v)} 回復した！`;}));return '日輪の 光が みかたの 魔力を 満たしていく！';});break;
-      case 'xr':if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
+      case 'xr':if(cmd.k==='neongenesis'){P_(()=>{if(!ok.v)return null;BT.ng=1;BT.ngUsed=1;sfx('g5');BT.shake=30;
+            BT.pt.forEach(t=>{const tc=G.chars[t.id],cs=cstat(t.id,t);tc.hp=cs.hp;tc.mp=cs.mp;});
+            return 'ガイウスの槍が 希望の 光を 放つ…！\nneonGenesis！\nみかたの 最大HP・MPが 1.5倍に なり 全回復した！';});
+          P_(()=>'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！');
+          const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
+        if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
           const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
         P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});break;
       case 'debuff':P_(()=>{if(!ok.v)return null;const L=BT.en.filter(e=>e.alive);if(!L.length)return null;sfx('ng');
@@ -1866,6 +1874,7 @@ function autoCmd(i){
   const hr=j=>G.chars[BT.pt[j].id].hp/cstat(BT.pt[j].id).hp,low=alive.filter(j=>hr(j)<.45).sort((a,b)=>hr(a)-hr(b));
   const mySk=myAll;
   if(can('nichirin')&&BT.pt.some(t=>isAlive(t)&&t!==m&&G.chars[t.id].mp<cstat(t.id,t).mp*.5)&&rnd()<.7)return{type:'skill',k:'nichirin'};
+  if(can('neongenesis')&&BT.en.some(e=>e.alive)&&(BT.pt.some(t=>!isAlive(t))||alive.some(j=>hr(j)<.5)||rnd()<.25))return{type:'skill',k:'neongenesis'};
   if(can('addimpact')&&BT.en.some(e=>e.alive)&&rnd()<.6)return{type:'skill',k:'addimpact'};
   {const xk=XRSK[m.id];if(xk&&can(xk)){const anyEn=BT.en.some(e=>e.alive);
     if(xk==='ujigami'&&anyEn&&rnd()<.6)return{type:'skill',k:xk};
@@ -1911,6 +1920,7 @@ const XR_DESC={ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n�
   yuiga:'自分の 守備力 +400%（5ターン）＋敵は 自分しか\n攻撃できない（5ターン）＋敵全体に 強力な 魔法攻撃',
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
+  neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復し、\nアディショナルインパクトも 発動する。\n編成に ロンギヌスと カシウスを 持つ キャラが 必要',
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
@@ -2059,7 +2069,8 @@ function loseBattle(){
   dialog(['ぜんめつ してしまった…'],()=>{noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
     enterVillage(G.home,true);dialog(`…${v.shrine}の 御神徳により\nめを さました。\nイェソが はんぶんに なった。`);});
 }
-function returnField(){BT=null;const tb=G.townBack;G.townBack=null;if(tb&&VIL[tb.vi]){startField();enterVillage(tb.vi);while(stack.length>1)pop();if(TW){TW.px=tb.px;TW.py=tb.py;}save();return;}startField();save();}
+function ngClamp(){G.party.forEach(id=>{const c=G.chars[id];if(!c)return;const t=cstat(id);if(c.hp>t.hp)c.hp=t.hp;if(c.mp>t.mp)c.mp=t.mp;});}
+function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(tb&&VIL[tb.vi]){startField();enterVillage(tb.vi);while(stack.length>1)pop();if(TW){TW.px=tb.px;TW.py=tb.py;}save();return;}startField();save();}
 
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
@@ -4065,8 +4076,10 @@ const GSTG={
   shi:{waves:1,f:(w,sp)=>.8+sp.n*.05,mk:(sp)=>{const S=GSH[sp.n];return[['近衛兵','bones','#24188c','#fcfcfc',1.5,1.1],[S.n,S.sh,S.c1,S.c2,10,1.5,1],['近衛兵','bones','#24188c','#fcfcfc',1.5,1.1]];},intro:(sp)=>`${GSH[sp.n].n}が 立ちはだかった！`},
   teio:{waves:1,f:()=>.78,mk:()=>[['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2],['帝王 錨ケンドウ','oni','#fcfcfc','#f8b800',16,1.6,1,'kendo'],['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2]],intro:()=>'錨ケンドウ「来い、外来の 者よ！」'},
   bannin:{waves:1,f:()=>.8,mk:()=>[['保管施設の 番人','bones','#3c3c3c','#3cbcfc',10,1.5,1]],intro:()=>'番人「保管 対象 外の 生体を 確認。\n排除 します」'},
-  minus:{waves:4,f:w=>w<4?.75:1,mk:(sp,w)=>w<4?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1],['保存された 嘆き','spirit','#24188c','#f878f8',1.4,1.1],['反響する 声','bat','#940084','#fcfcfc',1.4,1.1]].concat(w===3?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1]]:[]):[['人間を捨てた神 錨ケンドウ','spirit','#fcfcfc','#f8b800',24,1.8,1,'kgod']],
-    intro:(sp)=>sp.wave<4?`マイナス宇宙　記憶の 層 ${sp.wave}\n保存された 人々の 声が 反響する…`:'人間を捨てた神「じゆうを えらぶというのか。」'}};
+  minus:{waves:4,f:(w,sp)=>(w<4?.75:sp&&sp.lv&&w===4?.78:1)*mlvMul(sp&&sp.lv),mk:(sp,w)=>sp.lv&&w===4?[['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2],['帝王 錨ケンドウ（記憶）','oni','#fcfcfc','#f8b800',16,1.6,1,'kendo'],['帝王の 近衛','bones','#f8b800','#fcfcfc',2,1.2]]:w<4?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1],['保存された 嘆き','spirit','#24188c','#f878f8',1.4,1.1],['反響する 声','bat','#940084','#fcfcfc',1.4,1.1]].concat(w===3?[['記憶の 断片','spirit','#6844fc','#fcfcfc',1.4,1.1]]:[]):[['人間を捨てた神 錨ケンドウ','spirit','#fcfcfc','#f8b800',24,1.8,1,'kgod']],
+    intro:(sp)=>sp.wave<4?`マイナス宇宙　記憶の 層 ${sp.wave}${sp.lv?`（難易度 Lv${sp.lv}）`:''}\n保存された 人々の 声が 反響する…`:sp.lv&&sp.wave===4?'記憶の 中の 帝王「もう一度 試してくれよう！」':'人間を捨てた神「じゆうを えらぶというのか。」'}};
+const MLV_MAX=100,mlvMul=lv=>lv?1+(Math.min(MLV_MAX,lv)-1)/(MLV_MAX-1)*2:1;
+const gmWaves=sp=>sp.st==='minus'&&sp.lv?5:GSTG[sp.st].waves;
 const gmStage=sp=>GSTG[sp.st];
 function gmEnemies(sp,en){const d=gmStage(sp),w=sp.wave||1,F=GM_F*d.f(w,sp);
   for(const [n,sh,c1,c2,hm,sm,boss,look] of d.mk(sp,w)){const e=mkEnemy(12,[n,sh,c1,c2]);if(look){e.shape=look;if(look==='kgod'){e.w=90;e.h=86;}else{e.w=36;e.h=52;}}for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm*F);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*sm*F);
@@ -4074,9 +4087,9 @@ function gmEnemies(sp,en){const d=gmStage(sp),w=sp.wave||1,F=GM_F*d.f(w,sp);
 function startGm(st,extra){fullHeal();G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;while(stack.length>1)pop();startBattle(false,null,Object.assign({kind:'gunma',st,wave:1},extra||{}));}
 const gmGive=(b,o,u,c)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)+o;if(u)G.items.urtk=(G.items.urtk||0)+u;if(c)noCount(()=>{G.coins+=c;});
   return `経験値祝詞×${b}・極上鉱石×${o}`+(u?`\nUR確定チケット×${u}`:'')+(c?`・${fmt(c)}イェソ`:'')+'を 手に入れた！';};
-function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS();
-  if(w<d.waves){
-    if(sp.st==='minus'&&w===3){pages.push('記憶の 層を 抜けた…');dialog(pages,()=>{BT=null;scene('minus',['宙に 浮かぶ 城壁と 役所の 向こうに\n帝王の 姿は もう なかった。','人間を捨てた神「わたしは ひとを すくうため\nひとを すてた。」','「かなしみも あらそいも ない\nせかいを みせてやろう。」','「それでも じゆうを えらぶというのか。」','（苦しみを 消すために\n喜びも 選択も 奪うことは 救済ではない！）','記憶の 光が 体を つつみ\nHPと MPが 回復した！'],()=>{fullHeal();startBattle(false,null,Object.assign({},sp,{wave:4}));});});return;}
+function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS(),NW=gmWaves(sp);
+  if(w<NW){
+    if(sp.st==='minus'&&w===NW-1){pages.push('記憶の 層を 抜けた…');dialog(pages,()=>{BT=null;scene('minus',['宙に 浮かぶ 城壁と 役所の 向こうに\n帝王の 姿は もう なかった。','人間を捨てた神「わたしは ひとを すくうため\nひとを すてた。」','「かなしみも あらそいも ない\nせかいを みせてやろう。」','「それでも じゆうを えらぶというのか。」','（苦しみを 消すために\n喜びも 選択も 奪うことは 救済ではない！）','記憶の 光が 体を つつみ\nHPと MPが 回復した！'],()=>{fullHeal();startBattle(false,null,Object.assign({},sp,{wave:NW}));});});return;}
     pages.push(`第${w}${sp.st==='chusei'?'試合':'区画'}を 突破した！\n（HP・MPは 回復しない）`);dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
   const back=(more)=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more);});
   if(sp.st==='yuko'||sp.st==='nozei'||sp.st==='chusei'){const was=st[sp.st];st[sp.st]=1;
@@ -4098,7 +4111,10 @@ function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS();
         dialog(['帝都は 音の ない 空虚な 街に なった…','（古書店主の 手掛かりを 探そう）']);}));});return;}
   if(sp.st==='bannin'){st.bannin=1;save();back(['番人は 機能を 停止した。','最深部に 巨大な 装置が ある。\n起動すれば マイナス宇宙への 道が 開くようだ。','（保管区画の 扉から 向かおう）',gmGive(10,10)]);return;}
   if(sp.st==='minus'){
-    if(st.ch>=7){st.minus=(st.minus||0)+1;save();back(['人間を捨てた神は ふたたび 光の 中へ 消えた…',gmGive(30,30)]);return;}
+    if(st.ch>=7){st.minus=(st.minus||0)+1;const lv=sp.lv||1,ex=['人間を捨てた神は ふたたび 光の 中へ 消えた…',`マイナス宇宙 難易度 Lv${lv} クリア！`,gmGive(30+lv,30+lv)];
+      if(lv>=MLV_MAX&&!st.gaius){st.gaius=1;if(!G.weapons.w_gaius)G.weapons.w_gaius={lv:1,exp:0,dup:0};else addCopy('w_gaius');sfx('g5');
+        ex.push('…神が 消えた あとに 一本の 槍が 残されていた。','XR武器「ガイウスの槍」（希望の槍）を 手に入れた！','編成に ロンギヌスと カシウスの槍を 持つ キャラが いると\n固有スキル「neonGenesis」が 使える！');}
+      if(lv>=st.mlv||!st.mlv)st.mlv=Math.min(MLV_MAX,lv+1);if(lv>=MLV_MAX)st.mlv=MLV_MAX;save();back(ex);return;}
     const rw=gmGive(200,200,50,100000000);
     dialog(pages,()=>{BT=null;scene('peace',['人間を捨てた神は 光の 中で 崩れていく…','錨ケンドウ「それでも 人間は\n過ちを 繰り返すぞ…」','答えは 言葉では なかった。\nただ 帰還の 道を 選んだ。','保管された 人々の 意識が\n元の 世界へ 帰っていく…','帝都に 人々が 戻り\n街の 灯りが ふたたび 点った。',rw,'帝国から 解放の 礼として\n「宅地建物取引の 特許状」を 授かった！','どこの 町でも 民家や ビルを 買ったり\n空き地に マンションを 建てたり\nできる ように なった。（メニュー「不動産」）'],()=>{
       st.ch=7;G.townBack=null;G.pos={x:GGATE.x+1,y:GGATE.y};save();startField();
@@ -4129,7 +4145,11 @@ function koshoFac(){const st=gmS();
   dialog(['古書店主「いらっしゃい。 この 街で\n古い 本を 読む 者は めずらしい。」','「役所の 手続きが 終わったら\nまた おいで。 話したい ことが ある。」']);}
 /* 保管区画（地下保管施設） */
 function hokanFac(){const st=gmS();
-  if(st.ch>=7){choice('マイナス宇宙への 装置が\n静かに 光っている。\n人間を捨てた神に 再び 挑みますか？\n（4連戦・推奨Lv29999）',['挑む','やめる'],r=>{if(r===0)startGm('minus');},96);return;}
+  if(st.ch>=7){const lv=Math.min(MLV_MAX,st.mlv||1),opts=[`難易度 Lv${lv} に 挑む`,...(lv>1?['難易度を えらぶ']:[]),'やめる'];
+    choice(`マイナス宇宙への 装置が 静かに 光っている。\n人間を捨てた神に 再び 挑みますか？\n（5連戦・難易度 Lv${lv}/${MLV_MAX}）${st.gaius?'':'\nLv100 クリアで XR「ガイウスの槍」'}`,opts,r=>{
+      if(r===0)startGm('minus',{lv});
+      else if(opts[r]==='難易度を えらぶ'){const L=[];for(let k=lv;k>=1;k-=k>20?10:k>5?5:1)L.push(k);if(!L.includes(1))L.push(1);
+        listPick('難易度を えらぶ',L.map(k=>({t:`Lv${k}`,r:k===lv?'最新':''})),i=>startGm('minus',{lv:L[i]}));}},96);return;}
   if(st.ch<6){dialog(['「保管区画　関係者以外 立入禁止」','分厚い 鋼鉄の 扉だ。\nだれも 近づこうと しない…']);return;}
   if(!st.bannin){scene('vanish',['地下保管施設…','無数の 端末に 住民の 記憶が\n記録として 流れている。','端末「保管対象　帝都住民　全員」\n「同期率　98%」','（同じ 言葉を くりかえす 住民たち…\nすでに 意識が 同期されていたのだ）','錨ケンドウの 記録を 見つけた。\n「かつて 帝王は 大切な 人々を 失った」','「二度と 誰も 失われない 世界を」\n…その 願いは 選択を 奪ってでも\n保存する 思想へ 変わっていった。','裁判記録：外来者 無罪。\n備考「帝王の 指示による」','（あの 無罪判決も 計画の 一部だった…）','保管された 人類は 生きているのか、\nそれとも 変化しない 記録なのか…','奥から 番人が 現れた！'],()=>startGm('bannin'));return;}
   choice('最深部の 装置を 起動すれば\nマイナス宇宙への 道が 開く。\n向かいますか？（4連戦・推奨Lv29999）',['起動する','やめる'],r=>{if(r===0)scene('minus',['装置が 起動した…！','視界が 反転し\n上下も 距離も 不確かな 空間へ 落ちていく…'],()=>startGm('minus'));},96);}
