@@ -853,12 +853,13 @@ function cstat(id,m){
   let atk=(d.atk*lm*dm+w.atk)*bl,mag=(d.mag*lm*dm+w.mag)*bl,def=d.def*lm*dm*bl,spd=d.spd*(1+(c.lv-1)*.012)*dm;
   const xm=isXR(id)?XR_MUL:1;if(xm>1){atk*=xm;mag*=xm;def*=xm;spd*=xm;}
   if(spearPair(id)){atk*=PAIR_MUL;mag*=PAIR_MUL;def*=PAIR_MUL;spd*=PAIR_MUL;}
+  const gm=hasGaius(id)?GAIUS_MUL:1;if(gm>1){atk*=gm;mag*=gm;def*=gm;spd*=gm;}
   if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;}
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
   const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1);atk*=aj;mag*=aj;def*=aj;
   const pm=spearPair(id)?PAIR_MUL:1,ngm=typeof BT!=='undefined'&&BT&&BT.ng&&G.party.includes(id)?1.5:1;
-  return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm*ngm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm*ngm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
+  return{hp:Math.max(1,Math.round(d.hp*lm*dm*bl*(1+ma)*shk*aj*xm*pm*ngm*gm)),mp:Math.round(d.mp*(1+(c.lv-1)*.015)*dm*xm*pm*ngm*gm),atk:Math.round(atk),mag:Math.round(mag),def:Math.round(def),spd:Math.max(1,Math.round(spd))};
 }
 function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=clamp(c.mp,0,s.mp);}
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
@@ -890,9 +891,22 @@ function wcopyReg(){if(!G||!G.weapons)return;for(const k in G.weapons){if(!k.inc
   WPD[k]=Object.assign({},d,{id:k,name:d.name+(WSUF[n]||'・'+n),copy:1,_base:{name:d.name}});if(GOD_BOOST[b])GOD_BOOST[k]=GOD_BOOST[b];}}
 function addCopy(id){let n=2;while(G.weapons[id+'~'+n])n++;const k=id+'~'+n;G.weapons[k]={lv:1,exp:0,dup:0};wcopyReg();return k;}
 let wQ=[],pullBulk=false;
-const ngReady=id=>{const c=G&&G.chars[id];if(!c||!G.party.includes(id))return false;if(![baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius'))return false;if(typeof BT!=='undefined'&&BT&&(BT.ngUsed||BT.aiUsed))return false;return G.party.some(p=>spearPair(p));};
+const ngReady=id=>{const c=G&&G.chars[id];if(!c||!G.party.includes(id))return false;if(![baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius'))return false;if(typeof BT!=='undefined'&&BT&&BT.ngUsed)return false;return true;};
 const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[baseW(c.wpn),baseW(c.wpn2)];return a.includes('w_longinus')&&a.includes('w_cassius');};
-const PAIR_MUL=2.75;
+const PAIR_MUL=2.75,GAIUS_MUL=3;
+const spKinds=id=>{const c=G.chars[id];if(!c)return[];const a=[baseW(c.wpn),baseW(c.wpn2)],k=[];if(a.includes('w_longinus')||a.includes('w_cassius'))k.push('lc');if(a.includes('w_gaius'))k.push('g');return k;};
+const spearClash=ids=>{const k=new Set(ids.flatMap(spKinds));return k.has('lc')&&k.has('g');};
+const SPEAR_NG='ロンギヌス・カシウスと ガイウスの槍は\n同じ 編成に 入れられない';
+const hasGaius=id=>{const c=G.chars[id];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius');};
+/* 武器の 効果説明 */
+function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=d.type;
+  if(d.rar===6)L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
+  if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
+  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');
+  if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
+  if(b==='w_longinus'||b==='w_cassius')L.push('ロンギヌスと カシウスを 1人で 両方 持つと 共鳴：','\t全ステータス +175%＋スキル「アディショナルインパクト」','※ガイウスの槍とは 同じ編成に 入れられない');
+  if(b==='w_gaius')L.push('装備すると 全ステータス +200%','固有スキル「neonGenesis」（1戦に1回）：','\tHP・MP 1.5倍で 全回復＋敵全体に 超絶ダメージ','\t＋アディショナルインパクト','※ロンギヌス・カシウスとは 同じ編成に 入れられない');
+  if(!L.length)L.push('特殊な 効果は ない');return L;}
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
@@ -970,6 +984,7 @@ function fixSave(){
   if(G.items.tk==null)G.items.tk=0;if(G.items.srtk==null)G.items.srtk=0;if(G.items.urtk==null)G.items.urtk=0;if(!G.items.tok)G.items.tok=[0,0,0];while(G.items.b.length<5)G.items.b.push(0);while(G.items.o.length<5)G.items.o.push(0);applyRevived();applyGimOcc();VIL.forEach((v,i)=>{if(v.dict&&!v.dict.gim)setT(v.x,v.y,occupied(i)?T.DICT:T.CITY);});if(!G.mine&&garubaFree())G.mine=newMine();for(const k in d.bank)if(G.bank[k]==null)G.bank[k]=d.bank[k];
   if(G.ukaiho&&G.ukaiho.rank>=2)G.cap3=1;wcopyReg();applyXR();wrapCoins();
   G.party=G.party.filter(id=>CH[id]&&G.chars[id]);
+  if(typeof spearClash==='function'&&spearClash(G.party))G.party.forEach(id=>{const c=G.chars[id];if(baseW(c.wpn)==='w_gaius')c.wpn=null;if(baseW(c.wpn2)==='w_gaius')c.wpn2=null;});
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
   for(const id in G.chars){const c=G.chars[id];if(c.wpn&&!WPD[c.wpn])c.wpn=null;if(c.wpn&&!xrwOk(id,c.wpn))c.wpn=null;if(c.wpn2&&WPD[c.wpn2]&&!xrwOk(id,c.wpn2))c.wpn2=null;if(c.wpn2&&(!WPD[c.wpn2]||!twoSlot(id)))c.wpn2=null;}
   if(!PASS[tileAt(G.pos.x,G.pos.y)])G.pos={x:VIL[0].x,y:VIL[0].y+1};
@@ -1404,7 +1419,7 @@ function partyScr(){
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();save();return;}if(r==null)return;
       const id=ids()[r],k=G.party.indexOf(id);
       if(k>=0){if(G.party.length<=1){sfx('ng');toast('1人は のこしてください');return;}G.party.splice(k,1);applyXR();G.party.forEach(fixHp);}
-      else{if(stationed().has(id)){sfx('ng');toast('村に 配置中です（集会所で 引き上げ）');return;}if(G.party.length>=4){sfx('ng');toast('パーティは 4人までです');return;}G.party.push(id);applyXR();G.party.forEach(fixHp);if(xrReady(id)&&!isXR(id))toast('XRは 編成に 1体まで（UR扱い・基礎Lvは そのまま）');}
+      else{if(stationed().has(id)){sfx('ng');toast('村に 配置中です（集会所で 引き上げ）');return;}if(G.party.length>=4){sfx('ng');toast('パーティは 4人までです');return;}if(spearClash([...G.party,id])){sfx('ng');toast(SPEAR_NG);return;}G.party.push(id);applyXR();G.party.forEach(fixHp);if(xrReady(id)&&!isXR(id))toast('XRは 編成に 1体まで（UR扱い・基礎Lvは そのまま）');}
       refresh();},
     drw(a){R(0,0,W,H,'#000');menuDraw(m,a);win(176,20,76,206);txt('パーティ',184,27,'#f8b800');
       G.party.forEach((id,i)=>{drawChar(id,184,42+i*44,(frame>>4)&1);txt(CH[id].short,202,44+i*44,'#fcfcfc','left',46);txt(`Lv${G.chars[id].lv}`,202,56+i*44,'#bcbcbc');});}});
@@ -1461,12 +1476,18 @@ function equipMenu(id,slot){
   const m=mkMenu([],{x:4,y:8,w:248,rows:12,title:`${CH[id].short}の 武器${twoSlot(id)?(slot==='wpn'?'（1つめ）':'（2つめ）'):''}`});
   const refresh=()=>{m.items=[{t:'（はずす）'},...list().map(w=>{const s=wstat(w),o=wOwner(w);return{tag:RAR[WPD[w].rar].n,tcol:RAR[WPD[w].rar].c,t:WPD[w].name+(o&&o!==id?'＊':'')+(GOD_BOOST[w]?`（神なら${GOD_BOOST[w]}倍）`:WPD[w].type==='神宝'?'（神専用）':WPD[w].type==='仏具'?'（仏陀専用）':WPD[w].type==='飲料'?'（先輩専用）':WPD[w].type==='マイク'?'（ビート兄専用）':WPD[w].type==='狙撃銃'?'（狙撃弟専用）':''),r:xrwOk(id,w)?`攻${fmt(s.atk)} 魔${fmt(s.mag)}`:`Lv${XRW_LV+1}〜`,dis:!xrwOk(id,w),col:G.chars[id][slot]===w?'#f8b800':null};})];};refresh();
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r==null)return;
-      if(r===0)G.chars[id][slot]=null;else{const w=list()[r-1],o=wOwner(w);if(!xrwOk(id,w)){sfx('ng');toast(`XR武器は キャラLv${XRW_LV+1}以上で 装備できる（今 Lv${G.chars[id].lv}）`);return;}if(o){if(G.chars[o].wpn===w)G.chars[o].wpn=null;if(G.chars[o].wpn2===w)G.chars[o].wpn2=null;}G.chars[id][slot]=w;}
-      if(!twoSlot(id))G.chars[id].wpn2=null;fixHp(id);save();pop();toast(spearPair(id)?'ロンギヌスと カシウス… 双槍が 共鳴した！ 全ステータス +175%':'そうびを かえた');},
-    drw(a){R(0,0,W,H,'#000');menuDraw(m,a);const r=m.sel;win(4,190,248,40);
-      if(r>0){const w=list()[r-1];if(w){const o=wOwner(w);txt(`${WPD[w].type}　Lv${G.weapons[w].lv}　基礎Lv${G.weapons[w].dup+1}`,14,198,'#fcfcfc','left',228);txt(o?`${CH[o].short}が そうび中（＊）`:'だれも そうびしていない',14,212,'#bcbcbc','left',228);}}
+      if(r===0)G.chars[id][slot]=null;else{const w=list()[r-1],o=wOwner(w);{const c=G.chars[id],sv=c[slot];c[slot]=w;const bad=spearClash(G.party.includes(id)?G.party:[id]);c[slot]=sv;if(bad){sfx('ng');toast(SPEAR_NG);return;}}if(!xrwOk(id,w)){sfx('ng');toast(`XR武器は キャラLv${XRW_LV+1}以上で 装備できる（今 Lv${G.chars[id].lv}）`);return;}if(o){if(G.chars[o].wpn===w)G.chars[o].wpn=null;if(G.chars[o].wpn2===w)G.chars[o].wpn2=null;}G.chars[id][slot]=w;}
+      if(!twoSlot(id))G.chars[id].wpn2=null;fixHp(id);save();pop();toast(spearPair(id)?'ロンギヌスと カシウス… 双槍が 共鳴した！ 全ステータス +175%':hasGaius(id)?'ガイウスの槍… 希望の 力！ 全ステータス +200%':'そうびを かえた');},
+    drw(a){R(0,0,W,H,'#000');menuDraw(m,a);const r=m.sel;win(4,182,248,50);
+      if(r>0){const w=list()[r-1];if(w){const o=wOwner(w),ef=wEffect(w);txt(`${WPD[w].type}　Lv${G.weapons[w].lv}　基礎Lv${G.weapons[w].dup+1}`,14,189,'#fcfcfc','left',228);txt(o?`${CH[o].short}が そうび中（＊）`:'だれも そうびしていない',14,202,'#bcbcbc','left',228);txt('効果：'+(ef.find(l=>!/^(XR武器|聖槍：|\t)/.test(l))||ef[0]).replace('\t','')+(ef.length>1?' …（くわしくは 武器の鍛錬で）':''),14,215,'#f8d878','left',228);}}
       else txt('武器を はずします',14,198,'#bcbcbc');}});
 }
+function wEffectScr(wid){const d=WPD[wid],ef=wEffect(wid);
+  push({full:true,canBack:true,upd(){if(I.A||I.B){pop();}},
+    drw(){R(0,0,W,H,'#000');win(0,4,256,232);R(10,14,36,36,'#24188c');drawWIcon(wid,12,16,2);
+      txt(RAR[d.rar].n,54,14,rcol(d.rar),'left',196);txt(d.name,54,28,'#fcfcfc','left',196);txt(`種類：${d.type}`,54,42,'#bcbcbc','left',196);
+      txt('― 武器の 効果 ―',128,62,'#f8b800','center');ef.forEach((l,j)=>txt(l[0]==='\t'?'　'+l.slice(1):'・'+l,12,78+j*14,l[0]==='\t'?'#bcbcbc':'#fcfcfc','left',236));
+      txt('Aボタン / Bボタンで もどる',128,220,'#7c7c7c','center');}});}
 function weaponListScr(){
   const m=mkMenu([],{x:4,y:20,w:248,rows:13,title:'武器の鍛錬（えらんでね）'});
   const ids=()=>ownedWeapons();
@@ -1474,8 +1495,8 @@ function weaponListScr(){
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r!=null)weaponDetail(ids()[r],refresh);},drw(a){R(0,0,W,H,'#000');menuDraw(m,a);}});
 }
 function weaponDetail(wid,after){
-  const m=mkMenu(['鍛錬鉱を使う','もどる'],{x:4,y:172,w:124});
-  push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===1){pop();after&&after();return;}if(r===0)bookMenu(wid,'wpn');},
+  const m=mkMenu(['鍛錬鉱を使う','武器の 効果を 見る','もどる'],{x:4,y:172,w:124});
+  push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===2){pop();after&&after();return;}if(r===0)bookMenu(wid,'wpn');if(r===1)wEffectScr(wid);},
     drw(a){R(0,0,W,H,'#000');win(0,4,256,166);const d=WPD[wid],w=G.weapons[wid],s=wstat(wid),o=wOwner(wid);
       R(10,14,52,52,'#24188c');drawWIcon(wid,12,16,3);
       txt(RAR[d.rar].n+(RAR[d.rar].lab?'（'+RAR[d.rar].lab+'）':''),70,12,rcol(d.rar),'left',176);txt(d.name,70,24,'#fcfcfc','left',176);
@@ -1485,6 +1506,7 @@ function weaponDetail(wid,after){
       txt(`種類：${d.type}`,12,80);txt(`攻撃 +${fmt(s.atk)}　魔力 +${fmt(s.mag)}`,12,94);
       txt(o?`${CH[o].name}が そうび中`:'だれも そうびしていない',12,108,'#bcbcbc','left',236);
       if(d.src!=='基本')txt('追加データ：'+d.src,12,122,'#7c7c7c','left',236);
+      {const ef=wEffect(wid);ef.slice(0,3).forEach((l,j)=>txt((j?'　':'効果：')+l.replace('\t',''),12,136+j*11,'#f8d878','left',236));}
       menuDraw(m,a);}});
 }
 function itemScr(){
@@ -1922,8 +1944,8 @@ const XR_DESC={ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n�
   yuiga:'自分の 守備力 +400%（5ターン）＋敵は 自分しか\n攻撃できない（5ターン）＋敵全体に 強力な 魔法攻撃',
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
-  neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※同じ戦闘では アディショナルインパクトと\nどちらか 一方しか 使えない',
-  addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する\n※同じ戦闘では neonGenesisと どちらか一方'};
+  neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
+  addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
     case 'phys':return `${tg}に 物理攻撃（威力 ×${s.p}${s.hits>1?`・${s.hits}回 攻撃`:''}）\n攻撃力で ダメージが きまる`;
@@ -4115,7 +4137,7 @@ function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS(),NW=gmWa
   if(sp.st==='minus'){
     if(st.ch>=7){st.minus=(st.minus||0)+1;const lv=sp.lv||1,ex=['人間を捨てた神は ふたたび 光の 中へ 消えた…',`マイナス宇宙 難易度 Lv${lv} クリア！`,gmGive(30+lv,30+lv)];
       if(lv>=MLV_MAX&&!st.gaius){st.gaius=1;if(!G.weapons.w_gaius)G.weapons.w_gaius={lv:1,exp:0,dup:0};else addCopy('w_gaius');sfx('g5');
-        ex.push('…神が 消えた あとに 一本の 槍が 残されていた。','XR武器「ガイウスの槍」（希望の槍）を 手に入れた！','編成に ロンギヌスと カシウスの槍を 持つ キャラが いると\n固有スキル「neonGenesis」が 使える！');}
+        ex.push('…神が 消えた あとに 一本の 槍が 残されていた。','XR武器「ガイウスの槍」（希望の槍）を 手に入れた！','装備すると 全ステータス +200%！\n固有スキル「neonGenesis」が 使える！','※ロンギヌス・カシウスとは\n同じ 編成に 入れられない');}
       if(lv>=st.mlv||!st.mlv)st.mlv=Math.min(MLV_MAX,lv+1);if(lv>=MLV_MAX)st.mlv=MLV_MAX;save();back(ex);return;}
     const rw=gmGive(200,200,50,100000000);
     dialog(pages,()=>{BT=null;scene('peace',['人間を捨てた神は 光の 中で 崩れていく…','錨ケンドウ「それでも 人間は\n過ちを 繰り返すぞ…」','答えは 言葉では なかった。\nただ 帰還の 道を 選んだ。','保管された 人々の 意識が\n元の 世界へ 帰っていく…','帝都に 人々が 戻り\n街の 灯りが ふたたび 点った。',rw,'帝国から 解放の 礼として\n「宅地建物取引の 特許状」を 授かった！','どこの 町でも 民家や ビルを 買ったり\n空き地に マンションを 建てたり\nできる ように なった。（メニュー「不動産」）'],()=>{
