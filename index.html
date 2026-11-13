@@ -625,8 +625,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=142,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -720,11 +720,11 @@ const GOUT={x0:130,y0:64,x1:186,y1:99};
   VIL.push({x:172,y:72,name:'廃線沿いの村',shrine:'鉄道神社',rank:1,tier:12,size:0,from:K+3,depop:'ruin',target:150,desc:'帝国の 鉄道が 止まり 人が 去った 村'});
   VIL.push({x:158,y:94,name:'峠の集落',shrine:'峠の神の祠',rank:1,tier:12,size:0,from:K,depop:'aging',target:150,desc:'壁の 影に なり 日の 当たらない 集落'});}
 /* 修羅の町 キタキュウ（グンマーへの つなぎの 大陸・推奨Lv22222） */
-const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137};
+const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137},KJO={x:126,y:132};
 {const NOR=VIL.findIndex(v=>v.name==='ノルデン港'),A=VIL.length;
   VIL.push({x:111,y:127,name:'ワカマツ浜',shrine:'恵比須神社',rank:3,tier:12,size:1,from:NOR,kq:1,rec:KQ_REC,desc:'旧大陸から 橋で つながる 潮風の 浜町'});
   VIL.push({x:113,y:133,name:'鉄の町 ヤハタ',shrine:'鉄祖神社',rank:4,tier:12,size:4,from:A,kq:1,rec:KQ_REC,kqf:['kqtetsu'],desc:'高炉の 火が 絶えない 鉄の 町'});
-  VIL.push({x:123,y:132,name:'城下町 コクラ',shrine:'城山八坂神社',rank:6,tier:12,size:5,from:A+1,kq:1,rec:KQ_REC,castle:1,kqf:['kqbugyo','keiba'],desc:'コクラ城を 中心に 栄える キタキュウの 都'});
+  VIL.push({x:123,y:132,name:'城下町 コクラ',shrine:'城山八坂神社',rank:6,tier:12,size:5,from:A+1,kq:1,rec:KQ_REC,castle:1,kqf:['kqbugyo'],desc:'コクラ城を 中心に 栄える キタキュウの 都'});
   VIL.push({x:118,y:127,name:'トバタの村',shrine:'提灯八幡宮',rank:3,tier:12,size:1,from:A,kq:1,rec:KQ_REC,kqf:['kqyagura'],desc:'夏に 千の 提灯が ともる 祭りの 村'});
   VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東に ワカトゥオー橋が 架かる'});
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:2,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
@@ -821,6 +821,9 @@ function genMap(){
   /* 皿倉山：ヤハタの 南、町の 外の 山 */
   {const h=VIL.find(v=>v.name==='鉄の町 ヤハタ');for(let y=h.y+1;y<SARA.y;y++){const t=tileAt(h.x,y);if(!isTownT(t)&&t!==T.SHR)setT(h.x,y,T.YAMA);}let x=h.x;while(x!==SARA.x){x+=Math.sign(SARA.x-x);setT(x,SARA.y-1,T.YAMA);}
     for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++){const t=tileAt(SARA.x+dx,SARA.y+dy);if(t!==T.YAMA&&t!==T.ROAD&&!isTownT(t))setT(SARA.x+dx,SARA.y+dy,T.MOUNT);}setT(SARA.x,SARA.y-1,T.YAMA);setT(SARA.x,SARA.y,T.KQSPOT);}
+  /* コクラ競馬場：コクラの すぐ 東 */
+  {const k=VIL.find(v=>v.name==='城下町 コクラ');for(let x=k.x+1;x<KJO.x;x++){const t=tileAt(x,KJO.y);if(!isTownT(t)&&t!==T.SHR)setT(x,KJO.y,T.ROAD);}
+    for(let dy=-1;dy<=1;dy++)for(let dx=0;dx<=1;dx++){const t=tileAt(KJO.x+dx,KJO.y+dy);if(t===T.WATER||t===T.SEA||t===T.MOUNT)setT(KJO.x+dx,KJO.y+dy,T.GRASS);}setT(KJO.x,KJO.y,T.KEIBAJO);}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -858,6 +861,8 @@ TILES[T.GGATE]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c44');P(0,0,16,3,'#8c8c9
 TILES[T.KQSPOT]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#000030');for(let y=0;y<14;y++){const hw=Math.min(8,Math.floor(y*0.62)+1);P(8-hw,2+y,hw*2,1,y<3?'#5c5c5c':'#24402c');}
   P(7,1,2,2,f?'#fcfcfc':'#f8d878');P(6,0,1,1,'#f8d878');P(9,0,1,1,'#f8d878');for(let k=0;k<7;k++)P(2+k,13-k,1,1,'#bcbcbc');P(f?4:5,f?10:9,3,2,'#d82800');
   for(let k=0;k<6;k++)P(1+((k*5)%14),14+(k%2),1,1,['#f8d878','#3cbcfc','#fcfcfc'][k%3]);}));
+TILES[T.KEIBAJO]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#00a800');P(1,4,14,10,'#e4c890');P(3,6,10,6,'#00a800');P(4,7,8,4,'#00c800');P(1,4,14,1,'#fcfcfc');P(1,13,14,1,'#fcfcfc');
+  P(2,0,12,4,'#3c3c3c');P(1,0,14,1,'#00a800');for(let x=3;x<13;x+=2)P(x,2,1,1,['#d82800','#fcfcfc','#f8b800','#0058f8'][(x+f)%4]);P(f?5:9,8,3,2,'#7c4c10');P(f?6:10,7,1,1,'#d82800');}));
 TILES[T.GSEAL]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c3c');P(2,4,12,12,'#5c5c5c');P(4,1,8,3,'#7c7c7c');P(5,8,6,8,'#000');P(2,4,12,1,'#bcbcbc');P(6,10,4,1,f?'#d82800':'#f8b800');P(1,13,14,1,'#f8b800');P(1,14,14,1,'#000');for(let x=1;x<15;x+=4)P(x,13,2,1,'#000');}));
 function drawTile(t,x,y){const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a.length],x,y);}
 
@@ -1297,6 +1302,7 @@ function onStep(pv){
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
   if(t===T.KQSPOT){kqFac('kqcable');return;}
+  if(t===T.KEIBAJO){enterKeibajo();return;}
   if(isTownT(t)){enterVillage(VIL.findIndex(v=>v.x===x&&v.y===y));return;}
   {const rr=RES.find(r=>r.x===x&&r.y===y);if(rr){resScr(rr.id);return;}}
   if(t===T.MINE){mineScr();return;}
@@ -2126,7 +2132,7 @@ const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
   kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr']);
+const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -2332,6 +2338,16 @@ function drawCell(c,sx,sy,city){
     case 'ura':{R(sx,sy,16,16,'#4c4c54');if(G.colo){R(sx+1,sy+1,14,14,'#000');for(let k=0;k<4;k++)R(sx+2+k,sy+3+k*3,12-k*2,2,'#2c2c2c');const g=(frame>>3)&1;R(sx+1,sy+1,14,1,g?'#940084':'#6844fc');R(sx+1,sy+14,14,1,g?'#940084':'#6844fc');}
       else{R(sx+1,sy+1,14,14,'#2c2c2c');R(sx+1,sy+1,14,1,'#5c5c5c');R(sx+7,sy+3,2,10,'#000');R(sx+3,sy+7,10,2,'#000');}break;}
     case 'kc':case 'kcdoor':drawKokura(c,sx,sy);break;
+    case 'kfl':R(sx,sy,16,16,'#bcb49c');R(sx,sy,8,8,'#c8c0a8');R(sx+8,sy+8,8,8,'#c8c0a8');break;
+    case 'kstep':R(sx,sy,16,16,'#7c7c7c');R(sx,sy+5,16,1,'#5c5c5c');R(sx,sy+11,16,1,'#5c5c5c');R(sx+2,sy+1,5,3,'#24188c');R(sx+9,sy+7,5,3,'#24188c');break;
+    case 'kturf':{R(sx,sy,16,16,'#00a800');R(sx,sy+(c.r?0:8),16,1,'#00b800');const f=(frame*2+c.x*16)%(26*16);if(c.r===1&&(f<16||(f>200&&f<216))){drawHorse(sx+(f%16)-8,sy+3,'#d82800',frame,'#f8b800');}if(c.r===0&&f>96&&f<112)drawHorse(sx+(f%16)-8,sy+3,'#0058f8',frame+2,'#fcfcfc');break;}
+    case 'krail':R(sx,sy,16,16,'#00a800');R(sx,sy+6,16,3,'#fcfcfc');R(sx+2,sy+6,2,8,'#fcfcfc');R(sx+10,sy+6,2,8,'#fcfcfc');if(c.goal){R(sx+6,sy-14,3,22,'#d82800');R(sx+3,sy-16,9,4,'#fcfcfc');}break;
+    case 'kwall':R(sx,sy,16,16,'#3c3c3c');R(sx,sy,16,3,'#00a800');R(sx,sy+13,16,3,'#5c5c5c');for(let x=2;x<16;x+=5)R(sx+x,sy+5,3,6,'#24243c');break;
+    case 'kwin':R(sx,sy,16,16,'#503000');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#3cbcfc');R(sx+5,sy+10,6,6,'#a05000');R(sx+1,sy+12,14,1,'#f8b800');txtS('券',sx+8,sy+3,'#000','center');break;
+    case 'kboard':{R(sx,sy,16,16,'#000');R(sx,sy,16,1,'#5c5c5c');const lt=((frame>>4)+c.k)%3;for(let y=2;y<14;y+=4)R(sx+2,sy+y,12,2,lt===(y>>2)%3?'#f8b800':'#7ee07e');if(c.k===0)R(sx,sy,1,16,'#5c5c5c');if(c.k===4)R(sx+15,sy,1,16,'#5c5c5c');break;}
+    case 'kpad':{R(sx,sy,16,16,'#00a800');if(c.e)R(sx,sy+(c.e===1?0:13),16,3,'#fcfcfc');if(c.e===0){const gx=(frame>>1)%96;if(Math.floor(gx/16)===c.dx)drawHorse(sx+(gx%16)-6,sy+2,'#f878f8',frame,'#f878f8');}break;}
+    case 'kfood':R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,4,c.dx?'#d82800':'#fcfcfc');R(sx+1,sy+4,14,8,'#a05000');R(sx+3,sy+5,10,4,'#3c3c3c');R(sx+4,sy+6,8,2,'#f8b800');if(!c.dx)txtS('焼',sx+8,sy,'#000','center');else txtS('う',sx+8,sy,'#fcfcfc','center');break;
+    case 'kown':R(sx,sy,16,16,'#3c2800');R(sx+3,sy+2,10,14,'#7c4c10');R(sx+3,sy+2,10,2,'#f8b800');R(sx+10,sy+9,2,2,'#f8b800');break;
     case 'moat':R(sx,sy,16,16,'#0038a8');R(sx,sy,16,3,'#8c8c8c');R(sx,sy+3,16,1,'#5c5c5c');for(let k=0;k<3;k++)R(sx+((k*6+(frame>>3)+c.dx*3)%14),sy+6+k*3,3,1,'#3cbcfc');if(((frame>>4)+c.dx)%5===0)R(sx+5,sy+9,4,2,'#f878f8');break;
     case 'kbr':R(sx,sy,16,16,'#0038a8');R(sx+2,sy,12,16,'#a05000');for(let y=1;y<16;y+=3)R(sx+2,sy+y,12,1,'#7c4c10');R(sx,sy,3,16,'#d82800');R(sx+13,sy,3,16,'#d82800');R(sx,sy+2,3,2,'#f8b800');R(sx+13,sy+2,3,2,'#f8b800');R(sx,sy+12,3,2,'#f8b800');R(sx+13,sy+12,3,2,'#f8b800');break;
     case 'sakura':R(sx,sy,16,16,'#4c4c54');R(sx+7,sy+10,2,6,'#7c4c10');R(sx+2,sy+2,12,8,'#f878f8');R(sx+4,sy+1,8,2,'#fcbcfc');R(sx+3,sy+4,3,3,'#fcbcfc');R(sx+10,sy+5,3,2,'#fcbcfc');R(sx+1,sy+6,2,2,'#f878f8');R(sx+13,sy+4,2,3,'#f878f8');
@@ -2377,12 +2393,13 @@ const townScr={full:true,mv:null,bt:0,
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);}return;}
+    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);}return;}
     if(!c)return;
     if(TPASS.has(c.t)){this.mv={x1:nx,y1:ny,dx,dy,t:0};return;}
     if(fresh&&c.t==='door'){openFac(c.b.kind);return;}
     if(fresh&&c.t==='trift'){gimRiftTalk(c);return;}
     if(fresh&&TW.ship&&shipBump(c))return;
+    if(fresh&&TW.kjo&&kjoBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
     if(fresh&&(c.t==='kcdoor'||c.t==='kc'||c.t==='moat'||c.t==='nobori'||c.t==='sakura')){if(c.t==='kcdoor')kqFac('kqjo');else dialog(c.t==='kc'?(kqS().ch===3?'五層の 天守に 黒い 雲が 渦を 巻いている…':kqS().ch>=4?'金の 鯱が 夜空に かがやく\n五層の 天守だ。 町の 誇りだ！':'白壁と 金の 飾りが まぶしい\n五層の 天守 コクラ城だ。'):c.t==='moat'?'お堀には 鯉が 泳いでいる。':c.t==='nobori'?'のぼりに「コクラ城」と 書かれている。':'城の 桜が 咲きほこっている。');return;}
     if(fresh&&c.t==='ura'){if(G.colo)uraFac();else dialog('黒い 石の 扉が 地面に はめこまれている。\n固く 閉ざされていて びくとも しない…');return;}
@@ -2404,7 +2421,7 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
-    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship?120:88);if(!TW.ship)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
+    win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo?120:88);if(!TW.ship&&!TW.kjo)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right');}
   }
@@ -4288,7 +4305,7 @@ function kqIntro(){const st=kqS();st.ch=1;
   return['…空気が ピリピリ している。','町の人「よそもんかい？ 気ぃつけり。\nこの キタキュウは いま 修羅の 霧に\nおおわれとるっちゃ。」','「霧を 吸うと だれでも 気が 荒くなって\nケンカっ早く なってしまうんよ。\nほんとは みんな 人情の ある 町なんやけど…」','「くわしい ことは 城下町 コクラの\n奉行所で 聞いてみり。」','（キタキュウの 推奨レベルは Lv22222）'];}
 function kqLines(vi){const ch=kqS().ch,v=VIL[vi];
   if(ch>=4)return['霧が 晴れて 町に 笑い声が 戻ったっちゃ！','あんたが 修羅を 鎮めてくれたん？\nありがとね！ 焼きうどん 食べていき！','仕事帰りの 角打ちが いちばんよ。\n立ったまま 一杯 やるんが キタキュウ流たい。','東の モジから ワカトゥオー橋を 渡ると\nグンマー帝国やね。 気ぃつけて 行きり！','成人式は 袴で 派手に 決めるっちゃ！\n…見た目は 派手でも 中身は まじめなんよ。'];
-  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の ワカトゥオー橋を 渡れば\nグンマー帝国。 でも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは フクエノナオヤン！\n袴は 重いけど 心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？',...(v.name.includes('ヤハタ')?['サラクラ山は 町を 出て 南に そびえとるよ。\n山頂から 見る 夜景が 自慢なんよ。']:[])];}
+  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の ワカトゥオー橋を 渡れば\nグンマー帝国。 でも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは フクエノナオヤン！\n袴は 重いけど 心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？',...(v.name.includes('ヤハタ')?['コクラ競馬場は 町を 出て すぐ 東っちゃ！','サラクラ山は 町を 出て 南に そびえとるよ。\n山頂から 見る 夜景が 自慢なんよ。']:[])];}
 function startKq(st,extra){startGm(st,extra);}
 function kqFac(kind){const st=kqS();
   if(kind==='kqkanmon'){dialog(st.ch>=4?['案内所「霧が 晴れて ワカトゥオー橋も\nにぎやかに なったよ。」','「東へ 渡れば グンマー帝国の 外縁地方。\n帝国の 推奨レベルは Lv29999 たい。」']:['案内所「ここは ワカトゥオー橋の 案内所。\n東へ 橋を 渡れば\nグンマー帝国の 外縁地方たい。」','「でも 帝国は 推奨Lv29999。\nまずは キタキュウの 修羅を 鎮めて 腕を 磨きり。」','（キタキュウの 推奨レベルは Lv22222）']);return;}
@@ -4583,8 +4600,43 @@ function keibaFac(){const vi=curVil,v=VIL[vi],bets=[];let card=keibaCard(vi);
       txt(`財布 ${fmt(G.coins)}`,148,224,'#bcbcbc','left',96);}});
 }
 
+/* ===================== コクラ競馬場（中に 入れる） ===================== */
+function buildKeibajo(){const w=21,h=17,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'kturf',r:0,x};C[1][x]={t:'kturf',r:1,x};C[2][x]={t:'krail',goal:x===14};C[3][x]={t:'kstep'};C[4][x]={t:'kstep'};C[h-1][x]={t:'kwall'};}
+  for(let y=0;y<h;y++){if(y>=3){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}}
+  for(let k=0;k<5;k++)C[7][2+k]={t:'kwin',k};for(let k=0;k<5;k++){C[6][13+k]={t:'kboard',k};C[7][13+k]={t:'kboard',k:k+5};}
+  C[7][9]={t:'kown'};
+  for(let dy=0;dy<4;dy++)for(let dx=0;dx<6;dx++)C[10+dy][13+dx]={t:'kpad',dx,e:dy===0?1:dy===3?2:(dy===1?0:3)};
+  C[12][2]={t:'kfood',dx:0};C[12][3]={t:'kfood',dx:1};
+  C[h-1][10]={t:'exit'};C[h-1][9]={t:'kwall'};C[h-1][11]={t:'kwall'};
+  const vi=VIL.findIndex(v=>v.name==='城下町 コクラ'),r=lcg(G.day*389+71);
+  const npcs=[{x:4,y:8,col:'#503000',hair:'#3c3c3c',line:'窓口の 係員「馬券の お求めは 窓口で どうぞ。\nG1 タムニィ杯は 10レースごとです」'},
+    {x:15,y:9,col:'#24188c',hair:'#000000',line:'パドックの 客「馬の 毛づやを 見るんよ。\n…まあ 結局は 勘やけどね」'},
+    {x:6,y:4,col:'#d82800',hair:'#7c4c10',line:'観客「いけーっ！ そのまま！ そのまま！」'},{x:12,y:3,col:'#00a800',hair:'#000000',line:'観客「ハリボテエレジーが 勝つ日を 見るまで\nおれは 死ねんっちゃ」'},
+    {x:5,y:13,col:'#fcfcfc',hair:'#5c5c5c',line:'焼きうどん屋「競馬の おともに 焼きうどん！\nソースの 香りで 運も 上がるよ！」'},
+    {x:8,y:10,col:'#7c7c7c',hair:'#bcbcbc',yoso:1,line:''}];
+  if(r()<.18)npcs.push({x:11,y:12,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
+  return{kjo:true,title:'コクラ競馬場',vi,v:VIL[vi],w,h,cx:10,C,npcs,city:true,sz:VIL[vi].size,px:10,py:h-2,top:0};}
+function enterKeibajo(){curVil=VIL.findIndex(v=>v.name==='城下町 コクラ');TW=buildKeibajo();townScr.mv=null;setBase(townScr);playBGM('village');sfx('bell');toast('コクラ競馬場に 入った');}
+function kjoBump(c){
+  if(c.t==='kwin'){keibaFac();return true;}
+  if(c.t==='kown'){if(G.uma)umaRoom(()=>{});else dialog('「馬主 専用 ラウンジ」\n関係者以外 立ち入り禁止…\n（G1 タムニィ杯の 3連単を 当てると…？）');return true;}
+  if(c.t==='kboard'){const cd=keibaCard(curVil);dialog([`次は ${cd.g1?'G1 タムニィ杯':'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}\n2番人気 ${cd.horses.find(h=>h.pop===2).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
+  if(c.t==='kpad'){const cd=keibaCard(curVil);const h=cd.horses[Math.floor(rnd()*8)];dialog(`パドックを 周回する 馬たち。\n${h.name}が ${['気合 じゅうぶんだ','少し イレこんでいる','落ちついて 歩いている','あくびを している'][Math.floor(rnd()*4)]}。`);return true;}
+  if(c.t==='kturf'||c.t==='krail'){dialog('ダートと 芝の 2つの コース。\n遠くで 馬が 走っている！');return true;}
+  if(c.t==='kfood'){dialog(['焼きうどん屋「1皿 どうね？」','（香ばしい ソースの 香りが する…）']);return true;}
+  return false;}
+function yosoTalk(){const cd=keibaCard(curVil),pick=cd.horses.map((h,i)=>i).sort((a,b)=>cd.horses[a].pop-cd.horses[b].pop)[Math.floor(rnd()*3)];
+  dialog([`予想屋「次の ${cd.g1?'タムニィ杯':'レース'}は ${pick+1}番 ${cd.horses[pick].name}で 決まりや！」`,'「…外れても 文句は 受けつけんけどな」']);}
+function loserTalk(n){G.kjoLoser=G.kjoLoser||{};
+  if(G.kjoLoser.day===G.day){dialog('大負けした 賭郎「…ほっといてくれ。\nおれは もう 空っぽだ…」');return;}
+  G.kjoLoser.day=G.day;G.items.tok[2]+=1;save();sfx('coin');
+  dialog(['大負けした 賭郎が 柱に もたれて 座りこんでいる…','賭郎「…3連単… あと 1頭…\nハリボテエレジーさえ 来なければ…」','「これ やるよ。 持ってても むなしいだけだ…」','金景品（小）を 1枚 もらった！']);}
+
 /* ===================== 馬主ルーム（＋繁殖） ===================== */
-const umaRank=ab=>ab>=2.6?'SS':ab>=2.2?'S':ab>=1.8?'A':ab>=1.4?'B':ab>=1.0?'C':'D';
+/* 素質の 超激レア：UR 1/8192・XR 1/16384 */
+const POT_UR=3.5,POT_XR=4.0,potRoll=()=>{const q=rnd();return q<1/16384?POT_XR:q<1/16384+1/8192?POT_UR:0;};
+const umaRank=ab=>ab>=3.8?'XR':ab>=3.3?'UR':ab>=2.6?'SS':ab>=2.2?'S':ab>=1.8?'A':ab>=1.4?'B':ab>=1.0?'C':'D';
 const umaCap=H=>H.cap||2.6,umaSex=H=>H.sex||'牡';
 /* 有名種牡馬（お金を 払って 種付けできる） */
 const STUD=[{name:'チョクセンバンチョー',ab:2.4,fee:5e7,d:'直線の 番長。 産駒は 末脚が するどい'},{name:'ドーピングバンザイ',ab:2.9,fee:2e8,d:'圧倒的な 能力。 …ただし 産駒も 検査には ご用心'},{name:'サイキナヲ',ab:0,fee:3e7,d:'産駒の 能力は まったく 読めない 謎の 血統'},{name:'ハリボテエレジー',ab:.5,fee:1e5,d:'負けても 走り続けた 根性を 子に 伝える（かも）'}];
@@ -4592,7 +4644,7 @@ function umaFix(){const U=G.uma;if(!U)return;U.brood=U.brood||[];U.horses.forEac
 function umaBirth(after){const U=G.uma,now=U.brood.filter(b=>b.foal&&b.foal.due<=G.day);if(!now.length)return false;const b=now[0],F=b.foal;b.foal=null;
   const go=()=>askText(`${b.name}の 子が 生まれた！ 名前を つけよう`,[{label:`${F.sex}馬　父 ${F.sire}／母 ${b.name}（カタカナ 9文字まで）`,max:9,placeholder:'例：コクラノホシ'}],v=>{
     const nm=v&&v[0]?v[0]:'ナナシノ'+(G.day%100);const H={name:nm,ab:F.pot*.6,cap:F.pot,sex:F.sex,kg:440+Math.floor(rnd()*60),jk:KJ1[Math.floor(rnd()*KJ1.length)]+' '+KJ2[Math.floor(rnd()*KJ2.length)],runs:0,win:0,tr:0,sire:F.sire,dam:b.name,dope:F.dope};
-    dialog([`${nm}が 生まれた！（${F.sex}）\n父 ${F.sire}　母 ${b.name}`,`素質 ${umaRank(F.pot)}${F.pot>=2.6?'　…大物の 予感が する！':''}`],()=>choice(`${nm}を どうしますか？`,['自分で 育てる','競売（セレクトセール）に かける'],k=>{
+    dialog([`${nm}が 生まれた！（${F.sex}）\n父 ${F.sire}　母 ${b.name}`,`素質 ${umaRank(F.pot)}${F.pot>=POT_XR?'\n！！！ XR素質 ！！！\n伝説が 生まれた…（1/16384）':F.pot>=POT_UR?'\n！！ UR素質 ！！\n奇跡の 1頭だ…（1/8192）':F.pot>=2.6?'　…大物の 予感が する！':''}`],()=>choice(`${nm}を どうしますか？`,['自分で 育てる','競売（セレクトセール）に かける'],k=>{
       if(k===1){auctionScr(H,pr=>{save();dialog(`${nm}を ${fmt(pr)}イェソで 売った！`,()=>umaRoom(after));},()=>keep());return;}keep();},120));
     const keep=()=>{if(U.horses.length<3){U.horses.push(H);save();sfx('lv');dialog('調教で 素質の 限界まで 育てよう。',()=>umaRoom(after));}
     else{U.wait=U.wait||[];U.wait.push(H);save();dialog('厩舎が いっぱいなので 牧場で 待機中。\n（厩舎が 空くと 入厩する）',()=>umaRoom(after));}};},
@@ -4601,14 +4653,14 @@ function umaBirth(after){const U=G.uma,now=U.brood.filter(b=>b.foal&&b.foal.due<
 function umaRoom(after){const U=G.uma;umaFix();
   if(U.wait&&U.wait.length&&U.horses.length<3){const H=U.wait.shift();U.horses.push(H);save();dialog(`牧場で 待っていた ${H.name}が 入厩した！`,()=>umaRoom(after));return;}
   if(umaBirth(after))return;
-  const L=[...U.horses.map((H,i)=>({t:(U.entry===i?'◎':'')+H.name,r:`${umaSex(H)} ${umaRank(H.ab)}`,col:U.entry===i?'#7ee07e':null})),{t:`繁殖牧場（${U.brood.length}/4頭）`,col:'#f878f8'},...(U.horses.length<3?[{t:'馬を 買う',col:'#f8b800'}]:[]),{t:'もどる'}];
+  const L=[...U.horses.map((H,i)=>({t:(U.entry===i?'◎':'')+H.name,r:`${umaSex(H)} ${umaRank(H.ab)}`+((H.cap||0)>=POT_UR?`（${umaRank(H.cap)}）`:''),col:(H.cap||0)>=POT_XR?((frame>>3)&1?'#f878f8':'#3cbcfc'):(H.cap||0)>=POT_UR?'#f8b800':U.entry===i?'#7ee07e':null})),{t:`繁殖牧場（${U.brood.length}/4頭）`,col:'#f878f8'},...(U.horses.length<3?[{t:'馬を 買う',col:'#f8b800'}]:[]),{t:'もどる'}];
   listPick('馬主ルーム（厩舎 3頭まで）',L,i=>{if(i<U.horses.length){umaMenu(i,after);return;}const t=L[i].t;if(t.startsWith('繁殖牧場')){broodRoom(after);return;}if(t==='馬を 買う'){umaBuy(after);return;}after&&after();},
     i=>{const H=U.horses[i];return H?`${H.name}（${umaSex(H)}）能力 ${umaRank(H.ab)}（${Math.round(H.ab*100)}／限界 ${Math.round(umaCap(H)*100)}）\n${H.runs||0}戦 ${H.win||0}勝`+(H.g1?`　G1 ${H.g1}勝`:'')+(H.sire?`\n父 ${H.sire}／母 ${H.dam}`:U.entry===i?'\n出走登録中':''):L[i]&&L[i].t.startsWith('繁殖')?'引退した 馬を 繁殖馬に して\n子どもを 産ませよう。 親の 能力を 受け継ぐ！':'自分の 馬を 買って 育て、\nレースに 出して 賞金を かせごう！';});}
 function umaBuy(after){const U=G.uma;
   choice('どの 馬を 買いますか？',['一般馬（1,000万イェソ）','良血馬（1億イェソ）','やめる'],k=>{if(k===2){umaRoom(after);return;}const price=k?1e8:1e7;
     choice('牡馬と 牝馬、 どちらに しますか？\n（引退後、 牡は 種牡馬・ 牝は 繁殖牝馬に なれる）',['牡馬','牝馬'],sx=>{const sex=sx?'牝':'牡';
     askText('馬の 名前を つけよう',[{label:'馬名（カタカナ 9文字まで）',max:9,placeholder:'例：コクラノホシ'}],v=>{if(!v){umaRoom(after);return;}
-      rePay(price,()=>{const ab=k?1.0+rnd()*.35:.7+rnd()*.3;U.horses.push({name:v[0],ab,sex,kg:450+Math.floor(rnd()*60),jk:KJ1[Math.floor(rnd()*KJ1.length)]+' '+KJ2[Math.floor(rnd()*KJ2.length)],runs:0,win:0,tr:0});save();sfx('lv');
+      rePay(price,()=>{const ab=k?1.0+rnd()*.35:.7+rnd()*.3,sp=potRoll();if(sp)toast(sp>=POT_XR?'！！！ XR素質の 馬だ ！！！':'！！ UR素質の 馬だ ！！');U.horses.push({name:v[0],ab,cap:sp||undefined,sex,kg:450+Math.floor(rnd()*60),jk:KJ1[Math.floor(rnd()*KJ1.length)]+' '+KJ2[Math.floor(rnd()*KJ2.length)],runs:0,win:0,tr:0});save();sfx('lv');
         dialog([`${v[0]}（${sex}）を 手に入れた！`,`能力 ${umaRank(ab)}（${Math.round(ab*100)}）\n調教で 能力を 上げて レースに 出そう。`],()=>umaRoom(after));});},
       v=>!v[0]?'名前を 入れてください':v[0].length>9?'9文字まで です':U.horses.some(h=>h.name===v[0])?'同じ 名前の 馬が います':'');},96);},120);}
 function umaMenu(i,after){const U=G.uma,H=U.horses[i],can=H.tr!==G.day;
@@ -4653,7 +4705,7 @@ function mate(after){const U=G.uma,mares=U.brood.filter(b=>b.sex==='牝'&&!b.foa
     listPick('父馬を えらぶ',sires.map(x=>({t:(x.own?'':'★')+x.name,r:x.fee?fmt(x.fee):'無料',col:x.own?'#3cbcfc':'#f8b800'})),si=>{const sr=sires[si];
       choice(`母 ${dam.name} × 父 ${sr.name}\n種付け料 ${sr.fee?fmt(sr.fee)+'イェソ':'無料'}\n種付けしますか？`,['種付けする','やめる'],k=>{if(k!==0){broodRoom(after);return;}
         rePay(sr.fee,()=>{const sab=sr.name==='サイキナヲ'?.3+rnd()*2.7:sr.ab;let pot=(sab+dam.ab)/2*(.88+rnd()*.24)+(rnd()<.08?.35:0);
-          if(sr.name==='ハリボテエレジー'&&rnd()<.15)pot+=.8;pot=Math.max(.6,Math.min(3.0,pot));
+          if(sr.name==='ハリボテエレジー'&&rnd()<.15)pot+=.8;pot=Math.max(.6,Math.min(3.0,pot));{const sp=potRoll();if(sp)pot=sp;}
           dam.foal={sire:sr.name,pot,sex:rnd()<.5?'牡':'牝',due:G.day+7,dope:sr.name==='ドーピングバンザイ'||sr.dope};save();sfx('lv');
           dialog([`${dam.name}に ${sr.name}を 種付けした！`,'7日後に 子馬が 生まれる 予定だ。\n（生まれたら 馬主ルームで 名前を つけよう）'],()=>broodRoom(after));});},96);},
       i=>{const x=sires[i];return x?`${x.name}${x.ab?`　能力 ${umaRank(x.ab)}`:'　能力 ？？？'}\n${x.d}`:'';});});}
