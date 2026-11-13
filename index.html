@@ -866,7 +866,7 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);return b;};
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);return b;};
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
 const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
@@ -890,7 +890,7 @@ function wcopyReg(){if(!G||!G.weapons)return;for(const k in G.weapons){if(!k.inc
   WPD[k]=Object.assign({},d,{id:k,name:d.name+(WSUF[n]||'・'+n),copy:1,_base:{name:d.name}});if(GOD_BOOST[b])GOD_BOOST[k]=GOD_BOOST[b];}}
 function addCopy(id){let n=2;while(G.weapons[id+'~'+n])n++;const k=id+'~'+n;G.weapons[k]={lv:1,exp:0,dup:0};wcopyReg();return k;}
 let wQ=[],pullBulk=false;
-const ngReady=id=>{const c=G&&G.chars[id];if(!c||!G.party.includes(id))return false;if(![baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius'))return false;if(typeof BT!=='undefined'&&BT&&BT.ngUsed)return false;return G.party.some(p=>spearPair(p));};
+const ngReady=id=>{const c=G&&G.chars[id];if(!c||!G.party.includes(id))return false;if(![baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius'))return false;if(typeof BT!=='undefined'&&BT&&(BT.ngUsed||BT.aiUsed))return false;return G.party.some(p=>spearPair(p));};
 const spearPair=id=>{const c=G.chars[id];if(!c)return false;const a=[baseW(c.wpn),baseW(c.wpn2)];return a.includes('w_longinus')&&a.includes('w_cassius');};
 const PAIR_MUL=2.75;
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
@@ -1827,9 +1827,10 @@ function pAct(i){
       case 'xr':if(cmd.k==='neongenesis'){P_(()=>{if(!ok.v)return null;BT.ng=1;BT.ngUsed=1;sfx('g5');BT.shake=30;
             BT.pt.forEach(t=>{const tc=G.chars[t.id],cs=cstat(t.id,t);tc.hp=cs.hp;tc.mp=cs.mp;});
             return 'ガイウスの槍が 希望の 光を 放つ…！\nneonGenesis！\nみかたの 最大HP・MPが 1.5倍に なり 全回復した！';});
+          P_(()=>{const me=st();sfx('magic');BT.shake=24;NOW(BT.en.filter(e=>e.alive).map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.5)+phys(me.atk,e.def,8))):null));return '希望の 槍が 天を 貫く…！\n敵全体に 超絶ダメージ！';});
           P_(()=>'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！');
           const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
-        if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
+        if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;BT.aiUsed=1;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
           const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
         P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});break;
       case 'debuff':P_(()=>{if(!ok.v)return null;const L=BT.en.filter(e=>e.alive);if(!L.length)return null;sfx('ng');
@@ -1876,7 +1877,7 @@ function autoCmd(i){
   const mySk=myAll;
   if(can('nichirin')&&BT.pt.some(t=>isAlive(t)&&t!==m&&G.chars[t.id].mp<cstat(t.id,t).mp*.5)&&rnd()<.7)return{type:'skill',k:'nichirin'};
   if(can('neongenesis')&&BT.en.some(e=>e.alive)&&(BT.pt.some(t=>!isAlive(t))||alive.some(j=>hr(j)<.5)||rnd()<.25))return{type:'skill',k:'neongenesis'};
-  if(can('addimpact')&&BT.en.some(e=>e.alive)&&rnd()<.6)return{type:'skill',k:'addimpact'};
+  if(can('addimpact')&&BT.en.some(e=>e.alive)&&!G.party.some(p=>ngReady(p))&&rnd()<.6)return{type:'skill',k:'addimpact'};
   {const xk=XRSK[m.id];if(xk&&can(xk)){const anyEn=BT.en.some(e=>e.alive);
     if(xk==='ujigami'&&anyEn&&rnd()<.6)return{type:'skill',k:xk};
     if(xk==='unabarising'&&anyEn&&!BT.en.some(e=>e.alive&&e.stun>0))return{type:'skill',k:xk};
@@ -1921,8 +1922,8 @@ const XR_DESC={ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n�
   yuiga:'自分の 守備力 +400%（5ターン）＋敵は 自分しか\n攻撃できない（5ターン）＋敵全体に 強力な 魔法攻撃',
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
-  neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復し、\nアディショナルインパクトも 発動する。\n編成に ロンギヌスと カシウスを 持つ キャラが 必要',
-  addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
+  neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※同じ戦闘では アディショナルインパクトと\nどちらか 一方しか 使えない',
+  addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する\n※同じ戦闘では neonGenesisと どちらか一方'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
     case 'phys':return `${tg}に 物理攻撃（威力 ×${s.p}${s.hits>1?`・${s.hits}回 攻撃`:''}）\n攻撃力で ダメージが きまる`;
