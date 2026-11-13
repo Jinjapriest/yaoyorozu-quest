@@ -726,7 +726,7 @@ const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222;
   VIL.push({x:113,y:133,name:'鉄の町 ヤハタ',shrine:'鉄祖神社',rank:4,tier:12,size:4,from:A,kq:1,rec:KQ_REC,kqf:['kqtetsu','kqcable'],desc:'高炉の 火が 絶えない 鉄の 町'});
   VIL.push({x:123,y:132,name:'城下町 コクラ',shrine:'城山八坂神社',rank:6,tier:12,size:5,from:A+1,kq:1,rec:KQ_REC,kqf:['kqbugyo','kqjo'],desc:'コクラ城を 中心に 栄える キタキュウの 都'});
   VIL.push({x:118,y:127,name:'トバタの村',shrine:'提灯八幡宮',rank:3,tier:12,size:1,from:A,kq:1,rec:KQ_REC,kqf:['kqyagura'],desc:'夏に 千の 提灯が ともる 祭りの 村'});
-  VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東は 関門の 海峡'});
+  VIL.push({x:128,y:127,name:'レトロ港 モジ',shrine:'和布刈神社',rank:5,tier:12,size:3,from:A+2,kq:1,rec:KQ_REC,kqf:['kqkanmon'],desc:'赤れんがの 建物が 並ぶ 港町。東に ワカトゥオー橋が 架かる'});
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:2,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
@@ -818,7 +818,7 @@ function genMap(){
       while(y!==g.y){y+=Math.sign(g.y-y);const t=tileAt(x,y);if(!isTownT(t)&&t!==T.SHR&&t!==T.WALL)setT(x,y,t===T.WATER?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}
       for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const t=tileAt(g.x+dx,g.y+dy);if(t!==T.ROAD&&t!==T.BRIDGE&&t!==T.YAMA&&!isTownT(t)&&t!==T.WALL)setT(g.x+dx,g.y+dy,T.MOUNT);}
       setT(g.x,g.y,T.GSEAL);}}
-  /* 関門大橋：モジから 東へ グンマー帝国の 外へ */
+  /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
 genMap();
@@ -2117,7 +2117,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'関門案内所',s:'関',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -4241,16 +4241,16 @@ Object.assign(GSTG,KQSTG);
 function kqIntro(){const st=kqS();st.ch=1;
   return['…空気が ピリピリ している。','町の人「よそもんかい？ 気ぃつけり。\nこの キタキュウは いま 修羅の 霧に\nおおわれとるっちゃ。」','「霧を 吸うと だれでも 気が 荒くなって\nケンカっ早く なってしまうんよ。\nほんとは みんな 人情の ある 町なんやけど…」','「くわしい ことは 城下町 コクラの\n奉行所で 聞いてみり。」','（キタキュウの 推奨レベルは Lv22222）'];}
 function kqLines(vi){const ch=kqS().ch,v=VIL[vi];
-  if(ch>=4)return['霧が 晴れて 町に 笑い声が 戻ったっちゃ！','あんたが 修羅を 鎮めてくれたん？\nありがとね！ 焼きうどん 食べていき！','仕事帰りの 角打ちが いちばんよ。\n立ったまま 一杯 やるんが キタキュウ流たい。','東の モジから 関門大橋を 渡ると\nグンマー帝国やね。 気ぃつけて 行きり！','成人式は 袴で 派手に 決めるっちゃ！\n…見た目は 派手でも 中身は まじめなんよ。'];
-  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の 関門大橋を 渡れば グンマー帝国。\nでも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは リュウ！ 袴は 重いけど\n心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？'];}
+  if(ch>=4)return['霧が 晴れて 町に 笑い声が 戻ったっちゃ！','あんたが 修羅を 鎮めてくれたん？\nありがとね！ 焼きうどん 食べていき！','仕事帰りの 角打ちが いちばんよ。\n立ったまま 一杯 やるんが キタキュウ流たい。','東の モジから ワカトゥオー橋を 渡ると\nグンマー帝国やね。 気ぃつけて 行きり！','成人式は 袴で 派手に 決めるっちゃ！\n…見た目は 派手でも 中身は まじめなんよ。'];
+  return['霧のせいで みんな 気が 立っとるんよ…','ほんとは 人情の 町なんやけど\nいまは だれも 目を 合わせんっちゃ。',v.name.includes('ヤハタ')?'製鉄所の 高炉が 夜も 赤く 光っとる…\nなんか おかしいっちゃ。':v.name.includes('トバタ')?'提灯櫓の 灯りが 消えんのよ。\n昼も 夜も 燃えとる…':v.name.includes('モジ')?'東の ワカトゥオー橋を 渡れば\nグンマー帝国。 でも 帝国は もっと 手強いらしいよ。':'コクラの 奉行所に 行ってみり。','派手袴の 若者「おれは リュウ！ 袴は 重いけど\n心は 軽いっちゃ！」','焼きうどんは キタキュウ 発祥っち 知っとった？'];}
 function startKq(st,extra){startGm(st,extra);}
 function kqFac(kind){const st=kqS();
-  if(kind==='kqkanmon'){dialog(st.ch>=4?['案内所「霧が 晴れて 関門大橋も にぎやかに なったよ。」','「東へ 渡れば グンマー帝国の 外縁地方。\n帝国の 推奨レベルは Lv29999 たい。」']:['案内所「ここは 関門の 案内所。\n東へ 関門大橋を 渡れば グンマー帝国の 外縁地方たい。」','「でも 帝国は 推奨Lv29999。\nまずは キタキュウの 修羅を 鎮めて 腕を 磨きり。」','（キタキュウの 推奨レベルは Lv22222）']);return;}
+  if(kind==='kqkanmon'){dialog(st.ch>=4?['案内所「霧が 晴れて ワカトゥオー橋も\nにぎやかに なったよ。」','「東へ 渡れば グンマー帝国の 外縁地方。\n帝国の 推奨レベルは Lv29999 たい。」']:['案内所「ここは ワカトゥオー橋の 案内所。\n東へ 橋を 渡れば\nグンマー帝国の 外縁地方たい。」','「でも 帝国は 推奨Lv29999。\nまずは キタキュウの 修羅を 鎮めて 腕を 磨きり。」','（キタキュウの 推奨レベルは Lv22222）']);return;}
   if(kind==='kqbugyo'){
     if(st.ch<=1){st.ch=2;save();dialog(['奉行「おお… 霧の 中を よう 来なさった。」','「この 霧は 修羅の 霧。 吸うと だれもが\n争いたく なってしまう。」','「霧の 源は 三つ。\nヤハタの 製鉄所の 高炉、 サラクラ山の 山頂、\nトバタの 提灯櫓に 修羅が 取りついておる。」','「三つの 修羅を 鎮めれば 霧は 晴れるはずじゃ。\n相手は 手強い。 目安は Lv22222 じゃ。」','派手袴の 若者 リュウ「おれも 手伝うけん！\n…と 言いたいけど 袴が 重くて 走れんっちゃ。\nがんばっての！」']);return;}
     if(st.ch===2){const n=Object.keys(st.s).length;dialog([`奉行「鎮めた 修羅は ${n}/3 じゃ。」`,`まだ 残っておるのは\n${Object.keys(KQB).filter(k=>!st.s[k]).map(k=>KQB[k].where).join('、\n')}。`]);return;}
     if(st.ch===3){dialog(['奉行「三つの 霧は 晴れた。 じゃが…\nコクラ城の 天守に 黒い 雲が 集まっておる。」','「霧を 生んだ 大元が おるに ちがいない。\n城へ 向かってくだされ！」']);return;}
-    dialog(['奉行「キタキュウの 恩人じゃ！\n町の みなが 感謝しておるぞ。」','「東の モジから 関門大橋を 渡れば\nグンマー帝国じゃ。 目安は Lv29999。\nここで しっかり 鍛えて いきなされ。」']);return;}
+    dialog(['奉行「キタキュウの 恩人じゃ！\n町の みなが 感謝しておるぞ。」','「東の モジから ワカトゥオー橋を 渡れば\nグンマー帝国じゃ。 目安は Lv29999。\nここで しっかり 鍛えて いきなされ。」']);return;}
   const bid={kqtetsu:'tetsu',kqcable:'yakei',kqyagura:'chochin'}[kind];
   if(bid){const B=KQB[bid];
     if(st.ch<2){dialog(kind==='kqtetsu'?['製鉄所の 門は 閉ざされている。','作業員「高炉が おかしいんよ…\nくわしいことは コクラの 奉行所に 聞きり。」']:kind==='kqcable'?['ケーブルカーは 運休中だ。','係員「山頂に 黒い 霧が かかっとって…\nコクラの 奉行所に 相談してみり。」']:['提灯櫓の 灯りが 昼も 燃え続けている…','村人「コクラの 奉行所に 行ってみり。」']);return;}
@@ -4269,8 +4269,8 @@ function kqWin(sp,back,pages){const st=kqS();
   if(sp.st==='kqashura'){
     if(sp.re||st.ch>=4){st.re=(st.re||0)+1;save();back(['修羅王の 残り火は ふたたび 消えた。',gmGive(8,8)]);return;}
     const rw=gmGive(15,15,3),gd=gmS().ch>=7;
-    dialog(pages,()=>{BT=null;scene('kq',['アシュラ「ぐ… わしは 帝王 錨ケンドウさまの 命で\nこの 町を 争わせ、 グンマーへの 道を\nふさいでおったのだ…」',gd?'「…その 帝王も もう おらんのか。\nならば わしの 役目も 終わりじゃな…」':'「霧で 人を 争わせれば だれも\n関門を 越えようとは せん…」','アシュラは 黒い 霧と なって 東の 空へ 消えた。'],()=>
-      scene('kqpeace',['修羅の 霧が 晴れた！','町の あちこちから 笑い声が 聞こえてくる。','奉行「ありがとう！ 東の モジから\n関門大橋を 渡れば グンマー帝国じゃ。」','「帝国は さらに 手強い。 目安は Lv29999。\nここで しっかり 鍛えて いきなされ。」','リュウ「あんた かっこよかったっちゃ！\n今度 成人式の 袴、 貸しちゃるけん！」',rw],()=>{st.ch=4;save();returnField();}));});return;}
+    dialog(pages,()=>{BT=null;scene('kq',['アシュラ「ぐ… わしは 帝王 錨ケンドウさまの 命で\nこの 町を 争わせ、 グンマーへの 道を\nふさいでおったのだ…」',gd?'「…その 帝王も もう おらんのか。\nならば わしの 役目も 終わりじゃな…」':'「霧で 人を 争わせれば だれも\n橋を 渡ろうとは せん…」','アシュラは 黒い 霧と なって 東の 空へ 消えた。'],()=>
+      scene('kqpeace',['修羅の 霧が 晴れた！','町の あちこちから 笑い声が 聞こえてくる。','奉行「ありがとう！ 東の モジから\nワカトゥオー橋を 渡れば\nグンマー帝国じゃ。」','「帝国は さらに 手強い。 目安は Lv29999。\nここで しっかり 鍛えて いきなされ。」','リュウ「あんた かっこよかったっちゃ！\n今度 成人式の 袴、 貸しちゃるけん！」',rw],()=>{st.ch=4;save();returnField();}));});return;}
 }
 /* ===================== 裏千日回峰行（八岐大蛇Lv15 撃破で 解放・推奨Lv19999・ラスボス 裏オロチ） ===================== */
 const OROCHI_MAX=30,UK_UNLOCK=15,UK_F=89,UAJ=['','裏阿闍梨','裏大阿闍梨'];
