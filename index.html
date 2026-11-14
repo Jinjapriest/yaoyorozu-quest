@@ -795,8 +795,10 @@ const CAPR={x0:120,y0:13,x1:174,y1:38};
     ['トイシ','ホウフ',156,32,3,'遠石八幡宮','工場夜景と 競艇の 海辺の 町'],['クダマツ','トイシ',160,36,2,'降松神社','ものづくりの 町'],['アサエ','クダマツ',164,34,2,'浅江神社','白い 砂浜の 町'],
     ['タカマツ','アサエ',166,30,1,'高松八幡宮','田園が 広がる 町'],['シロタ','アサエ',168,37,2,'代田八幡宮','白壁と 金魚ちょうちんの 町'],['シダイ','シロタ',162,38,0,'志駄岸神社','瀬戸内の 小さな 漁村'],
     ['ナガオ','シロタ',172,36,1,'長尾八幡宮','みかんの 島'],['シラヤマヒメ','タカマツ',171,23,3,'白山比咩神社','五連の 木橋が 架かる 城下町'],['セタ','シラヤマヒメ',172,17,0,'瀬田八幡宮','島の 東の はずれの 小さな 町']];
+  const YPF={'ジングウコウゴウ':'カルストの町','シモノセキ':'ふくの港','イイヤマ':'棚田の里','ショウゴウ':'セメントの町','ウベ':'彫刻の町','ハギ':'城下町','アキラギ':'往還の村','アブ':'北浦の町','ホウフ':'天神の町',
+    'トイシ':'工場夜景の町','クダマツ':'ものづくりの町','アサエ':'白砂の町','タカマツ':'田園の里','シロタ':'白壁の町','シダイ':'瀬戸の漁村','ナガオ':'みかんの島','シラヤマヒメ':'錦帯橋の町','セタ':'東端の村'};
   const YRK={'ウベ':3,'ホウフ':3,'トイシ':3,'シラヤマヒメ':2,'ショウゴウ':2,'ハギ':3,'クダマツ':1,'アサエ':1,'シロタ':3,'ジングウコウゴウ':3};
-  YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:n,shrine:sh,rank:YRK[n]!=null?YRK[n]:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f),yama:1,rec:'＝平均',desc:d,...(n==='トイシ'?{kyotei:1}:{})}));}
+  YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:YPF[n]?`${YPF[n]} ${n}`:n,shrine:sh,rank:YRK[n]!=null?YRK[n]:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f||v.name.replace(/^.* /,'')===f),yama:1,rec:'＝平均',desc:d,...(n==='トイシ'?{kyotei:1}:{})}));}
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
@@ -2381,7 +2383,7 @@ function buildTown(vi){
     for(const n of npcs)n.y+=P;
     C.unshift(...Z);top=P;H2=h+P;
   }
-  if(v.name==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
+  if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
   if(v.dict&&v.dict.gim&&occupied(vi)){const O=G.gimOcc['v'+vi]||{},closed=O.closed||[],rr=lcg(vi*131+(O.day||1)*17);let n=0,tries=0;const want=4+Math.min(4,sz);
@@ -2677,7 +2679,7 @@ function enterVillage(i,atShrine){
   curVil=i;TW=buildTown(i);if(atShrine){TW.py=4+(TW.top||0);}
   townScr.mv=null;setBase(townScr);playBGM('village');
   const first=!G.seen['v'+i];G.seen['v'+i]=1;
-  const msgs=[...(first||VIL[i].name==='アキラギ'?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc.split('|')[0]:''}`,...(VIL[i].desc||'').split('|').slice(1)]:[]),...(VIL[i].kq&&kqS().ch===0?kqIntro():[]),...(first&&hatan(i)?['この 村は 財政破綻して\n財政再生団体に なっている…','税金が 高く 店の 値段も 5割増し。\n不動産の 固定資産税も 重く\n入居者も なかなか 集まらない。','（村を 再生すれば 財政も 再建される）']:[]),...jobProgress('deliver',i)];
+  const msgs=[...(first||VIL[i].name.replace(/^.* /,'')==='アキラギ'?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc.split('|')[0]:''}`,...(VIL[i].desc||'').split('|').slice(1)]:[]),...(VIL[i].kq&&kqS().ch===0?kqIntro():[]),...(first&&hatan(i)?['この 村は 財政破綻して\n財政再生団体に なっている…','税金が 高く 店の 値段も 5割増し。\n不動産の 固定資産税も 重く\n入居者も なかなか 集まらない。','（村を 再生すれば 財政も 再建される）']:[]),...jobProgress('deliver',i)];
   save();if(msgs.length)dialog(msgs);
 }
 function leaveTown(){TW=null;startField();}
