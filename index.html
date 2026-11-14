@@ -5777,7 +5777,7 @@ function ajRoomBg(){R(0,0,W,H,'#0c0806');
   R(AJ_OX-4,AJ_OY,4,AJ_H*16+4,'#5c3410');R(AJ_OX+AJ_W*16,AJ_OY,4,AJ_H*16+4,'#5c3410');R(AJ_OX-4,AJ_OY+AJ_H*16,AJ_W*16+8,4,'#5c3410');
   R(AJ_OX+AJ_DX*16,AJ_OY+AJ_H*16,16,4,'#3c2a14');R(AJ_OX+AJ_DX*16+1,AJ_OY+AJ_H*16-4,14,4,'#3c5c8c');
   txt('アジト',8,8,'#58f898');txt('B：メニュー　A：しらべる',248,8,'#7c7c7c','right');}
-function ajDrawAll(npcs,P,mv){ajRoomBg();
+function ajDrawAll(npcs,P,mv){ajRoomBg();drawKamidana(ajS().kdDay===G.day);
   const A=ajS(),list=[];A.furn.forEach(f=>list.push({y:f.y+(AJ_F[f.k].h||1)-1,d:()=>ajDrawF(f.k,AJ_OX+f.x*16,AJ_OY+f.y*16,f.on>0,f)}));
   npcs.forEach(n=>list.push({y:n.y,d:()=>drawChar(n.id,AJ_OX+n.x*16,AJ_OY+n.y*16-2,(frame>>4)&1)}));
   if(P){const ox=mv?mv.dx*mv.t:0,oy=mv?mv.dy*mv.t:0;list.push({y:P.y+.5,d:()=>drawChar(G.party[0],AJ_OX+P.x*16+ox,AJ_OY+P.y*16-2+oy,(frame>>3)&1)});}
@@ -5837,6 +5837,24 @@ function ajDaily(){if(!ajOK())return[];const A=ajS(),bl=ajBill();if(!bl)return[]
 function ajBillScr(){const A=ajS(),bl=ajBill();if(!bl){dialog('アジトが ない。');return;}const E=bl.it.filter(x=>x[2]==='e'),Wt=bl.it.filter(x=>x[2]==='w');
   dialog([`【光熱費（1日あたり）】\n電気代 ${fmt(bl.e)}イェソ／水道代 ${fmt(bl.w)}イェソ`+(bl.n?`\n通信費 ${fmt(bl.n)}イェソ（${NET_L[A.line].n}）`:'')+'\n毎日 銀行の 普通預金から 引き落とし','電気：\n'+E.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),...(E.length>4?['電気（つづき）：\n'+E.slice(4,8).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n')]:[]),'水道：\n'+Wt.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),
     A.cut?`※ 滞納中（${fmt(A.debt||0)}イェソ）\n電気と 水道が 止まっている！`:`普通預金：${fmt(G.bank.sav)}イェソ\n使用電力 ${fmt(ajLoad())}W／契約 ${fmt(ajCap())}W`+(ajTrip()?'\n（ブレーカーが 落ちている！）':'')]);}
+/* ---------- アジトの 神棚（神宮大麻・氏神さま・崇敬神社） ---------- */
+const KD_X=6;
+const ajUji=()=>{const A=ajS();return A.x==null?'':VIL[nearestVil(A.x,A.y)].shrine;};
+const ajSukei=()=>{const A=ajS();return A.sukei!=null&&VIL[A.sukei]?VIL[A.sukei].shrine:null;};
+function drawKamidana(t){const x=AJ_OX+KD_X*16,y=AJ_OY+1;
+  R(x-6,y+4,44,2,'#3c2a14');for(let i=0;i<5;i++){R(x-2+i*9,y+6,2,4,'#fcfcfc');R(x-1+i*9,y+9,1,2,'#fcfcfc');}
+  R(x-4,y+24,40,3,'#c8a060');R(x-4,y+27,40,1,'#8c6c3c');R(x+1,y+28,2,3,'#8c6c3c');R(x+29,y+28,2,3,'#8c6c3c');
+  R(x+6,y+10,20,2,'#a07040');R(x+4,y+12,24,2,'#c8a060');R(x+7,y+14,18,10,'#e8d8b0');R(x+7,y+14,18,1,'#c8a060');
+  R(x+9,y+15,4,8,'#fcfcfc');R(x+14,y+15,4,8,'#fcfcfc');R(x+19,y+15,4,8,'#fcfcfc');R(x+15,y+16,2,1,'#d82800');R(x+10,y+16,2,1,'#202020');R(x+20,y+16,2,1,'#202020');
+  for(const sx of [x-2,x+30]){R(sx,y+18,4,6,'#e8e8e8');R(sx-1,y+13,6,5,'#2c7c1c');R(sx,y+12,4,2,'#3c9c3c');}
+  if(t&&(frame>>4)%2)R(x+15,y+12,2,1,'#f8d878');}
+function kamidanaUse(){const A=ajS(),su=ajSukei();
+  const O=['お参りする','崇敬神社の お札を 選ぶ','お札を 見る','やめる'];
+  choice('神棚だ。',O,r=>{
+    if(r===0){const today=A.kdDay===G.day;dialog(['（二拝… 二拍手… 一拝）',`天照皇大神宮、 ${ajUji()}${su?'、 '+su:''}…`,...(today?['今日も 一日 お守りください。']:(()=>{A.kdDay=G.day;const cur=G.bless;if(!cur||cur.left<=0||5>=cur.pct)G.bless={pct:5,left:5,name:'神棚'};fullHeal();save();return['心が すっと 落ち着いた。','仲間全員の HP・MPが 回復した！\n（今日の お参り：全能力・戦利品 +5%／5戦）'];})())]);sfx('bell');return;}
+    if(r===1){const L=VIL.map((v,i)=>i).filter(i=>G.seen&&G.seen['v'+i]&&VIL[i].shrine);
+      listPick('崇敬神社を 選ぶ（行ったことの ある 神社）',L.map(i=>({t:VIL[i].shrine,r:VIL[i].name.replace(/^.* /,'')})),j=>{A.sukei=L[j];save();sfx('ok');dialog([`${VIL[L[j]].shrine}の お札を\n神棚に お祀りした。`]);});return;}
+    if(r===2){dialog(['【神棚の お札】',`中央：神宮大麻（天照皇大神宮）\n向かって右：氏神さま ${ajUji()}\n向かって左：崇敬神社 ${su||'（まだ 選んでいない）'}`,'（氏神さまは アジトの ある 場所で 決まる。\n　引っ越すと 変わる）']);}},104);}
 function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
   const P={x:AJ_DX,y:AJ_H-1,dir:'u'},npcs=[],spots=[[3,5],[10,5],[4,8],[10,8],[2,3],[11,3],[6,3]];
   const busy=(x,y,self)=>!ajFloor(x,y)||ajFurnAt(x,y)||(P.x===x&&P.y===y)||npcs.some(n=>n!==self&&n.x===x&&n.y===y);
@@ -5849,7 +5867,7 @@ function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
       if(this.mv){this.mv.t+=2;if(this.mv.t>=16){P.x=this.mv.x1;P.y=this.mv.y1;this.mv=null;}return;}
       if(I.B||I.menu){ajRoomMenu(P,npcs,sync);return;}
       const fx=P.x+(P.dir==='l'?-1:P.dir==='r'?1:0),fy=P.y+(P.dir==='u'?-1:P.dir==='d'?1:0);
-      if(I.A){const n=npcs.find(q=>q.x===fx&&q.y===fy);if(n){ajTalk(n.id);return;}const f=ajFurnAt(fx,fy);if(f){ajUse(f);return;}return;}
+      if(I.A){if(fy===1&&(fx===KD_X||fx===KD_X+1)){kamidanaUse();return;}const n=npcs.find(q=>q.x===fx&&q.y===fy);if(n){ajTalk(n.id);return;}const f=ajFurnAt(fx,fy);if(f){ajUse(f);return;}return;}
       let dx=0,dy=0;if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;if(!dx&&!dy)return;
       P.dir=dy<0?'u':dy>0?'d':dx<0?'l':'r';
       if(dy>0&&P.x===AJ_DX&&P.y===AJ_H-1){pop();sfx('ok');save();return;}
@@ -5860,7 +5878,7 @@ function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
   push(scr);
   {const dl=fkDone()?amzDeliver():null;if(dl)dialog(dl);}
   {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&(A.cut||ajTrip())){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=Math.round(ns*5000*d*netSrvMul());A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n（回線 ${netSpeed().r?netFmt(netSpeed().m):'テザリング'}：×${netSrvMul().toFixed(1)}）\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
-  if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」、 パソコン関係は\n「Dスパラ」か「アークン」で 買える。']);}
+  if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','正面の 壁には 神棚が お祀りしてある。\n（神宮大麻・氏神さま・崇敬神社の お札）','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」、 パソコン関係は\n「Dスパラ」か「アークン」で 買える。']);}
 }
 function ajRoomMenu(P,npcs,sync){const A=ajS();
   const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['光熱費を 見る','電気の 契約（昇圧）','外に 出る','とじる']);
