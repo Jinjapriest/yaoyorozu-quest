@@ -5703,24 +5703,30 @@ const AJ_F={bed:{n:'ベッド',p:3000,h:2,d:'寝ると 仲間全員の HP・MP�
   pcj:{n:'自作PC',p:0,nb:1,d:'太陽家具で パーツを 選んで 自分で 組む'}};
 const PCP=[['CPU','cpu',[['ライゼソ 5',22000,35,65],['コマ ウルトラ 5',24000,36,65],['ライゼソ 7 X3D',55000,62,120],['コマ ウルトラ 7',50000,58,125],['ライゼソ 9',85000,88,170],['コマ ウルトラ 9',90000,90,180],
     ['兆芯',9800,12,65,{ura:1,d:'謎の 国産… ではない x86 CPU。\n安い。 とにかく 安い。'}],['スナップタイガー エリート',60000,48,45,{ura:1,arm:1,d:'省電力の ARM CPU。\nゲームは 互換レイヤーで 動かす。'}],
-    ['ジーオソ',250000,96,300,{ura:1,d:'サーバー用 CPU。\nECCメモリ推奨… 気にしない。'}],['スリッパ',800000,125,350,{ura:1,d:'96コアの 怪物。\nなぜ 家に？'}]]],
+    ['ジーオソ Gold',250000,96,300,{ura:1,srv:'xe2',dual:1,d:'サーバー用 CPU。 2個まで 載せられる。\nECCメモリ推奨… 気にしない。'}],['スリッパ',800000,125,350,{ura:1,srv:'tr',d:'96コアの 怪物。 専用マザボが 要る。\nなぜ 家に？'}],
+    ['ジーオソ W',180000,80,250,{ura:1,srv:'xe1',d:'ワークステーション用。 1個だけ。\n（ジーオソ用 1ソケット マザボ）'}],['ジーオソ Platinum',400000,110,350,{ura:1,srv:'xe2',dual:1,d:'最上位の サーバー用 CPU。\n2個まで 載せられる。'}]]],
   ['CPUクーラー','cool',[['付属クーラー',0,0,0],['虎鉄（空冷）',5000,5,0],['ノクチュア（茶色ファンの 静音空冷）',18000,9,0,{quiet:1}],['クラーケソ（光る 簡易水冷）',28000,10,0,{lit:1}]]],
   ['メモリ','mem',[['クルーシャル 16GB',7000,5],['クルーシャル 32GB',13000,10],['コルセヤ ベンジェンス 32GB（光る）',16000,10,0,{lit:1}],['Gスキノレ 64GB',28000,15]]],
-  ['マザーボード','mb',[['MSl B',15000,2],['ギガパイト X',28000,4],['エイスース ROC（光る）',55000,6,0,{lit:1}]]],
+  ['マザーボード','mb',[['MSl B',15000,2],['ギガパイト X',28000,4],['エイスース ROC（光る）',55000,6,0,{lit:1}],
+    ['エイスース Pro WS（スリッパ用）',120000,8,0,{ura:1,sock:'tr',srv:1,d:'スリッパ専用の ワークステーション マザボ。\n電源を 2個 つなげる。'}],['スーパーマイク口 X（ジーオソ 1ソケット）',90000,7,0,{ura:1,sock:'xe1',srv:1,d:'ジーオソ用 サーバー マザボ。\n電源を 2個 つなげる。'}],['スーパーマイク口 X デュアル（ジーオソ 2ソケット）',160000,8,0,{ura:1,sock:'xe2',srv:1,dual:1,d:'ジーオソを 2個 載せられる。\n電源も 2個 つなげる。'}]]],
   ['グラフィック','gpu',[['内蔵グラフィック',0,5,0],
-    ['ゲフォ RTZ Bronze',30000,30,130],['ゲフォ RTZ Silver',50000,42,170],['ゲフォ RTZ Silver X',60000,48,190],['ゲフォ RTZ Gold',90000,60,220],['ゲフォ RTZ Gold X',110000,66,250],
-    ['ゲフォ RTZ Platinum',160000,78,300],['ゲフォ RTZ Platinum X',200000,85,350],['ゲフォ RTZ Titanium',300000,95,575],
-    ['グラデオン RX Bronze',28000,30,150],['グラデオン RX Silver Ti',55000,46,200],['グラデオン RX Gold Ti',85000,64,260],['グラデオン RX Platinum Ti',150000,82,320],
-    ['RTZ イナズマ',1200000,72,600,{ura:1,ina:1,d:'AI 特化の 試作グラボ。 ゲームより\n学習と 推論が 得意。\n「RTX spark」の うわさの 正体？'}]]],
-  ['ストレージ','ssd',[['クルーシャル 1TB',9000,3],['WD ブラッグ 2TB',18000,5],['サムスソ 990 PRO 4TB',38000,8]]],
+    ['ゲフォ RTZ Bronze',30000,30,130,{mg:'SLI'}],['ゲフォ RTZ Silver',50000,42,170,{mg:'SLI'}],['ゲフォ RTZ Silver X',60000,48,190,{mg:'SLI'}],['ゲフォ RTZ Gold',90000,60,220,{mg:'SLI'}],['ゲフォ RTZ Gold X',110000,66,250,{mg:'SLI'}],
+    ['ゲフォ RTZ Platinum',160000,78,300,{mg:'SLI'}],['ゲフォ RTZ Platinum X',200000,85,350,{mg:'SLI'}],['ゲフォ RTZ Titanium',300000,95,575,{mg:'SLI'}],
+    ['グラデオン RX Bronze',28000,30,150,{mg:'CrossFire X'}],['グラデオン RX Silver Ti',55000,46,200,{mg:'CrossFire X'}],['グラデオン RX Gold Ti',85000,64,260,{mg:'CrossFire X'}],['グラデオン RX Platinum Ti',150000,82,320,{mg:'CrossFire X'}],
+    ['RTZ イナズマ',1200000,72,600,{ura:1,ina:1,ai:12,d:'AI 特化の 試作グラボ。 ゲームより\n学習と 推論が 得意。\n「RTX spark」の うわさの 正体？'}],
+    ['RTZ Pro A（サーバー用）',650000,75,300,{ura:1,ai:6,d:'サーバー・ワークステーション用。\nAIと 計算が 得意。 ゲームは そこそこ。'}]]],
+  ['ストレージ','ssd',[['クルーシャル 1TB',9000,3],['WD ブラッグ 2TB',18000,5],['サムスソ 990 PRO 4TB',38000,8],['Optein SSD 1.5TB',120000,12,0,{ura:1,d:'今はなき 伝説の SSD。\n速さより「応答の 速さ」が ちがう。\n在庫限り。'}]]],
   ['電源','psu',[['シーソニック 650W',12000,0,650],['シーソニック 850W',18000,0,850],['コルセヤ 1000W',26000,0,1000],['コルセヤ 1600W',48000,0,1600]]],
   ['ケース','case',[['NZXZ（シンプル 黒）',12000,0,0,{c:0}],['NZXZ（シンプル 白）',12000,0,0,{c:1}],['フラクタノ ノース（木目）',22000,0,0,{c:2}],['リアソリー O11（ガラス・光る）',20000,0,0,{c:3,lit:1}]]]];
 const PC_CASE=['#202020','#e8e8e8','#8c5c2c','#202020'];
 const pcPart=(b,k)=>{const L=PCP.find(p=>p[1]===k)[2];return L[b[k]!=null?b[k]:0]||L[0];};
 const pcX=(b,k)=>pcPart(b,k)[4]||{};
-const pcScore=b=>b.P?['cpu','cool','mem','mb','gpu','ssd'].reduce((t,k)=>t+(b.P[k]||0),0)*100:PCP.reduce((t,[,k])=>t+pcPart(b,k)[2],0)*100;
+const pcMul=(b,k)=>k==='cpu'?((b.cpuN||1)===2?1.8:1):k==='gpu'?((b.gpuN||1)===2?1.1:1):1;
+const pcScore=b=>b.P?['cpu','cool','mem','mb','gpu','ssd'].reduce((t,k)=>t+(b.P[k]||0),0)*100:Math.round(PCP.reduce((t,[,k])=>t+pcPart(b,k)[2]*pcMul(b,k),0))*100;
 const pcRank=sc=>sc<10000?'事務用 マシン':sc<16000?'ゲームも 快適':sc<22000?'配信も できる 高性能機':sc<30000?'モンスター マシン':'規格外（なぜ 家に…）';
-const pcNeedW=b=>pcPart(b,'cpu')[3]+pcPart(b,'gpu')[3]+100;
+const pcNeedW=b=>pcPart(b,'cpu')[3]*(b.cpuN||1)+pcPart(b,'gpu')[3]*(b.gpuN||1)+100;
+const pcCapW=b=>pcPart(b,'psu')[3]*(b.psuN||1);
+const pcPartName=(b,k)=>pcPart(b,k)[0]+(k==='cpu'&&b.cpuN===2?' ×2':k==='gpu'&&b.gpuN===2?` ×2（${pcX(b,'gpu').mg}）`:k==='psu'&&b.psuN===2?' ×2':'');
 const pcLit=b=>PCP.some(([,k])=>pcX(b,k).lit);
 const pcMig=b=>{if(!b||b.v===2)return b;const M={cpu:[0,2,4],cool:[0,2,3],mem:[0,1,3],gpu:[0,2,4],ssd:[0,1,2]};Object.keys(M).forEach(k=>{b[k]=M[k][b[k]||0];});b.mb=0;b.psu=1;b.v=2;return b;};
 const AJ_K=Object.keys(AJ_F).filter(k=>!AJ_F[k].nb&&!AJ_F[k].pc),AJ_KP=Object.keys(AJ_F).filter(k=>AJ_F[k].pc),AJ_KA=Object.keys(AJ_F),AJ_W=14,AJ_H=11,AJ_OX=16,AJ_OY=34,AJ_DX=7;
@@ -5933,7 +5939,7 @@ const doorLogo=(x,y,sz)=>{const w=sz,h=Math.round(sz*1.5);R(x-w/2,y-h/2,w,h,'#c8
 const mikanLogo=(x,y,r,c)=>{pc(x,y,r,c||'#f89820');if(r>=4){R(x-Math.round(r*.5),y-Math.round(r*.4),1,1,'#fcd8a0');}R(x,y-r-1,1,2,'#5c3410');R(x+1,y-r-2,Math.max(2,Math.round(r*.7)),Math.max(1,Math.round(r*.35)),'#2c9c3c');};
 function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[])[f.b]:PC_FIX[f.k];
   const AP=[].concat(fkDone()?[{n:'アマゾソ',ic:'amz',go:amzScr}]:[]).concat([{n:'スロ攻略ナビ',ic:'slot',go:slotSite},{n:'オセロ',ic:'oth',go:othelloScr},{n:'5五将棋',ic:'sho',go:shogiScr},{n:'一人麻雀',ic:'mj',go:mahjongScr},{n:'ベンチマーク',ic:'bench',go:()=>benchScr(spec)}])
-    .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcPart(spec,'psu')[3]}W`])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'勝手口 OS　ゲーミング仕様'])}])
+    .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPartName(spec,k)}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPartName(spec,k)}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcCapW(spec)}W`+(spec.gpuN===2?'\n（'+pcX(spec,'gpu').mg+'… あまり 速くならない）':'')])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'勝手口 OS　ゲーミング仕様'])}])
     .concat([{n:mac?'システム終了':'シャットダウン',ic:'pow',go:null}]);
   let sel=0,t=0,boot=40,off=-1;f.on=9999;
   const icon=(k,x,y)=>{R(x,y,20,20,mac?'#fcfcfc':'rgba(0,0,0,0)');if(mac){R(x,y,20,20,'#e8e8f0');}
@@ -5965,7 +5971,7 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
       if(off>=0){ctx.globalAlpha=Math.min(1,off/30);R(0,0,W,H,'#000');ctx.globalAlpha=1;if(off<30)txt(mac?'システムを 終了しています…':'シャットダウンしています…',128,112,'#fcfcfc','center');}}});}
 function pcGameMenu(){choice('どの ゲームで 遊ぶ？',['オセロ','将棋（5五将棋）','一人麻雀','やめる'],r=>{if(r===0)othelloScr();else if(r===1)shogiScr();else if(r===2)mahjongScr();},112);}
 /* ---------- ベンチマーク（演出のみ・スコアは 構成から 計算） ---------- */
-function benchCalc(b){const L=k=>b.P?(b.P[k]||0):pcPart(b,k)[2],fct=b.f||1,arm=b.arm||pcX(b,'cpu').arm;const cpu=Math.round((L('cpu')*120+L('mem')*60+L('cool')*80+L('ssd')*30+L('mb')*40)*fct),gpu=Math.round((L('gpu')*150+L('cpu')*20)*fct*(arm?.7:1));const ai=Math.round((L('gpu')*80+L('mem')*100+L('cpu')*20)*fct*(pcX(b,'gpu').ina?12:b.P?b.P.aim:1)*(arm&&!b.P?.5:1));return{cpu,gpu,ai,tot:cpu+gpu,L};}
+function benchCalc(b){const L=k=>b.P?(b.P[k]||0):pcPart(b,k)[2]*pcMul(b,k),fct=b.f||1,arm=b.arm||pcX(b,'cpu').arm;const cpu=Math.round((L('cpu')*120+L('mem')*60+L('cool')*80+L('ssd')*30+L('mb')*40)*fct),gpu=Math.round((L('gpu')*150+L('cpu')*20)*fct*(arm?.7:1));const ai=Math.round((L('gpu')*80+L('mem')*100+L('cpu')*20)*fct*(b.P?b.P.aim:(pcX(b,'gpu').ai||1)*((b.gpuN||1)===2?1.8:1))*(arm&&!b.P?.5:1));return{cpu,gpu,ai,tot:cpu+gpu,L};}
 function benchScr(b){const BC=benchCalc(b),L=BC.L,fct=b.f||1,cpu=BC.cpu,gpu=BC.gpu,ai=Math.round(BC.ai*(.97+rnd()*.06)),tot=Math.round(BC.tot*(.97+rnd()*.06));
   const fpsBase=Math.max(8,Math.round(L('gpu')*1.6+L('cpu')*.3)*fct);
   const arm=b.arm||pcX(b,'cpu').arm,PH=[{n:'CPU テスト：物理演算',d:240},{n:'GPU テスト1：神社の 森'+(arm?'（互換）':''),d:300},{n:'GPU テスト2：ナメガワマチ 夜景'+(arm?'（互換）':''),d:300},{n:'AI テスト：画像生成',d:240}];let ph=0,t=0,done=false,fps=fpsBase,hist=[],crash=b.unst&&rnd()<.5?120+Math.floor(rnd()*500):-1,dead=false;
@@ -5974,7 +5980,7 @@ function benchScr(b){const BC=benchCalc(b),L=BC.L,fct=b.f||1,cpu=BC.cpu,gpu=BC.g
       t++;if(t%10===0){fps=Math.max(1,Math.round(fpsBase*(ph===0?1.3:ph===1?1:.82)*(.85+rnd()*.3)));hist.push(fps);if(hist.length>40)hist.shift();}
       if(t>=PH[ph].d){ph++;t=0;hist=[];sfx('cur');if(ph>=PH.length){done=true;sfx('g5');}}},
     drw(){R(0,0,W,H,'#000');
-      if(dead){txt('……プツン。',128,90,'#bcbcbc','center');txt('電源が 落ちた！',128,110,'#fc7460','center');txt(`（電源容量が 足りない：必要 ${pcNeedW(b)}W／${pcPart(b,'psu')[3]}W）`,128,130,'#7c7c7c','center',240);txt('A：とじる',128,200,'#7c7c7c','center');return;}
+      if(dead){txt('……プツン。',128,90,'#bcbcbc','center');txt('電源が 落ちた！',128,110,'#fc7460','center');txt(`（電源容量が 足りない：必要 ${pcNeedW(b)}W／${pcCapW(b)}W）`,128,130,'#7c7c7c','center',240);txt('A：とじる',128,200,'#7c7c7c','center');return;}
       if(done){R(0,0,W,H,'#0c1020');big('ベンチマーク 結果',128,12,'#68ccfc','center',14);big(fmt(tot),128,36,'#fcfcfc','center',28);txt(`判定：${pcRank(pcScore(b))}`+(b.cpu===6&&b.v===2&&!b.f?'　…兆芯 です':''),128,70,'#f8d878','center');
         const bar=(y,n,v,mx,c)=>{txt(n,16,y,'#bcbcbc');R(80,y+1,150,8,'#202838');R(80,y+1,Math.round(150*Math.min(1,v/mx)),8,c);txt(fmt(v),232,y,'#fcfcfc','right');};
         bar(92,'CPU',cpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).cpu,'#58f898');bar(124,'AI',ai,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).ai,'#f8d878');bar(108,'GPU',gpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).gpu,'#f878f8');
@@ -6091,19 +6097,25 @@ function mahjongScr(){const HN=['東','南','西','北','白','發','中'],SU=['
       if(over&&res){R(20,74,216,64,'#000');txt(res.Y.map(y=>`${y[0]} ${y[1]}翻`).join('　'),128,82,'#fcfcfc','center',200);big(`${res.h}翻　${pts(res.h)}`,128,104,'#f8d878','center',14);}
       win(4,190,248,46);txt(msg,128,198,over&&!res?'#fc7460':'#fcfcfc','center');txt(over?'A：とじる':'←→：選ぶ　A：捨てる　↑：ツモ和了　B：やめる',128,214,'#7c7c7c','center',240);}});}
 function psuSwap(back){const A=ajS(),L=A.builds||[];if(!L.length){dialog('まだ PCを 組んでいない。',back);return;}const PS=PCP.find(p=>p[1]==='psu')[2];
-  listPick('どの PCの 電源を 交換する？',L.map(b=>({t:b.name,r:`${pcPart(b,'psu')[3]}W／必要 ${pcNeedW(b)}W`+(b.unst?' ⚠':'')})),i=>{const b=L[i];
-    listPick(`${b.name}の 新しい 電源`,PS.map(o=>({t:o[0],r:fmt(o[1])})),j=>{const o=PS[j];if(G.coins<o[1]){dialog('イェソが たりない…',back);return;}G.coins-=o[1];b.psu=j;b.unst=o[3]<pcNeedW(b)?1:0;save();sfx('ok');
+  listPick('どの PCの 電源を 交換する？',L.map(b=>({t:b.name,r:`${pcCapW(b)}W／必要 ${pcNeedW(b)}W`+(b.unst?' ⚠':'')})),i=>{const b=L[i];
+    listPick(`${b.name}の 新しい 電源`,PS.map(o=>({t:o[0],r:fmt(o[1])})),j=>{const o=PS[j];if(G.coins<o[1]){dialog('イェソが たりない…',back);return;}G.coins-=o[1];b.psu=j;b.unst=o[3]*(b.psuN||1)<pcNeedW(b)?1:0;save();sfx('ok');
       dialog([`${b.name}の 電源を ${o[0]}に 交換した！`,b.unst?`まだ 足りない…（必要 ${pcNeedW(b)}W）`:'これで 安心して 回せる！'],back);},s=>`容量 ${PS[s][3]}W（必要 目安 ${pcNeedW(b)}W）${PS[s][3]<pcNeedW(b)?'\n足りない！':''}`);});}
 function pcBuild(back){const A=ajS(),b={v:2};let i=0;
-  const total=()=>PCP.reduce((t,[,k,L])=>t+(b[k]!=null?L[b[k]][1]:0),0);
-  const step=()=>{if(i>=PCP.length){confirm();return;}const [n,k,L]=PCP[i],vis=L.map((o,j)=>j).filter(j=>!(L[j][4]&&L[j][4].ura)||A.ura);
-    listPick(`PCを 組む　${i+1}/${PCP.length}　${n}`,vis.map(j=>({t:(L[j][4]&&L[j][4].ura?'★':'')+L[j][0],r:L[j][1]?fmt(L[j][1]):'0'})),q=>{b[k]=vis[q];i++;step();},
-      s=>{const o=L[vis[s]];return `${n}：${o[0]}`+(o[4]&&o[4].d?`\n${o[4].d}`:'')+(k==='psu'?`\n容量 ${o[3]}W（必要 目安 ${pcPart(b,'cpu')[3]+pcPart(b,'gpu')[3]+100}W）`:k==='cpu'||k==='gpu'?`\n消費電力 ${o[3]}W`:'')+`\n今の 合計：${fmt(total()+o[1])}イェソ`;});};
-  const confirm=()=>{const p=total(),sc=pcScore(b),need=pcNeedW(b),cap=pcPart(b,'psu')[3],low=cap<need;
+  const total=()=>PCP.reduce((t,[,k,L])=>t+(b[k]!=null?L[b[k]][1]*(k==='cpu'?b.cpuN||1:k==='gpu'?b.gpuN||1:k==='psu'?b.psuN||1:1):0),0);
+  const okMb=(o)=>{const cs=pcX(b,'cpu').srv,ms=(o[4]&&o[4].sock)||'pc';if(!cs)return ms==='pc';if(cs==='tr')return ms==='tr';if(cs==='xe1')return ms==='xe1';return ms==='xe1'||ms==='xe2';};
+  const extra=(k,next)=>{
+    if(k==='mb'&&pcX(b,'cpu').dual&&pcX(b,'mb').dual){choice(`${pcPart(b,'cpu')[0]}を いくつ 載せる？`,['1個','2個（デュアル）'],r=>{b.cpuN=r===1?2:1;next();},120);return;}
+    if(k==='gpu'&&pcX(b,'gpu').mg&&A.ura){const mg=pcX(b,'gpu').mg;choice(`グラボを 2枚 挿して\n${mg}に しますか？\n（あまり 速くならない）`,['1枚','2枚（'+mg+'）'],r=>{b.gpuN=r===1?2:1;next();},120);return;}
+    if(k==='psu'&&pcX(b,'mb').srv){choice(`サーバー マザボなので\n電源を 2個 つなげる。\n（容量が 2倍）`,['1個','2個'],r=>{b.psuN=r===1?2:1;next();},88);return;}
+    next();};
+  const step=()=>{if(i>=PCP.length){confirm();return;}const [n,k,L]=PCP[i],vis=L.map((o,j)=>j).filter(j=>(!(L[j][4]&&L[j][4].ura)||A.ura)&&(k!=='mb'||okMb(L[j])));
+    listPick(`PCを 組む　${i+1}/${PCP.length}　${n}`,vis.map(j=>({t:(L[j][4]&&L[j][4].ura?'★':'')+L[j][0],r:L[j][1]?fmt(L[j][1]):'0'})),q=>{b[k]=vis[q];extra(k,()=>{i++;step();});},
+      s=>{const o=L[vis[s]];return `${n}：${o[0]}`+(o[4]&&o[4].d?`\n${o[4].d}`:'')+(k==='psu'?`\n容量 ${o[3]}W${b.psuN===2?'×2':''}（必要 目安 ${pcNeedW(b)}W）`:k==='cpu'||k==='gpu'?`\n消費電力 ${o[3]}W`:'')+`\n今の 合計：${fmt(total()+o[1])}イェソ`;});};
+  const confirm=()=>{const p=total(),sc=pcScore(b),need=pcNeedW(b),cap=pcCapW(b),low=cap<need;
     choice(`合計 ${fmt(p)}イェソ　予想スコア ${fmt(sc)}\n（${pcRank(sc)}）`+(low?`\n⚠ 電源が 足りない！（必要 ${need}W）`:'\nこの 構成で 組みますか？'),['組む','やめる'],r=>{if(r!==0){back&&back();return;}
       if(G.coins<p){dialog('イェソが たりない…',back);return;}G.coins-=p;if(low)b.unst=1;
       const names=['いつもの 相棒','静かな 書斎機','開発マシン','夜ふかし号','自作 1号機','メイン機'];
-      b.name=b.cpu===9?'スリッパ号':b.cpu===8?'自宅 データセンター':pcX(b,'gpu').ina?'イナズマ号':b.cpu===6?'兆芯 チャレンジ機':pcX(b,'cpu').arm?'ARM 実験機':sc>=22000?'モンスター':names[(A.builds||[]).length%names.length];
+      b.name=b.cpu===9?'スリッパ号':b.cpuN===2?'デュアル ジーオソ機':[8,10,11].includes(b.cpu)?'自宅 データセンター':pcX(b,'gpu').ai===6?'計算サーバー':pcX(b,'gpu').ina?'イナズマ号':b.cpu===6?'兆芯 チャレンジ機':pcX(b,'cpu').arm?'ARM 実験機':sc>=22000?'モンスター':names[(A.builds||[]).length%names.length];
       A.builds=A.builds||[];A.builds.push(Object.assign({},b));A.inv.pcj=(A.inv.pcj||0)+1;save();
       const ev=low?['電源ON！　……ピッ。 …プツン。','…落ちた。 もう一度。','……起動した！ でも なんだか 不安だ。\n（電源容量が 足りない）']:rnd()<.3?['…ネジを 1本 なくした。','（ケースの 底から 出てきた）','電源ON！　……ピッ。']:rnd()<.3?['…電源が 入らない！？','（電源ユニットの スイッチが OFFだった）','電源ON！　……ピッ。']:['電源ON！　……ピッ。'];
       dialog(['パーツが 届いた。 さっそく 組み立てる！',`${pcPart(b,'mb')[0]}に ${pcPart(b,'cpu')[0]}を 載せて…\nグリスを 塗って ${pcPart(b,'cool')[0].replace(/（.*$/,'')}を 取り付けた。`,`${pcPart(b,'mem')[0].replace(/（.*$/,'')}を カチッと 差しこむ。`+(b.gpu?`\n${pcPart(b,'gpu')[0]}を 挿して…`:''),`${pcPart(b,'psu')[0]}から 配線して… ケースを 閉じた。`,...ev,`起動した！ 自作PC「${b.name}」の 完成だ！\n（アジトの「もようがえ」で 置ける）`],back);},104);};
@@ -6115,7 +6127,7 @@ function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:A
     G.coins-=f.p;A.inv[k]=(A.inv[k]||0)+1;sfx('coin');save();
     dialog([`${f.n}を 買った！`,ajOK()?(A.x==null?'メニューの「アジト」から アジトを 建てて\n部屋に 置こう。':'アジトの 中の「もようがえ」で 置ける。'):'（アジトを 持てば 部屋に 置ける）'],open);
   },s=>pcShop&&s===1?`組んだ PCの 電源ユニットを 入れ替える。\n電源が 足りない PCも これで 安定する。`:pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
-  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・\nスナップタイガー エリート・RTZ イナズマ','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
+  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・スナップタイガー・\nサーバー マザボ・RTZ イナズマ・RTZ Pro A・\nOptein・SLI／CrossFire X','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
   dialog([pcShop==='Dスパラ'?'店員「いらっしゃいませ！ Dスパラへ ようこそ！\nパーツも 完成品も そろってます！」':pcShop?'店員「アークンへ ようこそ！\n自作の ご相談も どうぞ！」':'太陽家具「いらっしゃいませ！\nお部屋を 明るく 太陽家具です」'],open);}
 function ajMenu(){const A=ajS(),x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   const okHere=[T.GRASS,T.ROAD,T.SAND,T.FOREST].includes(t)&&!RES.some(r=>r.x===x&&r.y===y)&&!G.rifts.some(q=>q.x===x&&q.y===y);
