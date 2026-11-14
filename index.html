@@ -751,7 +751,7 @@ const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
 
 /* ===================== マップ ===================== */
-const MW=190,OW=130,MH=142,MAINW=64,MH0=56;
+const MW=190,OW=130,MH=182,MAINW=64,MH0=56;
 const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24};
 const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
@@ -869,6 +869,18 @@ const CAPR={x0:120,y0:13,x1:174,y1:38};
     'トイシ':'工場夜景の町','クダマツ':'ものづくりの町','アサエ':'白砂の町','タカマツ':'田園の里','シロタ':'白壁の町','シダイ':'瀬戸の漁村','ナガオ':'みかんの島','シラヤマヒメ':'錦帯橋の町','セタ':'東端の村'};
   const YRK={'ウベ':3,'マツザキ':3,'トイシ':3,'シラヤマヒメ':2,'ショウゴウ':2,'ハギ':3,'クダマツ':1,'アサエ':1,'シロタ':3,'ジングウコウゴウ':3};
   YM.forEach(([n,f,x,y,sz,sh,d])=>VIL.push({x,y,name:YPF[n]?`${YPF[n]} ${n}`:n,shrine:sh,rank:YRK[n]!=null?YRK[n]:Math.min(8,2+sz),tier:10,size:sz,from:VIL.findIndex(v=>v.name===f||v.name.replace(/^.* /,'')===f),yama:1,rec:'＝平均',desc:d,...(n==='トイシ'?{kyotei:1}:{})}));}
+/* サキタマ（グンマーの 南に 地続きで 広がる 新大陸・人類保管計画編 完結の 地） */
+const SKR={x0:132,y0:136,x1:188,y1:178};
+{const SOT=VIL.findIndex(v=>v.name==='関所町 ソトガワ'),A=VIL.length;
+  const SV=[['国境の町 クマガヤ','高城神社',148,143,3,4,SOT,['skkuma'],'日本一 暑いと 言われる サキタマの 玄関口'],
+    ['ネギの里 フカヤ','瀧宮神社',140,149,1,2,A,['sknegi'],'甘くて 太い ネギが 名物の 里'],
+    ['古墳の里 ギョウダ','前玉神社',158,148,2,3,A,['skkofun'],'さきたま古墳群が 眠る この 国の 名の 起こりの 地'],
+    ['山の町 チチブ','秩父神社',139,164,3,4,A+1,['skkodo'],'武甲山の ふもとの 山あいの 町'],
+    ['完全平和都市 ナメガワマチ','伊古乃速御玉比売神社',157,161,5,5,A+2,['skjin','sktower'],'かなしみも あらそいも ない 白い 街'],
+    ['小江戸 コエド','川越氷川神社',169,167,3,4,A+4,[],'蔵造りの 町並みと 時の鐘の 町'],
+    ['鉄道の街 オオミヤ','武蔵一宮 氷川神社',179,172,4,6,A+5,['skomiya'],'線路が 集まる サキタマ 最大の 街'],
+    ['せんべいの町 ソウカ','草加神社',184,162,1,2,A+6,[],'焼きたての せんべいの 香りが ただよう 町']];
+  SV.forEach(([name,shrine,x,y,size,rank,from,f,desc])=>VIL.push({x,y,name,shrine,rank,tier:12,size,from,sk:1,kqf:f,desc,...(name.endsWith('ナメガワマチ')?{skn:'namegawa'}:{})}));}
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村','鈴音村','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
@@ -901,7 +913,7 @@ function genMap(){
   const n5=mkNoise(61,3);
   for(const I of ISLES)for(let y=I.cy-I.ry-2;y<=I.cy+I.ry+2;y++)for(let x=I.cx-I.rx-2;x<=I.cx+I.rx+2;x++){
     const d=((x-I.cx)/I.rx)**2+((y-I.cy)/I.ry)**2+(n5(x%MAINW,y)-.5)*.6;if(d>=1||x>=MW-1)continue;
-    const q=n5((x*3)%MAINW,(y*2)%MH);setT(x,y,d>.82?T.ROAD:d<.25&&q>.6?T.MOUNT:q>.55?T.FOREST:T.GRASS);}
+    const q=n5((x*3)%MAINW,(y*2)%142);setT(x,y,d>.82?T.ROAD:d<.25&&q>.6?T.MOUNT:q>.55?T.FOREST:T.GRASS);}
   const s1=mkNoise(71,9,OW),s2=mkNoise(83,4,OW),s3=mkNoise(97,6,OW),s4=mkNoise(101,5,OW),S=SOUTH;
   for(let y=S.y0-3;y<=S.y1+3;y++)for(let x=S.x0-3;x<=S.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
     const edge=Math.min(x-S.x0,y-S.y0,S.x1-x,S.y1-y)+(s4(x,y)-.5)*7;if(edge<0)continue;
@@ -928,6 +940,10 @@ function genMap(){
     for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;
       const edge=Math.min(x-N.x0,y-N.y0,N.x1-x,N.y1-y)+(g4(x,y)-.5)*5;if(edge<0)continue;
       if(((x-117)/10)**2+((y-44)/8)**2<1)continue;const e=g1(x,y)*.7+g2(x,y)*.3;setT(x,y,e>.8?T.MOUNT:e<.15?T.WATER:g3(x,y)>.65?T.FOREST:T.GRASS);}}
+  {const g1=mkNoise(501,9,MW),g2=mkNoise(509,4,MW),g3=mkNoise(521,6,MW),g4=mkNoise(523,5,MW),N=SKR;
+    for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;if(y<=GUN.y1&&x>=GUN.x0&&x<=GUN.x1&&tileAt(x,y)!==T.SEA)continue;
+      const edge=Math.min(x-N.x0,y-N.y0+8,N.x1-x,N.y1-y)+(g4(x,y)-.5)*6;if(edge<0)continue;
+      const e=g1(x,y)*.7+g2(x,y)*.3+(x<146?Math.max(0,(146-x)/30):0);setT(x,y,e>.72?T.MOUNT:e<.18?T.WATER:g3(x,y)>.66?T.FOREST:T.GRASS);}}
   const pts=[...VIL.filter(v=>v.from==null&&!v.island),CAVE];
   for(let i=0;i<pts.length-1;i++){
     const a=pts[i],b=pts[i+1],path=[];
@@ -2390,7 +2406,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'中枢の 塔',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -2431,7 +2447,7 @@ function buildTown(vi){
   if(sz>=2){const fy=h-2;set(cx+3,fy,{t:'fount'});set(cx-3,fy,{t:'fount'});}
   {const lm=lmkOf(vi),fy=h-2,pos=[cx-3,cx+3,cx-5,cx+5];lm.forEach((id,j)=>{if(pos[j]>0&&pos[j]<w-1)set(pos[j],fy,{t:'lmk',id});});}
   const DI=dinfo(v),LINES=occupied(vi)?[`${DI.boss}さまに 逆らっては いけない…`,`店も 神社も 閉められてしまった。\nだれか ${DI.title}を たおして くれないか…`,'親衛隊「なにを じろじろ 見ている！」',`${DI.hall}は 町の いちばん 奥の 豪華な 建物だ。`]:v.dict?[`${DI.title}が いなくなって 町が 明るく なった！`,'ありがとう！ あなたは 町の 恩人だ！',`${v.shrine}の お祭りも 再開されたよ。`]:v.colo?['魔物コロシアムの 優勝者は 英雄だ！','コロシアムの 決勝の 相手は\n闘魔王 ガルゴスらしい…','挑戦料は 高いが 優勝賞品も すごいぞ。']:v.shugen?['山伏「法螺ヶ岳の 山頂には 奥宮が ある。」','山伏「滝行は 心を 清める。」','峰入り修行は きびしいぞ。 覚悟して いけ。','山道は 魔物が 多い。 気を つけて。']:v.depop?(ruin?(v.depop==='ruin'?['…わしが この村の 最後の ひとりじゃ。\n神社の 神主さまも おらんように なってのう。','魔物さえ こなければ\nみんな 帰って くるかも しれんのう…']:['子どもの 声を 聞かなくなって ひさしいねえ。','神社の お祭りも もう 何年も やっとらんよ。','若い もんは みんな 都会へ 出てしもうた。','集会所で 村の 仕事を 手伝って くれんかね。']):['村が にぎやかに なったねえ！','神主さまが 来てから 毎日が たのしいよ。','ワープの鳥居で 遠くからも 人が 来るんだ。']):NPC_LINES;
-  const LN=v.gm==='cap'?gmLines():v.kq?kqLines(vi):LINES;
+  const LN=v.gm==='cap'?gmLines():v.kq?kqLines(vi):v.sk?skLines(vi):LINES;
   const npcs=[],cols=['#0058f8','#d82800','#00a800','#6844fc','#e45c10','#008888','#fcfcfc'];
   const nN=v.gm==='cap'&&gmS().ch===6?0:v.depop?(ruin?(v.depop==='ruin'?1:4):5):2+sz;
   let tries=0;while(npcs.length<nN&&tries++<300){const k=Math.floor(r()*streets),y=6+5*k+1,x=1+Math.floor(r()*(w-2));/* 町の人は 道の 下側の 列に 立つ（店の 入口を ふさがない） */
@@ -2821,6 +2837,7 @@ function townCam(){
 }
 let ptrFresh=false;
 function enterVillage(i,atShrine){
+  if(VIL[i]&&VIL[i].skn&&!skGateCheck(i))return;
   curVil=i;TW=buildTown(i);if(atShrine){TW.py=4+(TW.top||0);}
   townScr.mv=null;setBase(townScr);playBGM('village');
   const first=!G.seen['v'+i];G.seen['v'+i]=1;
@@ -2833,7 +2850,7 @@ function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -4888,7 +4905,7 @@ function gsTeijo(){const S=gsS();
   if(S.ch===4){choice('帝城の 地下から 地鳴りが ひびく…\nギムの遺産を 止めに いきますか？\n（3連戦・推奨Lv29999）',['地下へ いく','やめる'],r=>{if(r===0)startGm('gs_izo');},96);return;}
   if(S.ch===5){choice('総選挙 当日。 帝城の 大広間の 開票所が\nキョーサン派に 占拠された！\n取り戻しますか？（3連戦・最終決戦）',['取り戻す','やめる'],r=>{if(r===0)startGm('gs_final');},96);return;}
   if(S.ch===6&&!S.chief){gsChief();return;}
-  if(tiOpen()){const T=tiS();if(T.ch===0){tiStart();return;}choice(`総長 ${S.chief.n}「ようこそ 帝城へ。」\n${T.clear?'帝愛の 地下帝国は 解放された。':'帝愛の 地下帝国への 昇降機が 動いている…'}`,T.clear?['地下帝国へ 行く','サキタマへ 向かう','やめる']:['地下帝国へ 行く','やめる'],r=>{if(r===0)tiHub();else if(r===1&&T.clear)skHub();},96);return;}
+  if(tiOpen()){const T=tiS();if(T.ch===0){tiStart();return;}choice(`総長 ${S.chief.n}「ようこそ 帝城へ。」\n${T.clear?'帝愛の 地下帝国は 解放された。\n（黒幕の 根城は 南の サキタマ。\n　国境門を 出て 南の 町 クマガヤへ）':'帝愛の 地下帝国への 昇降機が 動いている…'}`,['地下帝国へ 行く','やめる'],r=>{if(r===0)tiHub();},96);return;}
   dialog([`総長 ${S.chief?S.chief.n:''}「ようこそ 帝城へ。\nグンマーは 自由な 国に 生まれ変わりました」`,'玉座の 間には 新しい 総長の 旗が かかげられている。','（本土の 政治メニューで 連立政権を 組める）']);}
 /* 三山の 神主の 推薦状 */
 function gsRec(g){const S=gsS();if(S.rec[g.id]){dialog(`${g.n.split(' ')[0]}の 神主「推薦状は もう 渡したぞ。\nグンマーを 頼んだ」`);return;}
@@ -5041,7 +5058,7 @@ function tiHub(){const T=tiS();
   if(T.ch===1){it.push({t:`はたらく（1日・${fmt(TI_WAGE)}ペリコ）`,k:'work'},{t:'坑道の 魔物退治（1日・報酬は 返済に）',k:'dun'});if(T.casino)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});if(T.exposed)it.push({t:'班長と 最後の 大勝負（456賽 返し）',k:'final'});
     it.push({t:`借金を 返す（残り ${fmt(T.debt)}）`,k:'pay'},...(tiHintN()?[{t:`ひろった 物を 見る（${tiHintN()}）`,k:'hint'}]:[]),{t:'地下の 売店（ペリコ）',k:'shop'},{t:'タガバソウと 話す',k:'talk'},{t:'昇降機の 前へ（帝城に もどる）',k:'out'});}
   else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});if(T.clear)it.push({t:`余った ペリコを 交換（${fmt(T.per)}P）`,k:'swap'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:T.ch===2?'タガバソウと 話す':'労働者と 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
-  const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（帝城から サキタマへ 向かえる）';
+  const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（国境門を 出て 南… サキタマの クマガヤへ）';
   listPick(T.ch===1?`帝愛 地下帝国　${Math.min(T.day,TI_DAYS)}日目　${fmt(T.per)}ペリコ`:`帝愛 地下帝国　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
     if(k==='work')tiWork();else if(k==='dun')tiDungeon();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='hint')tiHintList();else if(k==='esc')tiEscBattle();else if(k==='swap')tiSwap();
     else if(k==='talk')tiTalk();else {save();dialog(T.ch===1?['昇降機の 前は 黒服が 見張っている。','（帝城から いつでも 地下へ もどれる。\n地下の 日数は 働いた 日だけ 進む）']:['帝城に もどった。']);}},goal);}
@@ -5290,6 +5307,7 @@ function skSky(t){R(0,0,W,H,'#3c1018');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%12
   const by=150-rise;R(50,by,156,12,'#5c3c2c');for(let k=0;k<10;k++)R(56+k*15,by+12+((k*7)%3)*6,10,10+((k*5)%4)*6,'#3c2418');
   for(let i=0;i<6;i++){const h=22+(i*13)%26;R(60+i*24,by-h,18,h,'#bcbcbc');}R(116,by-62,24,62,'#fcfcfc');R(124,by-74,8,12,'#d82800');}
 function skSceneBg(k){
+  if(skSceneBg2(k))return true;
   if(k==='skcity'){skCity(0);return true;}
   if(k==='skcity2'){skCity(1);return true;}
   if(k==='sklab'){skLab();return true;}
@@ -5308,6 +5326,10 @@ function skBattleBG(sp){const st=sp.st;
   if(st==='sk_nizu3'){R(6,48,244,98,'#34080e');for(let i=0;i<30;i++)R(6+(i*47)%244,48+(i*31)%98,1,1,'#e01818');for(let i=0;i<6;i++)R(6+((i*41+(frame>>2))%240),128+(i%3)*5,30,5,'#5c1c24');return;}
   if(st==='sk_nizu1'){R(6,48,244,98,'#08080c');for(const x of [14,40,196,222]){R(x,56,18,62,'#1c3c3c');R(x+3,72,12,44,'#2c6c6c');}R(6,118,244,28,'#1c0810');R(98,118,60,28,'#4c0814');return;}
   if(st==='sk_lab'){R(6,48,244,98,'#081414');for(let x=14;x<244;x+=40){R(x,54,22,64,'#1c3c3c');R(x+3,62,16,54,'#2c6c6c');}R(6,118,244,28,'#102020');return;}
+  if(st==='sk_kofun'){R(6,48,244,98,'#7cc8fc');R(6,118,244,28,'#58a838');pe(128,118,60,14,'#2c7c1c');pc(128,104,22,'#2c7c1c');return;}
+  if(st==='sk_negi'){R(6,48,244,98,'#a4e4fc');R(6,112,244,34,'#7c4c10');for(let x=12;x<244;x+=10){R(x,104,2,12,'#58d854');R(x,114,2,3,'#fcfcfc');}for(let i=0;i<5;i++)pc(30+i*48,100,5+((frame>>3)+i)%3,'#f83800');return;}
+  if(st==='sk_kodo'){R(6,48,244,98,'#141410');for(let x=6;x<244;x+=40){R(x,48,6,98,'#3c2c1c');R(x,52,40,4,'#3c2c1c');}R(6,118,244,28,'#2c2418');for(let x=10;x<244;x+=14)R(x,130,8,2,'#7c7c7c');return;}
+  if(st==='sk_train'){R(6,48,244,98,'#202838');R(20,60,216,40,'#fcfcfc');for(let x=28;x<230;x+=22)R(x,66,14,12,'#3cbcfc');R(20,96,216,4,'#d82800');R(6,118,244,28,'#3c3c44');for(let x=6;x<244;x+=12)R(x,124,8,3,'#7c5c3c');R(6,132,244,2,'#bcbcbc');return;}
   R(6,48,244,98,'#7cc8fc');for(let x=10;x<244;x+=34){R(x,70,26,48,'#fcfcfc');}R(6,118,244,28,'#bcbcbc');}
 
 /* ---------- 専用演出 ---------- */
@@ -5344,12 +5366,26 @@ function skAwakeScr(cb){let t=0;const END=200;
       if(t>170)big('覚醒',128,24,'#fcfcfc','center',24);
       region(0,0,W,H,()=>{vA=true;});}};}
 
+/* ---------- サキタマの 町の 背景 ---------- */
+function skSceneBg2(k){
+  if(k==='skkuma'){R(0,0,W,H,'#fc9838');pc(200,40,18,'#fcfc00');pc(200,40,13,'#fcfcfc');for(let i=0;i<8;i++){const x=10+i*32,h=40+(i*17)%30;R(x,150-h,26,h,'#e8c8a0');R(x+4,150-h+6,6,6,'#a05000');}
+    R(0,150,W,90,'#c8a060');for(let i=0;i<12;i++)R(((i*41)+(frame>>1))%W,90+(i*13)%60,10,1,'#fce0a8');R(60,60,136,16,'#d82800');txt('暑さ 日本一の 町',128,64,'#fcfcfc','center');return true;}
+  if(k==='skkofun'){R(0,0,W,H,'#7cc8fc');R(0,120,W,120,'#58a838');pe(128,130,70,22,'#2c7c1c');pc(128,104,34,'#2c7c1c');R(94,126,68,2,'#1c5c10');for(let i=0;i<10;i++)R(20+i*24,150+(i%2)*6,2,6,'#a05000');R(116,96,24,30,'#3c3c3c');txt('さきたま 古墳群',128,24,'#fcfcfc','center');return true;}
+  if(k==='sknegi'){R(0,0,W,H,'#a4e4fc');R(0,110,W,130,'#7c4c10');for(let y=116;y<230;y+=10)for(let x=6;x<W;x+=12){R(x,y-12,2,12,'#58d854');R(x,y-2,2,4,'#fcfcfc');}if(frame%60<40)for(let i=0;i<6;i++)pc(40+i*36,104,6+(i%2)*3,'#f83800');return true;}
+  if(k==='skchichibu'){R(0,0,W,H,'#3c5c7c');for(let i=0;i<5;i++){const x=i*60-10;for(let r=0;r<70;r++)R(x+r*.5,150-r,120-r,1,i%2?'#2c4c3c':'#3c5c3c');}R(100,100,56,50,'#141414');pe(128,100,28,16,'#141414');R(0,150,W,90,'#2c2c24');for(let x=0;x<W;x+=12)R(x,184,8,2,'#7c7c7c');return true;}
+  if(k==='skomiya'){R(0,0,W,H,'#202838');for(let i=0;i<4;i++)R(0,120+i*22,W,2,'#7c7c7c');R(30,96,196,30,'#fcfcfc');for(let x=40;x<220;x+=22)R(x,102,14,12,'#3cbcfc');R(30,124,196,4,'#d82800');txt('保管列車',128,84,'#fc7460','center');return true;}
+  return false;}
+
 /* ---------- ステージ ---------- */
 const SKSTG={
-  sk_kenmon:{waves:1,f:()=>.92,mk:()=>[['白服の 治安部隊','bones','#fcfcfc','#3cbcfc',1.6,1.2],['白服の 隊長','oni','#fcfcfc','#d82800',8,1.5,1],['白服の 治安部隊','bones','#fcfcfc','#3cbcfc',1.6,1.2]],intro:()=>'白服「笑顔の ない 者は\n平和の 敵と みなす。」'},
-  sk_lab:{waves:3,f:w=>.94+w*.03,mk:(sp,w)=>w<3?[['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.8,1.2],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',1.8,1.2],['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.8,1.2]]
-      :[['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.25],['実験場 主任 シロガネ','oni','#fcfcfc','#3cbcfc',18,1.7,1],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.25]],
-    intro:sp=>sp.wave<3?`地下実験場　第${sp.wave}区画\n培養槽の 中で 何かが 動いた…`:'主任 シロガネ「被験体の 補充か。\nちょうど 足りなかった ところだ」'},
+  sk_kenmon:{waves:1,f:()=>.92,mk:()=>[['白服の 勧誘員','bones','#fcfcfc','#3cbcfc',1.6,1.2],['白服の 勧誘部隊長','oni','#fcfcfc','#d82800',8,1.5,1],['白服の 勧誘員','bones','#fcfcfc','#3cbcfc',1.6,1.2]],intro:()=>'白服「ナメガワマチへ ようこそ。\n…笑顔の ない 者は 連れて 行きます」'},
+  sk_kofun:{waves:1,f:()=>.95,mk:()=>[['埴輪の 兵','bones','#c87c3c','#fcfcfc',2,1.25],['古墳の 番人 タマモリ','spirit','#2c7c1c','#f8b800',12,1.6,1],['埴輪の 兵','bones','#c87c3c','#fcfcfc',2,1.25]],intro:()=>'番人「…玉ヲ… 荒ラス 者ハ… 許サヌ……」\n（首すじに 同期装置が 刺さっている！）'},
+  sk_negi:{waves:2,f:w=>.95+w*.02,mk:(sp,w)=>w<2?[['白服の 焼き払い班','bones','#fcfcfc','#f83800',1.8,1.25],['白服の 焼き払い班','bones','#fcfcfc','#f83800',1.8,1.25],['白服の 焼き払い班','bones','#fcfcfc','#f83800',1.8,1.25]]:[['火炎放射の 白服','oni','#fcfcfc','#f83800',12,1.6,1],['白服の 焼き払い班','bones','#fcfcfc','#f83800',1.9,1.25]],intro:sp=>sp.wave<2?'白服「この 畑の ネギは 平和の 毒だ。\n燃やし 尽くせ！」':'火炎放射の 白服が 立ちはだかった！'},
+  sk_kodo:{waves:2,f:w=>.97+w*.02,mk:(sp,w)=>w<2?[['坑道の 失敗作','blob','#5c0c1c','#fc7460',1.9,1.25],['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.9,1.25],['坑道の 失敗作','blob','#5c0c1c','#fc7460',1.9,1.25]]:[['武甲の 掘削機','bones','#7c7c7c','#f8b800',13,1.62,1]],intro:sp=>sp.wave<2?'武甲山の 坑道…\n奥から 呻き声が 聞こえる…':'坑道を ふさぐ 巨大な 掘削機が 動きだした！'},
+  sk_lab:{waves:3,f:w=>.97+w*.03,mk:(sp,w)=>w<3?[['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.9,1.25],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',1.9,1.25],['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.9,1.25]]
+      :[['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.3],['実験場 主任 シロガネ','oni','#fcfcfc','#3cbcfc',18,1.7,1],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.3]],
+    intro:sp=>sp.wave<3?`地下第七層 実験場　第${sp.wave}区画\n培養槽の 中で 何かが 動いた…`:'主任 シロガネ「被験体の 補充か。\nちょうど 足りなかった ところだ」'},
+  sk_train:{waves:2,f:w=>1+w*.02,mk:(sp,w)=>w<2?[['保管列車の 車掌','bones','#24306c','#f8b800',2.1,1.3],['白服の 護送兵','bones','#fcfcfc','#d82800',2.1,1.3],['保管列車の 車掌','bones','#24306c','#f8b800',2.1,1.3]]:[['保管列車 ホカン号','bones','#fcfcfc','#d82800',20,1.75,1]],intro:sp=>sp.wave<2?'オオミヤ 車両基地。\n笑顔の 人々を 乗せた 列車が 動きだす！':'列車そのものが 牙を むいた！\n保管列車 ホカン号「ホカン… ホカン……」'},
   sk_nizu1:{waves:1,f:()=>1.02,mk:()=>[['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3],['総帥 ニズゥーイッツァイ','oni','#1c1c24','#8c0c24',26,1.85,1],['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3]],intro:()=>'ニズゥーイッツァイ「神の 前に ひれ伏せ、 実験体ども。」'},
   sk_nizu2:{waves:2,f:w=>w<2?1.02:1.06,mk:(sp,w)=>w<2?[['コブシデの 複製','oni','#3c2858','#f8b800',10,1.6,1],['錨ケンドウの 複製','oni','#fcfcfc','#f8b800',14,1.65,1,'kendo'],['クロヌマの 複製','oni','#5c5c5c','#f8b800',10,1.6,1]]
       :[['ニズゥーイッツァイ 幼体','oni','#000000','#d82800',60,1.95,1]],
@@ -5357,61 +5393,99 @@ const SKSTG={
   sk_nizu3:{waves:1,f:()=>1.1,mk:()=>[['ニズゥーイッツァイ 生体','oni','#000000','#d82800',70,2.1,1]],intro:()=>'「ワタシハ……カミニ ナッタ」\n天使の 輪を 背負った 神が 降臨した！'}};
 Object.assign(GSTG,SKSTG);
 
-/* ---------- 物語 ---------- */
-function skStart(){const S=skS();
-  scene('skcity',['帝城を 出る 前に 裏・賭郎が 言った。','裏・賭郎「コブシデが 口にした 名…\nニズゥーイッツァイの 根城は サキタマだ」','── サキタマ　ナメガワマチ ──','看板「完全平和都市 ナメガワマチへ ようこそ」','街の 人々は みな 同じ 笑顔で\nこちらに 手を ふっている…','住民「ここは 完全平和都市。\nかなしみも あらそいも ありません」','住民「かなしみも あらそいも ありません」\n（…さっきと 一言一句 同じだ）'],()=>
-  scene('skcity2',['…路地裏から 手招きする 影が ある。','トモヤヨシダ「おい、 こっちだ！\n笑ってる 連中には 近づくな」','タケウチジョウチャン「俺たちは レジスタンス。\nこの 街は 平和都市なんかじゃ ない」','トモヤヨシダ「ナメガワマチの 地下は 実験場だ。\n地下に 送られた 人間は 二度と 戻らない」','ジョウチャン「黒幕は ニズゥーイッツァイ。\n人類保管装置を 作り変えて\n人間を 神に する 薬を 作ってる」','ジョウチャン「その 薬の 名は\n『ネブカドネザルの 鍵』……」','トモヤヨシダ「…あんたたち、 帝愛の 地下を\n抜けてきたんだろ？ 力を 貸してくれ」','【ぶっ飛びサキタマ編】\n〜ナメガワマチを 取り戻せ〜'],()=>{S.ch=1;save();
-    dialog(['目標：白服の 検問を 突破し\n地下への 入口を 探す'],skHub);}));}
-function skHub(){const S=skS();if(S.ch===0){skStart();return;}
-  const it=[];
-  if(S.ch===1)it.push({t:'白服の 検問を 突破する',k:'kenmon'});
-  if(S.ch===2)it.push({t:'地下実験場へ 潜入する（3連戦）',k:'lab'});
-  if(S.ch===3)it.push({t:'中枢の 塔へ 乗りこむ（最終決戦）',k:'n1'});
-  if(S.ch===4)it.push({t:'天空の マイナス宇宙へ（幼体）',k:'n2'});
-  if(S.ch===5)it.push({t:'最終決戦　ニズゥーイッツァイ 生体',k:'n3'});
-  if(S.ch>=6)it.push({t:'神の 残響と 再戦する',k:'re'});
-  it.push({t:'街を しらべる',k:'look'},{t:'レジスタンスと 話す',k:'talk'},{t:'帝城に もどる',k:'back'});
-  const goal=['','目標：白服の 検問を 突破し 地下への 入口を 探す','目標：地下実験場の 真相を 暴く','目標：中枢の 塔で ニズゥーイッツァイを 止める','目標：天空へ 浮上した 街で 神を 追う','目標：神と化した ニズゥーイッツァイを 倒す','ナメガワマチは 取り戻された。'][Math.min(6,S.ch)];
-  listPick('サキタマ　ナメガワマチ',it.map(x=>({t:x.t})),i=>{const k=it[i].k;
-    if(k==='kenmon')choice('白服の 検問所を 突破しますか？',['突破する','やめる'],r=>{if(r===0)startGm('sk_kenmon');else skHub();},96);
-    else if(k==='lab')choice('地下実験場へ 潜入しますか？\n（3連戦）',['潜入する','やめる'],r=>{if(r===0)startGm('sk_lab');else skHub();},96);
-    else if(k==='n1')choice('中枢の 塔の 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();else skHub();},96);
-    else if(k==='n2')choice('天空に 浮かぶ ナメガワマチ。\nマイナス宇宙の 奥へ 進みますか？（2連戦）',['進む','やめる'],r=>{if(r===0)scene('skminus',['マイナス宇宙…\n何もかもが 存在し、 何もかもが 存在しない。','トモヤヨシダ「残骸は 俺たちが 抑える！\n行け！」'],()=>startGm('sk_nizu2'));else skHub();},96);
-    else if(k==='n3')choice('神と化した ニズゥーイッツァイに\n挑みますか？（6人で 戦う）',['挑む','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});}else skHub();},96);
-    else if(k==='re')choice('マイナス宇宙に 残る 神の 残響と\n再戦しますか？（6人で 戦う）',['再戦する','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS,re:1});}else skHub();},96);
-    else if(k==='look')skLook();else if(k==='talk')skTalk();else{save();dialog(['帝城に もどった。']);}},goal);}
-function skLook(){const S=skS();const L=S.ch>=6?['街の 人々が 思い思いの 顔で 笑っている。','子ども「おかあさんが 泣いてるの。\nでも うれしいんだって」','看板の「完全」の 二文字は 誰かに 塗りつぶされていた。']
-  :S.ch>=3?['空が 不気味に 赤く 染まっている…','住民「かなしみも あらそいも ありません」\n（住民の 首すじに 小さな 注射の 痕が ある）']
-  :['住民「かなしみも あらそいも ありません」','白服の 治安部隊が 笑っていない 者を 探して 歩いている。','マンホールの ふたに「関係者以外 立入禁止　地下第七層」と 刻まれている。'];
-  dialog(L,skHub);}
-function skTalk(){const S=skS();const L=S.ch>=6?['トモヤヨシダ「…生きてるよな、 俺たち」','ジョウチャン「ああ。 タガバソウの 薬の おかげだ」','トモヤヨシダ「また どこかで 会おうぜ。\n今度は 酒でも 飲みながら な」']
-  :S.ch>=3?['タガバソウ「改良型は 理性を 保てるが\n体への 負担は 大きい。」','「…使うのは 本当に 追いつめられた 時だけだ」','トモヤヨシダ「わかってるさ」']
-  :['トモヤヨシダ「俺は この 街で 生まれた。\n親父も お袋も 地下に 送られた」','ジョウチャン「俺は 薬草屋だった。\nあの 注射の 中身を 調べて 気づいたんだ」','ジョウチャン「人間を 神に する？\n…神に なり損ねた 連中を 何人も 見たよ」'];
-  dialog(L,skHub);}
-function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「人類は 保管されるべき 資源。\nそして わたしは その 管理者… 神と なる」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
-function skWin(sp,back,pages){const S=skS(),w=sp.wave||1,NW=GSTG[sp.st].waves;
-  if(w<NW){pages.push(sp.st==='sk_nizu2'?'複製たちは マイナス宇宙に 溶けて 消えた…':`第${w}区画を 突破した！\n（HP・MPは 回復しない）`);dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
-  const hub=more=>dialog(pages,()=>{returnField();dialog(more&&more.length?more:['（ナメガワマチに もどった）'],skHub);});
-  if(sp.st==='sk_kenmon'){const first=S.ch<2;S.ch=Math.max(S.ch,2);save();hub(first?['白服の 隊長「笑え… 笑うんだ……」','検問所の 奥に 地下へ 続く 階段が あった！','トモヤヨシダ「地下第七層… 実験場だ」',gmGive(10,10)]:['白服たちは 逃げていった。',gmGive(5,5)]);return;}
-  if(sp.st==='sk_lab'){if(S.ch>2){hub(['実験場の 残骸を 退けた。',gmGive(8,8)]);return;}
+/* ---------- 町・施設 ---------- */
+const SKQ=[['kofun','ギョウダの さきたま古墳','幸魂の 勾玉'],['negi','フカヤの ネギ畑','目覚めの ネギ'],['kodo','チチブの 武甲山 坑道','地下への 抜け道']];
+function skQ(){const S=skS();S.q=S.q||{};return S.q;}
+function skGoal(){const S=skS(),q=skQ();
+  return ['目標：国境の 町 クマガヤの 自警団を 訪ねる','目標：クマガヤを 襲う 白服の 勧誘部隊を 退ける','目標：完全平和都市 ナメガワマチの レジスタンスの アジトへ',
+    `目標：サキタマ 各地を 回る（${SKQ.filter(x=>q[x[0]]).length}/3）\n${SKQ.map(x=>`${q[x[0]]?'済':'　'} ${x[1]}`).join('\n')}`,'目標：アジトから 地下第七層の 実験場へ 潜入する','目標：オオミヤの 車両基地で 保管列車を 止める','目標：ナメガワマチ 中枢の 塔へ 乗りこむ','目標：天空の マイナス宇宙で 神を 追う（中枢の 塔）','目標：神と化した ニズゥーイッツァイを 倒す（中枢の 塔）','ナメガワマチは 取り戻された。'][Math.min(9,S.ch)];}
+function skGateCheck(vi){if(VIL[vi].skn!=='namegawa')return true;const S=skS();if(S.ch>=2)return true;
+  dialog(['巨大な 白い 門に 白服が 立っている。','白服「完全平和都市 ナメガワマチへ ようこそ。\n移住許可証を 拝見します」','白服「…お持ちで ない？\nでは お引き取りを。 笑顔で どうぞ」',skOpen()?'（国境の 町 クマガヤで 何か わかるかもしれない）':'（今は 入れそうにない…）']);return false;}
+function skLines(vi){const S=skS(),v=VIL[vi],nm=v.name.replace(/^.* /,'');
+  if(nm==='ナメガワマチ')return S.ch>=9?['かなしい ことも あるけど… 今は 自分で 笑ってるの。','地下から 父さんが 帰ってきた！','看板の「完全」の 二文字が 塗りつぶされている。','白服を 着ていた 人も 今は 畑を 耕している。']
+    :['かなしみも あらそいも ありません。','かなしみも あらそいも ありません。','ここは 完全平和都市です。 笑顔で どうぞ。','夜に なると 地下から 音が するの… でも 平和です。','かなしみも あらそいも ありません。'];
+  if(nm==='クマガヤ')return S.ch>=9?['ナメガワマチから みんな 帰ってきたよ！','暑いけど 生きてるって 感じがするね！']:['今日も 暑いねえ… ナメガワマチは 涼しいらしいよ。','息子が ナメガワマチへ 移住したきり 手紙も 来ない。','白服の 勧誘員が 毎日 来るんだ。'];
+  if(nm==='ギョウダ')return['さきたま… 幸せの 魂と 書いて 幸魂（さきみたま）。','古墳の 上で 白い 服の 男が 石碑を 読んでいた。','この 国の 名前は この 地から 生まれたんだよ。'];
+  if(nm==='フカヤ')return['フカヤの ネギは 甘くて 香りが 強い。','ネギの 香りを かぐと ぼんやりした 頭が すっきり するって 話だ。','白服が 畑を 目の敵に してるんだ。'];
+  if(nm==='チチブ')return['武甲山は 削られて 形が 変わっちまった。','坑道の 奥から 夜な夜な 呻き声が…','秩父神社の 夜祭りは 冬の 名物だよ。'];
+  if(nm==='オオミヤ')return['真夜中に 白い 列車が 走るんだ。 時刻表に ない 列車が。','鉄道の 街だからね。 列車の 音で 目が 覚めるのさ。','氷川さまの 参道は 日本一 長いんだって。'];
+  if(nm==='コエド')return['蔵造りの 町並みと 時の鐘が 自慢だよ。','いもの お菓子を 食べていきな。','ナメガワマチから 逃げてきた 人を かくまってる 家が あるらしい。'];
+  return['せんべい 焼きたてだよ！','サキタマは 海が ない。 だから 川と 田んぼを 大事に するんだ。','ナメガワマチの 噂？ …あまり 大きな 声では 言えないね。'];}
+function skFac(kind){const S=skS(),q=skQ();
+  if(kind==='skkuma'){
+    if(!skOpen()){dialog(['自警団長 アツミ「最近 ナメガワマチへ\n移住した 者が 誰も 戻って こない」','「…あんた 強そうだな。 いずれ 力を 借りるかもな」']);return;}
+    if(S.ch===0){scene('skkuma',['── サキタマ　国境の 町 クマガヤ ──','自警団長 アツミ「あんたが 帝愛の 地下を\n抜けてきた 連中か。 噂は 聞いてる」','「この 町の 若い 連中が 次々と\nナメガワマチへ 移住して いった」','「完全平和都市… かなしみも あらそいも ない 街。\n…だが 誰ひとり 帰って こない」','「勧誘に 来るのは 白い 服の 連中だ。\n今日も そろそろ 来る ころだ…」','見張り「団長！ 白服の 勧誘部隊です！\n住民を 無理やり 連れて いこうと してる！」','【ぶっ飛びサキタマ編】\n〜ナメガワマチを 取り戻せ〜'],()=>{S.ch=1;save();
+      choice('白服の 勧誘部隊を 止めますか？',['止める','あとで'],r=>{if(r===0)startGm('sk_kenmon');},96);});return;}
+    if(S.ch===1){choice('白服の 勧誘部隊が 住民を 連れ去ろうと している！\n止めますか？',['止める','やめる'],r=>{if(r===0)startGm('sk_kenmon');},96);return;}
+    dialog(S.ch>=9?['アツミ「ナメガワマチから みんな 帰ってきた。\n…ありがとよ。 暑い 町だが また 来てくれ」']:['アツミ「その 移住許可証が あれば\nナメガワマチの 門を くぐれる」',skGoal()]);return;}
+  if(kind==='skjin'){
+    if(S.ch<2){dialog('裏通りの 古い 倉庫だ。 鍵が かかっている。');return;}
+    if(S.ch===2){scene('skcity2',['裏通りの 倉庫に 入ると…','トモヤヨシダ「…おい、 動くな。\nその 許可証、 本物じゃ ないな？」','タケウチジョウチャン「よせ トモヤ。\n笑ってない。 こいつらは 操られて ない」','トモヤヨシダ「…俺は トモヤヨシダ。\nこっちは タケウチジョウチャン。 レジスタンスだ」','ジョウチャン「この 街は 平和都市なんかじゃ ない。\n地下第七層は 人体実験場だ」','トモヤヨシダ「地下に 送られた 人間は 二度と 戻らない。\n…俺の 親父と お袋も だ」','ジョウチャン「黒幕は 総帥 ニズゥーイッツァイ。\n人類保管装置を 作り変えて\n人間を 神に する 薬を 作ってる」','ジョウチャン「その 薬の 名は\n『ネブカドネザルの 鍵』……」'],()=>
+      scene('skcity2',['トモヤヨシダ「正面から 塔に 乗りこんでも\n住民が 盾に される。 準備が いる」','ジョウチャン「頼みが 三つ ある」','「ひとつ。 ギョウダの さきたま古墳。\n奴が 何を 調べていたのか 知りたい」','「ふたつ。 フカヤの ネギ畑。\n白服が 畑を 焼こうと してる。 理由が ある はずだ」','「みっつ。 チチブの 武甲山 坑道。\n地下第七層へ 通じる 抜け道が あるらしい」','トモヤヨシダ「頼む。 この 街を… 取り戻したいんだ」'],()=>{S.ch=3;save();dialog([skGoal()]);}));return;}
+    const it=[];if(S.ch===4)it.push({t:'地下第七層へ 潜入する（3連戦）',k:'lab'});
+    it.push({t:'話を 聞く',k:'talk'},{t:'目標を 確かめる',k:'goal'},{t:'やめる',k:'x'});
+    listPick('レジスタンスの アジト',it.map(x=>({t:x.t})),i=>{const k=it[i].k;
+      if(k==='lab')scene('skchichibu',['武甲山の 抜け道から 地下へ 降りていく…','トモヤヨシダ「この 先が 地下第七層だ」','ジョウチャン「勾玉を 持っていれば\n同期装置の 声に 飲まれずに すむ」'],()=>startGm('sk_lab'));
+      else if(k==='talk')skTalk();else if(k==='goal')dialog([skGoal()]);},skGoal());return;}
+  if(kind==='sktower'){
+    if(S.ch<6){dialog(['街の 中心に そびえる 白い 塔だ。','白服「関係者以外 立入禁止です。\n笑顔で お引き取りを」']);return;}
+    if(S.ch===6){choice('中枢の 塔の 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();},96);return;}
+    if(S.ch===7){choice('塔の 上空に マイナス宇宙が 広がっている。\n奥へ 進みますか？（2連戦）',['進む','やめる'],r=>{if(r===0)scene('skminus',['マイナス宇宙…\n何もかもが 存在し、 何もかもが 存在しない。','トモヤヨシダ「残骸は 俺たちが 抑える！\n行け！」'],()=>startGm('sk_nizu2'));},96);return;}
+    if(S.ch===8){choice('神と化した ニズゥーイッツァイに\n挑みますか？（6人で 戦う）',['挑む','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});}},96);return;}
+    choice('塔の 最上階に 神の 残響が 残っている。\n再戦しますか？（6人で 戦う）',['再戦する','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS,re:1});}},96);return;}
+  if(kind==='skkofun'){
+    if(S.ch<3||q.kofun){dialog(q.kofun?['前玉神社の 宮司「幸魂の 勾玉は\nあなたがたを 守るでしょう」','古墳は 静けさを 取り戻している。']:['前玉神社の 宮司「ここは さきたま古墳群。\nこの 国の 名の 起こりの 地です」','「…最近 白い 服の 男が\n古墳の 石碑を 熱心に 読んでいました」']);return;}
+    scene('skkofun',['前玉神社の 宮司「レジスタンスの 方ですね。\nお待ちしていました」','「さきたまとは 幸魂（さきみたま）。\n古の 人々は 人の 魂を 玉に 宿し\n災いから 守ったと 伝わります」','「守るための 祈りでした。\n閉じこめる ためでは ない」','「白い 服の 男… ニズゥーイッツァイは\n石碑を 読み 笑って いました」','「『人を 玉に 保管すれば\n永遠に 平和だ』と……」','そのとき 古墳の 石室が 開き\n埴輪の 兵と 番人が 現れた！'],()=>startGm('sk_kofun'));return;}
+  if(kind==='sknegi'){
+    if(S.ch<3||q.negi){dialog(q.negi?['ネギ農家の 婆さま「畑は 半分 焼けたけど\nまた 植えれば いいさ」','「目覚めの ネギ、 しっかり 使っておくれ」']:['ネギ農家の 婆さま「フカヤの ネギは 甘くて 太いよ。\n香りも 強いんだ」']);return;}
+    scene('sknegi',['ネギ畑に 火の 手が 上がっている！','ネギ農家の 婆さま「白服の 連中が\n畑を 焼き払おうと してるんだよ！」','ジョウチャン（の 声が 通信機から）\n「…やっぱりか。 婆さま、 理由は？」','婆さま「この ネギの 香りを かぐと\nぼんやりした 頭が すっきり するのさ」','「ナメガワマチから 逃げてきた 子も\nネギ汁を 飲ませたら 目を 覚ました」','ジョウチャン「それだ…！ 同期装置の 洗脳を\n解く 鍵は フカヤの ネギだ！」'],()=>startGm('sk_negi'));return;}
+  if(kind==='skkodo'){
+    if(S.ch<3||q.kodo){dialog(q.kodo?['坑道の 奥は 地下第七層へと 続いている。','（アジトから 潜入できる）']:['武甲山 坑道の 入口だ。','鉱夫「この 坑道は 閉鎖中だ。\n…奥から 妙な 声が するんでな」']);return;}
+    scene('skchichibu',['── チチブ　武甲山 坑道 ──','鉱夫「本当に 行くのか？\n奥から 夜な夜な 呻き声が するんだぞ」','坑道の 壁には 白い 塗料で\n「第七層 搬入路」と 書かれている…','暗闇の 奥で 何かが うごめいた！'],()=>startGm('sk_kodo'));return;}
+  if(kind==='skomiya'){
+    if(S.ch<5){dialog(['オオミヤ 車両基地だ。','駅員「真夜中に 時刻表に ない\n白い 列車が 出ていくんです」']);return;}
+    if(S.ch===5){scene('skomiya',['── 鉄道の 街 オオミヤ　車両基地 ──','笑顔の 人々が 白い 列車に 乗せられていく…','トモヤヨシダ「保管列車… 地下で 『保管』された\n人間を 塔へ 運ぶ 列車だ」','ジョウチャン「ネギは 用意した。\n列車を 止めて みんなを 起こすぞ！」'],()=>startGm('sk_train'));return;}
+    dialog(['車両基地には 止まったままの 保管列車が ある。','駅員「もう 二度と あんな 列車は 走らせません」']);return;}
+  dialog('…');}
+function skTalk(){const S=skS();const L=S.ch>=9?['トモヤヨシダ「…生きてるよな、 俺たち」','ジョウチャン「ああ。 タガバソウの 薬の おかげだ」','トモヤヨシダ「また どこかで 会おうぜ。\n今度は 酒でも 飲みながら な」']
+  :S.ch>=5?['タガバソウ「改良型は 理性を 保てるが\n体への 負担は 大きい」','「…使うのは 本当に 追いつめられた 時だけだ」','トモヤヨシダ「わかってるさ」']
+  :['トモヤヨシダ「俺は この 街で 生まれた。\n親父も お袋も 地下に 送られた」','ジョウチャン「俺は フカヤの 薬草屋の 弟子だった。\nあの 注射の 中身を 調べて 気づいたんだ」','ジョウチャン「人間を 神に する？\n…神に なり損ねた 連中を 何人も 見たよ」'];
+  dialog(L);}
+function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
+
+/* ---------- 勝利後 ---------- */
+function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].waves;
+  if(w<NW){pages.push(sp.st==='sk_nizu2'?'複製たちは マイナス宇宙に 溶けて 消えた…':sp.st==='sk_lab'?`第${w}区画を 突破した！\n（HP・MPは 回復しない）`:'まだ 終わらない…！\n（HP・MPは 回復しない）');dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
+  const after=more=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more);});
+  const qDone=(id,lines)=>{const first=!q[id];q[id]=1;const all=SKQ.every(x=>q[x[0]]);if(all&&S.ch===3)S.ch=4;save();
+    after([...lines,...(first?[gmGive(15,15,2)]:[]),...(all&&S.ch===4&&first?['三つの 手がかりが そろった！','トモヤヨシダ（通信機）「よし… アジトに 戻ってくれ。\n地下第七層へ 乗りこむぞ」']:[`（${SKQ.filter(x=>q[x[0]]).length}/3）`])]);};
+  if(sp.st==='sk_kenmon'){const first=S.ch<2;S.ch=Math.max(S.ch,2);save();
+    after(first?['勧誘部隊長「笑え… 笑うんだ……\nナメガワマチは… 平和……」','部隊長は 気を 失った。 懐から 一枚の 書類が 落ちた。','「ナメガワマチ 移住許可証」を 手に入れた！','アツミ「そいつが あれば ナメガワマチの 門を くぐれる」','「…頼む。 若い 連中を 連れて 帰ってくれ」',gmGive(10,10),'目標：完全平和都市 ナメガワマチの レジスタンスの アジトへ']:['白服たちは 逃げていった。',gmGive(5,5)]);return;}
+  if(sp.st==='sk_kofun'){qDone('kofun',['番人の 首すじの 同期装置が 砕けた。','番人「…玉ハ… 守ル タメニ… アル……」\n番人は 静かに 石室へ 還っていった。','宮司「幸魂の 勾玉を お持ちください。\n心を 奪う 声から 身を 守ります」','「幸魂の 勾玉」を 手に入れた！']);return;}
+  if(sp.st==='sk_negi'){qDone('negi',['火は 消し止められた！','婆さま「助かったよ。\n焼け残った ネギを 持って いきな」','「目覚めの ネギ」を 手に入れた！','ジョウチャン（通信機）「これで 操られた 住民を\n起こせる！」']);return;}
+  if(sp.st==='sk_kodo'){qDone('kodo',['掘削機は 動きを 止めた。','その 奥には… 白い 壁の 通路が 続いていた。','「地下第七層 搬入路」\nナメガワマチの 地下へ 通じる 抜け道だ！']);return;}
+  if(sp.st==='sk_lab'){if(S.ch>4){after(['実験場の 残骸を 退けた。',gmGive(8,8)]);return;}
     dialog(pages,()=>{BT=null;scene('sklab',['主任 シロガネは 培養槽に 倒れこんだ。','実験記録が 残されている…','「被験者 第三千二百号… 神化に 失敗。\n　残骸として 保管」','「ネブカドネザルの 鍵　完成。\n　総帥 自らが 投与を 開始」','ジョウチャン「…自分に 打ったのか！」'],()=>
-      scene('sktagaba',['そのとき 培養槽の 影から\n聞き覚えの ある 声が した。','？？？「…相変わらず 無茶を するな」','タガバソウ「よう。 生きてたぜ」','（帝愛の 地下で コブシデを 止めた あの 男だ！）','タガバソウ「コブシデの 同期装置から\n奴らの 薬の 設計を 抜き取った」','「理性を 保ったまま 覚醒できる…\n改良型の ネブカドネザルだ」','タガバソウは 小さな アンプルを 二本\nトモヤヨシダと ジョウチャンに 渡した。','タガバソウ「使うのは 本当に\n追いつめられた 時だけだ。 いいな」','トモヤヨシダ「…ああ」\nジョウチャン「恩に 着る」',gmGive(20,20,5),'目標：中枢の 塔で ニズゥーイッツァイを 止める'],()=>{S.ch=3;save();returnField();skHub();}));});return;}
-  if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,4);save();
+      scene('sktagaba',['そのとき 培養槽の 影から\n聞き覚えの ある 声が した。','？？？「…相変わらず 無茶を するな」','タガバソウ「よう。 生きてたぜ」','（帝愛の 地下で コブシデを 止めた あの 男だ！）','タガバソウ「コブシデの 同期装置から\n奴らの 薬の 設計を 抜き取った」','「理性を 保ったまま 覚醒できる…\n改良型の ネブカドネザルだ」','タガバソウは 小さな アンプルを 二本\nトモヤヨシダと ジョウチャンに 渡した。','タガバソウ「使うのは 本当に\n追いつめられた 時だけだ。 いいな」','トモヤヨシダ「…ああ」\nジョウチャン「恩に 着る」','タガバソウ「それと… オオミヤの 車両基地だ。\n保管された 人間を 塔へ 運ぶ 列車が ある」','「塔に 運ばれたら 終わりだ。 先に 止めろ」',gmGive(20,20,5),'目標：オオミヤの 車両基地で 保管列車を 止める'],()=>{S.ch=5;save();returnField();}));});return;}
+  if(sp.st==='sk_train'){if(S.ch>5){after(['車両基地は 静かに なった。',gmGive(8,8)]);return;}
+    S.ch=6;save();
+    dialog(pages,()=>{BT=null;scene('skomiya',['保管列車が 火花を 散らして 止まった！','ジョウチャンが ネギを 刻んで 車内に 撒く…','乗客「……あれ？ ここは… どこ……？」','乗客「わたし… なんで 笑って……」','人々が 次々と 目を 覚ましていく！','トモヤヨシダ「…親父！？ お袋！！」\n父「…トモヤ… なのか……？」','トモヤヨシダ「……っ。 あとは 一つだけだ」','トモヤヨシダ「ニズゥーイッツァイを 止める。\n中枢の 塔へ 行くぞ！」',gmGive(20,20,5),'目標：ナメガワマチ 中枢の 塔へ 乗りこむ'],()=>returnField());});return;}
+  if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,7);save();
     dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」','ニズゥーイッツァイは 首すじに\n『ネブカドネザルの 鍵』を 打ち込んだ！'],()=>
       scene('sksky',['塔が… いや 街 全体が 激しく 揺れる！','ナメガワマチが 大地から 引き剥がされ…\n天空へと 浮上していく！！','住民たちの 笑顔の まま 街は 雲を 越えた…'],()=>
       scene('skminus',['ニズゥーイッツァイの 体が 裂け\n人の 形が 崩れていく……','空間が 反転した。\n── マイナス宇宙 ──','何もかもが 存在し、 何もかもが 存在しない…','闇の 中から 神に なり損ねた 残骸が\n無数に 這い出してきた！','トモヤヨシダ「…今が その 時だな、 ジョウチャン」','ジョウチャン「ああ」\nふたりは タガバソウの アンプルを 飲み干した！'],()=>push(skAwakeScr(()=>
       scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「ここは 俺たちに 任せて 行け！」'],()=>startGm('sk_nizu2')))))));});return;}
-  if(sp.st==='sk_nizu2'){S.ch=Math.max(S.ch,5);save();
+  if(sp.st==='sk_nizu2'){S.ch=Math.max(S.ch,8);save();
     dialog(pages,()=>{BT=null;scene('skyoutai',['胎児の 殻に ひびが 走る……','「ウマレ……ル…… カミガ……」'],()=>
       scene('skgod',['殻を 破って 現れたのは\n人の 姿を 捨てた 縦長の 異形。','背中には 天使の 輪…\n目の 位置には 赤い 溝が 一文字に 走る。','「ワタシハ……カミニ ナッタ」'],()=>
       scene('skwake',['そのとき 背後から 足音が 響いた。','トモヤヨシダ「待たせたな！」','ジョウチャン「残骸は 片付けた。\nここからは 6人で 行くぞ！」','（トモヤヨシダと タケウチジョウチャンが\n戦いに 加わった！）'],()=>{skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});})));});return;}
   if(sp.st==='sk_nizu3'){
-    if(sp.re||S.clear){dialog(pages,()=>{BT=null;skGuestOff();returnField();dialog(['神の 残響は 光の 粒に なって 消えた…',gmGive(30,30,5)],skHub);});return;}
-    const rw=gmGive(50,50,20,2e11);S.ch=6;S.clear=1;save();
+    if(sp.re||S.clear){dialog(pages,()=>{BT=null;skGuestOff();returnField();dialog(['神の 残響は 光の 粒に なって 消えた…',gmGive(30,30,5)]);});return;}
+    const rw=gmGive(50,50,20,2e11);S.ch=9;S.clear=1;save();
     dialog(pages,()=>{BT=null;skGuestOff();scene('skgod',['胸の 赤い コアに 亀裂が 走る！','「ワタシハ… カミ… ダ……\nカミ……ナノ…ダ………」','コアが 砕け散った！','天使の 輪が 崩れ 虚無の 胴体は\n音も なく 崩れ去っていく…','ニズゥーイッツァイは 跡形も なく 消滅した。'],()=>
       scene('sksky',['マイナス宇宙が 閉じていく…','天空の ナメガワマチは ゆっくりと\n大地へ 降りていった。'],()=>
-      scene('skend',['地下第七層の 扉が 開かれ\n地下に 送られた 人々が 地上へ 戻ってきた。','トモヤヨシダ「親父…！ お袋…！」','ジョウチャン「…生きてる。 俺たちも な」','タガバソウ「人類保管計画は… これで 終わりだ」','住民たちは もう 同じ 言葉を くりかえさない。\n泣いたり 笑ったり している。'],()=>
-      titleCard('人類保管計画編　完',()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！',rw],skHub);}))));});return;}
+      scene('skend',['地下第七層の 扉が 開かれ\n保管されていた 人々が 地上へ 戻ってきた。','クマガヤから 来た 若者たちも\nアツミの もとへ 帰っていく。','ジョウチャン「…生きてる。 俺たちも な」','タガバソウ「人類保管計画は… これで 終わりだ」','前玉神社の 宮司「玉は 閉じこめる ものでは ない。\n人の 幸せを 守る ものです」','住民たちは もう 同じ 言葉を くりかえさない。\n泣いたり 笑ったり している。'],()=>
+      titleCard('人類保管計画編　完',()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！',rw]);}))));});return;}
   back([]);}
 
 /* ===================== TAインダストリアル（地下帝国編の クリア報酬） ===================== */
@@ -5957,7 +6031,7 @@ function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
 const POL_SEATS=300,POL_MAJ=151,POL_EVERY=50;
-const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.yama},{n:'マホロバ',s:20,f:v=>!!v.yama},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
+const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.yama&&!v.sk},{n:'マホロバ',s:20,f:v=>!!v.yama},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
 const NPC_PARTY=['自由八百万党','民衆の 会','帝国再興党','無所属'];
 const ZOKU={ken:{n:'建設族',d:'建設費 -10%'},jin:{n:'神社族',d:'奉納・造営 -10%'},uma:{n:'競馬族',d:'馬主の 賞金 +30%'},kin:{n:'金融族',d:'超富裕層課税・査察 -20%'}};
 const POLICY={tax:{n:'富裕層 減税',d:'超富裕層課税・査察が 半分',k:'kin',m:.5},jin:{n:'神社 振興',d:'奉納・造営 -30%',k:'jin',m:.7},ken:{n:'国土 強靭化',d:'建設費 -30%',k:'ken',m:.7},uma:{n:'競馬 振興',d:'馬主の 賞金 2倍',k:'uma',m:2}};
