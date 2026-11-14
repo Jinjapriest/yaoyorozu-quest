@@ -2183,9 +2183,9 @@ function pAct(i){
   }
 }
 function predEatAlly(m,i){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return '（捕食植物は 味方の 方を 見たが… 誰も いなかった）';
-  const a=al[ri(0,al.length-1)],an=CH[a.id].short;G.chars[a.id].hp=0;a.stun=0;BT.shake=12;
+  const a=al[ri(0,al.length-1)],an=CH[a.id].short,ac=G.chars[a.id],cut=Math.max(1,Math.round(cstat(a.id,a).hp*.25));ac.hp=Math.max(1,ac.hp-cut);BT.shake=12;
   const ng=['predplant','kakuhyper','krmz_kikoku','gogo'];const pool=[...new Set(skillsOf(a.id).concat(XRSK[a.id]?[XRSK[a.id]]:[]))].filter(k=>SK[k]&&!ng.includes(k)&&SK[k].k!=='krmz2');
-  const msg=`捕食植物の つるが ${an}に 巻きついた！\n${an}は 丸のみに された…（戦闘不能）`;
+  const msg=`捕食植物の つるが ${an}に 巻きついた！\n${an}は 少し かじられた…\n（${an}の HPが ${fmt(cut)} 減った）`;
   if(!pool.length){NOW([()=>`${an}の 力を 取りこんだが…\n使える 技が なかった！`]);return msg;}
   const k=pool[ri(0,pool.length-1)],sk=SK[k],en=BT.en.map((e,j)=>j).filter(j=>BT.en[j].alive);
   const keep=BT.cmds[i];BT.cmds[i]={type:'skill',k,t:sk.tg==='enemy'?(en.length?en[ri(0,en.length-1)]:0):i};G.chars[m.id].mp+=skCost(m.id,k);
@@ -2299,7 +2299,7 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
   neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
   kakuhyper:'可能性の 獣が 目覚める。\n強攻撃（最大HPの 2%＋物理）が 81%で ループ、19%で 終了\n（転落は 偶数揃い。 偶数揃いの うち 約20%は\n　復活して 7に 変化）\n（ループ中 5%で 保留が たまり 最大4つ。\n　終了時に 保留が あれば「Fever!?」で 再開）',
-  predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ\nさらに 味方を 1人 捕食し（戦闘不能）\nその 味方の 技を ランダムで 発動する',
+  predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ\nさらに 味方を 1人 捕食し（HPを 25% 削る）\nその 味方の 技を ランダムで 発動する',
   teiaiou:'みかた 全員の HPを 全回復（倒れた 仲間も 復活）\n＋敵全体の 攻撃・魔力 -50%・守備 -30%（4ターン）\n＋敵全体の HPを 最大HPの 30% 削る',
   sakatari:'梅枝の笏を 装備した 道真公 専用。\n敵全体に 最大HPの 30%＋強力な 雷撃、\n敵全体を 2ターン 行動不能に し、\n味方全体の HPを 最大HPの 50% 回復する',
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
