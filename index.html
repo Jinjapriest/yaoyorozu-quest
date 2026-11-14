@@ -4058,7 +4058,7 @@ function lbPickRun(){const q=G.lbPick||[];if(!q.length)return;const k=q[0],nm=id
     listPick('記念ボーナス：好きな UR・XR武器を 1本',ids.map(id=>({t:WPD[id].name,r:(WPD[id].rar===6?'XR':'UR')+(G.weapons[id]?' 所持':''),col:WPD[id].rar===6?'#f8d878':null})),j=>{const id=ids[j];addWeapon(id);save();sfx('g5');
       dialog([`${WPD[id].name}を 手に入れた！`],done);},s=>'1本だけ えらべます（あとから 変えられません）\n※ ガイウスの槍・梅枝の笏・専用武器は 対象外');return;}
   G.lbPick.shift();}
-const LBC=[{key:'lbh',title:'人類保管計画 集結記念',start:'2026-11-15',end:'2026-12-14',days:LBH},{key:'lb',title:'リリース記念',start:LB_START,end:LB_END,days:LB},{key:'lb3',title:'Ver.3.0 公開記念',start:'2026-11-13',end:'2026-12-12',days:LB3}];
+const LBC=[{key:'lbh',title:'人類保管計画 終結記念',start:'2026-11-15',end:'2026-12-14',days:LBH},{key:'lb',title:'リリース記念',start:LB_START,end:LB_END,days:LB},{key:'lb3',title:'Ver.3.0 公開記念',start:'2026-11-13',end:'2026-12-12',days:LB3}];
 const jstDay=()=>Math.floor((Date.now()+9*3600000)/86400000),jstOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000);
 function lbCamp(){if(!G)return null;const d=jstDay();return LBC.find(c=>{if(d<jstOf(c.start)||d>jstOf(c.end))return false;const L=G[c.key]||(G[c.key]={n:0,last:0});return L.n<c.days.length&&L.last!==d;})||null;}
 function lbCheck(){return !!lbCamp()||!!(G&&G.lbPick&&G.lbPick.length);}
