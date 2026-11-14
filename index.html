@@ -5004,7 +5004,7 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'チョクセンバンチョー',d:'最後の 直線で 鬼の 追い込みを 見せる\n直線の 番長。',w:()=>2.6,pace:.15},
   {name:'ドーピングバンザイ',d:'ありえない 速さで 走るが\nレース後の 検査で 失格に なることも…',w:()=>6,pace:1.9,dq:.4},
   {name:'サイキナヲ',d:'現代の 気まぐれ 名馬。 スタートは すごく 遅いが\n最後の 最後の 最後で 本気を 出す（かも しれない）',w:r=>1.6+r()*.8,pace:1,saiki:1},
-  {name:'ジェニファーピームラタ',d:'異国から やってきた 超良血の 貴公子（牡馬）。\n走る 姿に ほかの 馬が 見とれてしまう…',w:()=>3.4,pace:1.15,charm:.8,rr:.15,ultra:1}];
+  {name:'ジェニファーピームラタ',d:'異国から やってきた 超良血の 貴公子（牡馬）。\n特殊能力「ターボスプリント」\n序盤・中盤・終盤 隙が ない！',w:()=>3.6,pace:1.6,turbo:1,rr:.15,ultra:1}];
 const kRarePick=r=>{const T=KRARE.reduce((a,K)=>a+(K.rr||1),0);let x=r()*T;for(let k=0;k<KRARE.length;k++){x-=KRARE[k].rr||1;if(x<0)return k;}return 0;};
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
@@ -5029,7 +5029,7 @@ function keibaSpecial(vi,no){const K=G.kinen;if(K&&K.vi===vi)return{name:K.name,
   const wk=Math.floor((G.day-1)/7),main=no===11&&dow()===0;
   if(VIL[vi].capital){const yr=Math.floor(G.day/360);if(main&&G.day%360>=350&&!((G.arima||{})[yr]))return{name:'アリウマ記念',grade:1,arima:yr,dist:'芝2500m'};if(main&&wk%2===1)return{name:'イツク杯',grade:1,dist:'芝2000m'};return null;}
   return main&&wk%2===0?{name:'タムニィ杯',grade:1,dist:'芝2400m'}:null;}
-const kW=(h,noise)=>Math.pow(h.w*(h.mul||1),1/(1+noise*2));
+const kW=(h,noise)=>Math.pow(h.w*(h.mul||1),1/(1+(h.rare!=null&&KRARE[h.rare].turbo?noise*.25:noise)*2));
 function keibaResult(hs,noise,rr=rnd){const sk=hs.find(h=>h.saiki);let honki=null;if(sk){honki=rr()<SAIKI_P;sk.mul=honki?3:.3;}const out=keibaResult0(hs,noise,rr);if(sk)sk.mul=undefined;out.honki=honki;return out;}
 function keibaResult0(hs,noise,rr){const left=hs.map((h,i)=>i),out=[];while(left.length){const tot=left.reduce((a,i)=>a+kW(hs[i],noise),0);let x=rr()*tot,k=0;for(;k<left.length-1;k++){x-=kW(hs[left[k]],noise);if(x<0)break;}out.push(left.splice(k,1)[0]);}return out;}
 function keibaProbOrd(hs,ord,noise){const sk=hs.find(h=>h.saiki);if(!sk||sk.mul)return keibaProbOrd0(hs,ord,noise);/* サイキナヲ：本気（30%）と 気まぐれ の 混合 */sk.mul=3;const a=keibaProbOrd0(hs,ord,noise);sk.mul=.3;const b=keibaProbOrd0(hs,ord,noise);sk.mul=undefined;return SAIKI_P*a+(1-SAIKI_P)*b;}
@@ -5128,7 +5128,7 @@ function keibaFac(vi0,pre){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(pre
   const start=()=>{if(!keibaRaceNo()){dialog('本日の 全レースは 終了しました。');return;}G.mn=Math.max(nowMin(),KPOST[card.no-1]);const res=keibaResult(card.horses,card.noise),fin=[];{const di=card.horses.findIndex(h=>(h.rare!=null&&KRARE[h.rare].dq)||h.dope);if(di>=0&&res.indexOf(di)<3&&rnd()<(card.horses[di].dope?.25:KRARE[card.horses[di].rare].dq)){res.dq=di;}}res.forEach((h,rank)=>fin[h]=1+rank*.022+rnd()*.012);
     const pace=card.horses.map(h=>h.rare!=null?KRARE[h.rare].pace:.6+rnd()*.8);let t=0;const LEN=600,DIST=2200;sfx('enc');playBGM('battle');
     push({full:true,upd(){t++;if(I.A&&t>30)t=Math.max(t,LEN);if(t>=LEN+60){pop();finish(res);}},
-      drw(){const pr=i=>{const q=Math.min(1.12,t/(LEN*fin[i]));if(card.horses[i].saiki){if(t<50)return 0;const q2=Math.min(1.12,(t-50)/(LEN*fin[i]-50));return q2<1?Math.pow(q2,res.honki?4.5:1.6)*(res.honki?1:.97):q2;}return Math.max(0,q<1?q+(pace[i]-1)*.06*Math.sin(q*Math.PI):q);};
+      drw(){const pr=i=>{const q=Math.min(1.12,t/(LEN*fin[i]));if(card.horses[i].rare!=null&&KRARE[card.horses[i].rare].turbo)return q<1?Math.min(1,Math.pow(q,.8)):q;if(card.horses[i].saiki){if(t<50)return 0;const q2=Math.min(1.12,(t-50)/(LEN*fin[i]-50));return q2<1?Math.pow(q2,res.honki?4.5:1.6)*(res.honki?1:.97):q2;}return Math.max(0,q<1?q+(pace[i]-1)*.06*Math.sin(q*Math.PI):q);};
         const pos=card.horses.map((h,i)=>pr(i)*DIST),lead=Math.max(...pos),cam=Math.min(DIST-200,Math.max(0,lead-170));
         R(0,0,W,H,'#68ccfc');R(0,28,W,30,'#3c3c3c');for(let k=0;k<40;k++){const x=((k*13-cam*.3)%W+W)%W;R(x,32+(k%3)*8,4,5,['#d82800','#fcfcfc','#f8b800','#0058f8'][k%4]);}
         R(0,58,W,6,'#fcfcfc');R(0,64,W,140,'#00a800');for(let y=70;y<200;y+=16)R(0,y,W,1,'#00b800');R(0,204,W,4,'#fcfcfc');
