@@ -5703,10 +5703,10 @@ const PCP=[['CPU','cpu',[['ライゼソ 5',22000,35,65],['コマ ウルトラ 5'
   ['メモリ','mem',[['クルーシャル 16GB',7000,5],['クルーシャル 32GB',13000,10],['コルセヤ ベンジェンス 32GB（光る）',16000,10,0,{lit:1}],['Gスキノレ 64GB',28000,15]]],
   ['マザーボード','mb',[['MSl B',15000,2],['ギガパイト X',28000,4],['エイスース ROC（光る）',55000,6,0,{lit:1}]]],
   ['グラフィック','gpu',[['内蔵グラフィック',0,5,0],
-    ['ゲフォ RTZ ブロンズ',30000,30,130],['ゲフォ RTZ シルバー',50000,42,170],['ゲフォ RTZ シルバー X',60000,48,190],['ゲフォ RTZ ゴールド',90000,60,220],['ゲフォ RTZ ゴールド X',110000,66,250],
-    ['ゲフォ RTZ プラチナ',160000,78,300],['ゲフォ RTZ プラチナ X',200000,85,350],['ゲフォ RTZ チタニウム',300000,95,575],
-    ['グラデオン RX ブロンズ',28000,30,150],['グラデオン RX シルバー Ti',55000,46,200],['グラデオン RX ゴールド Ti',85000,64,260],['グラデオン RX プラチナ Ti',150000,82,320],
-    ['RTZ イナズマ',1200000,140,600,{ura:1,ina:1,d:'稲妻の 名を 持つ 試作品。\n「RTX spark」の うわさの 正体？'}]]],
+    ['ゲフォ RTZ Bronze',30000,30,130],['ゲフォ RTZ Silver',50000,42,170],['ゲフォ RTZ Silver X',60000,48,190],['ゲフォ RTZ Gold',90000,60,220],['ゲフォ RTZ Gold X',110000,66,250],
+    ['ゲフォ RTZ Platinum',160000,78,300],['ゲフォ RTZ Platinum X',200000,85,350],['ゲフォ RTZ Titanium',300000,95,575],
+    ['グラデオン RX Bronze',28000,30,150],['グラデオン RX Silver Ti',55000,46,200],['グラデオン RX Gold Ti',85000,64,260],['グラデオン RX Platinum Ti',150000,82,320],
+    ['RTZ イナズマ',1200000,72,600,{ura:1,ina:1,d:'AI 特化の 試作グラボ。 ゲームより\n学習と 推論が 得意。\n「RTX spark」の うわさの 正体？'}]]],
   ['ストレージ','ssd',[['クルーシャル 1TB',9000,3],['WD ブラッグ 2TB',18000,5],['サムスソ 990 PRO 4TB',38000,8]]],
   ['電源','psu',[['シーソニック 650W',12000,0,650],['シーソニック 850W',18000,0,850],['コルセヤ 1000W',26000,0,1000],['コルセヤ 1600W',48000,0,1600]]],
   ['ケース','case',[['NZXZ（シンプル 黒）',12000,0,0,{c:0}],['NZXZ（シンプル 白）',12000,0,0,{c:1}],['フラクタノ ノース（木目）',22000,0,0,{c:2}],['リアソリー O11（ガラス・光る）',20000,0,0,{c:3,lit:1}]]]];
@@ -5866,10 +5866,10 @@ const PC_FIX={pcd:{name:'ゲーミングPC（デスクトップ）',v:2,cpu:2,co
 function pcSpecOf(f){const A=ajS();if(f.k==='pcj')return (A.builds||[])[f.b];return PC_FIX[f.k];}
 function pcGameMenu(){choice('どの ゲームで 遊ぶ？',['オセロ','将棋（5五将棋）','一人麻雀','やめる'],r=>{if(r===0)othelloScr();else if(r===1)shogiScr();else if(r===2)mahjongScr();},112);}
 /* ---------- ベンチマーク（演出のみ・スコアは 構成から 計算） ---------- */
-function benchCalc(b){const L=k=>pcPart(b,k)[2],fct=b.f||1,arm=pcX(b,'cpu').arm;const cpu=Math.round((L('cpu')*120+L('mem')*60+L('cool')*80+L('ssd')*30+L('mb')*40)*fct),gpu=Math.round((L('gpu')*150+L('cpu')*20)*fct*(arm?.7:1));return{cpu,gpu,tot:cpu+gpu,L};}
-function benchScr(b){const BC=benchCalc(b),L=BC.L,fct=b.f||1,cpu=BC.cpu,gpu=BC.gpu,tot=Math.round(BC.tot*(.97+rnd()*.06));
+function benchCalc(b){const L=k=>pcPart(b,k)[2],fct=b.f||1,arm=pcX(b,'cpu').arm;const cpu=Math.round((L('cpu')*120+L('mem')*60+L('cool')*80+L('ssd')*30+L('mb')*40)*fct),gpu=Math.round((L('gpu')*150+L('cpu')*20)*fct*(arm?.7:1));const ai=Math.round((L('gpu')*80+L('mem')*100+L('cpu')*20)*fct*(pcX(b,'gpu').ina?12:1)*(arm?.5:1));return{cpu,gpu,ai,tot:cpu+gpu,L};}
+function benchScr(b){const BC=benchCalc(b),L=BC.L,fct=b.f||1,cpu=BC.cpu,gpu=BC.gpu,ai=Math.round(BC.ai*(.97+rnd()*.06)),tot=Math.round(BC.tot*(.97+rnd()*.06));
   const fpsBase=Math.max(8,Math.round(L('gpu')*1.6+L('cpu')*.3)*fct);
-  const arm=pcX(b,'cpu').arm,PH=[{n:'CPU テスト：物理演算',d:240},{n:'GPU テスト1：神社の 森'+(arm?'（互換）':''),d:300},{n:'GPU テスト2：ナメガワマチ 夜景'+(arm?'（互換）':''),d:300}];let ph=0,t=0,done=false,fps=fpsBase,hist=[],crash=b.unst&&rnd()<.5?120+Math.floor(rnd()*500):-1,dead=false;
+  const arm=pcX(b,'cpu').arm,PH=[{n:'CPU テスト：物理演算',d:240},{n:'GPU テスト1：神社の 森'+(arm?'（互換）':''),d:300},{n:'GPU テスト2：ナメガワマチ 夜景'+(arm?'（互換）':''),d:300},{n:'AI テスト：画像生成',d:240}];let ph=0,t=0,done=false,fps=fpsBase,hist=[],crash=b.unst&&rnd()<.5?120+Math.floor(rnd()*500):-1,dead=false;
   push({full:true,upd(){if(dead){if(I.A||I.B)pop();return;}if(done){if(I.A||I.B){pop();const A=ajS();A.bench=Math.max(A.bench||0,tot);save();}return;}if(I.B){pop();return;}
       if(crash>=0&&--crash<=0){dead=true;sfx('bump');return;}
       t++;if(t%10===0){fps=Math.max(1,Math.round(fpsBase*(ph===0?1.3:ph===1?1:.82)*(.85+rnd()*.3)));hist.push(fps);if(hist.length>40)hist.shift();}
@@ -5878,16 +5878,18 @@ function benchScr(b){const BC=benchCalc(b),L=BC.L,fct=b.f||1,cpu=BC.cpu,gpu=BC.g
       if(dead){txt('……プツン。',128,90,'#bcbcbc','center');txt('電源が 落ちた！',128,110,'#fc7460','center');txt(`（電源容量が 足りない：必要 ${pcNeedW(b)}W／${pcPart(b,'psu')[3]}W）`,128,130,'#7c7c7c','center',240);txt('A：とじる',128,200,'#7c7c7c','center');return;}
       if(done){R(0,0,W,H,'#0c1020');big('ベンチマーク 結果',128,12,'#68ccfc','center',14);big(fmt(tot),128,36,'#fcfcfc','center',28);txt(`判定：${pcRank(pcScore(b))}`+(b.cpu===6&&b.v===2&&!b.f?'　…兆芯 です':''),128,70,'#f8d878','center');
         const bar=(y,n,v,mx,c)=>{txt(n,16,y,'#bcbcbc');R(80,y+1,150,8,'#202838');R(80,y+1,Math.round(150*Math.min(1,v/mx)),8,c);txt(fmt(v),232,y,'#fcfcfc','right');};
-        bar(92,'CPU',cpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).cpu,'#58f898');bar(108,'GPU',gpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).gpu,'#f878f8');
-        txt('くらべてみよう',16,132,'#7c7c7c');const ref=[['事務用 ノート',benchCalc({cpu:0,cool:0,mem:0,mb:0,gpu:0,ssd:0,f:.8}).tot],['ゲーミングPC（ノート）',benchCalc(PC_FIX.pcn).tot],['ゲーミングPC（デスクトップ）',benchCalc(PC_FIX.pcd).tot],['この PC',tot]];const mx=Math.max(...ref.map(r=>r[1]),1);
-        ref.forEach(([n,v],i)=>{const y=146+i*14,me=i===3;txt(n,16,y,me?'#f8d878':'#bcbcbc','left',100);R(122,y+2,Math.round(100*v/mx),7,me?'#f8d878':'#5c5c74');txt(fmt(v),248,y,'#fcfcfc','right');});
+        bar(92,'CPU',cpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).cpu,'#58f898');bar(124,'AI',ai,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).ai,'#f8d878');bar(108,'GPU',gpu,benchCalc({cpu:5,cool:3,mem:3,mb:2,gpu:8,ssd:2}).gpu,'#f878f8');
+        txt('くらべてみよう（総合）',16,138,'#7c7c7c');const ref=[['事務用 ノート',benchCalc({cpu:0,cool:0,mem:0,mb:0,gpu:0,ssd:0,f:.8}).tot],['ゲーミングPC（ノート）',benchCalc(PC_FIX.pcn).tot],['ゲーミングPC（デスクトップ）',benchCalc(PC_FIX.pcd).tot],['この PC',tot]];const mx=Math.max(...ref.map(r=>r[1]),1);
+        ref.forEach(([n,v],i)=>{const y=150+i*14,me=i===3;txt(n,16,y,me?'#f8d878':'#bcbcbc','left',100);R(122,y+2,Math.round(100*v/mx),7,me?'#f8d878':'#5c5c74');txt(fmt(v),248,y,'#fcfcfc','right');});
         txt('A：とじる',128,216,'#7c7c7c','center');return;}
       const p=PH[ph],tt=t/60;
       if(ph===0){for(let i=0;i<40;i++){const a=i*2.4+tt*(1+i%3),r=20+(i*7)%70;const x=128+Math.cos(a)*r,y=110+Math.sin(a*1.3)*r*.6;R(Math.round(x),Math.round(y),4+(i%3),4+(i%3),['#58f898','#68ccfc','#f8d878'][i%3]);}}
       else if(ph===1){R(0,0,W,120,'#3c7cbc');for(let z=12;z>0;z--){const s=1/z,y=120+40*s*4,off=(tt*30)%16;for(let x=-8;x<8;x++){const sx=128+(x*16-off*0)*s*6,sh=30*s*6;R(Math.round(sx),Math.round(y-sh),Math.max(1,Math.round(6*s*6)),Math.round(sh),z%2?'#1c5c1c':'#2c7c2c');}}
         R(110,70,36,6,'#d82800');R(114,76,4,40,'#d82800');R(138,76,4,40,'#d82800');R(0,170,W,70,'#3c5c1c');}
+      else if(ph===3){R(0,0,W,H,'#101018');const pr=Math.min(1,t/p.d*(pcX(b,'gpu').ina?3:1));const S=8;for(let y=0;y<20;y++)for(let x=0;x<24;x++){const tx=x*S+32,ty=y*S+30;const tgt=(y>14?'#3c5c1c':(x>=9&&x<=14&&y===5)||((x===10||x===13)&&y>5&&y<14)?'#d82800':y<9?'#68ccfc':'#2c7c2c');const h=((x*73+y*151)%97)/97;R(tx,ty,S,S,h<pr?tgt:['#3c3c5c','#5c5c7c','#2c2c3c'][(x+y+(frame>>2))%3]);}
+        txt(`ステップ ${Math.round(pr*50)}/50`,128,196,'#bcbcbc','center');if(pcX(b,'gpu').ina&&pr>=1)txt('イナズマ「…もう 描けました」',128,186,'#f8d878','center');}
       else{R(0,0,W,H,'#0c0820');for(let i=0;i<14;i++){const x=((i*37-tt*20*(1+i%2))%300+300)%300-20,h=40+(i*23)%90;R(Math.round(x),200-h,26,h,'#1c1c3c');for(let y=206-h;y<196;y+=8)R(Math.round(x)+4,y,4,3,(i+y)%3?'#f8d878':'#3c3c5c');}R(108,30,40,170,'#e8e8f8');R(112,34,32,162,'#fcfcfc');}
-      R(0,0,W,22,'rgba(0,0,0,.6)');txt(p.n,6,6,'#fcfcfc');txt(`${fps} FPS`,250,6,fps>=60?'#58f898':fps>=30?'#f8d878':'#fc7460','right');
+      R(0,0,W,22,'rgba(0,0,0,.6)');txt(p.n,6,6,'#fcfcfc');if(ph===3)txt(`${Math.max(1,Math.round(ai/1500))} 枚/分`,250,6,'#f8d878','right');else txt(`${fps} FPS`,250,6,fps>=60?'#58f898':fps>=30?'#f8d878':'#fc7460','right');
       R(0,214,W,26,'#000');R(6,220,244,6,'#202838');R(6,220,Math.round(244*(ph+t/p.d)/PH.length),6,'#68ccfc');txt(`${ph+1}/${PH.length}　B：中止`,128,229,'#7c7c7c','center');
       for(let i=0;i<hist.length;i++)R(200+i,20-Math.min(14,Math.round(hist[i]/12)),1,1,'#58f898');}});}
 /* ---------- オセロ ---------- */
