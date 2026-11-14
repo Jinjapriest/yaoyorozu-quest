@@ -5700,6 +5700,9 @@ const AJ_F={bed:{n:'ベッド',p:3000,h:2,d:'寝ると 仲間全員の HP・MP�
   hmini:{pc:1,hk:1,n:'hack mini（N1）',p:98000,d:'手のひらサイズの 小さな 箱。\n静かで 速い。'},hbair:{pc:1,hk:1,n:'hack Book Air（N1）',p:160000,d:'薄くて 軽い ノート。\nファンが ない。'},
   hbpro:{pc:1,hk:1,n:'hack Book Pro（N1 Max）',p:450000,d:'クリエイター向けの ノート。\n画面が とても きれい。'},hstudio:{pc:1,hk:1,n:'hack Studio（N1 Ultra）',p:700000,d:'机の 上の 小さな 怪物。\n大容量の 統合メモリで AIも 得意。'},
   hpro:{pc:1,hk:1,n:'hack Pro（N1 Ultra）',p:1200000,d:'おろし金のような 銀色の タワー。\n車輪は 別売り（10万イェソ）。'},
+  rt_cheap:{pc:1,rt:300,rw:5,n:'TQ-リンコ（クッソ安い）',p:1980,d:'とにかく 安い ルーター。 最大 300Mbps。\nたまに 固まる。'},rt_std:{pc:1,rt:1000,rw:10,n:'パッファロー（通常）',p:12000,d:'ふつうの 家庭用 ルーター。 最大 1Gbps。'},
+  rt_std2:{pc:1,rt:2500,rw:12,n:'エーターン（通常）',p:18000,d:'安定した 家庭用 ルーター。 最大 2.5Gbps。'},rt_game:{pc:1,rt:10000,rw:30,game:1,n:'エイスース ROC ラプター（ゲーミング）',p:60000,d:'アンテナ 8本の ゲーミング ルーター。\n最大 10Gbps・低遅延・光る。'},
+  rt_yama:{pc:1,ura:1,biz:1,rt:10000,rw:15,n:'YAMAMMI RTX（業務用）',p:80000,d:'業務用 ルーター。 最大 10Gbps。\n落ちない。 サーバーの 収入 +20%。'},rt_allied:{pc:1,ura:1,biz:1,rt:10000,rw:20,n:'アライドテレシズ（業務用）',p:70000,d:'業務用 ルーター。 最大 10Gbps。\n堅牢。 サーバーの 収入 +20%。'},
   pcj:{n:'自作PC',p:0,nb:1,d:'太陽家具で パーツを 選んで 自分で 組む'}};
 const PCP=[['CPU','cpu',[['ライゼソ 5',22000,35,65],['コマ ウルトラ 5',24000,36,65],['ライゼソ 7 X3D',55000,62,120],['コマ ウルトラ 7',50000,58,125],['ライゼソ 9',85000,88,170],['コマ ウルトラ 9',90000,90,180],
     ['兆芯',9800,12,65,{ura:1,d:'謎の 国産… ではない x86 CPU。\n安い。 とにかく 安い。'}],['スナップタイガー エリート',60000,48,45,{ura:1,arm:1,d:'省電力の ARM CPU。\nゲームは 互換レイヤーで 動かす。'}],
@@ -5760,6 +5763,7 @@ function ajDrawF(k,x,y,on,o){
     else if(k==='hbair'||k==='hbpro'){R(x+2,y+1,12,7,k==='hbpro'?'#5c5c64':SV);R(x+7,y+8,2,1,'#f89820');R(x+3,y+2,10,5,on?'#a8e4fc':'#202838');R(x+1,y+8,14,1,k==='hbpro'?'#5c5c64':SV);}
     else if(k==='hstudio'){R(x+1,y,10,8,'#181818');R(x+2,y+1,8,6,on?'#a8e4fc':'#3c5c8c');R(x+5,y+8,2,1,SD);R(x+11,y+4,4,5,SV);R(x+12,y+5,2,1,SD);}
     else{R(x+9,y-2,6,11,SV);R(x+11,y+7,2,1,'#f89820');for(let i=0;i<4;i++)for(let j=0;j<2;j++)pc(x+11+j*2,y+i*2,0,SD);for(let i=0;i<5;i++)R(x+10+(i%2),y-1+i*2,1,1,SD);R(x+1,y+1,7,7,'#181818');R(x+2,y+2,5,5,on?'#a8e4fc':'#3c5c8c');}}
+  else if(AJ_F[k]&&AJ_F[k].rt){const C=k==='rt_game'?'#202020':AJ_F[k].biz?'#3c5c8c':k==='rt_cheap'?'#e8e8e8':'#f8f8f8';R(x+2,y+9,12,5,C);R(x+2,y+13,12,1,'#7c7c7c');const na=k==='rt_game'?8:k==='rt_cheap'?2:AJ_F[k].biz?0:3;for(let i=0;i<na;i++)R(x+3+Math.round(i*(10/Math.max(1,na-1))),y+4+(i%2),1,5,'#3c3c3c');for(let i=0;i<3;i++)R(x+4+i*3,y+11,1,1,(frame+i*9)%24<12?'#58f898':'#1c5c3c');if(k==='rt_game')R(x+3,y+14,10,1,['#f878f8','#68ccfc','#58f898'][(frame>>4)%3]);if(AJ_F[k].biz){R(x+3,y+10,10,1,'#bcbcbc');}}
   else if(k==='pcj'){const b=(o&&ajS().builds&&ajS().builds[o.b])||{v:2};R(x,y+9,16,3,'#8c5c2c');R(x+1,y+12,2,4,'#6c3c10');R(x+13,y+12,2,4,'#6c3c10');
     R(x+1,y+1,9,7,'#181818');R(x+2,y+2,7,5,on?'#58f898':'#3858c8');R(x+5,y+8,1,1,'#3c3c3c');const cc=PC_CASE[pcX(b,'case').c||0];R(x+10,y-1,5,10,cc);R(x+11,y,3,8,b.case===1?'#bcbcbc':b.case===2?'#a07040':'#3c3c3c');
     if(pcLit(b))R(x+11,y+1+((frame>>3)%3)*2,3,2,['#f878f8','#68ccfc','#58f898'][(frame>>4)%3]);else if(pcX(b,'cool').quiet)R(x+12,y+2,1,1,'#a08060');}
@@ -5778,10 +5782,35 @@ function ajDrawAll(npcs,P,mv){ajRoomBg();
   npcs.forEach(n=>list.push({y:n.y,d:()=>drawChar(n.id,AJ_OX+n.x*16,AJ_OY+n.y*16-2,(frame>>4)&1)}));
   if(P){const ox=mv?mv.dx*mv.t:0,oy=mv?mv.dy*mv.t:0;list.push({y:P.y+.5,d:()=>drawChar(G.party[0],AJ_OX+P.x*16+ox,AJ_OY+P.y*16-2+oy,(frame>>3)&1)});}
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());}
+/* ---------- ネット回線・ルーター ---------- */
+const NET_L=[{n:'100Mbps',m:100,cost:5000,fee:100},{n:'1Gbps',m:1000,cost:10000,fee:150},{n:'2.5Gbps',m:2500,cost:20000,fee:200},{n:'5Gbps',m:5000,cost:30000,fee:250},{n:'10Gbps',m:10000,cost:50000,fee:300}];
+const LAN_C=[{n:'CAT5',m:100,p:100,d:'古い 規格。 最大 100Mbps。'},{n:'CAT5e',m:1000,p:300,d:'ルーターに ついてくる やつ。 最大 1Gbps。'},{n:'CAT6',m:1000,p:500,d:'ノイズに 強い。 最大 1Gbps。'},{n:'CAT6A',m:10000,p:1200,d:'10Gbps 対応。 これで 十分。'},{n:'CAT7',m:10000,p:2000,d:'シールド付き。 最大 10Gbps。'},{n:'CAT8',m:40000,p:3500,d:'最大 40Gbps。 太くて 曲がらない。'}];
+const ajLan=()=>{const A=ajS();return LAN_C[A.lan!=null?A.lan:1];};
+const ajRouter=()=>{const A=ajS();let b=null;A.furn.forEach(f=>{const F=AJ_F[f.k];if(F&&F.rt&&(!b||F.rt>AJ_F[b].rt||(F.rt===AJ_F[b].rt&&F.biz)))b=f.k;});return b;};
+function netSpeed(){const A=ajS(),r=ajRouter();if(A.line==null||!r)return{m:10,t:'テザリング',r:null};return{m:Math.min(NET_L[A.line].m,AJ_F[r].rt,ajLan().m),t:NET_L[A.line].n,r,lan:ajLan().n};}
+const netSrvMul=()=>{const sp=netSpeed(),m=sp.m;return (m<100?.3:m<1000?.6:m<2500?1:m<5000?1.3:m<10000?1.6:2)*(sp.r&&AJ_F[sp.r].biz?1.2:1);};
+const netFmt=m=>m>=1000?`${m/1000}Gbps`:`${m}Mbps`;
+function netGo(fn){const sp=netSpeed(),A=ajS();if(A.cut||ajTrip()){dialog('ルーターの 電源が 入っていない…\n（電気が 止まっている）');return;}
+  if(sp.r==='rt_cheap'&&rnd()<.15){dialog(['……読み込みが 終わらない。','TQ-リンコが 固まっている！','（コンセントを 抜いて 差し直した）'],()=>netGo(fn));return;}
+  const T=Math.max(4,Math.min(150,Math.round(1500/sp.m)));let t=0;push({full:true,upd(){if(++t>=T){pop();fn();}},drw(){R(0,0,W,H,'#fcfcfc');R(0,0,W,14,'#e8e8f0');txt(`${sp.r?'':'（テザリング）'} 読み込み中… ${netFmt(sp.m)}`,6,3,'#5c5c5c');R(20,120,216,4,'#d8d8e0');R(20,120,Math.round(216*t/T),4,'#3c7cfc');}});}
+function lanScr(back){const A=ajS(),cur=A.lan!=null?A.lan:1;
+  listPick(`LANケーブル（今：${LAN_C[cur].n}）`,LAN_C.map((c,i)=>({t:(i===cur?'▶':'')+c.n,r:`${fmt(c.p)}イェソ`})),i=>{const c=LAN_C[i];if(G.coins<c.p){dialog('イェソが たりない…',back);return;}
+    G.coins-=c.p;A.lan=i;save();sfx('ok');const sp=netSpeed();dialog([`${c.n}の LANケーブルを 買って つなぎ替えた。`,sp.r?`今の 速さ：${netFmt(sp.m)}`+(c.m<Math.min(A.line!=null?NET_L[A.line].m:0,AJ_F[sp.r].rt)?'\n（ケーブルが ボトルネック…）':''):'（回線と ルーターが まだ ない）'],back);},s=>`${LAN_C[s].n}：最大 ${netFmt(LAN_C[s].m)}\n${LAN_C[s].d}`);}
+function lineScr(back){const A=ajS();if(A.x==null){dialog('回線を 引く アジトが ない。',back);return;}const cur=A.line;
+  listPick(`回線 開通工事（今：${cur!=null?NET_L[cur].n:'未開通'}）`,NET_L.map((l,i)=>({t:(i===cur?'▶':'')+l.n,r:i===cur?'契約中':`工事費 ${fmt(l.cost)}`})),i=>{if(i===cur){back&&back();return;}const l=NET_L[i];
+    choice(`${l.n}の 回線を 開通しますか？\n工事費 ${fmt(l.cost)}イェソ\n通信費 1日 ${l.fee}イェソ（口座から）`,['開通する','やめる'],r=>{if(r!==0){back&&back();return;}if(G.coins<l.cost){dialog('イェソが たりない…',back);return;}
+      G.coins-=l.cost;A.line=i;save();sfx('ok');const sp=netSpeed();
+      dialog(['工事の 人が 来て アジトに\n光ファイバーを 引きこんだ。',`${l.n} 回線が 開通した！`,sp.r?`今の 速さ：${netFmt(sp.m)}`+(AJ_F[sp.r].rt<l.m?`\n（ルーターが ボトルネック… 最大 ${netFmt(AJ_F[sp.r].rt)}）`:''):'（ルーターを 置かないと つながらない）'],back);},104);},
+    s=>`${NET_L[s].n}：工事費 ${fmt(NET_L[s].cost)}イェソ\n通信費 1日 ${NET_L[s].fee}イェソ\n（速さは 回線と ルーターの 遅い方）`);}
+function speedTest(){const sp=netSpeed(),g=sp.r&&AJ_F[sp.r].game,bz=sp.r&&AJ_F[sp.r].biz;const dl=Math.round(sp.m*(.82+rnd()*.12)),ul=Math.round(dl*(sp.r?.9:.3)),ping=sp.r?Math.round((g?3:bz?5:sp.r==='rt_cheap'?28:9)+rnd()*3):45+Math.floor(rnd()*20);let t=0;
+  push({full:true,upd(){t++;if(t>150&&(I.A||I.B))pop();},drw(){R(0,0,W,H,'#101828');big('スピードテスト',128,14,'#68ccfc','center',14);const ph=Math.min(1,t/60),ph2=Math.min(1,Math.max(0,(t-70)/60));
+    const gauge=(cx,v,mx,lab,p,c)=>{pc(cx,110,34,'#202838');pc(cx,110,28,'#101828');const a=Math.PI*(.75+1.5*Math.min(1,Math.log10(1+v*p)/Math.log10(1+mx)));R(Math.round(cx+Math.cos(a)*22),Math.round(110+Math.sin(a)*22),3,3,c);txt(lab,cx,150,'#bcbcbc','center');big(netFmt(Math.round(v*p)),cx,162,'#fcfcfc','center',12);};
+    gauge(70,dl,10000,'ダウンロード',ph,'#58f898');gauge(186,ul,10000,'アップロード',ph2,'#f878f8');txt(`Ping ${ping}ms`,128,190,'#f8d878','center');
+    txt(sp.r?`回線 ${sp.t}／${AJ_F[sp.r].n.replace(/（.*$/,'')}／${sp.lan}`:'回線なし（スマホの テザリング）',128,206,'#7c7c7c','center',240);if(t>150)txt('A：とじる',128,222,'#5c5c5c','center');}});}
 /* ---------- 電気の 契約（昇圧）・ブレーカー ---------- */
 const AJ_AMP=[{n:'30A',w:3000,cost:0,fee:30},{n:'40A',w:4000,cost:20000,fee:40},{n:'60A',w:6000,cost:50000,fee:60},{n:'200V 昇圧工事',w:10000,cost:200000,fee:100},{n:'高圧受電（キュービクル）',w:30000,cost:2000000,fee:500}];
 const AJ_LW={pcd:500,pcn:150,mon:40,slot:300,ih:1400,water:350,hmini:60,hbair:30,hbpro:100,hstudio:200,hpro:900};
-function ajLoad(){const A=ajS();let w=500;A.furn.forEach(f=>{if(f.k==='pcj'){const b=(A.builds||[])[f.b];if(b)w+=pcNeedW(b);}else if(f.k==='rack')w+=(f.n||0)*400;else w+=AJ_LW[f.k]||0;});return w;}
+function ajLoad(){const A=ajS();let w=500;A.furn.forEach(f=>{if(f.k==='pcj'){const b=(A.builds||[])[f.b];if(b)w+=pcNeedW(b);}else if(f.k==='rack')w+=(f.n||0)*400;else w+=AJ_LW[f.k]||(AJ_F[f.k]&&AJ_F[f.k].rw)||0;});return w;}
 const ajCap=()=>AJ_AMP[ajS().amp||0].w,ajTrip=()=>ajLoad()>ajCap();
 function ajAmpScr(){const A=ajS(),cur=A.amp||0,ld=ajLoad();
   listPick(`電気の 契約（今：${AJ_AMP[cur].n}）`,AJ_AMP.map((a,i)=>({t:(i===cur?'▶':'')+a.n,r:i>cur?`工事費 ${fmt(a.cost)}`:i===cur?'契約中':'変更 無料'})),i=>{if(i===cur)return;const a=AJ_AMP[i];
@@ -5789,18 +5818,18 @@ function ajAmpScr(){const A=ajS(),cur=A.amp||0,ld=ajLoad();
     if(i>cur){if(G.coins<a.cost){dialog('イェソが たりない…（工事費は 所持金から）');return;}choice(`${a.n}に 昇圧しますか？\n工事費 ${fmt(a.cost)}イェソ`,['する','やめる'],r=>{if(r!==0)return;G.coins-=a.cost;go();},88);}else go();},
     s=>`使っている 電力：${fmt(ld)}W／契約 ${fmt(AJ_AMP[cur].w)}W${ld>AJ_AMP[cur].w?'（オーバー！）':''}\n${AJ_AMP[s].n}：最大 ${fmt(AJ_AMP[s].w)}W　基本料金 1日 ${AJ_AMP[s].fee}イェソ\n（家具を 置きすぎると ブレーカーが 落ちる）`);}
 /* ---------- アジトの 光熱費（銀行口座から 引き落とし） ---------- */
-const AJ_EW={pcd:300,pcn:80,mon:30,slot:120,ih:100,water:40,hmini:30,hbair:20,hbpro:60,hstudio:80,hpro:150},AJ_ELEC=new Set(['pcd','pcn','pcj','mon','rack','slot','ih','water','hmini','hbair','hbpro','hstudio','hpro']);
-function ajBill(){const A=ajS();if(A.x==null)return null;const am=AJ_AMP[A.amp||0];let e=200+am.fee,w=100;const it=[[`基本料金（${am.n}）`,am.fee,'e'],['照明・冷蔵庫など',200,'e'],['生活用水',100,'w']];
-  A.furn.forEach(f=>{let v=0;if(f.k==='pcj'){const b=(A.builds||[])[f.b];v=b?Math.round(pcNeedW(b)*.6):0;}else if(f.k==='rack')v=(f.n||0)*150;else v=AJ_EW[f.k]||0;if(v){e+=v;it.push([f.k==='rack'?`サーバー ${f.n||0}台`:f.k==='pcj'?`自作PC「${((A.builds||[])[f.b]||{}).name||''}」`:AJ_F[f.k].n,v,'e']);}});
+const AJ_EW={pcd:300,pcn:80,mon:30,slot:120,ih:100,water:40,hmini:30,hbair:20,hbpro:60,hstudio:80,hpro:150},AJ_ELEC=new Set(['rt_cheap','rt_std','rt_std2','rt_game','rt_yama','rt_allied','pcd','pcn','pcj','mon','rack','slot','ih','water','hmini','hbair','hbpro','hstudio','hpro']);
+function ajBill(){const A=ajS();if(A.x==null)return null;const am=AJ_AMP[A.amp||0];let e=200+am.fee,w=100,n=A.line!=null?NET_L[A.line].fee:0;const it=[[`基本料金（${am.n}）`,am.fee,'e'],['照明・冷蔵庫など',200,'e'],['生活用水',100,'w']];
+  A.furn.forEach(f=>{let v=0;if(AJ_F[f.k]&&AJ_F[f.k].rw)v=AJ_F[f.k].rw;else if(f.k==='pcj'){const b=(A.builds||[])[f.b];v=b?Math.round(pcNeedW(b)*.6):0;}else if(f.k==='rack')v=(f.n||0)*150;else v=AJ_EW[f.k]||0;if(v){e+=v;it.push([f.k==='rack'?`サーバー ${f.n||0}台`:f.k==='pcj'?`自作PC「${((A.builds||[])[f.b]||{}).name||''}」`:AJ_F[f.k].n,v,'e']);}});
   if(A.furn.some(f=>f.k==='water')){w+=80;it.push(['ウォーターサーバーの 水',80,'w']);}if(A.furn.some(f=>f.k==='ih')){w+=40;it.push(['台所の 水',40,'w']);}
-  (G.garden||[]).forEach((g,i)=>{if(g&&g.c){const v=i<4?30:60;w+=v;it.push([i<4?'畑の 水やり':'田んぼの 水',v,'w']);}});return{e,w,it};}
-function ajDaily(){if(!ajOK())return[];const A=ajS(),bl=ajBill();if(!bl)return[];const B=G.bank,tot=bl.e+bl.w,out=[];
+  (G.garden||[]).forEach((g,i)=>{if(g&&g.c){const v=i<4?30:60;w+=v;it.push([i<4?'畑の 水やり':'田んぼの 水',v,'w']);}});if(n)it.push([`インターネット（${NET_L[A.line].n}）`,n,'n']);return{e,w,n,it};}
+function ajDaily(){if(!ajOK())return[];const A=ajS(),bl=ajBill();if(!bl)return[];const B=G.bank,tot=bl.e+bl.w+(bl.n||0),out=[];
   if(A.cut){const need=(A.debt||0)+tot;if(B.sav>=need){B.sav-=need;out.push(`アジトの 光熱費の 滞納分を 含め\n${fmt(need)}イェソが 引き落とされた。\n電気と 水道が 復旧した！`);A.cut=0;A.debt=0;A.srvDay=G.day;}else A.debt=(A.debt||0)+tot;return out;}
   if(B.sav<tot){A.cut=1;A.debt=tot;out.push('アジトの 光熱費が 引き落とせなかった！\n（銀行の 普通預金が 足りない）','アジトの 電気と 水道が 止められた…\n（預金を 入れれば 次の 日に 復旧する）');return out;}
-  B.sav-=tot;A.bill=A.bill||{e:0,w:0,d:0};A.bill.e+=bl.e;A.bill.w+=bl.w;A.bill.d++;
-  if(A.bill.d>=7){out.push(`アジトの 光熱費（${A.bill.d}日分）が\n口座から 引き落とされた。\n電気代 ${fmt(A.bill.e)}イェソ／水道代 ${fmt(A.bill.w)}イェソ`);A.bill={e:0,w:0,d:0};}return out;}
+  B.sav-=tot;A.bill=A.bill||{e:0,w:0,d:0};A.bill.e+=bl.e;A.bill.w+=bl.w;A.bill.n=(A.bill.n||0)+(bl.n||0);A.bill.d++;
+  if(A.bill.d>=7){out.push(`アジトの 光熱費（${A.bill.d}日分）が\n口座から 引き落とされた。\n電気代 ${fmt(A.bill.e)}イェソ／水道代 ${fmt(A.bill.w)}イェソ`+(A.bill.n?`\n通信費 ${fmt(A.bill.n)}イェソ`:''));A.bill={e:0,w:0,d:0,n:0};}return out;}
 function ajBillScr(){const A=ajS(),bl=ajBill();if(!bl){dialog('アジトが ない。');return;}const E=bl.it.filter(x=>x[2]==='e'),Wt=bl.it.filter(x=>x[2]==='w');
-  dialog([`【光熱費（1日あたり）】\n電気代 ${fmt(bl.e)}イェソ／水道代 ${fmt(bl.w)}イェソ\n毎日 銀行の 普通預金から 引き落とし`,'電気：\n'+E.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),...(E.length>4?['電気（つづき）：\n'+E.slice(4,8).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n')]:[]),'水道：\n'+Wt.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),
+  dialog([`【光熱費（1日あたり）】\n電気代 ${fmt(bl.e)}イェソ／水道代 ${fmt(bl.w)}イェソ`+(bl.n?`\n通信費 ${fmt(bl.n)}イェソ（${NET_L[A.line].n}）`:'')+'\n毎日 銀行の 普通預金から 引き落とし','電気：\n'+E.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),...(E.length>4?['電気（つづき）：\n'+E.slice(4,8).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n')]:[]),'水道：\n'+Wt.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),
     A.cut?`※ 滞納中（${fmt(A.debt||0)}イェソ）\n電気と 水道が 止まっている！`:`普通預金：${fmt(G.bank.sav)}イェソ\n使用電力 ${fmt(ajLoad())}W／契約 ${fmt(ajCap())}W`+(ajTrip()?'\n（ブレーカーが 落ちている！）':'')]);}
 function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
   const P={x:AJ_DX,y:AJ_H-1,dir:'u'},npcs=[],spots=[[3,5],[10,5],[4,8],[10,8],[2,3],[11,3],[6,3]];
@@ -5824,7 +5853,7 @@ function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
       if(P.x===AJ_DX&&P.y===AJ_H-1)txt('↓ 外に 出る',248,22,'#f8d878','right');}};
   push(scr);
   {const dl=fkDone()?amzDeliver():null;if(dl)dialog(dl);}
-  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&(A.cut||ajTrip())){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=ns*5000*d;A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
+  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&(A.cut||ajTrip())){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=Math.round(ns*5000*d*netSrvMul());A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n（回線 ${netSpeed().r?netFmt(netSpeed().m):'テザリング'}：×${netSrvMul().toFixed(1)}）\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
   if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」、 パソコン関係は\n「Dスパラ」か「アークン」で 買える。']);}
 }
 function ajRoomMenu(P,npcs,sync){const A=ajS();
@@ -5867,6 +5896,7 @@ function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
     if(f.k==='pcd')pages.push('デスクトップは 静かで よく 冷えている。');dialog(pages);return;}
   if(f.k==='mon'){dialog(has('pcd')||has('pcn')||has('pcj')||A.furn.some(q=>AJ_F[q.k].hk)?'4Kモニターだ。\nPCを 起動すると 映る。':'4Kモニターだ。\n…つなぐ PCが ない。');return;}
   if(f.k==='slot'){ajSlotScr();return;}
+  if(AJ_F[f.k]&&AJ_F[f.k].rt){const A2=ajS(),sp=netSpeed();dialog([`${F.n}`,A2.line==null?'回線が 開通していない…\n（パソコンショップの「回線 開通工事」で 引こう）':`回線 ${NET_L[A2.line].n}／ルーター 最大 ${netFmt(F.rt)}\nLANケーブル ${ajLan().n}（最大 ${netFmt(ajLan().m)}）\n今の 速さ：${netFmt(sp.m)}`,F.biz?'ランプが 規則正しく 点滅している。\n…業務用は 安心感が ちがう。':f.k==='rt_cheap'?'…本体が ちょっと 熱い。':f.k==='rt_game'?'アンテナが 8本 生えている。 光る。':'ランプが 緑に 光っている。']);return;}
   if(f.k==='ochair'){dialog(['オフィスチェアに 座った。','背筋が 伸びる。\n…仕事が はかどりそうだ。',has('pcj')||has('pcd')||has('pcn')?'（PCの 前に 置くと 作業が 楽しい）':'']);return;}
   if(f.k==='gchair'){dialog(['ゲーミングチェアに 座った。','ぐーっと リクライニング……','……zzz　（少し 休めた）']);G.party.forEach(id=>{const c=G.chars[id];if(!c||c.hp<=0)return;const s=cstat(id);c.hp=Math.min(s.hp,c.hp+Math.ceil(s.hp*.1));});save();return;}
   if(f.k==='ldesk'){dialog(['L字の 机だ。','モニターも キーボードも 資料も\n全部 広げられる。 作業が はかどる！']);return;}
@@ -5938,7 +5968,7 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
 const doorLogo=(x,y,sz)=>{const w=sz,h=Math.round(sz*1.5);R(x-w/2,y-h/2,w,h,'#c87c3c');R(x-w/2+1,y-h/2+1,w-2,h-2,'#a05c28');R(x-w/2+2,y-h/2+2,w-4,Math.round(h*.35),'#a8e4fc');R(x+w/2-4,y+1,2,2,'#f8d878');};
 const mikanLogo=(x,y,r,c)=>{pc(x,y,r,c||'#f89820');if(r>=4){R(x-Math.round(r*.5),y-Math.round(r*.4),1,1,'#fcd8a0');}R(x,y-r-1,1,2,'#5c3410');R(x+1,y-r-2,Math.max(2,Math.round(r*.7)),Math.max(1,Math.round(r*.35)),'#2c9c3c');};
 function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[])[f.b]:PC_FIX[f.k];
-  const AP=[].concat(fkDone()?[{n:'アマゾソ',ic:'amz',go:amzScr}]:[]).concat([{n:'スロ攻略ナビ',ic:'slot',go:slotSite},{n:'オセロ',ic:'oth',go:othelloScr},{n:'5五将棋',ic:'sho',go:shogiScr},{n:'一人麻雀',ic:'mj',go:mahjongScr},{n:'ベンチマーク',ic:'bench',go:()=>benchScr(spec)}])
+  const AP=[].concat(fkDone()?[{n:'アマゾソ',ic:'amz',go:()=>netGo(amzScr)}]:[]).concat([{n:'スロ攻略ナビ',ic:'slot',go:()=>netGo(slotSite)},{n:'スピードテスト',ic:'net',go:speedTest},{n:'オセロ',ic:'oth',go:othelloScr},{n:'5五将棋',ic:'sho',go:shogiScr},{n:'一人麻雀',ic:'mj',go:mahjongScr},{n:'ベンチマーク',ic:'bench',go:()=>benchScr(spec)}])
     .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPartName(spec,k)}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPartName(spec,k)}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcCapW(spec)}W`+(spec.gpuN===2?'\n（'+pcX(spec,'gpu').mg+'… あまり 速くならない）':'')])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'勝手口 OS　ゲーミング仕様'])}])
     .concat([{n:mac?'システム終了':'シャットダウン',ic:'pow',go:null}]);
   let sel=0,t=0,boot=40,off=-1;f.on=9999;
@@ -5950,6 +5980,7 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
     else if(k==='mj'){R(x+5,y+2,11,16,'#f8f0d8');R(x+5,y+16,11,2,'#2c9c3c');txt('中',x+10,y+5,'#d82800','center');}
     else if(k==='bench'){R(x+2,y+2,16,16,'#202838');R(x+4,y+13,2,3,'#58f898');R(x+8,y+10,2,6,'#58f898');R(x+12,y+6,2,10,'#f8d878');R(x+15,y+4,2,12,'#f878f8');}
     else if(k==='chip'){R(x+5,y+5,10,10,'#3c3c3c');R(x+7,y+7,6,6,'#a0a0b0');for(let i=0;i<4;i++){R(x+6+i*3,y+2,1,3,'#bcbcbc');R(x+6+i*3,y+15,1,3,'#bcbcbc');}}
+    else if(k==='net'){R(x+2,y+2,16,16,'#101828');for(let i=0;i<3;i++){R(x+5+i*4,y+14-i*4,3,3+i*4,'#68ccfc');}}
     else if(k==='pow'){pc(x+10,y+11,6,'#d82800');pc(x+10,y+11,4,mac?'#e8e8f0':'#3c6cb8');R(x+9,y+3,3,8,'#d82800');}};
   push({full:true,upd(){t++;if(boot>0){boot--;if(boot===30)tone(mac?523:392,.4,'triangle',.1);if(boot===24&&mac)tone(659,.5,'triangle',.08);return;}
       if(off>=0){if(++off>40){pop();f.on=0;save();}return;}
@@ -5959,14 +5990,14 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
     drw(){const now=nowMin(),clk=`${Math.floor(now/60)}:${String(now%60).padStart(2,'0')}`;
       if(boot>0){R(0,0,W,H,mac?'#000':'#081830');if(mac){mikanLogo(128,104,12,'#f89820');R(98,130,60,3,'#3c3c3c');R(98,130,Math.round(60*(1-boot/40)),3,'#fcfcfc');}else{doorLogo(128,84,16);big('勝手口',128,104,'#fcfcfc','center',14);for(let i=0;i<6;i++){const a=t*.25+i*.6;pc(128+Math.round(Math.cos(a)*10),150+Math.round(Math.sin(a)*10),1,'#fcfcfc');}txt('ようこそ',128,128,'#bcbcbc','center');}return;}
       if(mac){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3c2c8c');g.addColorStop(.6,'#c85c8c');g.addColorStop(1,'#f8a050');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-        R(0,0,W,12,'rgba(250,250,255,.75)');mikanLogo(8,6,3,'#f89820');txt('Finder　ファイル　編集　表示',18,2,'#202020','left',150);txt(clk,250,2,'#202020','right');
+        R(0,0,W,12,'rgba(250,250,255,.75)');mikanLogo(8,6,3,'#f89820');txt('Finder　ファイル　編集　表示',18,2,'#202020','left',150);txt(clk,250,2,'#202020','right');txt(netSpeed().r?netFmt(netSpeed().m):'テザリング',214,2,'#3c3c5c','right');
         const n=AP.length,dw=n*26+8,dx=128-dw/2;R(dx,206,dw,30,'rgba(250,250,255,.45)');
         AP.forEach((a,i)=>{const up=i===sel?-5:0;icon(a.ic,dx+6+i*26,210+up);if(i===sel)R(dx+15+i*26,234,2,1,'#202020');});
         win(60,40,136,50);big(AP[sel].n,128,50,'#fcfcfc','center',14);txt('A：ひらく　B：システム終了',128,72,'#bcbcbc','center');}
       else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0c2c6c');g.addColorStop(1,'#3c8cd8');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<5;i++)R(160+i*14,40+i*10,60-i*8,120-i*20,'rgba(140,200,255,.12)');
         AP.forEach((a,i)=>{const x=10+Math.floor(i/4)*60,y=10+(i%4)*46;if(i===sel)R(x-4,y-3,48,42,'rgba(180,220,255,.35)');icon(a.ic,x+10,y);txt(a.n,x+20,y+24,'#fcfcfc','center',56);});
         R(0,224,W,16,'#141c2c');R(4,226,30,12,'#3c6cb8');doorLogo(11,232,6);txt('勝手',25,229,'#fcfcfc','center');R(40,226,1,12,'#3c3c4c');AP.slice(0,3).forEach((a,i)=>{R(46+i*18,226,14,12,'#202838');});
-        txt(clk,250,229,'#fcfcfc','right');txt(`${G.day}日目`,212,229,'#bcbcbc','right');
+        txt(clk,250,229,'#fcfcfc','right');txt(`${G.day}日目`,212,229,'#bcbcbc','right');txt(netSpeed().r?netFmt(netSpeed().m):'テザリング',178,229,'#68ccfc','right');
         const sx=10+Math.floor(sel/4)*60+28,sy=10+(sel%4)*46+14;R(sx,sy,1,9,'#000');for(let i=0;i<6;i++)R(sx+1,sy+1+i,Math.min(i+1,5),1,'#fcfcfc');R(sx+1,sy+7,3,1,'#000');}
       if(off>=0){ctx.globalAlpha=Math.min(1,off/30);R(0,0,W,H,'#000');ctx.globalAlpha=1;if(off<30)txt(mac?'システムを 終了しています…':'シャットダウンしています…',128,112,'#fcfcfc','center');}}});}
 function pcGameMenu(){choice('どの ゲームで 遊ぶ？',['オセロ','将棋（5五将棋）','一人麻雀','やめる'],r=>{if(r===0)othelloScr();else if(r===1)shogiScr();else if(r===2)mahjongScr();},112);}
@@ -6120,14 +6151,14 @@ function pcBuild(back){const A=ajS(),b={v:2};let i=0;
       const ev=low?['電源ON！　……ピッ。 …プツン。','…落ちた。 もう一度。','……起動した！ でも なんだか 不安だ。\n（電源容量が 足りない）']:rnd()<.3?['…ネジを 1本 なくした。','（ケースの 底から 出てきた）','電源ON！　……ピッ。']:rnd()<.3?['…電源が 入らない！？','（電源ユニットの スイッチが OFFだった）','電源ON！　……ピッ。']:['電源ON！　……ピッ。'];
       dialog(['パーツが 届いた。 さっそく 組み立てる！',`${pcPart(b,'mb')[0]}に ${pcPart(b,'cpu')[0]}を 載せて…\nグリスを 塗って ${pcPart(b,'cool')[0].replace(/（.*$/,'')}を 取り付けた。`,`${pcPart(b,'mem')[0].replace(/（.*$/,'')}を カチッと 差しこむ。`+(b.gpu?`\n${pcPart(b,'gpu')[0]}を 挿して…`:''),`${pcPart(b,'psu')[0]}から 配線して… ケースを 閉じた。`,...ev,`起動した！ 自作PC「${b.name}」の 完成だ！\n（アジトの「もようがえ」で 置ける）`],back);},104);};
   step();}
-function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:AJ_K).filter(k=>!AJ_F[k].hk||A.hack);};reKS();const SN=pcShop||'太陽家具',bo=pcShop?2:0;
+function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:AJ_K).filter(k=>(!AJ_F[k].hk||A.hack)&&(!AJ_F[k].ura||A.ura));};reKS();const SN=pcShop||'太陽家具',bo=pcShop?4:0;
   if(!ajOK()){dialog([`${SN}の 入口に 張り紙が ある。`,'「ただいま 開店準備中です」']);return;}
-  let open=()=>listPick(SN,(pcShop?[{t:'★ PCを 自分で 組む',r:'パーツ選び'},{t:'★ 自作PCの 電源を 交換',r:`${(A.builds||[]).length}台`}]:[]).concat(KS.map(k=>({t:AJ_F[k].n,r:fmt(AJ_F[k].p)+'イェソ'}))),ii=>{if(pcShop&&ii===0){pcBuild(open);return;}if(pcShop&&ii===1){psuSwap(open);return;}const i=ii-bo,k=KS[i],f=AJ_F[k];
+  let open=()=>listPick(SN,(pcShop?[{t:'★ PCを 自分で 組む',r:'パーツ選び'},{t:'★ 自作PCの 電源を 交換',r:`${(A.builds||[]).length}台`},{t:'★ 回線 開通工事',r:A.line!=null?NET_L[A.line].n:'未開通'},{t:'★ LANケーブル',r:ajLan().n}]:[]).concat(KS.map(k=>({t:AJ_F[k].n,r:fmt(AJ_F[k].p)+'イェソ'}))),ii=>{if(pcShop&&ii===0){pcBuild(open);return;}if(pcShop&&ii===1){psuSwap(open);return;}if(pcShop&&ii===2){lineScr(open);return;}if(pcShop&&ii===3){lanScr(open);return;}const i=ii-bo,k=KS[i],f=AJ_F[k];
     if(G.coins<f.p){dialog('イェソが たりない…',open);return;}
     G.coins-=f.p;A.inv[k]=(A.inv[k]||0)+1;sfx('coin');save();
     dialog([`${f.n}を 買った！`,ajOK()?(A.x==null?'メニューの「アジト」から アジトを 建てて\n部屋に 置こう。':'アジトの 中の「もようがえ」で 置ける。'):'（アジトを 持てば 部屋に 置ける）'],open);
-  },s=>pcShop&&s===1?`組んだ PCの 電源ユニットを 入れ替える。\n電源が 足りない PCも これで 安定する。`:pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
-  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・スナップタイガー・\nサーバー マザボ・RTZ イナズマ・RTZ Pro A・\nOptein・SLI／CrossFire X','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
+  },s=>pcShop&&s===3?`ルーターと パソコンを つなぐ ケーブル。\n速さは 回線・ルーター・ケーブルの\nいちばん 遅いもので 決まる。`:pcShop&&s===2?`アジトに インターネット回線を 引く。\n速さは 回線と ルーターの 遅い方で 決まる。\n（通信費は 毎日 口座から 引き落とし）`:pcShop&&s===1?`組んだ PCの 電源ユニットを 入れ替える。\n電源が 足りない PCも これで 安定する。`:pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
+  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・スナップタイガー・\nサーバー マザボ・RTZ イナズマ・RTZ Pro A・\nOptein・SLI／CrossFire X','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
   dialog([pcShop==='Dスパラ'?'店員「いらっしゃいませ！ Dスパラへ ようこそ！\nパーツも 完成品も そろってます！」':pcShop?'店員「アークンへ ようこそ！\n自作の ご相談も どうぞ！」':'太陽家具「いらっしゃいませ！\nお部屋を 明るく 太陽家具です」'],open);}
 function ajMenu(){const A=ajS(),x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   const okHere=[T.GRASS,T.ROAD,T.SAND,T.FOREST].includes(t)&&!RES.some(r=>r.x===x&&r.y===y)&&!G.rifts.some(q=>q.x===x&&q.y===y);
