@@ -4704,6 +4704,31 @@ function gsealScr(g){const st=gmS(),E=GSEAL_EN[g.id];
   if(st.seal&&st.seal[g.id]){dialog([`${g.n}。 ${g.desc}。`,...E.lore]);return;}
   choice(`${g.n}\n${g.desc}。\n守護者に 挑みますか？（3連戦・推奨Lv29999）`,['挑む','やめる'],r=>{if(r===0)startGm('seal',{id:g.id});},96);}
 
+/* 雷光 */
+function drawBolt(x,y0,y1,seed,w,col,glow){const r=lcg(seed);let px=x,py=y0;const pts=[[px,py]];while(py<y1){py+=6+r()*10;px+=(r()-.5)*22;pts.push([px,Math.min(py,y1)]);}
+  ctx.globalAlpha=.35;ctx.strokeStyle=glow;ctx.lineWidth=w*4;ctx.beginPath();pts.forEach(([a,b],k)=>k?ctx.lineTo(a,b):ctx.moveTo(a,b));ctx.stroke();
+  ctx.globalAlpha=1;ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();pts.forEach(([a,b],k)=>k?ctx.lineTo(a,b):ctx.moveTo(a,b));ctx.stroke();
+  for(let k=2;k<pts.length-1;k+=3){if(r()<.5)continue;const [a,b]=pts[k];let bx=a,by=b;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(bx,by);for(let q=0;q<4;q++){bx+=(r()-.3)*14*(r()<.5?-1:1);by+=6+r()*8;ctx.lineTo(bx,by);}ctx.stroke();}}
+function thunderSfx(big){try{noise(big?1.4:.7,big?.45:.25);tone(big?48:70,big?1.2:.6,'triangle',.35,28);}catch(e){}}
+/* 菅原道真公の 顕現：雷光が 落ちて その中から 現れる */
+function michiManifest(cb){const LEN=230,STR=[[24,70],[46,188],[66,40],[84,210]],MAIN=104;const fired={};
+  const draw=(t,final)=>{if(final)t=LEN+(frame%60);
+    const sh=t>=MAIN&&t<MAIN+26?Math.round((Math.random()-.5)*8):0;ctx.save();ctx.translate(sh,sh?Math.round((Math.random()-.5)*6):0);
+    R(-8,-8,W+16,H+16,'#05030f');for(let i=0;i<40;i++)R((i*53)%W,40+(i*29)%60,1,1,'#3c3c6c');
+    for(let k=0;k<6;k++){const cx=k*48-10+((t*.3)%48);R(cx,0,60,26+(k%3)*6,(t>>3)%9===k?'#2c2c4c':'#14142c');}
+    R(-8,168,W+16,80,'#0c0c18');R(88,140,80,28,'#1c1424');R(80,134,96,8,'#24182c');R(120,124,16,10,'#24182c');
+    for(const [ts,x] of STR){if(t>=ts&&t<ts+7){drawBolt(x,0,150+(x%30),ts*77+(t>>1),2,'#fcfcfc','#a4b4fc');if(t<ts+2){ctx.globalAlpha=.45;R(-8,-8,W+16,H+16,'#e4e8fc');ctx.globalAlpha=1;}}}
+    if(t>=MAIN&&t<MAIN+30){drawBolt(128,0,150,MAIN*31+(t>>1),4,'#fcfcfc','#f8f8a0');drawBolt(124,0,150,MAIN*17+(t>>2),2,'#f8f8a0','#fcfcfc');}
+    if((t>=MAIN&&t<MAIN+5)||(t>=MAIN+12&&t<MAIN+15)){R(-8,-8,W+16,H+16,'#fcfcfc');}
+    if(t>=MAIN+8){const a=Math.min(1,(t-MAIN-8)/40);ctx.globalAlpha=a*.7;pc(128,112,34+Math.sin(t/8)*3,'#4c3c7c');ctx.globalAlpha=a;
+      ctx.save();ctx.translate(128-24,74);ctx.scale(3,3);drawChar('michizane',0,0,(t>>4)&1);ctx.restore();ctx.globalAlpha=1;
+      if((t>>2)%3!==0)for(let k=0;k<3;k++){const ang=(t*.2+k*2.1),r0=30;const x=128+Math.cos(ang)*r0,y=110+Math.sin(ang)*r0;ctx.strokeStyle='#f8f8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+(Math.random()-.5)*10,y+(Math.random()-.5)*10);ctx.lineTo(x+(Math.random()-.5)*14,y+(Math.random()-.5)*14);ctx.stroke();}}
+    if(t>=MAIN+40)for(let i=0;i<22;i++){const px=((i*37+t*.7)%W),py=((i*61+t*(.6+i%3*.2))%H);R(px,py,2,2,i%2?'#f878f8':'#fcb8d8');}
+    ctx.restore();};
+  const bg={full:true,upd(){},drw(){draw(0,true);}};push(bg);
+  cutscene(LEN,t=>{for(const [ts] of STR)if(t===ts&&!fired[ts]){fired[ts]=1;thunderSfx(0);}if(t===MAIN&&!fired.m){fired.m=1;thunderSfx(1);sfx('g5');}draw(t,false);},
+    [[1,'…空が 急に かき曇った。'],[24,'ゴロゴロ… ピシャーン！'],[MAIN,'宝箱めがけて\n雷光が 落ちた！！'],[MAIN+44,'雷光の 中から\n天神 菅原道真公が 顕現した！']],
+    ()=>dialog(['菅原道真公「この地、 未だ 帝土を 離れず、\n願わくば 居を このところに しめむ」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）'],()=>{if(stack[stack.length-1]===bg)pop();cb&&cb();}));}
 /* 宝箱（防府天満宮の 本殿の 裏手） */
 function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は からっぽだ。');return;}
   if(c.id==='michizane'){dialog(['本殿の 裏手に まわると…','梅の 花びらが 舞う 中に\n古びた 宝箱が ある。','宝箱の ふたに 文字が 刻まれている。\n「東風吹かば にほひおこせよ 梅の花」','…続きの 下の句を 唱えれば\n開きそうだ。'],()=>askText('下の句を 入力してください',[{label:'東風吹かば にほひおこせよ 梅の花…',placeholder:'ひらがなでも 漢字でも',max:30}],v=>{if(!v)return;
@@ -4712,13 +4737,7 @@ function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は から
     if(!ok){sfx('ng');dialog(['…宝箱は しんと 静まりかえっている。','（下の句が ちがうようだ）']);return;}
     sfx('ok');dialog(['「あるじなしとて 春な忘れそ」','宝箱が かすかに ふるえ…\nふたが ひとりでに 開いた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
     if(!nw){dialog(['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);return;}
-    const f0=frame;let t=0;const sc={full:true,upd(){},drw(){t=frame-f0;R(0,0,W,H,'#0c0820');for(let i=0;i<40;i++)R((i*53)%W,(i*29)%120,1,1,'#7c7cbc');
-      if(t<40&&(t>>2)%2===0){ctx.globalAlpha=.85;R(0,0,W,H,'#fcfcfc');ctx.globalAlpha=1;}
-      if(t<60){const x=150+(t%7)*3;for(let k=0;k<8;k++)R(x+(k%2?3:-3),k*12,3,12,'#f8f8a0');}
-      for(let i=0;i<24;i++){const px=((i*37+t*.7)%W),py=((i*61+t*(.6+i%3*.2))%H);R(px,py,2,2,i%2?'#f878f8':'#fcb8d8');}
-      const a=Math.min(1,t/50);ctx.globalAlpha=a;pc(128,110,40+Math.sin(t/10)*3,'#3c2c5c');ctx.save();ctx.translate(128-24,72);ctx.scale(3,3);drawChar('michizane',0,0,(t>>4)&1);ctx.restore();ctx.globalAlpha=1;}};
-    push(sc);sfx('g5');
-    dialog(['宝箱から まばゆい 雷光が ほとばしった！','梅の 香りと ともに\n天神 菅原道真公が 顕現した！','菅原道真公「この地、 未だ 帝土を 離れず、\n願わくば 居を このところに しめむ」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）'],()=>{if(stack[stack.length-1]===sc)pop();});});}));return;}}
+    michiManifest(()=>{});});}));return;}}
 /* ===================== グンマー帝国 総長総選挙編（グンマー解放後・立党で 解放） ===================== */
 function gsS(){if(!G.gs)G.gs={ch:0,rec:{},sup:{},day:{}};for(const k of ['rec','sup','day'])if(!G.gs[k])G.gs[k]={};return G.gs;}
 const gsOpen=()=>gmS().ch>=8&&!!G.pol,GS_NEED=5;
