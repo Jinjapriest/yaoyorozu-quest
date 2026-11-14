@@ -1257,7 +1257,7 @@ function drawEnemy(e,x,y,t){
     case 'kendo':drawKendo(x,y,t);break;
     case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
-    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;
+    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushide(x,y,t,1);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -4394,7 +4394,7 @@ function drawMinusBG(x0,y0,w,h,t){const cl=[x0,y0,x0+w,y0+h],cx=x0+w/2,vy=y0+h*.
   for(let i=0;i<26;i++){const px=x0+((i*53+t*(1+i%3)*.2)%w),py=y0+((i*37)%h);R(px,py,1,1,i%4?'#6844a0':'#a4e4fc');}}
 /* 帝王 錨ケンドウ：白髪の 総髪・軍服と 和装の 礼装・錨の 紋・法典 */
 /* ===================== オリジナル キャラの 敵（ギム総書記・書記代 ジョソウソ・ギムトモコ） ===================== */
-const OC_OF=n=>/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+const OC_OF=n=>/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
 function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
 /* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
 function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
@@ -4912,6 +4912,14 @@ function drawHimuro(x,y,t){const S='#2c2c3c';
   R(x-6,y-48,12,12,'#e8c098');R(x-7,y-52,14,6,'#bcbcd8');R(x+4,y-50,4,6,'#bcbcd8');R(x-7,y-48,2,3,'#bcbcd8');
   R(x-5,y-44,4,2,'#fcfcfc');R(x+1,y-44,4,2,'#fcfcfc');R(x-5,y-44,4,1,'#3c3c3c');R(x+1,y-44,4,1,'#3c3c3c');R(x-4,y-43,2,1,'#000');R(x+2,y-43,2,1,'#000');
   R(x-2,y-39,5,1,'#7c4c3c');R(x+2,y-40,1,1,'#7c4c3c');}
+/* 帝愛 幹部 コブシデ：紫の スーツ・オールバック・眼鏡・金の 拳の バッジ。 暴走時は 赤い オーラ */
+function drawKobushide(x,y,t,rage){if(rage)ocAura(x,y,t,'#d82800');const S=rage?'#3c0028':'#3c2858',Gd='#f8b800';
+  R(x-9,y-5,7,5,'#000');R(x+2,y-5,7,5,'#000');R(x-10,y-18,20,13,S);
+  R(x-12,y-37,24,20,S);R(x-3,y-37,6,11,'#fcfcfc');R(x-1,y-36,2,12,'#a80020');R(x-12,y-18,24,1,'#000');pc(x-7,y-31,2,Gd);
+  R(x-16,y-35,4,15,S);R(x+12,y-35,4,15,S);pc(x-14,y-18,4,'#e8c098');pc(x+14,y-18,4,'#e8c098');R(x-16,y-20,4,1,'#c89878');R(x+12,y-20,4,1,'#c89878');
+  R(x-6,y-49,12,12,'#e8c098');R(x-7,y-53,14,5,'#1c1c1c');R(x-7,y-49,2,5,'#1c1c1c');R(x+5,y-49,2,5,'#1c1c1c');
+  R(x-5,y-45,4,3,'#fcfcfc');R(x+1,y-45,4,3,'#fcfcfc');R(x-5,y-45,4,1,'#000');R(x+1,y-45,4,1,'#000');R(x-1,y-44,2,1,'#000');
+  const ec=rage?'#f80000':'#000';R(x-4,y-43,2,1,ec);R(x+2,y-43,2,1,ec);R(x-3,y-39,6,1,rage?'#d82800':'#7c4c3c');}
 function drawTagaba(x,y,t,big_){const Wt='#fcfcfc',Gd='#f8b800';
   if(big_){ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);}
   for(let k=0;k<10;k++){const ph=(t*1.2+k*41)%40;R(x-18+(k*13)%36,y-8-ph,2,2,k%2?Gd:'#fce0a8');}
@@ -4952,7 +4960,7 @@ function tiHub(){const T=tiS();
   const it=[];
   if(T.ch===1){it.push({t:`はたらく（1日・${fmt(TI_WAGE)}ペリコ）`,k:'work'});if(T.casino)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});if(T.exposed)it.push({t:'班長と 最後の 大勝負（456賽 返し）',k:'final'});
     it.push({t:`借金を 返す（残り ${fmt(T.debt)}）`,k:'pay'},{t:'地下の 売店（ペリコ）',k:'shop'},{t:'タガバソウと 話す',k:'talk'},{t:'昇降機の 前へ（帝城に もどる）',k:'out'});}
-  else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:'タガバソウと 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
+  else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:T.ch===2?'タガバソウと 話す':'労働者と 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
   const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（黒幕 ニズゥーイッツァイ… 埼玉編へ つづく）';
   listPick(T.ch===1?`帝愛 地下帝国　${Math.min(T.day,TI_DAYS)}日目　${fmt(T.per)}ペリコ`:`帝愛 地下帝国　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
     if(k==='work')tiWork();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='esc')tiEscBattle();
@@ -4961,7 +4969,7 @@ function tiTalk(){const T=tiS();let L;
   if(T.ch===1){L=!T.casino?['タガバソウ「1日 1万ペリコでは\n1年 働いても 借金は 返せん」','「この 地下は そういう 仕組みに なっておる。\n…まずは 働いて 様子を 見るんじゃ」','裏・賭郎「……」']
     :!T.exposed?['タガバソウ「班長の チンチロは インチキじゃ。\n大きく 張ると 班長ばかり 勝つ」','「4・5・6… また 4・5・6…\n仕組まれた サイコロか、 すり替えた 椀か…\nよく 見極めるんじゃぞ」','裏・賭郎「……サイコロ……」\n（裏・賭郎が 何かを 言いかけた）']
     :['タガバソウ「暴いた 456賽…\n今度は こちらが 使う 番じゃ」','「元手が 足りなければ わしが 出そう。\n班長との 大勝負で 一気に 返すんじゃ」'];}
-  else L=T.ch===2?['タガバソウ「昇降機には 黒服が 張りついておる。\n強行突破じゃ！」']:['タガバソウ「実験を 帝愛に 持ちこんだのは\nわしの 元同僚 コブシデ…」','「そして その 裏には\nニズゥーイッツァイという 男が おる…」'];
+  else L=T.ch===2?['タガバソウ「昇降機には 黒服が 張りついておる。\n強行突破じゃ！」','「実験を 帝愛に 持ちこんだのは\nわしの 元同僚 コブシデ… 気をつけるんじゃ」']:['労働者「タガバソウさんは コブシデを 止めて\nそのまま 行方知れずだ…」','「でも あの人の ことだ。\nきっと どこかで 生きてるさ」'];
   dialog(L,tiHub);}
 function tiWork(){const T=tiS();timeAdd(24*60);T.day++;T.per+=TI_WAGE;T.work=(T.work||0)+1;sfx('coin');
   const pg=[`1日 働いた… ${fmt(TI_WAGE)}ペリコ もらった。\n地下 ${Math.min(T.day,TI_DAYS)}日目　所持 ${fmt(T.per)}P`];
@@ -4973,7 +4981,9 @@ function tiPay(){const T=tiS();if(T.per<=0){dialog('返す ペリコが ない�
   tiEscape();}
 function tiEscape(){const T=tiS();
   scene('chika',['借金を 完済した！','黒服「…ほう。 1年を 待たずに 返し切るとはな」','タガバソウ「よし… 次は その 男じゃ」','タガバソウは 裏・賭郎の 首すじに 手を あて\n小さな 装置を 取り外した…！','タガバソウ「意識同期の 受信機じゃ。\nこれで 実験の 呪縛は 解ける」','裏・賭郎の 目に 光が もどった！','裏・賭郎「……おれは 何を…\nずっと 悪い 夢を 見ていた 気がする」','「あんたを 地下に 落とす 道具に\nされて いた… すまねえ」','裏・賭郎「…一緒に 出るぞ。 地上へ」'],()=>{T.ch=2;save();tiHub();});}
-function tiEscBattle(){choice('昇降機の 前に 黒服の 部隊が 待ち構えている！\n強行突破しますか？（2連戦）',['突破する','やめる'],r=>{if(r===0)startGm('ti_escape');else tiHub();},96);}
+function tiEscBattle(){const T=tiS();choice('昇降機の 前に 黒服の 部隊が 待ち構えている！\n強行突破しますか？（2連戦）',['突破する','やめる'],r=>{if(r!==0){tiHub();return;}
+    if(T.clear){startGm('ti_escape');return;}
+    scene('chika',['昇降機の 前に 黒服の 部隊…','その 奥から 紫の スーツの 男が 現れた。','タガバソウ「…コブシデ！」','帝愛 幹部 コブシデ「久しいな タガバソウ。\n実験に 反対して 地下に 落ちた 負け犬が」','「その 実験体は 返して もらおう。\n大事な データの 塊なのでな」','タガバソウ「…あんたたち、 これを 持っていけ」\n（TAインダストリアルの 権利書を 託された）','タガバソウ「いくぞ！」'],()=>startGm('ti_escape'));},96);}
 function tiTimeout(){const T=tiS();
   dialog([`地下 ${TI_DAYS}日目を 迎えた…`,`借金は まだ ${fmt(T.debt)}ペリコ 残っている。`,'黒服「時間切れだ。 地上へ 放り出せ」'],()=>{G.shockUntil=G.day+5;G.shockHard=1;G.party.forEach(fixHp);G.ti={ch:0,per:0};save();returnField();
     dialog(['地上に 放り出された…','あまりの ショックで 力が 100分の1に なった…\n5日の あいだ ショック状態が 続く。','（帝城を 訪ねると もう一度 挑める）']);});}
@@ -5029,15 +5039,15 @@ function tiFinal(){const T=tiS();if(T.per<50000000&&!T.seed){T.seed=1;const add=
 const TISTG={
   ti_hancho:{waves:2,f:w=>.9+w*.03,mk:(sp,w)=>w<2?[['帝愛の 黒服','oni','#000000','#fcfcfc',1.5,1.1],['帝愛の 黒服','oni','#000000','#fcfcfc',1.5,1.1],['帝愛の 黒服','oni','#000000','#fcfcfc',1.5,1.1]]:[['帝愛の 黒服','oni','#000000','#fcfcfc',1.6,1.15],['地下の 班長 クロヌマ','oni','#7c7c6c','#f8b800',12,1.5,1],['帝愛の 黒服','oni','#000000','#fcfcfc',1.6,1.15]],
     intro:sp=>sp.wave<2?'黒服たちが 取り囲んだ！':'班長 クロヌマ「ワシの 地下で\nいい気に なるなよ……！」'},
-  ti_escape:{waves:2,f:w=>.96+w*.04,mk:(sp,w)=>w<2?[['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2]]:[['地下 警備の 黒服','oni','#000000','#fcfcfc',1.9,1.25],['地下 監視長 ガンドウ','oni','#3c3c3c','#d82800',20,1.7,1],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.9,1.25]],
-    intro:sp=>sp.wave<2?'昇降機の 前　黒服の 部隊が 立ちはだかる！':'地下 監視長 ガンドウ「地下から 出られると 思うなよ…！」'}};
+  ti_escape:{waves:2,f:w=>.96+w*.04,mk:(sp,w)=>w<2?[['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.7,1.2]]:[['地下 警備の 黒服','oni','#000000','#fcfcfc',1.9,1.25],['帝愛 幹部 コブシデ','oni','#3c2858','#f8b800',22,1.75,1],['地下 警備の 黒服','oni','#000000','#fcfcfc',1.9,1.25]],
+    intro:sp=>sp.wave<2?'昇降機の 前　黒服の 部隊が 立ちはだかる！':'コブシデ「意識同期の 力… 見せて やろう！」'}};
 Object.assign(GSTG,TISTG);
 function tiWin(sp,back0,pages){const T=tiS(),back=more=>dialog(pages,()=>{returnField();dialog(more&&more.length?more:['（地下帝国に もどった）'],()=>tiHub());});
   if(sp.st==='ti_hancho'){const first=!T.exposed;T.exposed=1;if(first)T.per+=50000000;save();back(first?['班長 クロヌマは 地面に へたりこんだ。','労働者たちが 歓声を あげた！\nイカサマで 巻き上げられた ペリコが もどってきた。（+50,000,000ペリコ）','裏・賭郎「……456賽……\nこいつは… 使える……」\n（裏・賭郎が 班長の サイコロを 拾い上げた）','タガバソウ「でかしたぞ！\nあとは 班長との 大勝負で 一気に 返すんじゃ」',gmGive(10,10,2),'（班長との 最後の 大勝負が 解放）']:['班長は ふたたび 倒れた。',gmGive(5,5)]);return;}
   if(sp.st==='ti_escape'){if(T.clear){back(['黒服たちは 散り散りに 逃げていった。',gmGive(8,8)]);return;}
     const rw=gmGive(25,25,10,1e11);
-    dialog(pages,()=>{BT=null;scene('chika',['監視長 ガンドウは 崩れ落ちた。','昇降機が 上がっていく…','…まぶしい！ 地上の 光だ！','裏・賭郎「地上の 光は まぶしいな…」','タガバソウ「…実験を 帝愛に 持ちこんだのは\nわしの 元同僚 コブシデじゃ」','「だが あやつも 駒に すぎん。\nその 裏で 糸を 引いておるのは…」','タガバソウ「ニズゥーイッツァイ。\n…埼玉の 方角に 根城を 構える 男じゃ」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
-      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウ「わしが 持っておった 帝愛の 子会社\nTAインダストリアルを あんたに 託そう」','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）','── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
+    dialog(pages,()=>{BT=null;scene('chika',['コブシデ「ぐ… ぐおお… まだだ……！」','コブシデは 自分の 首に 同期装置を 突き立てた！\n「出力… 最大……！」','コブシデの 体から 赤黒い 光が あふれだす…\n暴走だ！','コブシデ「実験体を 逃がしては…\nニズゥーイッツァイ様に 顔向けが……！！」','タガバソウが コブシデに 組みついた！','タガバソウ「ここは わしが 止める！\n行け！ 地上へ！！」','裏・賭郎「じいさん…！」\nタガバソウ「振り向くな！ 行くんじゃ！」','昇降機の 扉が 閉まる… タガバソウの 背中が\n赤い 光の 中に 消えていった…','…まぶしい！ 地上の 光だ！','裏・賭郎「…あのじいさんに 救われたな」','「暴走した コブシデが 口に した 名…\nニズゥーイッツァイ…」','裏・賭郎「そいつが すべての 黒幕だ。\n…埼玉の 方角に 根城が あると 聞いた」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
+      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）','── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
   back([]);}
 /* ===================== TAインダストリアル（地下帝国編の クリア報酬） ===================== */
 function tiTaInit(){if(!G.ta)G.ta={cash:1e9,fin:{out:0,rate:0,susp:0,last:null},hall:{vi:null,set:null,rep:1,ev:0,last:null}};}
