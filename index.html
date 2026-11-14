@@ -4711,7 +4711,14 @@ function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は から
     const ok=['あるじなしとてはるなわすれそ','あるじなしとてはるなわすれぞ','あるじなしとてはるをわするな'].includes(norm(v[0]));
     if(!ok){sfx('ng');dialog(['…宝箱は しんと 静まりかえっている。','（下の句が ちがうようだ）']);return;}
     sfx('ok');dialog(['「あるじなしとて 春な忘れそ」','宝箱が かすかに ふるえ…\nふたが ひとりでに 開いた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
-    dialog(nw?['まばゆい 雷光が ほとばしった…！','「東風吹かば にほひおこせよ 梅の花…」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）']:['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);});}));return;}}
+    if(!nw){dialog(['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);return;}
+    const f0=frame;let t=0;const sc={full:true,upd(){},drw(){t=frame-f0;R(0,0,W,H,'#0c0820');for(let i=0;i<40;i++)R((i*53)%W,(i*29)%120,1,1,'#7c7cbc');
+      if(t<40&&(t>>2)%2===0){ctx.globalAlpha=.85;R(0,0,W,H,'#fcfcfc');ctx.globalAlpha=1;}
+      if(t<60){const x=150+(t%7)*3;for(let k=0;k<8;k++)R(x+(k%2?3:-3),k*12,3,12,'#f8f8a0');}
+      for(let i=0;i<24;i++){const px=((i*37+t*.7)%W),py=((i*61+t*(.6+i%3*.2))%H);R(px,py,2,2,i%2?'#f878f8':'#fcb8d8');}
+      const a=Math.min(1,t/50);ctx.globalAlpha=a;pc(128,110,40+Math.sin(t/10)*3,'#3c2c5c');ctx.save();ctx.translate(128-24,72);ctx.scale(3,3);drawChar('michizane',0,0,(t>>4)&1);ctx.restore();ctx.globalAlpha=1;}};
+    push(sc);sfx('g5');
+    dialog(['宝箱から まばゆい 雷光が ほとばしった！','梅の 香りと ともに\n天神 菅原道真公が 顕現した！','菅原道真公「この地、 未だ 帝土を 離れず、\n願わくば 居を このところに しめむ」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）'],()=>{if(stack[stack.length-1]===sc)pop();});});}));return;}}
 /* ===================== グンマー帝国 総長総選挙編（グンマー解放後・立党で 解放） ===================== */
 function gsS(){if(!G.gs)G.gs={ch:0,rec:{},sup:{},day:{}};for(const k of ['rec','sup','day'])if(!G.gs[k])G.gs[k]={};return G.gs;}
 const gsOpen=()=>gmS().ch>=8&&!!G.pol,GS_NEED=5;
