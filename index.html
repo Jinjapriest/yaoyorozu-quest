@@ -2820,6 +2820,7 @@ const townScr={full:true,mv:null,bt:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(c)drawCell(c,tx*16-cam.x,ty*16-cam.y,TW.city);}
     TW.npcs.forEach(n=>drawNPC(n,n.x*16-cam.x,n.y*16-cam.y,(frame>>4)&1));
     drawChar(G.party[0],pxp,pyp,(frame>>3)&1);
+    if(TW.v&&TW.v.skn&&typeof skHaze==='function'&&skS().ch===7)skHaze();
     if(!TW.ship&&!TW.jogai&&!TW.diet&&!TW.kanShop){const a=nightShade(TW.kanIn?.6:1);if(a>.2)for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++){const c=(TW.C[ty]||[])[tx];if(!c)continue;const X=tx*16-cam.x,Y=ty*16-cam.y;
       if(c.t==='lamp'){ctx.globalAlpha=.3;pc(X+8,Y+4,8,'#fce0a8');ctx.globalAlpha=1;R(X+6,Y+2,4,2,'#fce0a8');}else if(TW.kanIn&&c.t==='kshop')drawCell(c,X,Y,true);
       else if(c.b&&c.b.kind==='kanraku'&&(c.t==='roof'||c.t==='front'||c.t==='door'))kanGateCell(c,X,Y,c.t==='roof'?0:1,TW.city,1);
@@ -5462,6 +5463,10 @@ function skZanSpawn(npcs,C,w,h,top,cx,vi){const S=skS(),zd=S.zd||[],r=lcg(vi*313
   while(k<SK_ZAN_N&&tries++<600){const x=1+Math.floor(r()*(w-2)),y=top+4+Math.floor(r()*(h-top-6));const c=C[y]&&C[y][x];if(!c||(c.t!=='s'&&c.t!=='g')||Math.abs(x-cx)<1)continue;
     if(npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;if(!zd.includes(k))npcs.push({x,y,zan:k,line:''});k++;}}
 function skZanTalk(npc){const S=skS();choice('神に なり損ねた 残骸が うごめいている…\n倒しますか？',['倒す','やめる'],r=>{if(r===0)startGm('sk_zan',{zk:npc.zan});},96);}
+/* 天空に 浮かんだ ナメガワマチ：画面に 赤黒い もや */
+function skHaze(){ctx.globalCompositeOperation='multiply';R(0,0,W,H,'#9c3434');ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.25;R(0,0,W,H,'#2c0004');ctx.globalAlpha=1;
+  for(let i=0;i<14;i++){const x=((i*73+frame*(1+i%3)*.35)%(W+120))-60,y=(i*41+Math.sin(frame/40+i)*10)%H;ctx.globalAlpha=.3+.1*Math.sin(frame/25+i);pe(Math.round(x),Math.round(y),40+(i%4)*10,10+(i%3)*4,i%2?'#7c0c18':'#0c0002');}
+  ctx.globalAlpha=.25;R(0,0,W,10,'#000');R(0,H-10,W,10,'#000');ctx.globalAlpha=1;}
 function skZanLeft(){const S=skS();return SK_ZAN_N-(S.zd||[]).length;}
 function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
 
