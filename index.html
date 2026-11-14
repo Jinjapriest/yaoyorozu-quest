@@ -5901,10 +5901,11 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
     s=>['行ったことの ある 町の パチンコ店の\n交換率・イベント日・公約が 見られる。','今日 イベントの ある 店と 公約の 一覧。','設定ごとの ボーナス確率と 小役確率。'][s]);
   dialog(['スロ攻略ナビ「全国の ホール情報と\n機種解析を お届け！」'],menu);}
 /* ---------- パソコンの 画面（ウィンドウ風／hack風） ---------- */
+const doorLogo=(x,y,sz)=>{const w=sz,h=Math.round(sz*1.5);R(x-w/2,y-h/2,w,h,'#c87c3c');R(x-w/2+1,y-h/2+1,w-2,h-2,'#a05c28');R(x-w/2+2,y-h/2+2,w-4,Math.round(h*.35),'#a8e4fc');R(x+w/2-4,y+1,2,2,'#f8d878');};
 const mikanLogo=(x,y,r,c)=>{pc(x,y,r,c||'#f89820');if(r>=4){R(x-Math.round(r*.5),y-Math.round(r*.4),1,1,'#fcd8a0');}R(x,y-r-1,1,2,'#5c3410');R(x+1,y-r-2,Math.max(2,Math.round(r*.7)),Math.max(1,Math.round(r*.35)),'#2c9c3c');};
 function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[])[f.b]:PC_FIX[f.k];
   const AP=[].concat(fkDone()?[{n:'アマゾソ',ic:'amz',go:amzScr}]:[]).concat([{n:'スロ攻略ナビ',ic:'slot',go:slotSite},{n:'オセロ',ic:'oth',go:othelloScr},{n:'5五将棋',ic:'sho',go:shogiScr},{n:'一人麻雀',ic:'mj',go:mahjongScr},{n:'ベンチマーク',ic:'bench',go:()=>benchScr(spec)}])
-    .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcPart(spec,'psu')[3]}W`])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'ウィンドウ OS　ゲーミング仕様'])}])
+    .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcPart(spec,'psu')[3]}W`])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'勝手口 OS　ゲーミング仕様'])}])
     .concat([{n:mac?'システム終了':'シャットダウン',ic:'pow',go:null}]);
   let sel=0,t=0,boot=40,off=-1;f.on=9999;
   const icon=(k,x,y)=>{R(x,y,20,20,mac?'#fcfcfc':'rgba(0,0,0,0)');if(mac){R(x,y,20,20,'#e8e8f0');}
@@ -5922,7 +5923,7 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
       const n=AP.length;if(mac){if(I.pl)sel=(sel+n-1)%n;if(I.pr)sel=(sel+1)%n;}else{if(I.pu)sel=Math.max(0,sel-1);if(I.pd)sel=Math.min(n-1,sel+1);if(I.pr)sel=Math.min(n-1,sel+4);if(I.pl)sel=Math.max(0,sel-4);}
       if(I.A){const a=AP[sel];sfx('cur');if(!a.go){off=0;tone(330,.2,'triangle',.08);return;}a.go();}},
     drw(){const now=nowMin(),clk=`${Math.floor(now/60)}:${String(now%60).padStart(2,'0')}`;
-      if(boot>0){R(0,0,W,H,mac?'#000':'#081830');if(mac){mikanLogo(128,104,12,'#f89820');R(98,130,60,3,'#3c3c3c');R(98,130,Math.round(60*(1-boot/40)),3,'#fcfcfc');}else{for(let i=0;i<6;i++){const a=t*.25+i*.6;pc(128+Math.round(Math.cos(a)*10),140+Math.round(Math.sin(a)*10),1,'#fcfcfc');}txt('ようこそ',128,100,'#fcfcfc','center');}return;}
+      if(boot>0){R(0,0,W,H,mac?'#000':'#081830');if(mac){mikanLogo(128,104,12,'#f89820');R(98,130,60,3,'#3c3c3c');R(98,130,Math.round(60*(1-boot/40)),3,'#fcfcfc');}else{doorLogo(128,84,16);big('勝手口',128,104,'#fcfcfc','center',14);for(let i=0;i<6;i++){const a=t*.25+i*.6;pc(128+Math.round(Math.cos(a)*10),150+Math.round(Math.sin(a)*10),1,'#fcfcfc');}txt('ようこそ',128,128,'#bcbcbc','center');}return;}
       if(mac){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3c2c8c');g.addColorStop(.6,'#c85c8c');g.addColorStop(1,'#f8a050');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
         R(0,0,W,12,'rgba(250,250,255,.75)');mikanLogo(8,6,3,'#f89820');txt('Finder　ファイル　編集　表示',18,2,'#202020','left',150);txt(clk,250,2,'#202020','right');
         const n=AP.length,dw=n*26+8,dx=128-dw/2;R(dx,206,dw,30,'rgba(250,250,255,.45)');
@@ -5930,7 +5931,7 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
         win(60,40,136,50);big(AP[sel].n,128,50,'#fcfcfc','center',14);txt('A：ひらく　B：システム終了',128,72,'#bcbcbc','center');}
       else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0c2c6c');g.addColorStop(1,'#3c8cd8');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<5;i++)R(160+i*14,40+i*10,60-i*8,120-i*20,'rgba(140,200,255,.12)');
         AP.forEach((a,i)=>{const x=10+Math.floor(i/4)*60,y=10+(i%4)*46;if(i===sel)R(x-4,y-3,48,42,'rgba(180,220,255,.35)');icon(a.ic,x+10,y);txt(a.n,x+20,y+24,'#fcfcfc','center',56);});
-        R(0,224,W,16,'#141c2c');R(4,226,30,12,'#3c6cb8');txt('スタート',19,229,'#fcfcfc','center');R(40,226,1,12,'#3c3c4c');AP.slice(0,3).forEach((a,i)=>{R(46+i*18,226,14,12,'#202838');});
+        R(0,224,W,16,'#141c2c');R(4,226,30,12,'#3c6cb8');doorLogo(11,232,6);txt('勝手',25,229,'#fcfcfc','center');R(40,226,1,12,'#3c3c4c');AP.slice(0,3).forEach((a,i)=>{R(46+i*18,226,14,12,'#202838');});
         txt(clk,250,229,'#fcfcfc','right');txt(`${G.day}日目`,212,229,'#bcbcbc','right');
         const sx=10+Math.floor(sel/4)*60+28,sy=10+(sel%4)*46+14;R(sx,sy,1,9,'#000');for(let i=0;i<6;i++)R(sx+1,sy+1+i,Math.min(i+1,5),1,'#fcfcfc');R(sx+1,sy+7,3,1,'#000');}
       if(off>=0){ctx.globalAlpha=Math.min(1,off/30);R(0,0,W,H,'#000');ctx.globalAlpha=1;if(off<30)txt(mac?'システムを 終了しています…':'シャットダウンしています…',128,112,'#fcfcfc','center');}}});}
