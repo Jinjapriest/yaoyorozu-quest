@@ -2410,7 +2410,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'中枢の 塔',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -2539,7 +2539,7 @@ function buildTown(vi){
     for(const n of npcs)n.y+=P;
     C.unshift(...Z);top=P;H2=h+P;
   }
-  if(v.skb){/* 神社の 裏（町の いちばん 奥）に 専用の 建物：ナメガワマチ＝中枢の 塔／マツゥヤマ＝アジト */
+  if(v.skb){/* 神社の 裏（町の いちばん 奥）に 専用の 建物：ナメガワマチ＝セントラルドグマ／マツゥヤマ＝アジト */
     const tw=v.skb==='sktower',P=tw?13:8,Z=[];for(let y=0;y<P;y++){Z.push([]);for(let x=0;x<w;x++)Z[y].push({t:tw?'pz':'g'});}
     const zs=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<P)Z[y][x]=o;};
     for(let x=0;x<w;x++)zs(x,0,{t:tw?'wall':'tree'});for(let y=0;y<P;y++){zs(0,y,{t:tw?'wall':'tree'});zs(w-1,y,{t:tw?'wall':'tree'});}
@@ -2816,7 +2816,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
     if(fresh&&(c.t==='dietdoor'||c.t==='diet')){if(c.t==='dietdoor')enterDiet();else dialog('白い 花崗岩で できた 壮麗な 国会議事堂だ。\n中央の 塔の 上で 国旗が はためいている。');return;}
     if(fresh&&TW.diet&&dietBump(c))return;
-    if(fresh&&(c.t==='skbdoor'||c.t==='skb')){if(c.t==='skbdoor')skEnter(c.kind);else dialog(c.tw?'白く そびえる 中枢の 塔だ。\n入口は 正面に ある。':'丘の 上の 見張り小屋だ。\n入口は 正面に ある。');return;}
+    if(fresh&&(c.t==='skbdoor'||c.t==='skb')){if(c.t==='skbdoor')skEnter(c.kind);else dialog(c.tw?'白く そびえる セントラルドグマだ。\n入口は 正面に ある。':'丘の 上の 見張り小屋だ。\n入口は 正面に ある。');return;}
     if(fresh&&(c.t==='kcdoor'||c.t==='kc'||c.t==='moat'||c.t==='nobori'||c.t==='sakura')){if(c.t==='kcdoor')kqFac('kqjo');else dialog(c.t==='kc'?(kqS().ch===3?'五層の 天守に 黒い 雲が 渦を 巻いている…':kqS().ch>=4?'金の 鯱が 夜空に かがやく\n五層の 天守だ。 町の 誇りだ！':'白壁と 金の 飾りが まぶしい\n五層の 天守 コクラ城だ。'):c.t==='moat'?'お堀には 鯉が 泳いでいる。':c.t==='nobori'?'のぼりに「コクラ城」と 書かれている。':'城の 桜が 咲きほこっている。');return;}
     if(fresh&&c.t==='ura'){if(G.colo)uraFac();else dialog('黒い 石の 扉が 地面に はめこまれている。\n固く 閉ざされていて びくとも しない…');return;}
     if(fresh&&(c.t==='cstatue'||c.t==='brazier'||c.t==='cflag')){dialog(c.t==='cstatue'?'歴代 優勝者の 黄金像だ。'+(G.colo?'\n台座に あなたの 名前も 刻まれている！':''):c.t==='brazier'?'聖火が ごうごうと 燃えている。':'闘技場の 旗が はためいている。');return;}
@@ -5280,6 +5280,8 @@ const SK_TA=["..e.e...e..e....","..EeE.eEe.eEe...","..eEEEeEEeEEe...","..EEeEEeE
 const SK_JN=["................",".....LLLLLL.....","....LLLLLLLL....","...DLLLLLLLLD...","...DDSSSSSSDD...","....SKSSSSKS....","....SSSSSSSS....",".....SSKKSS.....","......SSSS......","....CCCCCCCC....","...CCWWWWWWCC...","..SCCWWWWWWCCS..","..SC.WWLLWW.CS..","..SS.WWWWWW.SS..",".....KKKKKK.....",".....kkkkkk.....",".....kkk.kkk....",".....kkk.kkk....",".....kk...kk....",".....kk...kk....","....BBB...BBB...","....BBB...BBB..."];
 const SK_JA=["................llll....","..............llLLLLl...","....L.L.L.L..lLLWLWLLl..","....LLLLLLLL.lRRRRRRRl..","...lLLLLLLLLl.lRRRRRRl..","...lLSSSSSSLl..lWLWLl...","....SMSSSSMS....llll....","....SSSSSSSS.....ll.....",".....SSKKSS......ll.....","......SSSS.......l......","....lLLLLLLl....ll......","...lLLlLLlLLl..ll.......","..SlLLLLLLLLlSll........","..SlL.LLLL.LlSl.........","..SS.lLLLLl.SS..........",".....KKKKKK.............",".....lLL.LLl............",".....LLl.lLL............",".....LL...LL............",".....lL...Ll............","...l.BB...BBl...........","..lll.......lll........."];
 const SK_NN=["........VVVVVV........",".......VVVVVVVV.......","......VVVVVVVVVV......","......VVSSSSSSVV......",".....VVKRSSSSRKVV.....",".....V.SSSSSSSS.V.....",".....V.SKKSSKKS.V.....","....qrYY.SSSS.YYrq....","...qrrYYZZWWZZYYrrq...","..qrrZZZZZRRZZZZZrrq..","..qrrZZZZYRRYZZZZrrq..",".qrrZZZZZZRRZZZZZZrrq.",".qrrWZZZZZZZZZZZZWrrq.",".qrrWWZZZZZZZZZZWWrrq.",".qrr..ZZZZZZZZZZ..rrq.",".qrr..ZZzZZZZzZZ..rrq.",".qrr..ZZZZZZZZZZ..rrq.",".qrr..ZZZZZZZZZZ..rrq.","qrrr..YZZZZZZZZY..rrrq","qrrr..YZZZZZZZZY..rrrq","qrrr..YYYYYYYYYY..rrrq","qrrrr..KK....KK..rrrrq","qqrrr..KK....KK..rrrqq",".qqqq.KKK....KKK.qqqq."];
+/* マツゥヤマの リーダー オオワック（ワクさん・26歳・小太り）：紺の 鉢巻き・まばらな 無精ひげ・オリーブの ベストに 白シャツ・腹が 出ている */
+const SK_WAKU=["................",".....HHHHHH.....","....HHHHHHHH....","...HHNNNNNNHH...","...HSSSSSSSSH...","..SSKSSSSSSKSS..","..SSSSSSSSSSSS..","..SSSSSKKSSSSS..","...SzSzSzSzSS...","....SSSSSSSS....","..GGGGGWWGGGGG..",".GGGGGGWWGGGGGG.","SGGGGGGWWGGGGGGS","SGGGGGWWWWGGGGGS","SSGGGWWWWWWGGGSS",".SGGGWWWWWWGGGS.","..GGGWWWWWWGGG..","...KKKKYKKKKK...","...NNNNNNNNNN...","...NNNN..NNNN...","...NNNN..NNNN...","..BBBBB..BBBBB.."];
 const SKSIL=new Proxy({},{get:(o,c)=>c==='R'?'#f80000':'#000'});
 /* 総帥 ニズゥーイッツァイ（悪の 組織の 首領）：銀髪・黒衣に 深紅の 裏地の マント・金の 紋章・白手袋・裂けた 薄笑い */
 function drawNizu(x,y,t,sil){const bob=(t>>5)&1;skGrid(SK_NN,sil?SKSIL:SKPAL,x-22,y-48-bob,2);if(!sil&&(t>>4)%4===0){R(x-8,y-48-bob+8,2,2,'#f80000');R(x+6,y-48-bob+8,2,2,'#f80000');}}
@@ -5355,16 +5357,29 @@ function skBattleBG(sp){const st=sp.st;
 
 /* ---------- 専用演出 ---------- */
 /* 覚醒ハイパー：結晶が 全身を 覆い、 ループごとに「n Hyper!」、保留連で「Fever!?」 */
-function hyperScr(seq){let t=0;const ST=Math.max(3,Math.min(8,Math.floor(220/Math.max(1,seq.length)))),T0=70,END=T0+seq.length*ST+50;
-  return{full:true,upd(){t++;if(t===20){sfx('magic');}if(t===60)sfx('g5');if(t>T0&&(t-T0)%ST===0){const s=seq[Math.floor((t-T0)/ST)-1];if(s)sfx(s.fever?'g5':'hit');}if(t>=END||(t>40&&I.A&&t>T0+10))pop();},
-    drw(){const ph=t<T0;R(0,0,W,H,ph?(t<30?'#000':'#04140a'):'#0c2418');
-      if(!ph){for(let i=0;i<40;i++){const a=i*2.4+t*.05;R(128+Math.cos(a)*(40+(i*7+t*3)%90),110+Math.sin(a)*(30+(i*5+t*2)%70),2,2,i%3?'#58f898':'#00a844');}}
+/* 覚醒ハイパー：攻撃が 当たるたびに 結晶の「7」が 3つ そろう（左→右→中）。 保留連は「Fever!?」 */
+function sk7(x,y,sz,hot,t){/* 結晶に 包まれた 7（オリジナル） */
+  for(let k=0;k<10;k++){const a=k/10*Math.PI*2+(k%2?.2:0),r=sz*(.95+(k%3)*.18);ctx.fillStyle=k%2?'#00a844':'#58f898';ctx.beginPath();ctx.moveTo(x+Math.cos(a-.25)*sz*.45,y+Math.sin(a-.25)*sz*.45);ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);ctx.lineTo(x+Math.cos(a+.25)*sz*.45,y+Math.sin(a+.25)*sz*.45);ctx.fill();}
+  pc(x,y,Math.round(sz*.55),'#005828');
+  ctx.font=`${Math.round(sz*1.3)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#3c1000';ctx.fillText('7',x+2,y+3);ctx.fillStyle=hot?((t>>2)&1?'#fcfc80':'#f8b800'):'#f87800';ctx.fillText('7',x,y+1);ctx.textBaseline='top';}
+function hyperScr(seq){let t=0;const ST=Math.max(10,Math.min(22,Math.floor(640/Math.max(1,seq.length)))),T0=70,END=T0+seq.length*ST+50;
+  const sym=['7','BAR','◆','★','チェ'];
+  return{full:true,upd(){t++;if(t===20){sfx('magic');}if(t===60)sfx('g5');
+      if(t>T0){const f=(t-T0)%ST,s=seq[Math.floor((t-T0)/ST)];if(s&&!s.fever){if(f===Math.round(ST*.18)||f===Math.round(ST*.32))tone(660,.05,'square',.1);if(f===Math.round(ST*.46)){sfx('hit');tone(1320,.15,'square',.12);}}else if(s&&f===1)sfx('g5');}
+      if(t>=END||(t>40&&I.A&&t>T0+10))pop();},
+    drw(){const ph=t<T0;R(0,0,W,H,ph?(t<30?'#000':'#04140a'):'#1c0800');
+      if(!ph){for(let k=0;k<20;k++){const a=k/20*Math.PI*2+t*.02;ctx.fillStyle=k%2?'#7c2000':'#a84000';ctx.beginPath();ctx.moveTo(128,96);ctx.lineTo(128+Math.cos(a)*260,96+Math.sin(a)*260);ctx.lineTo(128+Math.cos(a+.17)*260,96+Math.sin(a+.17)*260);ctx.fill();}
+        for(let i=0;i<30;i++){const a=i*2.4+t*.05;R(128+Math.cos(a)*(40+(i*7+t*3)%110),96+Math.sin(a)*(30+(i*5+t*2)%90),2,2,i%3?'#fcd040':'#58f898');}}
       if(ph){skGrid(SK_TN,SKPAL,104,80,3);const k=Math.max(0,(t-20)/2.2);const rows=SK_TA.map((r,j)=>Math.abs(j-10)<=k?r:'.'.repeat(r.length));skGrid(rows,SKPAL,104,80,3);
         if(t>40){R(118,0,20,H,'rgba(120,232,168,.25)');big('覚醒ハイパー',128,30,'#58f898','center',22);}if(t>20&&t<40)txtS('パキ… パキパキッ',128,60,'#58f898','center');}
-      else{skGrid(SK_TA,SKPAL,104,90,3);const i=Math.min(seq.length-1,Math.floor((t-T0)/ST));const s=seq[Math.max(0,i)];let stock=0;for(let j=0;j<=i&&j<seq.length;j++){if(seq[j].add)stock++;if(seq[j].fever)stock--;}
-        if(s&&s.fever){big('Fever!?',128,40,(t>>2)&1?'#f8b800':'#fc7460','center',30);}
-        else if(s){const n=s.n,cols=['#f83800','#f8b800','#fcfc00','#58f898','#3cbcfc','#6888fc','#f878f8'];const tx=`${n} Hyper!${n>=20?'!!':n>=10?'!':''}`;big(tx,128,40,n>=20?cols[(t>>2)%7]:n>=10?'#f8b800':'#fcfcfc','center',n>=10?28:24);}
-        for(let j=0;j<4;j++){const x=92+j*20;pc(x,206,6,j<stock?(j===3?'#f83800':'#58f898'):'#202020');}txt('保留',128,218,'#bcbcbc','center');}
+      else{const i=Math.min(seq.length-1,Math.floor((t-T0)/ST)),f=(t-T0)%ST,s=seq[Math.max(0,i)];let stock=0;for(let j=0;j<=i&&j<seq.length;j++){if(seq[j].add)stock++;if(seq[j].fever)stock--;}
+        skGrid(SK_TA,SKPAL,116,150,2);
+        if(s&&s.fever){big('Fever!?',128,70,(t>>2)&1?'#f8b800':'#fc7460','center',34);}
+        else if(s){const stopL=f>=ST*.18,stopR=f>=ST*.32,stopC=f>=ST*.46,all=stopC;
+          [[50,stopL],[206,stopR],[128,stopC]].forEach(([x,st],k)=>{if(st)sk7(x,96,k===2?40:34,all,t);else{win(x-26,70,52,52,'#58f898');big(sym[(t+k*2)%sym.length],x,86,'#fcfcfc','center',14);}});
+          if(all){if(f<Math.round(ST*.46)+3){ctx.globalAlpha=.6;R(0,0,W,H,'#fcfce0');ctx.globalAlpha=1;}
+            const n=s.n,cols=['#f83800','#f8b800','#fcfc00','#58f898','#3cbcfc','#6888fc','#f878f8'];big(`${n} Hyper!${n>=20?'!!':n>=10?'!':''}`,128,20,n>=20?cols[(t>>2)%7]:n>=10?'#f8b800':'#fcfcfc','center',n>=10?24:20);}}
+        for(let j=0;j<4;j++){const x=92+j*20;pc(x,214,6,j<stock?(j===3?'#f83800':'#58f898'):'#202020');}txt('保留',128,224,'#bcbcbc','center');}
       region(0,0,W,H,()=>{vA=true;});}};}
 /* プレデタープラント：紫の 捕食植物が 食らいつき、 HPと 攻撃力を 吸い取る */
 function predScr(hpA,atA){let t=0;const END=170;
@@ -5402,10 +5417,12 @@ function drawSkKey(cx,cy,soft,t){
   else{for(let k=0;k<4;k++){const ph=(t/8+k*1.6);R(Math.round(cx-12+((ph*3)%16)),Math.round(cy-22+k*3+Math.sin(ph)*2),3,1,'#a01020');}pc(cx-8,cy-20,2,'#7c7c88');}
   pc(cx-6,cy-18,3,soft?'#8cbca0':'#000');R(cx-10,cy+2,20,4,Rg);R(cx-3,cy-34,6,4,Rg);}
 function skSceneBg2(k){
-  if(k==='skhqin'){R(0,0,W,H,'#3c2410');for(let y=0;y<150;y+=14)R(0,y,W,2,'#2c1808');R(0,150,W,90,'#5c3c24');R(20,40,90,60,'#e8d8a8');for(let i=0;i<6;i++)R(30+i*13,52+(i%3)*12,8,2,'#d82800');R(150,100,80,8,'#7c4c10');R(156,108,4,42,'#5c3c24');R(222,108,4,42,'#5c3c24');R(170,84,14,16,'#bcbcbc');pc(214,92,6,'#f8b800');
+  if(k==='skhqin'){R(0,0,W,H,'#3c2410');for(let y=0;y<150;y+=14)R(0,y,W,2,'#2c1808');R(0,150,W,90,'#5c3c24');R(20,40,90,60,'#e8d8a8');for(let i=0;i<6;i++)R(30+i*13,52+(i%3)*12,8,2,'#d82800');
+    skGrid(SK_WAKU,SKPAL,166,72+((frame>>5)&1),3);txtS('ワクさん',190,60,'#fce0a8','center');
+    R(140,118,100,8,'#7c4c10');R(146,126,4,24,'#5c3c24');R(232,126,4,24,'#5c3c24');R(152,104,14,14,'#bcbcbc');pc(222,112,6,'#f8b800');
     txt('マツゥヤマ　レジスタンスの アジト',128,14,'#fce0a8','center');return true;}
   if(k==='sktwin'){R(0,0,W,H,'#e8f0f8');for(let i=0;i<8;i++){const x=128-(8-i)*14,w2=(8-i)*28;R(x,20+i*14,w2,1,'#c8d0dc');}R(0,150,W,90,'#d0d8e4');for(let x=0;x<W;x+=32)R(x,150,1,90,'#bcc4d0');R(116,40,24,110,'#fcfcfc');R(120,44,16,106,'#e0e8f0');
-    if(skS().ch===7){ctx.globalCompositeOperation='multiply';R(0,0,W,H,'#9c3434');ctx.globalCompositeOperation='source-over';}txt('中枢の 塔',128,14,'#5c6c80','center');return true;}
+    if(skS().ch===7){ctx.globalCompositeOperation='multiply';R(0,0,W,H,'#9c3434');ctx.globalCompositeOperation='source-over';}txt('セントラルドグマ',128,14,'#5c6c80','center');return true;}
   if(k==='skkey'||k==='skkey2'){R(0,0,W,H,k==='skkey'?'#140408':'#04140a');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%H,1,1,k==='skkey'?'#5c0c14':'#1c5c2c');
     if(k==='skkey2'){R(0,0,W,H,'#10241c');for(let i=0;i<18;i++){const x=(i*47+frame*.3)%W,y=(i*31+frame*.5)%H;R(Math.round(x),Math.round(y),2,1,i%3?'#f8c8d8':'#fff6d8');}}
     drawSkKey(128,96,k==='skkey2',frame);txt(k==='skkey'?'ネブカドネザルの 鍵':'改良型 ネブカドネザル',128,20,k==='skkey'?'#c06070':'#e8f4ec','center');txt(k==='skkey'?'通称「黒血漿」':'通称「白血漿」',128,32,k==='skkey'?'#a04050':'#bff2d4','center');return true;}
@@ -5440,7 +5457,7 @@ const SKQ=[['kofun','ギョウダの さきたま古墳','幸魂の 勾玉'],['n
 function skQ(){const S=skS();S.q=S.q||{};return S.q;}
 function skGoal(){const S=skS(),q=skQ();
   return ['目標：国境の 町 クマガヤの 自警団を 訪ねる','目標：クマガヤを 襲う 白服の 勧誘部隊を 退ける','目標：ナメガワマチの 近く レジスタンスの 集落 マツゥヤマへ',
-    `目標：サキタマ 各地を 回る（${SKQ.filter(x=>q[x[0]]).length}/3）\n${SKQ.map(x=>`${q[x[0]]?'済':'　'} ${x[1]}`).join('\n')}`,'目標：マツゥヤマの アジトから 地下第七層の 実験場へ 潜入する','目標：オオミヤの 車両基地で 保管列車を 止める','目標：ナメガワマチ 中枢の 塔へ 乗りこむ',(skZanLeft()>0?`目標：天空の ナメガワマチで 残骸を 倒す（のこり ${skZanLeft()}体）`:'目標：天空の マイナス宇宙で 神を 追う（中枢の 塔）'),'目標：神と化した ニズゥーイッツァイを 倒す（中枢の 塔）','ナメガワマチは 取り戻された。'][Math.min(9,S.ch)];}
+    `目標：サキタマ 各地を 回る（${SKQ.filter(x=>q[x[0]]).length}/3）\n${SKQ.map(x=>`${q[x[0]]?'済':'　'} ${x[1]}`).join('\n')}`,'目標：マツゥヤマの アジトから 地下第七層の 実験場へ 潜入する','目標：オオミヤの 車両基地で 保管列車を 止める','目標：ナメガワマチ セントラルドグマへ 乗りこむ',(skZanLeft()>0?`目標：天空の ナメガワマチで 残骸を 倒す（のこり ${skZanLeft()}体）`:'目標：天空の マイナス宇宙で 神を 追う（セントラルドグマ）'),'目標：神と化した ニズゥーイッツァイを 倒す（セントラルドグマ）','ナメガワマチは 取り戻された。'][Math.min(9,S.ch)];}
 function skGateCheck(vi){if(VIL[vi].skn!=='namegawa')return true;const S=skS();if(S.ch>=2)return true;
   dialog(['巨大な 白い 門に 白服が 立っている。','白服「完全平和都市 ナメガワマチへ ようこそ。\n移住許可証を 拝見します」','白服「…お持ちで ない？\nでは お引き取りを。 笑顔で どうぞ」',skOpen()?'（国境の 町 クマガヤで 何か わかるかもしれない）':'（今は 入れそうにない…）']);return false;}
 function skLines(vi){const S=skS(),v=VIL[vi],nm=v.name.replace(/^.* /,'');
@@ -5473,7 +5490,7 @@ function skFac(kind){const S=skS(),q=skQ();
       else if(k==='talk')skTalk();else if(k==='vil')dialog(['集落の 母親「娘が 地下に 送られたの。\n…まだ 生きてるって 信じてる」','元白服の 青年「おれは 毎日 笑えと 命令されてた。\nネギの 匂いで 目が 覚めたんだ」','長老「ここは 箭弓稲荷の 丘。\nお稲荷さまが 逃げ道を 守って くださる」','長老「ワクさんは 26で この 集落を\nまとめあげた。 大した 若者じゃよ」']);else if(k==='goal')dialog([skGoal()]);},skGoal());return;}
   if(kind==='sktower'){
     if(S.ch<6){dialog(['街の 中心に そびえる 白い 塔だ。','白服「関係者以外 立入禁止です。\n笑顔で お引き取りを」']);return;}
-    if(S.ch===6){choice('中枢の 塔の 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();},96);return;}
+    if(S.ch===6){choice('セントラルドグマの 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();},96);return;}
     if(S.ch===7&&skZanLeft()>0){dialog(['塔の 入口で トモヤヨシダと ジョウチャンが\n残骸を 食い止めている！',`トモヤヨシダ「街に あふれた 残骸を 片付けてくれ！\n（のこり ${skZanLeft()}体）」`]);return;}
     if(S.ch===7){choice('塔の 上空に マイナス宇宙が 広がっている。\n奥へ 進みますか？（2連戦）',['進む','やめる'],r=>{if(r===0)scene('skminus',['マイナス宇宙…\n何もかもが 存在し、 何もかもが 存在しない。','トモヤヨシダ「残骸は 俺たちが 抑える！\n行け！」'],()=>startGm('sk_nizu2'));},96);return;}
     if(S.ch===8){choice('神と化した ニズゥーイッツァイに\n挑みますか？（6人で 戦う）',['挑む','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});}},96);return;}
@@ -5549,9 +5566,9 @@ function drawSkBuilding(c,sx,sy,city){const P=(x,y,w,h,col)=>R(sx+x,sy+y,w,h,col
     if(c.t!=='skbdoor'&&c.dy===2&&Math.abs(c.dx)===2){P(4,4,8,7,'#3c2410');P(5,5,6,5,'#fce0a8');}
     if(c.t==='skbdoor'){P(3,2,10,14,'#3c2410');P(4,3,8,13,'#7c4c10');P(10,9,1,2,'#f8b800');P(5,0,6,3,'#fcfcfc');txt('レ',8,-1,'#d82800','center');}}}
 function skEnter(kind){sfx('ok');if(TW&&occupied(TW.vi)){dialog('…');return;}
-  scene(kind==='sktower'?'sktwin':'skhqin',kind==='sktower'?['中枢の 塔の 中に 入った。','白い 壁と 白い 床が どこまでも 続いている…']:['見張り小屋の 中に 入った。','地図や 武器が 並ぶ レジスタンスの アジトだ。'],()=>skFac(kind));}
+  scene(kind==='sktower'?'sktwin':'skhqin',kind==='sktower'?['セントラルドグマの 中に 入った。','白い 壁と 白い 床が どこまでも 続いている…']:['見張り小屋の 中に 入った。','地図や 武器が 並ぶ レジスタンスの アジトだ。'],()=>skFac(kind));}
 function skZanLeft(){const S=skS();return SK_ZAN_N-(S.zd||[]).length;}
-function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','その 首すじには 無数の 注射の 痕と\n黒く 浮き出た 血管が 走っている…','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
+function skN1(){scene('skthrone',['セントラルドグマ　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','その 首すじには 無数の 注射の 痕と\n黒く 浮き出た 血管が 走っている…','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
 
 /* ---------- 勝利後 ---------- */
 function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].waves;
@@ -5570,9 +5587,9 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
       scene('sktagaba',['そのとき 培養槽の 影から\n聞き覚えの ある 声が した。','？？？「…相変わらず 無茶を するな」','タガバソウ「よう。 生きてたぜ」','（帝愛の 地下で コブシデを 止めた あの 男だ！）','タガバソウ「コブシデの 同期装置から\n奴らの 薬の 設計を 抜き取った」','「理性を 保ったまま 覚醒できる…\n改良型の ネブカドネザルだ」'],()=>scene('skkey2',['タガバソウが 取り出したのは\n白く やさしく 光る 勾玉の アンプルだった。','タガバソウ「奴らの 黒血漿を\n幸魂の 勾玉の 力で 中和した」','タガバソウ「俺は こいつを\n通称「白血漿」と 呼んでる」','タガバソウ「…ギョウダの 宮司の おかげだ。\n人を 縛る 薬じゃない。 人を 守る 薬に なった」','タガバソウは アンプルを 二本\nトモヤヨシダと ジョウチャンに 渡した。','タガバソウ「使うのは 本当に\n追いつめられた 時だけだ。 いいな」','トモヤヨシダ「…ああ」\nジョウチャン「恩に 着る」','タガバソウ「それと… オオミヤの 車両基地だ。\n保管された 人間を 塔へ 運ぶ 列車が ある」','「塔に 運ばれたら 終わりだ。 先に 止めろ」',gmGive(20,20,5),'目標：オオミヤの 車両基地で 保管列車を 止める'],()=>{S.ch=5;save();returnField();}))));});return;}
   if(sp.st==='sk_train'){if(S.ch>5){after(['車両基地は 静かに なった。',gmGive(8,8)]);return;}
     S.ch=6;save();
-    dialog(pages,()=>{BT=null;scene('skomiya',['保管列車が 火花を 散らして 止まった！','ジョウチャンが ネギを 刻んで 車内に 撒く…','乗客「……あれ？ ここは… どこ……？」','乗客「わたし… なんで 笑って……」','人々が 次々と 目を 覚ましていく！','トモヤヨシダ「…親父！？ お袋！！」\n父「…トモヤ… なのか……？」','トモヤヨシダ「……っ。 あとは 一つだけだ」','トモヤヨシダ「ニズゥーイッツァイを 止める。\n中枢の 塔へ 行くぞ！」',gmGive(20,20,5),'目標：ナメガワマチ 中枢の 塔へ 乗りこむ'],()=>returnField());});return;}
+    dialog(pages,()=>{BT=null;scene('skomiya',['保管列車が 火花を 散らして 止まった！','ジョウチャンが ネギを 刻んで 車内に 撒く…','乗客「……あれ？ ここは… どこ……？」','乗客「わたし… なんで 笑って……」','人々が 次々と 目を 覚ましていく！','トモヤヨシダ「…親父！？ お袋！！」\n父「…トモヤ… なのか……？」','トモヤヨシダ「……っ。 あとは 一つだけだ」','トモヤヨシダ「ニズゥーイッツァイを 止める。\nセントラルドグマへ 行くぞ！」',gmGive(20,20,5),'目標：ナメガワマチ セントラルドグマへ 乗りこむ'],()=>returnField());});return;}
   if(sp.st==='sk_zan'){S.zd=S.zd||[];if(sp.zk!=null&&!S.zd.includes(sp.zk))S.zd.push(sp.zk);save();const n=skZanLeft();
-    after(n>0?['残骸は 崩れて 消えた…',`（のこり ${n}体）`]:['街の 残骸を すべて 倒した！','塔の 方から トモヤヨシダの 声が 響く。\n「よし！ 道が 開いた！ 塔へ 戻ってこい！」','目標：中枢の 塔から マイナス宇宙へ']);return;}
+    after(n>0?['残骸は 崩れて 消えた…',`（のこり ${n}体）`]:['街の 残骸を すべて 倒した！','塔の 方から トモヤヨシダの 声が 響く。\n「よし！ 道が 開いた！ 塔へ 戻ってこい！」','目標：セントラルドグマから マイナス宇宙へ']);return;}
   if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,7);S.zd=[];save();
     dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」'],()=>scene('skkey',['ニズゥーイッツァイが 懐から 取り出したのは\n黒い 血漿が 満ちた 勾玉の アンプル…','ジョウチャン「黒血漿…！ まさか それが…」','ニズゥーイッツァイ「そう、 最後の 一本だ。\nこの 体には もう 六本 流れている」','「この 一本が 最後の ひとかけら。\nこれで わたしは 完成する」','ニズゥーイッツァイ「これが ネブカドネザルの 鍵。\n人の 魂を 玉に 封じ、 神へと 昇華させる」','ニズゥーイッツァイ「人類は 玉に 還り…\nわたしは 神に なる」'],()=>push(nizuInjectScr(()=>
       scene('sksky',['塔が… いや 街 全体が 激しく 揺れる！','ナメガワマチが 大地から 引き剥がされ…\n天空へと 浮上していく！！','住民たちの 笑顔の まま 街は 雲を 越えた…'],()=>
