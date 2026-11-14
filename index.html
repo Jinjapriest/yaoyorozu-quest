@@ -2536,6 +2536,7 @@ function buildTown(vi){
     for(const n of npcs)n.y+=P;
     C.unshift(...Z);top=P;H2=h+P;
   }
+  if(v.skn&&typeof skZanSpawn==='function'&&skS().ch===7)skZanSpawn(npcs,C,w,h,top,cx,vi);
   if(v.name.replace(/^.* /,'')==='マツザキ'){C[top+1][cx+3]={t:'tbox',id:'michizane'};C[top+2][cx+3]={t:'s'};C[top+1][cx-3]={t:'tbox',id:'umegae'};C[top+2][cx-3]={t:'s'};}
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
@@ -2767,7 +2768,7 @@ function drawCell(c,sx,sy,city){
     case 'torii':ground();R(sx+2,sy+4,2,12,'#d82800');R(sx+12,sy+4,2,12,'#d82800');R(sx,sy+1,16,3,'#d82800');R(sx,sy,16,1,'#000');R(sx+2,sy+6,12,2,'#d82800');break;
   }
 }
-function drawNPC(n,x,y,f){if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
+function drawNPC(n,x,y,f){if(n.zan!=null){const b=f?1:0;pe(x+8,y+11-b,6,5,'#3c0c14');pc(x+8,y+5-b,4,'#3c0c14');R(x+4,y+4-b,8,2,'#d82800');R(x+6,y+4-b,4,1,'#fce0e0');R(x+3,y+14,2,2,'#5c0c1c');R(x+11,y+14,2,2,'#5c0c1c');if((frame>>4)&1)R(x+4,y+6-b,1,4,'#b01020');return;}if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
   R(x+5,y+13+(f?0:1),2,3-(f?0:1),'#3c3c3c');R(x+9,y+13+(f?1:0),2,3-(f?1:0),'#3c3c3c');}
 const townScr={full:true,mv:null,bt:0,
   upd(){
@@ -2782,7 +2783,7 @@ const townScr={full:true,mv:null,bt:0,
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
+    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
       /* 方向キーを 押しつづけると 通行人と 入れかわって 通りぬける（道を ふさがれない ように） */
       if(!(npc.debtor||npc.loser||npc.trial||npc.kan||npc.yoso||npc.gambler||npc.fix)&&c&&TPASS.has(c.t)){npc.x=TW.px;npc.y=TW.py;this.mv={x1:nx,y1:ny,dx,dy,t:0};}return;}
     if(!c)return;
@@ -5387,6 +5388,7 @@ const SKSTG={
       :[['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.3],['実験場 主任 シロガネ','oni','#fcfcfc','#3cbcfc',18,1.7,1],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.3]],
     intro:sp=>sp.wave<3?`地下第七層 実験場　第${sp.wave}区画\n培養槽の 中で 何かが 動いた…`:'主任 シロガネ「被験体の 補充か。\nちょうど 足りなかった ところだ」'},
   sk_train:{waves:2,f:w=>1+w*.02,mk:(sp,w)=>w<2?[['保管列車の 車掌','bones','#24306c','#f8b800',2.1,1.3],['白服の 護送兵','bones','#fcfcfc','#d82800',2.1,1.3],['保管列車の 車掌','bones','#24306c','#f8b800',2.1,1.3]]:[['保管列車 ホカン号','bones','#fcfcfc','#d82800',20,1.75,1]],intro:sp=>sp.wave<2?'オオミヤ 車両基地。\n笑顔の 人々を 乗せた 列車が 動きだす！':'列車そのものが 牙を むいた！\n保管列車 ホカン号「ホカン… ホカン……」'},
+  sk_zan:{waves:1,f:()=>1.02,mk:()=>[['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',2.2,1.3],['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',2.2,1.3],['うごめく 失敗作','blob','#5c0c1c','#fc7460',2.4,1.3]],intro:()=>'残骸「……ワタシモ… カミニ……」'},
   sk_nizu1:{waves:1,f:()=>1.02,mk:()=>[['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3],['総帥 ニズゥーイッツァイ','oni','#1c1c24','#8c0c24',26,1.85,1],['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3]],intro:()=>'ニズゥーイッツァイ「神の 前に ひれ伏せ、 実験体ども。」'},
   sk_nizu2:{waves:2,f:w=>w<2?1.02:1.06,mk:(sp,w)=>w<2?[['コブシデの 複製','oni','#3c2858','#f8b800',10,1.6,1],['錨ケンドウの 複製','oni','#fcfcfc','#f8b800',14,1.65,1,'kendo'],['クロヌマの 複製','oni','#5c5c5c','#f8b800',10,1.6,1]]
       :[['ニズゥーイッツァイ 幼体','oni','#000000','#d82800',60,1.95,1]],
@@ -5399,7 +5401,7 @@ const SKQ=[['kofun','ギョウダの さきたま古墳','幸魂の 勾玉'],['n
 function skQ(){const S=skS();S.q=S.q||{};return S.q;}
 function skGoal(){const S=skS(),q=skQ();
   return ['目標：国境の 町 クマガヤの 自警団を 訪ねる','目標：クマガヤを 襲う 白服の 勧誘部隊を 退ける','目標：ナメガワマチの 近く レジスタンスの 集落 マツゥヤマへ',
-    `目標：サキタマ 各地を 回る（${SKQ.filter(x=>q[x[0]]).length}/3）\n${SKQ.map(x=>`${q[x[0]]?'済':'　'} ${x[1]}`).join('\n')}`,'目標：マツゥヤマの アジトから 地下第七層の 実験場へ 潜入する','目標：オオミヤの 車両基地で 保管列車を 止める','目標：ナメガワマチ 中枢の 塔へ 乗りこむ','目標：天空の マイナス宇宙で 神を 追う（中枢の 塔）','目標：神と化した ニズゥーイッツァイを 倒す（中枢の 塔）','ナメガワマチは 取り戻された。'][Math.min(9,S.ch)];}
+    `目標：サキタマ 各地を 回る（${SKQ.filter(x=>q[x[0]]).length}/3）\n${SKQ.map(x=>`${q[x[0]]?'済':'　'} ${x[1]}`).join('\n')}`,'目標：マツゥヤマの アジトから 地下第七層の 実験場へ 潜入する','目標：オオミヤの 車両基地で 保管列車を 止める','目標：ナメガワマチ 中枢の 塔へ 乗りこむ',(skZanLeft()>0?`目標：天空の ナメガワマチで 残骸を 倒す（のこり ${skZanLeft()}体）`:'目標：天空の マイナス宇宙で 神を 追う（中枢の 塔）'),'目標：神と化した ニズゥーイッツァイを 倒す（中枢の 塔）','ナメガワマチは 取り戻された。'][Math.min(9,S.ch)];}
 function skGateCheck(vi){if(VIL[vi].skn!=='namegawa')return true;const S=skS();if(S.ch>=2)return true;
   dialog(['巨大な 白い 門に 白服が 立っている。','白服「完全平和都市 ナメガワマチへ ようこそ。\n移住許可証を 拝見します」','白服「…お持ちで ない？\nでは お引き取りを。 笑顔で どうぞ」',skOpen()?'（国境の 町 クマガヤで 何か わかるかもしれない）':'（今は 入れそうにない…）']);return false;}
 function skLines(vi){const S=skS(),v=VIL[vi],nm=v.name.replace(/^.* /,'');
@@ -5433,6 +5435,7 @@ function skFac(kind){const S=skS(),q=skQ();
   if(kind==='sktower'){
     if(S.ch<6){dialog(['街の 中心に そびえる 白い 塔だ。','白服「関係者以外 立入禁止です。\n笑顔で お引き取りを」']);return;}
     if(S.ch===6){choice('中枢の 塔の 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();},96);return;}
+    if(S.ch===7&&skZanLeft()>0){dialog(['塔の 入口で トモヤヨシダと ジョウチャンが\n残骸を 食い止めている！',`トモヤヨシダ「街に あふれた 残骸を 片付けてくれ！\n（のこり ${skZanLeft()}体）」`]);return;}
     if(S.ch===7){choice('塔の 上空に マイナス宇宙が 広がっている。\n奥へ 進みますか？（2連戦）',['進む','やめる'],r=>{if(r===0)scene('skminus',['マイナス宇宙…\n何もかもが 存在し、 何もかもが 存在しない。','トモヤヨシダ「残骸は 俺たちが 抑える！\n行け！」'],()=>startGm('sk_nizu2'));},96);return;}
     if(S.ch===8){choice('神と化した ニズゥーイッツァイに\n挑みますか？（6人で 戦う）',['挑む','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});}},96);return;}
     choice('塔の 最上階に 神の 残響が 残っている。\n再戦しますか？（6人で 戦う）',['再戦する','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS,re:1});}},96);return;}
@@ -5454,6 +5457,12 @@ function skTalk(){const S=skS();const L=S.ch>=9?['ワクさん「あんたたち
   :S.ch>=5?['ワクさん「タガバソウって 男…\n信用して いいんだな？」','トモヤヨシダ「ああ。 あの 人は 本物だ」','タガバソウ「改良型は 理性を 保てるが\n体への 負担は 大きい」','「…使うのは 本当に 追いつめられた 時だけだ」','トモヤヨシダ「わかってるさ」']
   :['ワクさん「焦るな。 一つずつ 片付ければ\n必ず 塔に 届く」','トモヤヨシダ「俺は この 街で 生まれた。\n親父も お袋も 地下に 送られた」','ジョウチャン「俺は フカヤの 薬草屋の 弟子だった。\nあの 注射の 中身を 調べて 気づいたんだ」','ジョウチャン「人間を 神に する？\n…神に なり損ねた 連中を 何人も 見たよ」'];
   dialog(L);}
+const SK_ZAN_N=6;
+function skZanSpawn(npcs,C,w,h,top,cx,vi){const S=skS(),zd=S.zd||[],r=lcg(vi*313+7);npcs.length=0;let k=0,tries=0;
+  while(k<SK_ZAN_N&&tries++<600){const x=1+Math.floor(r()*(w-2)),y=top+4+Math.floor(r()*(h-top-6));const c=C[y]&&C[y][x];if(!c||(c.t!=='s'&&c.t!=='g')||Math.abs(x-cx)<1)continue;
+    if(npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;if(!zd.includes(k))npcs.push({x,y,zan:k,line:''});k++;}}
+function skZanTalk(npc){const S=skS();choice('神に なり損ねた 残骸が うごめいている…\n倒しますか？',['倒す','やめる'],r=>{if(r===0)startGm('sk_zan',{zk:npc.zan});},96);}
+function skZanLeft(){const S=skS();return SK_ZAN_N-(S.zd||[]).length;}
 function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
 
 /* ---------- 勝利後 ---------- */
@@ -5473,11 +5482,13 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
   if(sp.st==='sk_train'){if(S.ch>5){after(['車両基地は 静かに なった。',gmGive(8,8)]);return;}
     S.ch=6;save();
     dialog(pages,()=>{BT=null;scene('skomiya',['保管列車が 火花を 散らして 止まった！','ジョウチャンが ネギを 刻んで 車内に 撒く…','乗客「……あれ？ ここは… どこ……？」','乗客「わたし… なんで 笑って……」','人々が 次々と 目を 覚ましていく！','トモヤヨシダ「…親父！？ お袋！！」\n父「…トモヤ… なのか……？」','トモヤヨシダ「……っ。 あとは 一つだけだ」','トモヤヨシダ「ニズゥーイッツァイを 止める。\n中枢の 塔へ 行くぞ！」',gmGive(20,20,5),'目標：ナメガワマチ 中枢の 塔へ 乗りこむ'],()=>returnField());});return;}
-  if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,7);save();
+  if(sp.st==='sk_zan'){S.zd=S.zd||[];if(sp.zk!=null&&!S.zd.includes(sp.zk))S.zd.push(sp.zk);save();const n=skZanLeft();
+    after(n>0?['残骸は 崩れて 消えた…',`（のこり ${n}体）`]:['街の 残骸を すべて 倒した！','塔の 方から トモヤヨシダの 声が 響く。\n「よし！ 道が 開いた！ 塔へ 戻ってこい！」','目標：中枢の 塔から マイナス宇宙へ']);return;}
+  if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,7);S.zd=[];save();
     dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」','ニズゥーイッツァイは 首すじに\n『ネブカドネザルの 鍵』を 打ち込んだ！'],()=>
       scene('sksky',['塔が… いや 街 全体が 激しく 揺れる！','ナメガワマチが 大地から 引き剥がされ…\n天空へと 浮上していく！！','住民たちの 笑顔の まま 街は 雲を 越えた…'],()=>
       scene('skminus',['ニズゥーイッツァイの 体が 裂け\n人の 形が 崩れていく……','空間が 反転した。\n── マイナス宇宙 ──','何もかもが 存在し、 何もかもが 存在しない…','闇の 中から 神に なり損ねた 残骸が\n無数に 這い出してきた！','トモヤヨシダ「…今が その 時だな、 ジョウチャン」','ジョウチャン「ああ」\nふたりは タガバソウの アンプルを 飲み干した！'],()=>push(skAwakeScr(()=>
-      scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「ここは 俺たちに 任せて 行け！」'],()=>startGm('sk_nizu2')))))));});return;}
+      scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「残骸が 街中に あふれだした！\n俺たちは 塔の 入口を 守る！」','ジョウチャン「街の 残骸を 片付けてくれ。\nそれまで ここは 一歩も 通さない！」'],()=>{returnField();dialog(['── 天空の ナメガワマチ ──','雲の 上に 浮かんだ 街の あちこちで\n神に なり損ねた 残骸が うごめいている…',`目標：街の 残骸を 倒す（のこり ${skZanLeft()}体）`]);}))))));});return;}
   if(sp.st==='sk_nizu2'){S.ch=Math.max(S.ch,8);save();
     dialog(pages,()=>{BT=null;scene('skyoutai',['胎児の 殻に ひびが 走る……','「ウマレ……ル…… カミガ……」'],()=>
       scene('skgod',['殻を 破って 現れたのは\n人の 姿を 捨てた 縦長の 異形。','背中には 天使の 輪…\n目の 位置には 赤い 溝が 一文字に 走る。','「ワタシハ……カミニ ナッタ」'],()=>
