@@ -1075,7 +1075,7 @@ function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
-const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*2.2)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
+const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*1.5)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
 const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
 /* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
 function gdPinch(){if(typeof BT==='undefined'||!BT||!BT.pt)return false;const n=BT.pt.length,dead=BT.pt.filter(t=>!isAlive(t)).length;let hp=0,mx=0;BT.pt.forEach(t=>{hp+=Math.max(0,G.chars[t.id].hp);mx+=cstat(t.id,t).hp;});return (n>1&&dead>=Math.ceil(n/2))||hp/Math.max(1,mx)<=.3;}
@@ -2112,12 +2112,12 @@ const phys=(a,d,p)=>Math.max(1,Math.round(a*a/(a+d)*p*(.88+rnd()*.24)));
 const magd=(m,d,p)=>Math.max(1,Math.round(m*m/(m+d*.5)*p*(.9+rnd()*.2)));
 const aliveEn=()=>BT.en.filter(e=>e.alive);
 function liveEn(i){const e=BT.en[i];if(e&&e.alive)return e;const l=aliveEn();return l.length?l[ri(0,l.length-1)]:null;}
-function dmgEnemy(e,d){if(e.cap)d=Math.min(d,Math.ceil(e.maxhp*e.cap));e.hp-=d;e.flash=12;sfx('hit');const s=`${e.label}に ${fmt(d)}の ダメージ！`;if(e.hp<=0){e.hp=0;e.alive=false;e.die=24;NOW([()=>{sfx('kill');return `${e.label}を たおした！`;}]);}return s;}
+function dmgEnemy(e,d){if(BT.urx)d=Math.max(1,Math.round(d*BT.urx));if(e.cap)d=Math.min(d,Math.ceil(e.maxhp*e.cap));e.hp-=d;e.flash=12;sfx('hit');const s=`${e.label}に ${fmt(d)}の ダメージ！`;if(e.hp<=0){e.hp=0;e.alive=false;e.die=24;NOW([()=>{sfx('kill');return `${e.label}を たおした！`;}]);}return s;}
 function dmgParty(m,d){const c=G.chars[m.id];if(m.guard)d=Math.max(1,Math.round(d*.5));if(m.shield>0){const ab=Math.min(m.shield,d);m.shield-=ab;d-=ab;if(d<=0){BT.shake=4;return `シールドが ${CH[m.id].short}への ${fmt(ab)}の ダメージを ふせいだ！`;}}c.hp=Math.max(0,c.hp-d);BT.shake=10;sfx('hurt');
   const s=`${CH[m.id].short}は ${fmt(d)}の ダメージを うけた！`;if(c.hp<=0){m.stun=0;NOW([`${CH[m.id].short}は ちからつきた…`]);}
   else if(CH[m.id].special==='meiwaku'&&!(m.stun>0)){m.stun=3;NOW([`${CH[m.id].short}は 逆に 凸られて 心が折れた！\n活動休止…（3ターン 動けない）`]);}
   return s;}
-function healM(m,amt){const c=G.chars[m.id],mx=cstat(m.id,m).hp,v=Math.min(mx-c.hp,amt);c.hp+=v;return v;}
+function healM(m,amt){if(BT&&BT.urx)amt=Math.round(amt*BT.urx);const c=G.chars[m.id],mx=cstat(m.id,m).hp,v=Math.min(mx-c.hp,amt);c.hp+=v;return v;}
 function pAct(i){
   const m=BT.pt[i],cmd=BT.cmds[i];if(!isAlive(m)||!cmd)return;
   const d=CH[m.id],c=G.chars[m.id],nm=d.short;BT.pend.push('\f');
@@ -2173,7 +2173,7 @@ function pAct(i){
           const pool=Object.values(XRSK).filter(q=>q!=='kakuhyper'&&q!=='predplant');for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
         if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;BT.aiUsed=1;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
           const pool=Object.values(XRSK).filter(q=>q!=='kakuhyper'&&q!=='predplant');for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
-        P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});break;
+        P_(()=>{if(ok.v&&XRSK[m.id]===cmd.k&&!isXR(m.id))BT.urx=.7;return null;});P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});P_(()=>{BT.urx=0;return null;});break;
       case 'debuff':P_(()=>{if(!ok.v)return null;const L=BT.en.filter(e=>e.alive);if(!L.length)return null;sfx('ng');
         L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def,spd:e.spd};e.atk=Math.round(e.atk*sk.amt);e.mag=Math.round(e.mag*sk.amt);e.def=Math.round(e.def*sk.amt);if(e.spd)e.spd=Math.round(e.spd*sk.amt);}e.deb=Math.max(e.deb||0,sk.turns);});
         return cmd.k==='meh'?`「渚まで 走るのは メッ！」\n敵は しゅんと なった…\n敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`:`敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`;});break;
@@ -2322,7 +2322,7 @@ function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',en
     case 'gamble':return '丁半博打！ ダメージ倍率が ×0〜×5の\nどれかに なる 運まかせの 攻撃';
     case 'debuff':return `${tg}の 攻撃・魔力・守備・素早さ\n-${pct(1-s.amt)}（${s.turns}ターン）`;
     case 'mprec':return '味方全体の MPを 最大MPの 35% 回復\n（自分は 15%）';
-    case 'xr':return (XR_DESC[k]||'')+`\n消費MP：最大MPの ${Math.round(XR_MPR*100)}%`+(Object.values(XRSK).includes(k)?'\n（XR状態で ない ときは 2.2倍＝最大MPの 全部）':'');
+    case 'xr':return (XR_DESC[k]||'')+`\n消費MP：最大MPの ${Math.round(XR_MPR*100)}%`+(Object.values(XRSK).includes(k)?'\n（XR状態で ない ときは 消費MP 1.5倍・威力 0.7倍）':'');
   }return '';}
 function selEnemy(cb,prev){const list=BT.en.map((e,i)=>i).filter(i=>BT.en[i].alive);BT.sub={kind:'enemy',list,cb,prev,m:mkMenu(list.map(i=>BT.en[i].label),{x:124,y:150,w:132,rows:Math.min(4,list.length)})};}
 function selAlly(filter,cb,prev){const list=BT.pt.map((m,i)=>i).filter(i=>filter==='dead'?!isAlive(BT.pt[i]):isAlive(BT.pt[i]));
