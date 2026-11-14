@@ -5791,7 +5791,13 @@ function netSpeed(){const A=ajS(),r=ajRouter();if(A.line==null||!r)return{m:10,t
 const netSrvMul=()=>{const sp=netSpeed(),m=sp.m;return (m<100?.3:m<1000?.6:m<2500?1:m<5000?1.3:m<10000?1.6:2)*(sp.r&&AJ_F[sp.r].biz?1.2:1);};
 const netFmt=m=>m>=1000?`${m/1000}Gbps`:`${m}Mbps`;
 function netGo(fn){const sp=netSpeed(),A=ajS();if(A.cut||ajTrip()){dialog('ルーターの 電源が 入っていない…\n（電気が 止まっている）');return;}
-  if(sp.r==='rt_cheap'&&rnd()<.15){dialog(['……読み込みが 終わらない。','TQ-リンコが 固まっている！','（コンセントを 抜いて 差し直した）'],()=>netGo(fn));return;}
+  const fr=sp.r==='rt_cheap'?.15:sp.r&&!AJ_F[sp.r].biz?.03:0;
+  if(fr&&rnd()<fr){const nm=AJ_F[sp.r].n.replace(/（.*$/,'');dialog(['……読み込みが 終わらない。',`Wi-Fiが 固まった！\n（${nm}の ランプが 点滅している）`],()=>
+    choice('どうする？',['コンセントを 差し直す','ルーターを 叩いて 直す','あきらめる'],r=>{
+      if(r===0){dialog(['コンセントを 抜いて… 10秒 待って… 差し直した。','……つながった！'],()=>netGo(fn));return;}
+      if(r===1){sfx('bump');if(rnd()<.75){const i=A.furn.findIndex(f=>f.k===sp.r);if(i>=0)A.furn.splice(i,1);A.inv[sp.r]=Math.max(0,(A.inv[sp.r]||1)-1);save();
+          dialog(['バンッ！！','……ランプが 消えた。',`${nm}は 壊れてしまった…`,'（昭和の 直し方は 平成の 機械には 効かない）']);}
+        else dialog(['バンッ！！','……ピコン。 ランプが 緑に 戻った！','直った！ …なぜか 直った。'],()=>netGo(fn));}},120));return;}
   const T=Math.max(4,Math.min(150,Math.round(1500/sp.m)));let t=0;push({full:true,upd(){if(++t>=T){pop();fn();}},drw(){R(0,0,W,H,'#fcfcfc');R(0,0,W,14,'#e8e8f0');txt(`${sp.r?'':'（テザリング）'} 読み込み中… ${netFmt(sp.m)}`,6,3,'#5c5c5c');R(20,120,216,4,'#d8d8e0');R(20,120,Math.round(216*t/T),4,'#3c7cfc');}});}
 function lanScr(back){const A=ajS(),cur=A.lan!=null?A.lan:1;
   listPick(`LANケーブル（今：${LAN_C[cur].n}）`,LAN_C.map((c,i)=>({t:(i===cur?'▶':'')+c.n,r:`${fmt(c.p)}イェソ`})),i=>{const c=LAN_C[i];if(G.coins<c.p){dialog('イェソが たりない…',back);return;}
