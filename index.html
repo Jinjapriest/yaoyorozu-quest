@@ -500,6 +500,9 @@ const BASE_SKILLS={
   hs_bottle:{name:'ドンペリ ゴールド',mp:10,target:'allies',kind:'heal',power:1.8,verb:'おろした'},
   hs_after:{name:'アフターの お誘い',mp:9,target:'enemies',kind:'debuff',amount:.4,turns:3,verb:'しかけた'},
   hs_no1:{name:'No.1の 風格',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'見せつけた'},
+  dazaifu:{name:'ダザイフバースト',mp:40,target:'enemies',kind:'mag',power:4.6,verb:'放った'},
+  kitano:{name:'キタノサンダー',mp:18,target:'enemies',kind:'mag',power:2.9,verb:'落とした'},
+  umekaze:{name:'梅風',mp:20,target:'allies',kind:'song',power:1.4,amount:.8,turns:4,verb:'吹かせた'},
   cg_omu:{name:'ケチャップ アート',mp:4,target:'enemy',kind:'mag',power:1.8,verb:'描いた'},
   cg_kyun:{name:'萌え萌え きゅん',mp:5,target:'allies',kind:'heal',power:1.0,verb:'唱えた'},
   cg_cheki:{name:'チェキ会',mp:6,target:'allies',kind:'buff',stat:'atk',amount:.4,turns:3,verb:'ひらいた'},
@@ -538,6 +541,7 @@ const BASE_PACK={
     {id:'buddha',name:'仏陀（ブッダ）',short:'仏陀',rarity:'UR',weapon:'any',hp:140,mp:80,atk:24,mag:38,def:30,spd:16,skills:['jihi','satori'],look:{head:'buddha',hair:'#24188c',body:'#e45c10',accent:'#f8b800',legs:'#e45c10',held:'神器'}},
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
+    {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
     {id:'momo',name:'幻のコンカフェ嬢 もも',short:'もも',rarity:'XR',weight:1,weapon:'any',special:'hostess',hp:150,mp:110,atk:30,mag:54,def:28,spd:34,skills:['momochk','momopocky','momoomu'],look:{head:'momo',hair:'#f8b0c8',body:'#a80020',accent:'#fcfcfc',legs:'#a80020',held:'杖'}},
     {id:'izanami',name:'伊邪那美命',short:'伊邪那美',rarity:'XR',weight:1,weapon:'any',special:'god',hp:145,mp:100,atk:30,mag:52,def:28,spd:24,skills:['gekko','jihi'],look:{head:'miko',hair:'#000000',body:'#3c1c5c',accent:'#d82800',legs:'#000000',held:'神器'}},
     {id:'susanoo',name:'須佐之男命',short:'須佐之男',rarity:'UR',weight:2,weapon:'any',hp:150,mp:40,atk:40,mag:14,def:28,spd:20,skills:['yakumo','kabuto'],look:{head:'storm',hair:'#000000',body:'#0058f8',accent:'#fcfcfc',legs:'#24188c',held:'両手剣'}},
@@ -999,7 +1003,7 @@ const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.cha
 const xrLead=()=>G&&G.party?G.party.find(xrReady):null;
 const isXR=id=>xrReady(id)&&(!G.party||!G.party.includes(id)||xrLead()===id);
 const crar=id=>isXR(id)?6:Math.min(5,CH[id].rar);
-function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
+function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
   if(isXR(id)){d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}else{d.name=d._base.name;d.short=d._base.short;}}}
 function addWeapon(id){const w=G.weapons[id];if(w){w.dup=Math.min(999,w.dup+1);return false;}G.weapons[id]={lv:1,exp:0,dup:0};return true;}
 const GOD_IDS=['kami','amaterasu','susanoo','tsukuyomi','okuninushi'];
@@ -1673,8 +1677,10 @@ function rollRar(min){
   if(k<min){const tot=RATES.slice(min).reduce((a,b)=>a+b,0);let x=rnd()*tot;k=5;for(let i=min;i<=5;i++){x-=RATES[i];if(x<0){k=i;break;}}}
   return k;
 }
+/* ガチャに 出ない キャラ（宝箱などで 入手） */
+const NOGACHA_C=['michizane'];
 function poolFor(b,rar){
-  const all=(b.type==='weapon'?wpList():chList()).filter(p=>p.rar===rar);
+  const all=(b.type==='weapon'?wpList():chList().filter(p=>!NOGACHA_C.includes(p.id))).filter(p=>p.rar===rar);
   return all;
 }
 function pickOne(b,rar){
@@ -2400,6 +2406,7 @@ function buildTown(vi){
     for(const n of npcs)n.y+=P;
     C.unshift(...Z);top=P;H2=h+P;
   }
+  if(v.name.replace(/^.* /,'')==='マツザキ'){C[top+1][cx+3]={t:'tbox',id:'michizane'};C[top+2][cx+3]={t:'s'};}
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
@@ -2497,6 +2504,8 @@ function drawCell(c,sx,sy,city){
   const ground=()=>{R(sx,sy,16,16,GC);if(city){R(sx,sy+15,16,1,'#8c8c8c');R(sx+15,sy,1,16,'#8c8c8c');}else{R(sx+3,sy+4,1,1,'#c8a058');R(sx+11,sy+10,1,1,'#c8a058');}};
   switch(c.t){
     case 'g':ground();break;
+    case 'tbox':{ground();const op=G.tbox&&G.tbox[c.id];R(sx+2,sy+6,12,9,'#7c4c10');R(sx+2,sy+6,12,1,'#000');R(sx+2,sy+14,12,1,'#000');R(sx+7,sy+6,2,9,'#f8b800');
+      if(op){R(sx+2,sy+3,12,3,'#3c2410');}else{R(sx+2,sy+3,12,4,'#a05000');R(sx+7,sy+3,2,4,'#f8b800');R(sx+6,sy+9,4,3,'#f8b800');if((frame>>4)%4===0)R(sx+12,sy+2,2,2,'#fcfcfc');}break;}
     case 'kanst':R(sx,sy,16,16,'#2c2c3c');R(sx,sy+15,16,1,'#24242c');R(sx+15,sy,1,16,'#24242c');break;
     case 'kanwall':{R(sx,sy,16,16,'#18182c');const n=isNight();for(let k=0;k<4;k++){const lit=((c.x||0)*7+k*3+(frame>>7))%5<2;R(sx+2+(k%2)*7,sy+2+(k>>1)*7,5,4,n&&lit?'#f8d878':'#3c3c5c');}break;}
     case 'kshop':kanShopCell(c,sx,sy);break;
@@ -2651,6 +2660,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&TW.ship&&shipBump(c))return;
     if(fresh&&TW.kjo&&kjoBump(c))return;
     if(fresh&&TW.jogai&&jogaiBump(c))return;
+    if(fresh&&c.t==='tbox'){tboxOpen(c);return;}
     if(fresh&&TW.kanIn&&kanBump(c))return;
     if(fresh&&TW.kanShop&&kanShopBump(c))return;
     if(fresh&&(c.t==='cdoor'||c.t==='arena')){if(c.t==='cdoor')coloFac();else dialog('白い 石と 金で できた 巨大な 円形闘技場だ。\n中から 観客の 歓声が 聞こえる！');return;}
@@ -4691,6 +4701,10 @@ function gsealScr(g){const st=gmS(),E=GSEAL_EN[g.id];
   if(st.seal&&st.seal[g.id]){dialog([`${g.n}。 ${g.desc}。`,...E.lore]);return;}
   choice(`${g.n}\n${g.desc}。\n守護者に 挑みますか？（3連戦・推奨Lv29999）`,['挑む','やめる'],r=>{if(r===0)startGm('seal',{id:g.id});},96);}
 
+/* 宝箱（防府天満宮の 本殿の 裏手） */
+function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は からっぽだ。');return;}
+  if(c.id==='michizane'){dialog(['本殿の 裏手に まわると…','梅の 花びらが 舞う 中に\n古びた 宝箱が ある。','宝箱を 開けた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
+    dialog(nw?['まばゆい 雷光が ほとばしった…！','「東風吹かば にほひおこせよ 梅の花…」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）']:['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);});return;}}
 /* ===================== グンマー帝国 総長総選挙編（グンマー解放後・立党で 解放） ===================== */
 function gsS(){if(!G.gs)G.gs={ch:0,rec:{},sup:{},day:{}};for(const k of ['rec','sup','day'])if(!G.gs[k])G.gs[k]={};return G.gs;}
 const gsOpen=()=>gmS().ch>=8&&!!G.pol,GS_NEED=5;
