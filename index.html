@@ -438,7 +438,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'祝詞':{a:.6,m:1.9},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'祝詞':{a:.6,m:1.9},'笏':{a:1.1,m:1.9},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid'];
 const BASE_SKILLS={
@@ -503,6 +503,7 @@ const BASE_SKILLS={
   dazaifu:{name:'ダザイフバースト',mp:40,target:'enemies',kind:'mag',power:4.6,verb:'放った'},
   kitano:{name:'キタノサンダー',mp:18,target:'enemies',kind:'mag',power:2.9,verb:'落とした'},
   umekaze:{name:'梅風',mp:20,target:'allies',kind:'song',power:1.4,amount:.8,turns:4,verb:'吹かせた'},
+  sakatari:{name:'佐加太利',mp:70,target:'enemies',kind:'xr',verb:'降ろした'},
   cg_omu:{name:'ケチャップ アート',mp:4,target:'enemy',kind:'mag',power:1.8,verb:'描いた'},
   cg_kyun:{name:'萌え萌え きゅん',mp:5,target:'allies',kind:'heal',power:1.0,verb:'唱えた'},
   cg_cheki:{name:'チェキ会',mp:6,target:'allies',kind:'buff',stat:'atk',amount:.4,turns:3,verb:'ひらいた'},
@@ -567,7 +568,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -696,7 +697,8 @@ function rebuild(){
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const NOGACHA=['w_gaius'];
+const NOGACHA=['w_gaius','w_umegae'];
+const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_umegae');};
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
 
 /* ===================== マップ ===================== */
@@ -995,7 +997,7 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);return b;};
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);return b;};
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
 const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
@@ -1028,17 +1030,18 @@ const SPEAR_NG='ロンギヌス・カシウスと ガイウスの槍は\n同じ 
 const hasGaius=id=>{const c=G.chars[id];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius');};
 /* 武器の 効果説明 */
 function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=d.type;
-  if(d.rar===6)L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
+  if(d.rar===6&&b!=='w_umegae')L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
   if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
-  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');
+  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
+  if(b==='w_umegae')L.push('道真公が 装備すると：','\t専用スキル「佐加太利」が 使える','\tキタノサンダーの 威力 1.5倍（紅白の雷）','\t梅風の 回復量 1.5倍');
   if(b==='w_longinus'||b==='w_cassius')L.push('ロンギヌスと カシウスを 1人で 両方 持つと 共鳴：','\t全ステータス +175%＋スキル「アディショナルインパクト」','※ガイウスの槍とは 同じ編成に 入れられない');
   if(b==='w_gaius')L.push('装備すると 全ステータス +200%','固有スキル「neonGenesis」（1戦に1回）：','\tHP・MP 1.5倍で 全回復＋敵全体に 超絶ダメージ','\t＋アディショナルインパクト','※ロンギヌス・カシウスとは 同じ編成に 入れられない');
   if(!L.length)L.push('特殊な 効果は ない');return L;}
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
-const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
+const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -1181,6 +1184,7 @@ function drawWIcon(id,x,y,sc=1){
     case '大幣':P(7,1,2,15,'#c89060');P(5,2,6,1,col);for(let k=0;k<4;k++){P(3+(k&1),4+k*2,3,2,'#fcfcfc');P(10-(k&1),4+k*2,3,2,'#fcfcfc');}break;
     case '扇':for(let r=0;r<8;r++){const w=Math.round(Math.sqrt(64-r*r));P(8-w,9-r,w*2,1,r%2?col:'#fcfcfc');}P(7,9,2,6,'#7c4c10');break;
     case '弓':for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#a05000');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#bcbcbc');P(12,7,2,3,col);break;
+    case '笏':for(let k=0;k<12;k++)P(4+Math.round(k*.35),3+k,3,1,'#c89060');P(4,3,3,1,'#e8c08a');P(5,14,2,1,'#7c4c10');for(let k=0;k<6;k++)P(8+k,6-Math.round(k*.6),1,1,'#503000');for(const [a,b2] of [[9,4],[12,2],[13,5],[10,7]]){P(a,b2,2,2,'#f878f8');P(a,b2,1,1,'#fcfcfc');}P(14,1,1,1,col);break;
     case 'マイク':P(6,8,4,8,'#3c3c3c');P(5,1,6,7,'#f8b800');P(6,2,4,5,'#a07800');for(let y=2;y<7;y+=2)P(5,y,6,1,'#fce0a8');P(7,15,2,1,'#d82800');break;
     case '狙撃銃':P(1,8,14,2,'#3c3c3c');P(9,10,3,4,'#7c4c10');P(3,6,5,2,'#000000');P(4,5,3,1,'#3cbcfc');P(13,7,2,1,'#5c5c5c');P(1,11,4,3,'#a81000');P(2,10,2,1,'#f8b800');break;
     case '飲料':P(4,4,8,11,'#bcbcbc');P(5,5,6,9,'#e8c39e');P(5,5,6,2,'#f8e8d0');P(5,12,2,1,'#503000');P(8,13,2,1,'#503000');P(9,0,2,5,'#d82800');P(3,4,10,1,'#fcfcfc');break;
@@ -1609,7 +1613,7 @@ function equipMenu(id,slot){
   slot=slot||'wpn';
   const list=()=>ownedWeapons().filter(w=>canEquip(id,w)&&(baseTwo(id)||slot==='wpn'||isSpear(w)||!isSpear(G.chars[id].wpn)));
   const m=mkMenu([],{x:4,y:8,w:248,rows:12,title:`${CH[id].short}の 武器${twoSlot(id)?(slot==='wpn'?'（1つめ）':'（2つめ）'):''}`});
-  const refresh=()=>{m.items=[{t:'（はずす）'},...list().map(w=>{const s=wstat(w),o=wOwner(w);return{tag:RAR[WPD[w].rar].n,tcol:RAR[WPD[w].rar].c,t:WPD[w].name+(o&&o!==id?'＊':'')+(GOD_BOOST[w]?`（神なら${GOD_BOOST[w]}倍）`:WPD[w].type==='神宝'?'（神専用）':WPD[w].type==='仏具'?'（仏陀専用）':WPD[w].type==='飲料'?'（先輩専用）':WPD[w].type==='マイク'?'（ビート兄専用）':WPD[w].type==='狙撃銃'?'（狙撃弟専用）':''),r:xrwOk(id,w)?`攻${fmt(s.atk)} 魔${fmt(s.mag)}`:`Lv${XRW_LV+1}〜`,dis:!xrwOk(id,w),col:G.chars[id][slot]===w?'#f8b800':null};})];};refresh();
+  const refresh=()=>{m.items=[{t:'（はずす）'},...list().map(w=>{const s=wstat(w),o=wOwner(w);return{tag:RAR[WPD[w].rar].n,tcol:RAR[WPD[w].rar].c,t:WPD[w].name+(o&&o!==id?'＊':'')+(GOD_BOOST[w]?`（神なら${GOD_BOOST[w]}倍）`:WPD[w].type==='神宝'?'（神専用）':WPD[w].type==='仏具'?'（仏陀専用）':WPD[w].type==='飲料'?'（先輩専用）':WPD[w].type==='マイク'?'（ビート兄専用）':WPD[w].type==='狙撃銃'?'（狙撃弟専用）':WPD[w].type==='笏'?'（道真公専用）':''),r:xrwOk(id,w)?`攻${fmt(s.atk)} 魔${fmt(s.mag)}`:`Lv${XRW_LV+1}〜`,dis:!xrwOk(id,w),col:G.chars[id][slot]===w?'#f8b800':null};})];};refresh();
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r==null)return;
       if(r===0)G.chars[id][slot]=null;else{const w=list()[r-1],o=wOwner(w);{const c=G.chars[id],sv=c[slot];c[slot]=w;const bad=spearClash(G.party.includes(id)?G.party:[id]);c[slot]=sv;if(bad){sfx('ng');toast(SPEAR_NG);return;}}if(!xrwOk(id,w)){sfx('ng');toast(`XR武器は キャラLv${XRW_LV+1}以上で 装備できる（今 Lv${G.chars[id].lv}）`);return;}if(o){if(G.chars[o].wpn===w)G.chars[o].wpn=null;if(G.chars[o].wpn2===w)G.chars[o].wpn2=null;}G.chars[id][slot]=w;}
       if(!twoSlot(id))G.chars[id].wpn2=null;fixHp(id);save();pop();toast(spearPair(id)?'ロンギヌスと カシウス… 双槍が 共鳴した！ 全ステータス +175%':hasGaius(id)?'ガイウスの槍… 希望の 力！ 全ステータス +200%':'そうびを かえた');},
@@ -2001,7 +2005,8 @@ function pAct(i){
     const healAmt=p=>Math.round(st().mag*1.8*p*rm*(.95+rnd()*.1));
     switch(sk.k){
       case 'phys':case 'mag':{
-        const one=e=>sk.k==='phys'?phys(st().atk,e.def,sk.p*(sk.k==='phys'?1:rm)):magd(st().mag,e.def,sk.p*rm);
+        const km=(cmd.k==='kitano'&&hasUmegae(m.id))?1.5:1;if(km>1)P_(()=>ok.v?'梅枝の笏が 光り…\n紅白の 雷が 走った！':null);
+        const one=e=>sk.k==='phys'?phys(st().atk,e.def,sk.p*(sk.k==='phys'?1:rm)):magd(st().mag,e.def,sk.p*rm*km);
         if(sk.tg==='enemies')P_(()=>{if(!ok.v)return null;NOW(aliveEn().map(e=>()=>e.alive?dmgEnemy(e,one(e)):null));return null;});
         else for(let h=0;h<sk.hits;h++)P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);return e?dmgEnemy(e,one(e)):null;});
         break;}
@@ -2032,7 +2037,7 @@ function pAct(i){
         L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def,spd:e.spd};e.atk=Math.round(e.atk*sk.amt);e.mag=Math.round(e.mag*sk.amt);e.def=Math.round(e.def*sk.amt);if(e.spd)e.spd=Math.round(e.spd*sk.amt);}e.deb=Math.max(e.deb||0,sk.turns);});
         return `「渚まで 走るのは メッ！」\n敵は しゅんと なった…\n敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`;});break;
       case 'song':P_(()=>{if(!ok.v)return null;BT.pt.forEach(t=>{t.ab=t.db=sk.turns;t.av=t.dv=sk.amt;});
-        NOW(BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,healAmt(sk.p));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;}));return 'みかたの 攻撃力と 守備力が あがった！';});break;
+        const um=(cmd.k==='umekaze'&&hasUmegae(m.id))?1.5:1;NOW(BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,healAmt(sk.p*um));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;}));return um>1?'梅枝の笏から 東風が 吹きわたる！\nみかたの 攻撃力と 守備力が あがった！':'みかたの 攻撃力と 守備力が あがった！';});break;
     }
   }
 }
@@ -2044,13 +2049,14 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='kuniumi'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;t.ab=t.db=5;t.av=t.dv=1.0;});sfx('heal');BT.shake=10;return '天沼矛で 混沌を かきまわし 国を 生みだす！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\nみかたの 攻撃・守備が 5ターン +100%！';}
         if(k==='yomotsu'){NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.4))):null));live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.4);e.mag=Math.round(e.mag*.4);e.def=Math.round(e.def*.4);}e.deb=5;});sfx('magic');BT.shake=16;return '黄泉の 国の 主が 姿を あらわす…\n敵全体の HPを 最大HPの 40% 削る！\n敵の 攻撃・魔力・守備が 5ターン -60%！';}
         if(k==='moekyun'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;t.ab=t.db=4;t.av=t.dv=.8;});live().forEach(e=>{e.stun=3;e.charm=1;});sfx('heal');BT.shake=10;return 'もも色の 光が はじけた！\n「萌え萌え きゅん♡」\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵は ももに 見とれて 3ターン 動けない！';}
+        if(k==='sakatari'){sfx('magic');BT.shake=26;const L=live();L.forEach(e=>{e.stun=Math.max(e.stun||0,2);e.charm=2;});NOW(['雷光が 敵全体を 打ちすえる！',...L.map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))+magd(me.mag,e.def,4)):null),()=>BT.en.some(e=>e.alive)?'敵は しびれて 2ターン 動けない！':null,'梅の 香りが みかたを つつむ…',...BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,Math.round(cstat(t.id,t).hp*.5));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;})]);return '酒垂（さかたり）の 山に 神光が 降りる！';}
         if(k==='yuiga'){m.db=5;m.dv=4;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
         return null;}
 function pExtra(i){const m=BT.pt[i];if(!isAlive(m)||!(m.extra>0))return;BT.pend.push('\f');const nm=CH[m.id].short;
   P_(`${nm}の 追加攻撃！`);P_(()=>{const e=BT.en.filter(x=>x.alive).sort((a,b)=>a.hp-b.hp)[0];if(!e)return null;return dmgEnemy(e,phys(cstat(m.id,m).atk,e.def,1.2));});}
 function eAct(i){
   const e=BT.en[i];if(!e.alive)return;const al=BT.pt.filter(isAlive);if(!al.length)return;BT.pend.push('\f');
-  if(e.stun>0){P_(e.charm?`${e.label}は ももに 見とれて 動けない…`:`${e.label}は 荒波に のまれて 動けない！`);return;}
+  if(e.stun>0){P_(e.charm===2?`${e.label}は 雷に しびれて 動けない！`:e.charm?`${e.label}は ももに 見とれて 動けない…`:`${e.label}は 荒波に のまれて 動けない！`);return;}
   const tz=BT.taunt&&BT.taunt.t>0&&isAlive(BT.pt[BT.taunt.i])?BT.pt[BT.taunt.i]:null;
   if(tz){const p=e.heavy&&rnd()<.25?1.8:1;P_(`${e.label}は 仏陀に 引きよせられた！`);P_(()=>isAlive(tz)?dmgParty(tz,Math.max(phys(e.atk,cstat(tz.id,tz).def,p),e.magic?magd(e.mag,cstat(tz.id,tz).def,.8):0)):null);return;}
   if(e.boss&&rnd()<.4){P_(`${e.label}は 八つの首から 炎を はいた！`);P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>()=>isAlive(m)?dmgParty(m,magd(e.mag,cstat(m.id,m).def,.9)):null));return null;});return;}
@@ -2074,6 +2080,7 @@ function autoCmd(i){
   if(can('nichirin')&&BT.pt.some(t=>isAlive(t)&&t!==m&&G.chars[t.id].mp<cstat(t.id,t).mp*.5)&&rnd()<.7)return{type:'skill',k:'nichirin'};
   if(can('neongenesis')&&BT.en.some(e=>e.alive)&&(BT.pt.some(t=>!isAlive(t))||alive.some(j=>hr(j)<.5)||rnd()<.25))return{type:'skill',k:'neongenesis'};
   if(can('addimpact')&&BT.en.some(e=>e.alive)&&!G.party.some(p=>ngReady(p))&&rnd()<.6)return{type:'skill',k:'addimpact'};
+  if(can('sakatari')&&BT.en.some(e=>e.alive)&&(low.length||!BT.en.some(e=>e.alive&&e.stun>0))&&rnd()<.6)return{type:'skill',k:'sakatari'};
   {const xk=XRSK[m.id];if(xk&&can(xk)){const anyEn=BT.en.some(e=>e.alive);
     if(xk==='ujigami'&&anyEn&&rnd()<.6)return{type:'skill',k:xk};
     if(xk==='unabarising'&&anyEn&&!BT.en.some(e=>e.alive&&e.stun>0))return{type:'skill',k:xk};
@@ -2120,6 +2127,7 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
   neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
+  sakatari:'梅枝の笏を 装備した 道真公 専用。\n敵全体に 最大HPの 30%＋強力な 雷撃、\n敵全体を 2ターン 行動不能に し、\n味方全体の HPを 最大HPの 50% 回復する',
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
@@ -2406,7 +2414,7 @@ function buildTown(vi){
     for(const n of npcs)n.y+=P;
     C.unshift(...Z);top=P;H2=h+P;
   }
-  if(v.name.replace(/^.* /,'')==='マツザキ'){C[top+1][cx+3]={t:'tbox',id:'michizane'};C[top+2][cx+3]={t:'s'};}
+  if(v.name.replace(/^.* /,'')==='マツザキ'){C[top+1][cx+3]={t:'tbox',id:'michizane'};C[top+2][cx+3]={t:'s'};C[top+1][cx-3]={t:'tbox',id:'umegae'};C[top+2][cx-3]={t:'s'};}
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
@@ -4737,7 +4745,10 @@ function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は から
     if(!ok){sfx('ng');dialog(['…宝箱は しんと 静まりかえっている。','（下の句が ちがうようだ）']);return;}
     sfx('ok');dialog(['「あるじなしとて 春な忘れそ」','宝箱が かすかに ふるえ…\nふたが ひとりでに 開いた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
     if(!nw){dialog(['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);return;}
-    michiManifest(()=>{});});}));return;}}
+    michiManifest(()=>{});});}));return;}
+  if(c.id==='umegae'){if(!G.party.includes('michizane')){dialog(['本殿の 反対側の 奥に…','梅の 枝が からみついた\n宝箱が ある。','…ふたは びくとも しない。','（天神さまの 気配が する…\n　道真公を 連れてくれば 開くかもしれない）']);return;}
+    dialog(['道真公「…この 梅の枝。\n　わが 庭に 咲いていた ものか」','道真公が 宝箱に 手を かざすと\n梅の 枝が するすると ほどけていく…'],()=>{G.tbox[c.id]=1;const nw=addWeapon('w_umegae');sfx('g5');save();
+      dialog(nw?['XR専用武器 「梅枝の笏」を 手に入れた！','道真公「東風（こち）よ、ふたたび…。\n　この 笏を もって、酒垂（さかたり）の 加護を 授けよう」','（道真公が 装備すると 専用スキル\n　「佐加太利」が 使えるように なる）']:['梅枝の笏の 力が 高まった！（重ねて＋1）']);});return;}}
 /* ===================== グンマー帝国 総長総選挙編（グンマー解放後・立党で 解放） ===================== */
 function gsS(){if(!G.gs)G.gs={ch:0,rec:{},sup:{},day:{}};for(const k of ['rec','sup','day'])if(!G.gs[k])G.gs[k]={};return G.gs;}
 const gsOpen=()=>gmS().ch>=8&&!!G.pol,GS_NEED=5;
