@@ -233,7 +233,22 @@ function nightShade(f=1){const h=nowMin()/60;let c=null,a=0;
   if(h<4.5){c='#000428';a=.5;}else if(h<6){c='#100838';a=.06+.44*(6-h)/1.5;}else if(h<7){c='#f8a878';a=.1*(7-h);}
   else if(h>=16.5&&h<18.5){c='#f86800';a=.16*(h-16.5)/2;}else if(h>=18.5&&h<19.5){c='#301050';a=.16+.26*(h-18.5);}else if(h>=19.5){c='#000838';a=.42+.08*Math.min(1,(h-19.5)/4);}
   a*=f;if(c&&a>0){ctx.globalAlpha=a;R(0,0,W,H,c);ctx.globalAlpha=1;}return a;}
-function clockBadge(){const n=isNight();win(196,21,56,28);txt(clockStr(),224,27,n?'#a4b4fc':'#f8d878','center');txt(todName(),224,38,'#bcbcbc','center');}
+const DOWN=['日','月','火','水','木','金','土'],dow=(d=G.day)=>(d+5)%7,hm=m=>`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+function clockBadge(){const n=isNight(),w=dow();win(196,21,56,28);txt(clockStr(),224,27,n?'#a4b4fc':'#f8d878','center');txt(`${todName()}（${DOWN[w]}）`,224,38,w===0?'#fc7460':w===6?'#68ccfc':'#bcbcbc','center',50);}
+/* 競馬（中央競馬に ならう）：土・日 開催・1日 12レース・メインは 11R */
+const KPOST=[595,625,655,685,735,765,795,825,855,890,940,980];
+const keibaDay=()=>dow()===6||dow()===0;
+const keibaRaceNo=()=>{if(!keibaDay())return 0;const m=nowMin(),i=KPOST.findIndex(t=>t>=m);return i<0?0:i+1;};
+function keibaClosed(){const m=nowMin();
+  if(!keibaDay())return[`本日（${DOWN[dow()]}曜日）は 開催日では ありません。`,'競馬は 土曜・日曜の 開催です。\n（1R 9:55 〜 12R 16:20　メインは 11R）'];
+  if(m<9*60)return['まだ 開門前です。（開門 9:00）','1R の 発走は 9:55 です。'];
+  if(!keibaRaceNo())return['本日の 全レースは 終了しました。','またの ご来場を お待ちしております。'];return null;}
+/* ボートレース：トイシは モーニング、 ほかは デイ／ナイター。 毎日 12レース */
+const BTYPE=vi=>VIL[vi].kyotei?'morning':(vi%3===0?'night':'day'),BTYPEN={morning:'モーニング',day:'デイ',night:'ナイター'};
+const BPOST=vi=>{const t=BTYPE(vi),[st,g]=t==='morning'?[510,25]:t==='night'?[910,30]:[645,30];return [...Array(12)].map((_,k)=>st+k*g);};
+const boatRaceNo=vi=>{const m=nowMin(),P=BPOST(vi),i=P.findIndex(t=>t>=m);return i<0?0:i+1;};
+function boatClosed(vi){const m=nowMin(),P=BPOST(vi),info=`（${BTYPEN[BTYPE(vi)]}開催　1R ${hm(P[0])} 〜 12R ${hm(P[11])}）`;
+  if(m<P[0]-60)return[`まだ 開場前です。（開場 ${hm(P[0]-60)}）`,info];if(!boatRaceNo(vi))return['本日の 全レースは 終了しました。',info];return null;}
 
 /* ===================== サウンド ===================== */
 let AC=null,master=null,muted=false,nbuf=null;
@@ -4915,7 +4930,7 @@ function undergroundScene(){
 const BCOL=['#fcfcfc','#000000','#d82800','#0058f8','#f8b800','#00a800'],BCOLN=['白','黒','赤','青','黄','緑'];
 const RSEI=['峰','浜田','潮見','海野','波多','岬','沖田','汐崎','磯部','船越','湊','網代','舟橋','渡辺','島'],RMEI=['太郎','一真','航','翔','颯','凪','舵','渚','汐里','海斗','帆波','大洋'];
 function raceCard(vi){
-  G.races=G.races||{};const no=G.races['v'+vi]||1,r=lcg(vi*7919+G.day*131+no*17);
+  const no=boatRaceNo(vi)||12,r=lcg(vi*7919+G.day*131+no*17);
   const LW=[1,.62,.5,.42,.35,.3],CL=[['A1',1.5],['A2',1.2],['B1',1],['B2',.8]];
   const boats=[0,1,2,3,4,5].map(i=>{const c=CL[Math.min(3,Math.floor(r()*r()*4.4))],m=.85+r()*.3;
     return{lane:i+1,name:RSEI[Math.floor(r()*RSEI.length)]+' '+RMEI[Math.floor(r()*RMEI.length)],cls:c[0],motor:Math.round(m*100)/100,w:LW[i]*c[1]*m};});
@@ -4925,16 +4940,16 @@ function raceProb(boats,order){let tot=boats.reduce((a,b)=>a+b.w,0),p=1;for(cons
 const raceOdds=(boats,order)=>Math.max(1.0,Math.round(.75/raceProb(boats,order)*10)/10);
 function raceResult(boats){const left=[0,1,2,3,4,5],out=[];while(left.length){const tot=left.reduce((a,i)=>a+boats[i].w,0);let x=rnd()*tot,k=0;for(;k<left.length-1;k++){x-=boats[left[k]].w;if(x<0)break;}out.push(left.splice(k,1)[0]);}return out;}
 function raceFac(vi0){
-  const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[];let card=raceCard(vi);
+  const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[];{const cl=boatClosed(vi);if(cl){dialog(cl);return;}}let card=raceCard(vi);
   const BT_=[['単勝',1],['2連単',2],['3連単',3]];
   const m=mkMenu([],{x:4,y:150,w:132,rows:6,rh:13});
-  const items=()=>['単勝を 買う','2連単を 買う','3連単を 買う',`レース スタート（${bets.length}点）`,'出走表の 説明','でる'];m.items=items();
+  const items=()=>['単勝を 買う','2連単を 買う','3連単を 買う',`${card.no}R 発走 ${hm(BPOST(vi)[card.no-1])}（${bets.length}点）`,'出走表の 説明','でる'];m.items=items();
   const pickLanes=(n,cb,sel=[])=>{if(sel.length===n){cb(sel);return;}
     const lanes=card.boats.map((b,i)=>i).filter(i=>!sel.includes(i));
     listPick(`${['1着','2着','3着'][sel.length]}を えらぶ`+(sel.length?`（${sel.map(i=>i+1).join('-')}-?）`:''),lanes.map(i=>({tag:String(i+1),tcol:i===1?'#7c7c7c':BCOL[i],t:card.boats[i].name,r:card.boats[i].cls})),k=>pickLanes(n,cb,[...sel,lanes[k]]));};
   const buy=(n)=>pickLanes(n,sel=>{const od=raceOdds(card.boats,sel);
     amtChoice(`${BT_[n-1][0]} ${sel.map(i=>i+1).join('-')}　オッズ ${od.toFixed(1)}倍\nいくら 買いますか？`,G.coins,a=>{G.coins-=a;bets.push({t:BT_[n-1][0],sel,od,amt:a});sfx('coin');save();toast(`${BT_[n-1][0]} ${sel.map(i=>i+1).join('-')} ${fmt(a)}イェソ`);});});
-  const start=()=>{
+  const start=()=>{if(!boatRaceNo(vi)){dialog('本日の 全レースは 終了しました。');return;}G.mn=Math.max(nowMin(),BPOST(vi)[card.no-1]);
     const res=raceResult(card.boats),T=res.map((b,rank)=>0);const fin=[];res.forEach((b,rank)=>fin[b]=1+rank*.035+rnd()*.02);
     let t=0;const LEN=300;sfx('enc');playBGM('battle');
     push({full:true,upd(){t++;if(I.A&&t>30)t=Math.max(t,LEN);if(t>=LEN){pop();finish(res);}},
@@ -4953,10 +4968,11 @@ function raceFac(vi0){
   const finish=(res)=>{
     const order=res.map(i=>i+1).join('-');let pay=0;const lines=[];
     for(const b of bets){const hit=b.sel.every((x,k)=>res[k]===x);if(hit){const p=Math.floor(b.amt*b.od);pay+=p;lines.push(`的中！ ${b.t} ${b.sel.map(i=>i+1).join('-')}　${fmt(p)}イェソ`);}}
-    G.coins+=pay;G.races['v'+vi]=(G.races['v'+vi]||1)+1;bets.length=0;card=raceCard(vi);save();playBGM('village');
+    G.coins+=pay;G.mn=Math.max(nowMin(),BPOST(vi)[card.no-1]+2);bets.length=0;const last=!boatRaceNo(vi);if(!last)card=raceCard(vi);save();playBGM('village');
     const head=`着順：${order}\n1着 ${res[0]+1}号艇（${BCOLN[res[0]]}）`;
-    if(pay){sfx('win');dialog([head,...lines.slice(0,3).map(x=>x),`払い戻し 合計 ${fmt(pay)}イェソ！`]);}
-    else{sfx('cancel');dialog([head,'舟券は ハズレた…']);}
+    const tail=last?['本日の 全レースが 終了しました。']:[];const after=()=>{if(last)pop();};
+    if(pay){sfx('win');dialog([head,...lines.slice(0,3).map(x=>x),`払い戻し 合計 ${fmt(pay)}イェソ！`,...tail],after);}
+    else{sfx('cancel');dialog([head,'舟券は ハズレた…',...tail],after);}
   };
   push({full:true,canBack:true,
     upd(){m.items=items();const r=menuUpd(m);if(r==null)return;
@@ -4990,7 +5006,7 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'サイキナヲ',d:'現代の 気まぐれ 名馬。 スタートは すごく 遅いが\n最後の 最後の 最後で 本気を 出す（かも しれない）',w:r=>1.6+r()*.8,pace:1,saiki:1}];
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
-function keibaCard(vi){G.keiba=G.keiba||{};const no=G.keiba['v'+vi]||1,r=lcg(vi*6151+G.day*97+no*29),cap=!!VIL[vi].capital,H1=cap?MH1:KH1,H2=cap?MH2:KH2,J1=cap?MJ1:KJ1,J2=cap?MJ2:KJ2;
+function keibaCard(vi){G.keiba=G.keiba||{};const no=keibaRaceNo()||12,r=lcg(vi*6151+G.day*97+no*29),cap=!!VIL[vi].capital,H1=cap?MH1:KH1,H2=cap?MH2:KH2,J1=cap?MJ1:KJ1,J2=cap?MJ2:KJ2;
   const used=new Set(),horses=[0,1,2,3,4,5,6,7].map(i=>{let n;do{n=H1[Math.floor(r()*H1.length)]+H2[Math.floor(r()*H2.length)];}while(used.has(n));used.add(n);
     const sp=.55+r()*r()*1.3,cd=.85+r()*.3;let j;do{j=J1[Math.floor(r()*J1.length)]+' '+J2[Math.floor(r()*J2.length)];}while(used.has(j));used.add(j);return{name:n,jk:j,kg:440+Math.floor(r()*80),cd:Math.round(cd*100)/100,w:Math.pow(sp*cd,2.2)};});
   const sp=keibaSpecial(vi,no),g1=!!sp&&sp.grade===1,gr=sp?sp.grade:0;
@@ -5007,8 +5023,9 @@ function keibaCard(vi){G.keiba=G.keiba||{};const no=G.keiba['v'+vi]||1,r=lcg(vi*
   return{no,horses,baba:bb[0],noise:bb[1],dist,top3,pair:k=>pair[k]||0,g1,sp,gname:sp?`G${sp.grade} ${sp.title||sp.name}`:'',course,rate:gr===1?.85:gr===2?.82:gr===3?.8:.78};}
 /* 特別競走：コクラ＝タムニィ杯、 マホロバ＝イツク杯・年末の アリウマ記念、 自分の 記念競走 */
 function keibaSpecial(vi,no){const K=G.kinen;if(K&&K.vi===vi)return{name:K.name,title:`第${((G.kinenN||{})[K.name]||0)+1}回 ${K.name}`,grade:K.grade,own:1,dist:['','芝2400m','芝2000m','芝1600m'][K.grade]};
-  if(VIL[vi].capital){const yr=Math.floor(G.day/360);if(G.day%360>=350&&!((G.arima||{})[yr]))return{name:'アリウマ記念',grade:1,arima:yr,dist:'芝2500m'};if(no%10===0)return{name:'イツク杯',grade:1,dist:'芝2000m'};return null;}
-  return no%10===0?{name:'タムニィ杯',grade:1,dist:'芝2400m'}:null;}
+  const wk=Math.floor((G.day-1)/7),main=no===11&&dow()===0;
+  if(VIL[vi].capital){const yr=Math.floor(G.day/360);if(main&&G.day%360>=350&&!((G.arima||{})[yr]))return{name:'アリウマ記念',grade:1,arima:yr,dist:'芝2500m'};if(main&&wk%2===1)return{name:'イツク杯',grade:1,dist:'芝2000m'};return null;}
+  return main&&wk%2===0?{name:'タムニィ杯',grade:1,dist:'芝2400m'}:null;}
 const kW=(h,noise)=>Math.pow(h.w*(h.mul||1),1/(1+noise*2));
 function keibaResult(hs,noise,rr=rnd){const sk=hs.find(h=>h.saiki);let honki=null;if(sk){honki=rr()<SAIKI_P;sk.mul=honki?3:.3;}const out=keibaResult0(hs,noise,rr);if(sk)sk.mul=undefined;out.honki=honki;return out;}
 function keibaResult0(hs,noise,rr){const left=hs.map((h,i)=>i),out=[];while(left.length){const tot=left.reduce((a,i)=>a+kW(hs[i],noise),0);let x=rr()*tot,k=0;for(;k<left.length-1;k++){x-=kW(hs[left[k]],noise);if(x<0)break;}out.push(left.splice(k,1)[0]);}return out;}
@@ -5033,7 +5050,7 @@ function kCombos(sh,mode,cols){const S=KSHIKI[sh],n=S.n,out=[],seen=new Set(),sr
   else{const rec=(c,d)=>{if(d===n){add(c);return;}for(const x of srt(cols[d]))rec([...c,x],d+1);};rec([],0);}
   return out;}
 const KMAXPT=600;
-function markCard(vi,onDone){const card=keibaCard(vi);let sh=0,mode=0,cols=[new Set(),new Set(),new Set()],lines=[],cur='s0';
+function markCard(vi,onDone){{const cl=keibaClosed();if(cl){dialog(cl);return;}}const card=keibaCard(vi);let sh=0,mode=0,cols=[new Set(),new Set(),new Set()],lines=[],cur='s0';
   const S=()=>KSHIKI[sh],ncol=()=>S().n===1||mode===1?1:S().n,pend=()=>lines.reduce((a,l)=>a+l.c.length*l.amt,0),ptsAll=()=>lines.reduce((a,l)=>a+l.c.length,0);
   const reset=()=>{cols=[new Set(),new Set(),new Set()];};
   const colName=d=>S().n===1?'馬番':mode===1?'BOX':S().u?`${d+1}頭目`:`${d+1}着`;
@@ -5096,16 +5113,16 @@ function kinenOpen(vi,after){const K=G.kinen;
       rePay(c,()=>{G.kinen={vi,name:v[0],grade:g};sink(c);sfx('lvup');save();dialog([`「${v[0]}」（G${g}）の 開催が 決まった！`,`次の レースが 第${((G.kinenN||{})[v[0]]||0)+1}回 ${v[0]}に なる。`,`賞金は ふだんの ${[0,30,10,5][g]}倍。${g===1?'\nG1なので 3連単 的中で 馬主にも なれる！':''}`]);after&&after();});},
       v=>!v[0]?'名前を 入れてください':['タムニィ杯','イツク杯','アリウマ記念'].includes(v[0])?'その 名前は 使えません':'');},
     i=>{const g=[3,2,1][i];return g?`G${g}：${['','強豪と 激レア馬2頭・賞金30倍・払戻率85%','強めの 馬と 激レア馬1頭・賞金10倍・払戻率82%','やや 強めの 馬・賞金5倍・払戻率80%'][g]}`:'';});}
-function keibaFac(vi0,pre){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(pre||[])];let card=keibaCard(vi);
+function keibaFac(vi0,pre){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(pre||[])];{const cl=keibaClosed();if(cl){if(bets.length){bets.forEach(b=>G.coins+=b.amt);cl.push('（買った 馬券の 代金は 返金された）');}dialog(cl);return;}}let card=keibaCard(vi);
   const kRareNote=()=>{const h=card.horses.find(x=>x.rare!=null);if(h){G.keibaSeen=G.keibaSeen||{};G.keibaSeen[h.name]=1;save();toast(`★激レア馬 ${h.name}が 出走！`);}};kRareNote();
   const BT_=['単勝','複勝','馬連','3連単'];
   const m=mkMenu([],{x:4,y:166,w:132,rows:5,rh:13});
-  const items=()=>['単勝を 買う（1着）','複勝を 買う（3着以内）','馬連を 買う（1-2着）','3連単を 買う',`発走！（${bets.length}点）`,'出馬表の 説明','マークカードで 買う','記念競走を 開く',...(G.uma?['馬主ルーム']:[]),'でる'];m.items=items();
+  const items=()=>['単勝を 買う（1着）','複勝を 買う（3着以内）','馬連を 買う（1-2着）','3連単を 買う',`${card.no}R 発走 ${hm(KPOST[card.no-1])}（${bets.length}点）`,'出馬表の 説明','マークカードで 買う','記念競走を 開く',...(G.uma?['馬主ルーム']:[]),'でる'];m.items=items();
   const pick=(n,cb,sel=[],lbl)=>{if(sel.length===n){cb(sel);return;}const L=card.horses.map((h,i)=>i).filter(i=>!sel.includes(i));
     listPick((lbl?lbl[sel.length]:`${['1着','2着','3着'][sel.length]}を えらぶ`)+(sel.length?`（${sel.map(i=>i+1).join('-')}-?）`:''),L.map(i=>({tag:String(i+1),tcol:KCOL[i]==='#000000'?'#7c7c7c':KCOL[i],t:card.horses[i].name,r:`${card.horses[i].pop}番人気`})),k=>pick(n,cb,[...sel,L[k]],lbl));};
   const buy=(t)=>{const n=t==='3連単'?3:t==='馬連'?2:1;pick(n,sel=>{const od=keibaOdds(card,t,sel);
     amtChoice(`${t} ${sel.map(i=>i+1).join(t==='馬連'?'=':'-')}　オッズ ${od.toFixed(1)}倍\nいくら 買いますか？`,G.coins,a=>{G.coins-=a;bets.push({t,sel,od,amt:a});sfx('coin');save();toast(`${t} ${sel.map(i=>i+1).join('-')} ${fmt(a)}イェソ`);});},[],t==='馬連'?['1頭目を えらぶ','2頭目を えらぶ']:t==='複勝'?['馬を えらぶ']:null);};
-  const start=()=>{const res=keibaResult(card.horses,card.noise),fin=[];{const di=card.horses.findIndex(h=>(h.rare!=null&&KRARE[h.rare].dq)||h.dope);if(di>=0&&res.indexOf(di)<3&&rnd()<(card.horses[di].dope?.25:KRARE[card.horses[di].rare].dq)){res.dq=di;}}res.forEach((h,rank)=>fin[h]=1+rank*.022+rnd()*.012);
+  const start=()=>{if(!keibaRaceNo()){dialog('本日の 全レースは 終了しました。');return;}G.mn=Math.max(nowMin(),KPOST[card.no-1]);const res=keibaResult(card.horses,card.noise),fin=[];{const di=card.horses.findIndex(h=>(h.rare!=null&&KRARE[h.rare].dq)||h.dope);if(di>=0&&res.indexOf(di)<3&&rnd()<(card.horses[di].dope?.25:KRARE[card.horses[di].rare].dq)){res.dq=di;}}res.forEach((h,rank)=>fin[h]=1+rank*.022+rnd()*.012);
     const pace=card.horses.map(h=>h.rare!=null?KRARE[h.rare].pace:.6+rnd()*.8);let t=0;const LEN=600,DIST=2200;sfx('enc');playBGM('battle');
     push({full:true,upd(){t++;if(I.A&&t>30)t=Math.max(t,LEN);if(t>=LEN+60){pop();finish(res);}},
       drw(){const pr=i=>{const q=Math.min(1.12,t/(LEN*fin[i]));if(card.horses[i].saiki){if(t<50)return 0;const q2=Math.min(1.12,(t-50)/(LEN*fin[i]-50));return q2<1?Math.pow(q2,res.honki?4.5:1.6)*(res.honki?1:.97):q2;}return Math.max(0,q<1?q+(pace[i]-1)*.06*Math.sin(q*Math.PI):q);};
@@ -5126,7 +5143,7 @@ function keibaFac(vi0,pre){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(pre
       else mineL.push(`◎あなたの ${H.name}は ${rk+1}着だった…`);});}
     let unlock=[];if(g1&&hit3&&!G.uma){G.uma={horses:[],entry:null};unlock=[`${gnm}の 3連単 的中！！`,'場内アナウンス「3連単 的中の お客さまに\n馬主の 資格が 贈られます！」','【馬主 解放】\n競馬場の メニューに「馬主ルーム」が 増えた！\n自分の 馬を 買って 育て、 レースに 出そう！'];}
     if(card.sp){if(card.sp.own){G.kinenN=G.kinenN||{};G.kinenN[card.sp.name]=(G.kinenN[card.sp.name]||0)+1;G.kinen=null;}if(card.sp.arima!=null){G.arima=G.arima||{};G.arima[card.sp.arima]=1;}}
-    G.coins+=pay;G.keiba['v'+vi]=(G.keiba['v'+vi]||1)+1;bets.length=0;const h=card.horses[res[0]];card=keibaCard(vi);save();playBGM('village');
+    G.coins+=pay;G.mn=Math.max(nowMin(),KPOST[card.no-1]+3);bets.length=0;const h=card.horses[res[0]];if(keibaRaceNo())card=keibaCard(vi);save();playBGM('village');
     const head=(gnm?`【${gnm}】\n`:'')+`着順：${res.slice(0,3).map(i=>i+1).join('-')}\n1着 ${res[0]+1}番 ${h.name}（${h.pop}番人気）`+(gnm?'':`\n騎手 ${h.jk}`);
     const pre=dq!=null?[`【審議】 ${dq+1}番 ${card0.horses[dq].name}は\nレース後の 検査で 失格と なった！`,'着順が 繰り上がります。']:[];
     const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
@@ -5551,14 +5568,14 @@ function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push
     {x:6,y:6,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「モニターの 前が いちばん 落ちつくわい」'},{x:11,y:10,col:'#00a800',hair:'#7c4c10',line:'客「1号艇から 流すのが 基本たい」'},{x:5,y:10,col:'#d82800',hair:'#000000',yoso:1,line:''}];
   if(r()<.12)npcs.push({x:14,y:9,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
   return{jogai:true,title:`場外発売所（${VIL[vi].name.replace(/^.* /,'')}）`,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
-function enterJogai(){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
+function enterJogai(){const m=nowMin();if(m<9*60||m>=21*60){dialog(['場外発売所は 閉まっている。','「営業時間 9:00〜21:00」']);return;}jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
 function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
 function jogaiBump(c){
-  if(c.t==='kwin'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('どの 競馬場の 馬券を 買いますか？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaCard(i).sp?keibaCard(i).gname:`第${(G.keiba&&G.keiba['v'+i])||1}R`})),k=>keibaFac(L[k]));return true;}
-  if(c.t==='kvote'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('マークカード：どの 競馬場？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaCard(i).sp?keibaCard(i).gname:`第${(G.keiba&&G.keiba['v'+i])||1}R`})),k=>markCard(L[k],bs=>keibaFac(L[k],bs)));return true;}
+  if(c.t==='kwin'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('どの 競馬場の 馬券を 買いますか？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし'})),k=>keibaFac(L[k]));return true;}
+  if(c.t==='kvote'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('マークカード：どの 競馬場？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし'})),k=>markCard(L[k],bs=>keibaFac(L[k],bs)));return true;}
   if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>(VIL[i].port||VIL[i].kyotei)&&!VIL[i].depop);
-    listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:`第${(G.races&&G.races['v'+i])||1}R`})),k=>raceFac(P[k]));return true;}
+    listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:boatRaceNo(i)&&nowMin()>=BPOST(i)[0]-60?`${boatRaceNo(i)}R ${hm(BPOST(i)[boatRaceNo(i)-1])}（${BTYPEN[BTYPE(i)]}）`:'発売なし'})),k=>raceFac(P[k]));return true;}
   if(c.t==='tvmon'){dialog('モニターに 各地の レースが 映っている。\n競馬と ボートレースが 交互に 流れる。');return true;}
   if(c.t==='kboard'){const cd=keibaCard(KOKURA());dialog([`コクラ 次は ${cd.sp?cd.gname:'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
   if(c.t==='kseat'){dialog('観戦用の いすだ。 新聞が 置きっぱなしに なっている。');return true;}
