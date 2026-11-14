@@ -2182,10 +2182,11 @@ function pAct(i){
     }
   }
 }
-function predEatAlly(m,i,fl){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return fl==='hyper'?null:'（捕食植物は 味方の 方を 見たが… 誰も いなかった）';
+function predEatAlly(m,i){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return '（捕食植物は 味方の 方を 見たが… 誰も いなかった）';
   const a=al[ri(0,al.length-1)],an=CH[a.id].short,ac=G.chars[a.id],cut=Math.max(1,Math.round(cstat(a.id,a).hp*.25));ac.hp=Math.max(1,ac.hp-cut);BT.shake=12;
-  const ng=['predplant','kakuhyper','krmz_kikoku','gogo'];const pool=[...new Set(skillsOf(a.id).concat(XRSK[a.id]?[XRSK[a.id]]:[]))].filter(k=>SK[k]&&!ng.includes(k)&&SK[k].k!=='krmz2');
-  const msg=fl==='hyper'?`…覚醒が 止まらない！\nエメラルドの 結晶が ${an}を 呑みこんだ！\n（${an}の HPが ${fmt(cut)} 減った）`:`捕食植物の つるが ${an}に 巻きついた！\n${an}は 少し かじられた…\n（${an}の HPが ${fmt(cut)} 減った）`;
+  const ng=['predplant','kakuhyper','krmz_kikoku','gogo'];let pool=[...new Set(skillsOf(a.id).concat(XRSK[a.id]?[XRSK[a.id]]:[]))].filter(k=>SK[k]&&!ng.includes(k)&&SK[k].k!=='krmz2');
+  if(a.id==='tomoya'&&rnd()<.05)pool=['kakuhyper'];
+  const msg=`捕食植物の つるが ${an}に 巻きついた！\n${an}は 少し かじられた…\n（${an}の HPが ${fmt(cut)} 減った）`;
   if(!pool.length){NOW([()=>`${an}の 力を 取りこんだが…\n使える 技が なかった！`]);return msg;}
   const k=pool[ri(0,pool.length-1)],sk=SK[k],en=BT.en.map((e,j)=>j).filter(j=>BT.en[j].alive);
   const keep=BT.cmds[i];BT.cmds[i]={type:'skill',k,t:sk.tg==='enemy'?(en.length?en[ri(0,en.length-1)]:0):i};G.chars[m.id].mp+=skCost(m.id,k);
@@ -2207,7 +2208,7 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
             if(rnd()<CP){if(rnd()<.0586)rev=1;continue;}seq.push({fall:EV()});if(stock>0){stock--;seq.push({fever:1});continue;}break;}
           push(hyperScr(seq));const L=[];
           seq.forEach(s_=>{if(s_.fever){L.push('Fever!?\n保留が 発動！ ループが 再開した！');return;}if(s_.fall){L.push(`${s_.fall}揃い… 転落`);return;}L.push(()=>{const al=live();if(!al.length)return null;const e=al[ri(0,al.length-1)];return `${s_.rev?`${s_.rev}揃い… からの 復活！ 7に 変化！\n`:''}${s_.n} Hyper!${s_.n>=20?'!!':s_.n>=10?'!':''}\n`+dmgEnemy(e,phys(me.atk,e.def,1.5)+Math.ceil(e.maxhp*(e.dboss?.02:.05)));});});
-          L.push(()=>`覚醒ハイパー 終了！　合計 ${n} Hyper`);if(rnd()<.03)L.push(()=>predEatAlly(m,i,'hyper'));NOW(L);sfx('g5');BT.shake=16;return '可能性の 獣が 目を 覚ます…！\n全身を エメラルドの 結晶が 覆っていく！';}
+          L.push(()=>`覚醒ハイパー 終了！　合計 ${n} Hyper`);NOW(L);sfx('g5');BT.shake=16;return '可能性の 獣が 目を 覚ます…！\n全身を エメラルドの 結晶が 覆っていく！';}
         if(k==='predplant'){const al=live();if(!al.length)return null;const e=al.slice().sort((a,b)=>b.maxhp-a.maxhp)[0];
           const gm=hasSkW(m.id,'w_gamaguchi')?1.5:1,hpA=Math.max(1,Math.round(e.hp*(e.dboss?.08:.25)*gm)),atA=Math.max(1,Math.round(e.atk*(e.dboss?.15:.3)*gm)),base=Math.max(1,cstat(m.id,m).atk);
           push(predScr(hpA,atA));e.atk=Math.max(1,e.atk-atA);if(e._deb)e._deb.atk=Math.max(1,e._deb.atk-atA);
