@@ -1191,6 +1191,7 @@ function drawEnemy(e,x,y,t){
   const c1=e.c1,c2=e.c2,K='#000000',Wt='#fcfcfc';
   switch(e.shape){
     case 'kendo':drawKendo(x,y,t);break;
+    case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
@@ -1927,6 +1928,7 @@ function startBattle(boss,rift=null,sp=null){
   {const im=sp&&sp.st==='minus'?(infMul()>1?1.1:1):infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;e.w=36;e.h=56;}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
@@ -4259,6 +4261,41 @@ function drawMinusBG(x0,y0,w,h,t){const cl=[x0,y0,x0+w,y0+h],cx=x0+w/2,vy=y0+h*.
   /* 保存された 記憶の 粒 */
   for(let i=0;i<26;i++){const px=x0+((i*53+t*(1+i%3)*.2)%w),py=y0+((i*37)%h);R(px,py,1,1,i%4?'#6844a0':'#a4e4fc');}}
 /* 帝王 錨ケンドウ：白髪の 総髪・軍服と 和装の 礼装・錨の 紋・法典 */
+/* ===================== オリジナル キャラの 敵（ギム総書記・書記代 ジョソウソ・ギムトモコ） ===================== */
+const OC_OF=n=>/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
+/* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
+function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
+  const C='#8c0000',D='#5c0000',Gd='#f8b800';
+  R(x-9,y-5,7,5,'#000');R(x+2,y-5,7,5,'#000');
+  R(x-12,y-34,24,30,C);R(x-12,y-34,24,2,D);R(x-1,y-32,2,28,D);for(let k=0;k<4;k++)R(x-4,y-30+k*6,2,2,Gd);R(x-12,y-14,24,3,'#000');R(x-2,y-14,4,3,Gd);
+  R(x-16,y-33,5,4,Gd);R(x+11,y-33,5,4,Gd);R(x-16,y-29,4,15,C);R(x+12,y-29,4,15,C);R(x-16,y-14,4,3,'#fcfcfc');R(x+12,y-14,4,3,'#fcfcfc');
+  R(x-6,y-45,12,11,'#e8c098');R(x-7,y-38,14,6,'#e4e4e4');R(x-6,y-33,12,2,'#bcbcbc');R(x-5,y-42,4,1,'#000');R(x+1,y-42,4,1,'#000');
+  R(x-4,y-41,2,1,ghost?'#f80000':'#000');R(x+2,y-41,2,1,ghost?'#f80000':'#000');
+  R(x-9,y-48,18,4,'#000');R(x-8,y-56,16,9,'#a80000');R(x-8,y-56,16,1,'#d82800');pc(x,y-52,3,Gd);R(x-1,y-53,2,2,'#000');
+  if(ghost)ctx.globalAlpha=1;}
+/* 書記代 ジョソウソ：銀の 長髪・片眼鏡・黒い 長外套に 赤い たすき・房付きの 指揮棒 */
+function drawJosouso(x,y,t,poss){if(poss)ocAura(x,y,t,'#a80020');
+  const C=poss?'#100008':'#1c1c2c',S='#d82800',H='#bcbcd8';
+  R(x-8,y-5,6,5,'#000');R(x+2,y-5,6,5,'#000');
+  R(x-11,y-34,22,30,C);R(x-11,y-6,22,2,'#3c3c5c');for(let k=0;k<9;k++)R(x-9+k*2,y-33+k*3,4,3,S);for(let k=0;k<3;k++)R(x+5,y-24+k*6,2,2,'#bcbcbc');
+  R(x-15,y-31,4,18,C);R(x+11,y-31,4,18,C);R(x-15,y-14,4,3,'#e8c098');R(x+11,y-14,4,3,'#e8c098');
+  const sw=(t>>4)&1;R(x+14,y-30-sw,2,18,'#3c2410');R(x+13,y-31-sw,4,3,'#f8b800');R(x+12,y-13-sw,6,4,S);R(x+13,y-9-sw,4,2,'#a80020');
+  R(x-6,y-46,12,12,'#e8c098');R(x-7,y-49,14,5,H);R(x-8,y-47,3,14,H);R(x+5,y-47,3,7,H);R(x-10,y-38,3,16,H);R(x-11,y-24,2,4,'#9c9cbc');
+  const ec=poss?'#f80000':'#000';R(x-4,y-41,3,1,ec);R(x+1,y-41,3,1,ec);if(poss){R(x-4,y-42,3,1,'#fc7460');R(x+1,y-42,3,1,'#fc7460');}
+  R(x,y-43,5,1,'#f8b800');R(x,y-39,5,1,'#f8b800');R(x,y-43,1,5,'#f8b800');R(x+4,y-43,1,5,'#f8b800');R(x+4,y-38,1,6,'#f8b800');
+  R(x-2,y-36,4,1,'#7c4c3c');}
+/* ギムトモコ：赤い ベレー帽・赤メッシュの 黒ボブ・眼鏡・赤い 上着・メガホン */
+function drawTomoko(x,y,t,poss){if(poss)ocAura(x,y,t,'#d82800');
+  const J=poss?'#5c0000':'#d82800',K='#000';
+  R(x-7,y-5,5,5,'#3c3c3c');R(x+2,y-5,5,5,'#3c3c3c');R(x-6,y-9,4,4,'#e8c098');R(x+2,y-9,4,4,'#e8c098');
+  R(x-9,y-17,18,9,'#1c1c1c');R(x-10,y-34,20,18,J);R(x-4,y-34,8,4,'#fcfcfc');R(x-1,y-30,2,12,poss?'#3c0000':'#a80020');R(x-10,y-19,20,2,'#000');
+  R(x-14,y-32,4,14,J);R(x+10,y-32,4,10,J);R(x-14,y-18,4,3,'#e8c098');
+  const sh=(t>>3)&1;R(x+12,y-27,4,6,'#e8c098');R(x+15,y-31-sh,4,10,'#fcfcfc');R(x+19,y-33-sh,3,14,'#fcfcfc');R(x+15,y-27-sh,7,2,'#d82800');if(!poss&&((t>>4)&1)){R(x+24,y-31,2,1,'#fcfcfc');R(x+24,y-26,3,1,'#fcfcfc');R(x+24,y-21,2,1,'#fcfcfc');}
+  R(x-6,y-45,12,11,'#e8c098');R(x-8,y-46,16,4,K);R(x-8,y-44,3,9,K);R(x+5,y-44,3,9,K);R(x+5,y-44,1,7,'#d82800');
+  R(x-9,y-50,18,5,'#d82800');R(x-7,y-52,12,2,'#d82800');R(x+3,y-53,2,2,'#a80020');
+  R(x-5,y-41,4,3,K);R(x+1,y-41,4,3,K);R(x-4,y-40,2,1,poss?'#f80000':'#a4e4fc');R(x+2,y-40,2,1,poss?'#f80000':'#a4e4fc');R(x-1,y-40,2,1,K);
+  R(x-2,y-36,4,1,poss?'#000':'#d82800');}
 function drawKendo(x,y,t){const b=(t>>5)&1;
   R(x-11,y-34,22,34,'#141c34');R(x-11,y-34,22,2,'#24305c');R(x-13,y-34,4,3,'#f8b800');R(x+9,y-34,4,3,'#f8b800');
   R(x-2,y-34,4,34,'#fcfcfc');R(x-1,y-34,2,34,'#d8d8d8');R(x-11,y-16,22,3,'#7c0000');R(x-8,y-30,1,10,'#f8b800');
