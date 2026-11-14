@@ -4983,10 +4983,10 @@ function tiHub(){const T=tiS();
   const it=[];
   if(T.ch===1){it.push({t:`はたらく（1日・${fmt(TI_WAGE)}ペリコ）`,k:'work'},{t:'坑道の 魔物退治（1日・報酬は 返済に）',k:'dun'});if(T.casino)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});if(T.exposed)it.push({t:'班長と 最後の 大勝負（456賽 返し）',k:'final'});
     it.push({t:`借金を 返す（残り ${fmt(T.debt)}）`,k:'pay'},...(tiHintN()?[{t:`ひろった 物を 見る（${tiHintN()}）`,k:'hint'}]:[]),{t:'地下の 売店（ペリコ）',k:'shop'},{t:'タガバソウと 話す',k:'talk'},{t:'昇降機の 前へ（帝城に もどる）',k:'out'});}
-  else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:T.ch===2?'タガバソウと 話す':'労働者と 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
+  else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});if(T.clear)it.push({t:`余った ペリコを 交換（${fmt(T.per)}P）`,k:'swap'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:T.ch===2?'タガバソウと 話す':'労働者と 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
   const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（黒幕 ニズゥーイッツァイ… 埼玉編へ つづく）';
   listPick(T.ch===1?`帝愛 地下帝国　${Math.min(T.day,TI_DAYS)}日目　${fmt(T.per)}ペリコ`:`帝愛 地下帝国　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
-    if(k==='work')tiWork();else if(k==='dun')tiDungeon();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='hint')tiHintList();else if(k==='esc')tiEscBattle();
+    if(k==='work')tiWork();else if(k==='dun')tiDungeon();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='hint')tiHintList();else if(k==='esc')tiEscBattle();else if(k==='swap')tiSwap();
     else if(k==='talk')tiTalk();else {save();dialog(T.ch===1?['昇降機の 前は 黒服が 見張っている。','（帝城から いつでも 地下へ もどれる。\n地下の 日数は 働いた 日だけ 進む）']:['帝城に もどった。']);}},goal);}
 function tiTalk(){const T=tiS();let L;
   if(T.ch===1){L=!T.casino?['タガバソウ「1日 1万ペリコじゃ\n1年 働いても 借金は 返せない」','「坑道の 魔物退治なら 1回 100万ペリコ以上…\n報酬は そのまま 返済に 回される」','「魔物は 地下の ガラクタを 拾って 巣に ためこむ。\n班長の 秘密も まぎれてるかもな」','「この 地下は そういう 仕組みに なってる。\n…まずは 働いて 様子を 見るんだ」','裏・賭郎「……」']
@@ -5018,6 +5018,13 @@ function tiPay(){const T=tiS();if(T.per<=0){dialog('返す ペリコが ない�
   tiEscape();}
 function tiEscape(){const T=tiS();
   scene('chika',['借金を 完済した！','黒服「…ほう。 1年を 待たずに 返し切るとはな」','タガバソウ「よし… 次は そいつの 番だ」','タガバソウは 裏・賭郎の 首すじに 手を あて\n小さな 装置を 取り外した…！','タガバソウ「意識同期の 受信機だ。\nこれで 実験の 呪縛は 解ける」','裏・賭郎の 目に 光が もどった！','裏・賭郎「……おれは 何を…\nずっと 悪い 夢を 見ていた 気がする」','「あんたを 地下に 落とす 道具に\nされて いた… すまねえ」','裏・賭郎「…一緒に 出るぞ。 地上へ」'],()=>{T.ch=2;save();tiHub();});}
+/* 地上に 出たあと：返済で 余った ペリコを 1,000万ごとに UR確定チケット 10枚と 交換 */
+const TI_SWAP=10000000,TI_SWAP_UR=10;
+function tiSwap(){const T=tiS(),n=Math.floor((T.per||0)/TI_SWAP);
+  if(n<1){dialog([`交換所の 係「1,000万ペリコ ごとに\nUR確定チケット 10枚と 交換するよ」`,`（いまの ペリコ：${fmt(T.per)}　あと ${fmt(TI_SWAP-(T.per||0)%TI_SWAP)}ペリコ）`],tiHub);return;}
+  choice(`余った ペリコを 交換する\n${fmt(n*TI_SWAP)}ペリコ → UR確定チケット ${n*TI_SWAP_UR}枚\n（1,000万ペリコ ごとに 10枚）`,['交換する','やめる'],r=>{if(r!==0){tiHub();return;}
+    T.per-=n*TI_SWAP;G.items.urtk=(G.items.urtk||0)+n*TI_SWAP_UR;sfx('g5');save();
+    dialog([`${fmt(n*TI_SWAP)}ペリコを 交換した！`,`UR確定チケットを ${n*TI_SWAP_UR}枚 手に入れた！\n（残り ${fmt(T.per)}ペリコ）`],tiHub);},120);}
 function tiEscBattle(){const T=tiS();choice('昇降機の 前に 黒服の 部隊が 待ち構えている！\n強行突破しますか？（2連戦）',['突破する','やめる'],r=>{if(r!==0){tiHub();return;}
     if(T.clear){startGm('ti_escape');return;}
     scene('chika',['昇降機の 前に 黒服の 部隊…','その 奥から 紫の スーツの 男が 現れた。','タガバソウ「…コブシデ！」','帝愛 幹部 コブシデ「久しいな タガバソウ。\n実験に 反対して 地下に 落ちた 負け犬が」','「その 実験体は 返して もらおう。\n大事な データの 塊なのでな」','タガバソウ「…あんたたち、 これを 持っていけ」\n（TAインダストリアルの 権利書を 託された）','タガバソウ「いくぞ！」'],()=>startGm('ti_escape'));},96);}
@@ -5038,15 +5045,15 @@ function tiShop(){const T=tiS(),hancho=T.ch===1&&!T.exposed;
     const after=()=>{const extra=s.sc==='set'&&hancho&&T.treat>=2?['タガバソウ「…うまいよな。 わかる。」','「でも それが 班長の 狙いだ。\nペリコを 使わせて 地下に 長く 縛りつける」']:[];dialog([m,...extra],tiShop);};
     if(s.sc)tiTreatScene(s.sc,after);else after();},i=>TI_SHOP[i]?TI_SHOP[i].d+'\n（1ペリコ＝イェソの 100分の1）':'');}
 /* 専用演出：1日の 終わりの ビール・炭火の 焼き鳥 */
-function tiTreatScene(kind,cb){let t=0;const END=kind==='set'?300:220,bub=[];
-  const lines={beer:['プシュッ……！','……っ！！ のどを 冷たい ビールが\n一気に 駆け下りていく…！','1日 掘りつづけた 体に しみわたる……','（地下でも… 生きてて よかった……！）'],
+function tiTreatScene(kind,cb){let t=0;const END=kind==='set'?310:240,bub=[];
+  const lines={beer:['プシュッ……！','キンッキンに 冷えてやがる……！！','……っ！！ のどを 冷たい ビールが\n一気に 駆け下りていく…！','1日 掘りつづけた 体に しみわたる……','（地下でも… 生きてて よかった……！）'],
     yaki:['ジュウウ… 炭火の 香りが 立ちのぼる','あまい タレが 炭に 落ちて\nけむりと 一緒に 鼻を くすぐる…','ひと口… やわらかい 肉汁が あふれる…！','（明日も… がんばれる……！）'],
     kaki:['ポリッ… ポリッ…','しょっぱい あられと ピーナッツ…\nこれが 地下の ささやかな ぜいたく'],
-    set:['プシュッ……！ ビール、 焼き鳥、 柿ピー…','ビールで 流しこみ、 焼き鳥に かぶりつき\n柿ピーで ひと息…','……とまらない……！！','（ペリコが… 消えていく… でも うまい……！）']}[kind];
-  const at=kind==='beer'?[0,50,110,160]:kind==='yaki'?[0,60,120,170]:kind==='kaki'?[0,80]:[0,70,140,210];
+    set:['プシュッ……！ ビール、 焼き鳥、 柿ピー…','キンッキンに 冷えてやがる……！！','ビールで 流しこみ、 焼き鳥に かぶりつき\n柿ピーで ひと息…','……とまらない……！！','（ペリコが… 消えていく… でも うまい……！）']}[kind];
+  const at=kind==='beer'?[0,30,70,130,180]:kind==='yaki'?[0,60,120,170]:kind==='kaki'?[0,80]:[0,40,90,150,220];
   push({full:true,upd(){t++;
       if(t===10&&(kind==='beer'||kind==='set')){noise(.25,.3);tone(1800,.1,'square',.06,600);}
-      if(kind==='beer'&&t>50&&t<110&&t%12===0)tone(150,.12,'triangle',.25,90);
+      if(kind==='beer'&&t>70&&t<130&&t%12===0)tone(150,.12,'triangle',.25,90);
       if((kind==='yaki'||kind==='set')&&t%20===0&&t<200)noise(.15,.04);
       if(kind==='kaki'&&t%25===0&&t<120)noise(.05,.15);
       if(t===at[at.length-1]+10)sfx('heal');
@@ -5057,10 +5064,10 @@ function tiTreatScene(kind,cb){let t=0;const END=kind==='set'?300:220,bub=[];
         for(let k=0;k<6;k++){const dy=((t*.6+k*13)%36);R(-10+((k*7)%20),-30+dy,1,2,'#fcfcfc');}ctx.restore();};
       const skewer=(x,y)=>{R(x-1,y-44,2,52,'#c89058');for(let k=0;k<4;k++){pc(x,y-34+k*9,5,k%2?'#7c3c10':'#a05000');R(x-3,y-36+k*9,3,1,'#e8a858');}for(let k=0;k<4;k++){const ph=(t*.8+k*15)%40;ctx.globalAlpha=.4*(1-ph/40);pc(x-6+k*4,y-50-ph,3,'#bcbcbc');ctx.globalAlpha=1;}};
       const kaki=(x,y)=>{pe(x,y,22,6,'#fcfcfc');for(let k=0;k<12;k++)R(x-16+(k*7)%30,y-6+(k*5)%6,4,2,k%3?'#e45c10':'#f8d878');};
-      if(kind==='beer')beer(128,130,t>50&&t<110?-.9:0);
+      if(kind==='beer')beer(128,130,t>70&&t<130?-.9:0);
       else if(kind==='yaki')skewer(128,128);
       else if(kind==='kaki')kaki(128,134);
-      else{beer(80,130,t>70&&t<130?-.9:0);skewer(132,128);kaki(186,134);}
+      else{beer(80,130,t>90&&t<150?-.9:0);skewer(132,128);kaki(186,134);}
       if((kind==='beer'||kind==='set')&&t>=10&&t<40)for(let k=0;k<8;k++){const a=k/8*Math.PI*2;R((kind==='set'?80:128)+Math.cos(a)*(t-10)*.8,96+Math.sin(a)*(t-10)*.4-(t-10)*.3,2,2,'#fcfcfc');}
       let li=0;at.forEach((a,k)=>{if(t>=a)li=k;});win(8,164,240,68);lines[li].split('\n').forEach((l,k)=>txt(l,18,174+k*14,'#fcfcfc','left',222));
       region(0,0,W,H,()=>{vA=true;});}});}
@@ -5115,13 +5122,13 @@ const TISTG={
     intro:sp=>sp.wave<2?'昇降機の 前　黒服の 部隊が 立ちはだかる！':'コブシデ「意識同期の 力… 見せて やろう！」'}};
 Object.assign(GSTG,TISTG);
 function tiWin(sp,back0,pages){const T=tiS(),back=more=>dialog(pages,()=>{returnField();dialog(more&&more.length?more:['（地下帝国に もどった）'],()=>tiHub());});
-  if(sp.st==='ti_dungeon'){const pay=Math.min(Math.max(0,T.debt||0),TI_DUN_PAY[0]+ri(0,5)*100000);T.debt=Math.max(0,(T.debt||0)-pay);T.dun=(T.dun||0)+1;T.hints=T.hints||{};const left=TI_HINTS.filter(h=>!T.hints[h.id]);let drop=null;if(!T.exposed&&left.length&&rnd()<.4){drop=left[ri(0,left.length-1)];T.hints[drop.id]=1;}save();
-    back(['坑道の 魔物を 退治した！',`報酬 ${fmt(pay)}ペリコは\nそのまま 借金の 返済に あてられた。`,...(drop?[`魔物が 何かを 落とした…\n「${drop.n}」を ひろった！`,drop.d,'（ハブの「ひろった 物を 見る」で 確かめられる）']:[]),T.debt>0?`借金 のこり ${fmt(T.debt)}ペリコ\n（地下 ${Math.min(T.day,TI_DAYS)}日目）`:'借金を 返し切った！']);return;}
+  if(sp.st==='ti_dungeon'){const rew=TI_DUN_PAY[0]+ri(0,5)*100000,pay=Math.min(Math.max(0,T.debt||0),rew),over=rew-pay;T.debt=Math.max(0,(T.debt||0)-pay);T.per+=over;T.dun=(T.dun||0)+1;T.hints=T.hints||{};const left=TI_HINTS.filter(h=>!T.hints[h.id]);let drop=null;if(!T.exposed&&left.length&&rnd()<.4){drop=left[ri(0,left.length-1)];T.hints[drop.id]=1;}save();
+    back(['坑道の 魔物を 退治した！',`報酬 ${fmt(pay)}ペリコは\nそのまま 借金の 返済に あてられた。`,...(over>0?[`返し切って 余った ${fmt(over)}ペリコは\n手元に 残った。`]:[]),...(drop?[`魔物が 何かを 落とした…\n「${drop.n}」を ひろった！`,drop.d,'（ハブの「ひろった 物を 見る」で 確かめられる）']:[]),T.debt>0?`借金 のこり ${fmt(T.debt)}ペリコ\n（地下 ${Math.min(T.day,TI_DAYS)}日目）`:'借金を 返し切った！']);return;}
   if(sp.st==='ti_hancho'){const first=!T.exposed;T.exposed=1;if(first)T.per+=50000000;save();back(first?['班長 クロヌマは 地面に へたりこんだ。','労働者たちが 歓声を あげた！\nイカサマで 巻き上げられた ペリコが もどってきた。（+50,000,000ペリコ）','裏・賭郎「……456賽……\nこいつは… 使える……」\n（裏・賭郎が 班長の サイコロを 拾い上げた）','タガバソウ「やったな！\nあとは 班長との 大勝負で 一気に 返すぞ」',gmGive(10,10,2),'（班長との 最後の 大勝負が 解放）']:['班長は ふたたび 倒れた。',gmGive(5,5)]);return;}
   if(sp.st==='ti_escape'){if(T.clear){back(['黒服たちは 散り散りに 逃げていった。',gmGive(8,8)]);return;}
     const rw=gmGive(25,25,10,1e11);addWeapon('w_tgphone');
     dialog(pages,()=>{BT=null;scene('chika',['コブシデ「ぐ… ぐおお… まだだ……！」','コブシデは 自分の 首に 同期装置を 突き立てた！\n「出力… 最大……！」','コブシデの 体から 赤黒い 光が あふれだす…\n暴走だ！','コブシデ「実験体を 逃がしては…\nニズゥーイッツァイ様に 顔向けが……！！」','タガバソウが コブシデに 組みついた！','タガバソウ「ここは おれが 止める！\n行け！ 地上へ！！」','裏・賭郎「タガバソウ…！」\nタガバソウ「振り向くな！ 行け！」','昇降機の 扉が 閉まる… タガバソウの 背中が\n赤い 光の 中に 消えていった…','…まぶしい！ 地上の 光だ！','裏・賭郎「…タガバソウに 救われたな」','「暴走した コブシデが 口に した 名…\nニズゥーイッツァイ…」','裏・賭郎「そいつが すべての 黒幕だ。\n…埼玉の 方角に 根城が あると 聞いた」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
-      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','XR専用武器「元幹部の スマホ」を 手に入れた！\n（タガバソウが 最後に 投げてよこした ものだ）','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）','── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
+      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','XR専用武器「元幹部の スマホ」を 手に入れた！\n（タガバソウが 最後に 投げてよこした ものだ）','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）',...(tiS().per>=TI_SWAP?[`返済で 余った ${fmt(tiS().per)}ペリコは\n帝城から 地下へ 行くと 交換できる。\n（1,000万ペリコ → UR確定チケット 10枚）`]:[]),'── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
   back([]);}
 /* ===================== ジャッジメント・ゴッドダイス（タガバソウ 固有） ===================== */
 function gdRoll(){const x=rnd();let d,k;
