@@ -4045,16 +4045,29 @@ const g4=(b,o)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)
 const LB3=[{t:'経験値祝詞×1000\n極上鉱石×1000\n金景品（大）×100',s:'祝詞・極上\n×1000\n大景品100',give:()=>{g4(1000,1000);G.items.tok[0]+=100;}},
   ...[2,3,4,5,6].map(()=>({t:'経験値祝詞×1000\n極上鉱石×1000',s:'祝詞・極上\n×1000',give:()=>g4(1000,1000)})),
   {t:'経験値祝詞×2000\n極上鉱石×2000\nガチャチケット×1000',s:'祝詞・極上\n×2000\n券×1000',give:()=>{g4(2000,2000);G.items.tk+=1000;}}];
-const LBC=[{key:'lb',title:'リリース記念',start:LB_START,end:LB_END,days:LB},{key:'lb3',title:'Ver.3.0 公開記念',start:'2026-11-13',end:'2026-12-12',days:LB3}];
+const LBH_EX=['w_gaius','w_umegae','w_misono','w_gamaguchi','w_tgphone'];
+const LBH=[{t:'好きな URキャラ\n好きな UR・XR武器',s:'URキャラ\nUR・XR\n武器',give:()=>{G.lbPick=(G.lbPick||[]).concat(['urc','urw']);}},
+  {t:'1,000億イェソ',s:'1,000億\nイェソ',give:()=>{noCount(()=>{G.coins+=1e11;});}},
+  {t:'経験値祝詞×5000',s:'経験値\n祝詞\n×5000',give:()=>{G.items.b[4]=(G.items.b[4]||0)+5000;}}];
+function lbPickRun(){const q=G.lbPick||[];if(!q.length)return;const k=q[0],nm=id=>CH[id]._base?CH[id]._base.name:CH[id].name;
+  const done=()=>{G.lbPick.shift();save();if(G.lbPick.length)lbPickRun();};
+  if(k==='urc'){const ids=Object.keys(CH).filter(id=>CH[id].rar===4&&!CH[id]._base&&!id.includes('~'));
+    listPick('記念ボーナス：好きな URキャラを 1体',ids.map(id=>({t:nm(id),r:G.chars[id]?`基礎Lv${G.chars[id].dup+1}`:'未所持',col:G.chars[id]?null:'#f8b800'})),j=>{const id=ids[j],before=G.chars[id]?G.chars[id].dup+1:0;addChar(id);applyXR();fullHeal();save();sfx('g5');
+      dialog([`${nm(id)}を 手に入れた！`,before?`基礎Lv ${before} → ${G.chars[id].dup+1}`:'新しく 仲間に なった！'],done);},s=>'1体だけ えらべます（あとから 変えられません）\n（Bで やめても あとで えらび直せる）');return;}
+  if(k==='urw'){const ids=Object.keys(WPD).filter(id=>[4,6].includes(WPD[id].rar)&&!id.includes('~')&&!LBH_EX.includes(id)).sort((a,b)=>WPD[b].rar-WPD[a].rar);
+    listPick('記念ボーナス：好きな UR・XR武器を 1本',ids.map(id=>({t:WPD[id].name,r:(WPD[id].rar===6?'XR':'UR')+(G.weapons[id]?' 所持':''),col:WPD[id].rar===6?'#f8d878':null})),j=>{const id=ids[j];addWeapon(id);save();sfx('g5');
+      dialog([`${WPD[id].name}を 手に入れた！`],done);},s=>'1本だけ えらべます（あとから 変えられません）\n※ ガイウスの槍・梅枝の笏・専用武器は 対象外');return;}
+  G.lbPick.shift();}
+const LBC=[{key:'lbh',title:'人類保管計画 集結記念',start:'2026-11-15',end:'2026-12-14',days:LBH},{key:'lb',title:'リリース記念',start:LB_START,end:LB_END,days:LB},{key:'lb3',title:'Ver.3.0 公開記念',start:'2026-11-13',end:'2026-12-12',days:LB3}];
 const jstDay=()=>Math.floor((Date.now()+9*3600000)/86400000),jstOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000);
 function lbCamp(){if(!G)return null;const d=jstDay();return LBC.find(c=>{if(d<jstOf(c.start)||d>jstOf(c.end))return false;const L=G[c.key]||(G[c.key]={n:0,last:0});return L.n<c.days.length&&L.last!==d;})||null;}
-function lbCheck(){return !!lbCamp();}
-function lbShow(){const C=lbCamp();if(!C)return;const LB=C.days,L=G[C.key];const i=L.n;L.n++;L.last=jstDay();LB[i].give();save();sfx('lvup');let t=0;
-  push({upd(){t++;if(t>30&&(I.A||I.B)){pop();dialog([`${C.title} ログインボーナス ${i+1}日目！`,`${LB[i].t}を 手に入れた！`,...(i===0&&C.key==='lb'?['仮想通貨高騰券は 銀行の「仮想通貨」で 使えます。\n使うと 2日間（ゲーム内）仮想通貨が 高騰！']:[]),...(i<LB.length-1?[`明日も ログインしてね！（全${LB.length}日）`]:['7日間 ありがとう！ これからも 八百万クエストを\nよろしく おねがいします！'])]);}},
-    drw(){R(0,0,W,H,'rgba(0,0,0,.75)');win(8,22,240,188,'#f8b800');big(C.title,128,34,'#f8b800','center',14);txt('ログインボーナス（7日間）',128,52,'#fcfcfc','center');
-      for(let k=0;k<7;k++){const x=k<4?18+k*56:46+(k-4)*56,y=k<4?68:134,got=k<=i,now=k===i,c=k===6?'#f8d878':'#3cbcfc';
+function lbCheck(){return !!lbCamp()||!!(G&&G.lbPick&&G.lbPick.length);}
+function lbShow(){const C=lbCamp();if(!C){if(G.lbPick&&G.lbPick.length)dialog(['記念ボーナスの 受け取りが 残っている！'],lbPickRun);return;}const LB=C.days,L=G[C.key];const i=L.n;L.n++;L.last=jstDay();LB[i].give();save();sfx('lvup');let t=0;
+  push({upd(){t++;if(t>30&&(I.A||I.B)){pop();dialog([`${C.title} ログインボーナス ${i+1}日目！`,`${LB[i].t}を 手に入れた！`,...(i===0&&C.key==='lb'?['仮想通貨高騰券は 銀行の「仮想通貨」で 使えます。\n使うと 2日間（ゲーム内）仮想通貨が 高騰！']:[]),...(i<LB.length-1?[`明日も ログインしてね！（全${LB.length}日）`]:[`${LB.length>1?LB.length+'日間 ':''}ありがとう！ これからも 八百万クエストを\nよろしく おねがいします！`])],()=>{if(G.lbPick&&G.lbPick.length)lbPickRun();});}},
+    drw(){R(0,0,W,H,'rgba(0,0,0,.75)');win(8,22,240,188,'#f8b800');big(C.title,128,34,'#f8b800','center',14);txt(`ログインボーナス（${LB.length}日間）`,128,52,'#fcfcfc','center');const NB=LB.length,r1=Math.min(4,NB),r2=NB-r1;
+      for(let k=0;k<NB;k++){const x=k<r1?128-r1*28+3+k*56:128-r2*28+3+(k-r1)*56,y=k<r1?(NB>4?68:100):134,got=k<=i,now=k===i,c=k===NB-1?'#f8d878':'#3cbcfc';
         R(x,y,50,58,now?(frame>>3)%2?'#7c4c10':'#5c3c08':got?'#24242c':'#14141c');R(x,y,50,1,c);R(x,y+57,50,1,c);R(x,y,1,58,c);R(x+49,y,1,58,c);
-        txt(`${k+1}日目`,x+25,y+5,k===6?'#f8d878':'#bcbcbc','center');LB[k].s.split('\n').forEach((l,j)=>txt(l,x+25,y+22+j*12,got&&!now?'#7c7c7c':'#fcfcfc','center',48));
+        txt(`${k+1}日目`,x+25,y+5,k===NB-1?'#f8d878':'#bcbcbc','center');LB[k].s.split('\n').forEach((l,j)=>txt(l,x+25,y+22+j*12,got&&!now?'#7c7c7c':'#fcfcfc','center',48));
         if(got&&!now){txt('済',x+43,y+5,'#d82800','center');}}
       if(t>30)txt('Zで うけとる',128,198,(frame>>4)%2?'#fcfcfc':'#7c7c7c','center');}});}
 function teiaiChika(){const P=G.chikaPending;G.chikaPending=null;const days=P.days,wage=100;
