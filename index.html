@@ -503,6 +503,37 @@ const BASE_SKILLS={
   dazaifu:{name:'ダザイフバースト',mp:40,target:'enemies',kind:'mag',power:4.6,verb:'放った'},
   kitano:{name:'キタノサンダー',mp:18,target:'enemies',kind:'mag',power:2.9,verb:'落とした'},
   umekaze:{name:'梅風',mp:20,target:'allies',kind:'song',power:1.4,amount:.8,turns:4,verb:'吹かせた'},
+  /* UR以上の 武器の 専用スキル（装備すると 使える・XRスキルより 控えめ） */
+  ws_amakago:{name:'天羽々矢',mp:16,target:'enemy',kind:'phys',power:3.2,verb:'放った'},
+  ws_murasame:{name:'叢雨斬り',mp:16,target:'enemies',kind:'phys',power:1.6,verb:'はなった'},
+  ws_nuboko:{name:'こをろこをろ',mp:16,target:'enemies',kind:'mag',power:2.4,verb:'かきまわした'},
+  ws_habakiri:{name:'大蛇断ち',mp:16,target:'enemy',kind:'phys',power:3.4,verb:'はなった'},
+  ws_futsu:{name:'韴霊の一閃',mp:16,target:'enemies',kind:'phys',power:1.7,verb:'はなった'},
+  ws_ikuyumi:{name:'生太刀生弓矢',mp:16,target:'enemy',kind:'drain',power:2.2,verb:'放った'},
+  ws_hikata:{name:'日像の照り返し',mp:16,target:'enemies',kind:'mag',power:2.4,verb:'放った'},
+  ws_milktea:{name:'午後の一服',mp:14,target:'allies',kind:'heal',power:1.8,verb:'すすった'},
+  ws_juzu:{name:'百八の念',mp:16,target:'allies',kind:'song',power:.9,amount:.4,turns:4,verb:'念じた'},
+  ws_chukei:{name:'中啓一閃',mp:16,target:'enemy',kind:'mag',power:3.2,verb:'ふりおろした'},
+  ws_ame:{name:'草薙ぎ',mp:16,target:'enemies',kind:'phys',power:1.8,verb:'はなった'},
+  ws_magatama:{name:'勾玉の祈り',mp:18,target:'allies',kind:'heal',power:2.0,revive:true,verb:'ささげた'},
+  ws_doji:{name:'鬼斬り',mp:16,target:'enemy',kind:'phys',power:3.4,verb:'はなった'},
+  ws_kanabo:{name:'鬼に金棒',mp:16,target:'enemy',kind:'phys',power:1.6,hits:2,verb:'ふりまわした'},
+  ws_norito:{name:'天津祝詞',mp:16,target:'allies',kind:'heal',power:2.0,verb:'奏上した'},
+  ws_houou:{name:'鳳凰の舞',mp:16,target:'allies',kind:'song',power:1.0,amount:.5,turns:4,verb:'舞った'},
+  ws_raijodo:{name:'鵺射ち',mp:16,target:'enemy',kind:'phys',power:3.4,verb:'放った'},
+  ws_nyoi:{name:'如意宝珠',mp:16,target:'enemies',kind:'mag',power:2.6,verb:'かかげた'},
+  ws_futonorito:{name:'太祝詞事',mp:18,target:'allies',kind:'heal',power:2.2,revive:true,verb:'奏上した'},
+  ws_beatmic:{name:'ゴールデンビート',mp:22,target:'allies',kind:'song',power:1.3,amount:.7,turns:4,verb:'刻んだ'},
+  ws_yakisnipe:{name:'焼肉スナイプ',mp:22,target:'enemy',kind:'phys',power:4.4,verb:'撃ちぬいた'},
+  ws_yata:{name:'八咫の神鏡',mp:22,target:'enemies',kind:'debuff',amount:.5,turns:4,verb:'かざした'},
+  ws_totsuka:{name:'十握の斬撃',mp:22,target:'enemies',kind:'phys',power:2.2,verb:'はなった'},
+  ws_ryujin:{name:'龍神斬',mp:22,target:'enemies',kind:'phys',power:2.4,verb:'はなった'},
+  ws_seishin:{name:'星辰招来',mp:22,target:'enemies',kind:'mag',power:3.4,verb:'となえた'},
+  ws_longinus:{name:'ロンギヌスの投擲',mp:30,target:'enemy',kind:'phys',power:6.0,verb:'放った'},
+  ws_cassius:{name:'カシウスの再生',mp:30,target:'allies',kind:'heal',power:3.0,revive:true,verb:'かかげた'},
+  ws_gaius:{name:'希望の光槍',mp:30,target:'enemies',kind:'mag',power:4.0,verb:'放った'},
+  ws_amanuboko:{name:'天沼の渦',mp:30,target:'enemies',kind:'mag',power:4.2,verb:'まき起こした'},
+  ws_sakahoko:{name:'逆鉾の楔',mp:30,target:'enemies',kind:'phys',power:2.8,verb:'突き立てた'},
   sakatari:{name:'佐加太利',mp:70,target:'enemies',kind:'xr',verb:'降ろした'},
   cg_omu:{name:'ケチャップ アート',mp:4,target:'enemy',kind:'mag',power:1.8,verb:'描いた'},
   cg_kyun:{name:'萌え萌え きゅん',mp:5,target:'allies',kind:'heal',power:1.0,verb:'唱えた'},
@@ -698,6 +729,8 @@ function rebuild(){
 }
 rebuild();
 const NOGACHA=['w_gaius','w_umegae'];
+const WSK={w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
+const wSkills=id=>{const c=G&&G.chars[id];if(!c)return[];const L=[c.wpn,typeof twoSlot==='function'&&twoSlot(id)?c.wpn2:null].filter(Boolean).map(w=>WSK[baseW(w)]).filter(k=>k&&SK[k]);return[...new Set(L)];};
 const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_umegae');};
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
 
@@ -997,13 +1030,14 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);return b;};
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));return b;};
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
 const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
 /* XRは 編成に 1体だけ。パーティ内で 先頭の 1体のみ XR、2体目以降は UR扱い（基礎Lvは そのまま） */
-const xrLead=()=>G&&G.party?G.party.find(xrReady):null;
-const isXR=id=>xrReady(id)&&(!G.party||!G.party.includes(id)||xrLead()===id);
+const XR_ALWAYS=['michizane'];/* 道真公は 他のXRと 並んでも 常に XR */
+const xrLead=()=>G&&G.party?G.party.find(id=>xrReady(id)&&!XR_ALWAYS.includes(id)):null;
+const isXR=id=>xrReady(id)&&(XR_ALWAYS.includes(id)||!G.party||!G.party.includes(id)||xrLead()===id);
 const crar=id=>isXR(id)?6:Math.min(5,CH[id].rar);
 function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
   if(isXR(id)){d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}else{d.name=d._base.name;d.short=d._base.short;}}}
@@ -1034,6 +1068,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
   if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
   else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
+  if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
   if(b==='w_umegae')L.push('道真公が 装備すると：','\t専用スキル「佐加太利」が 使える','\tキタノサンダーの 威力 1.5倍（紅白の雷）','\t梅風の 回復量 1.5倍');
   if(b==='w_longinus'||b==='w_cassius')L.push('ロンギヌスと カシウスを 1人で 両方 持つと 共鳴：','\t全ステータス +175%＋スキル「アディショナルインパクト」','※ガイウスの槍とは 同じ編成に 入れられない');
   if(b==='w_gaius')L.push('装備すると 全ステータス +200%','固有スキル「neonGenesis」（1戦に1回）：','\tHP・MP 1.5倍で 全回復＋敵全体に 超絶ダメージ','\t＋アディショナルインパクト','※ロンギヌス・カシウスとは 同じ編成に 入れられない');
@@ -2035,7 +2070,7 @@ function pAct(i){
         P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});break;
       case 'debuff':P_(()=>{if(!ok.v)return null;const L=BT.en.filter(e=>e.alive);if(!L.length)return null;sfx('ng');
         L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def,spd:e.spd};e.atk=Math.round(e.atk*sk.amt);e.mag=Math.round(e.mag*sk.amt);e.def=Math.round(e.def*sk.amt);if(e.spd)e.spd=Math.round(e.spd*sk.amt);}e.deb=Math.max(e.deb||0,sk.turns);});
-        return `「渚まで 走るのは メッ！」\n敵は しゅんと なった…\n敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`;});break;
+        return cmd.k==='meh'?`「渚まで 走るのは メッ！」\n敵は しゅんと なった…\n敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`:`敵の 攻撃・魔力・守備・素早さが ${sk.turns}ターン 下がった！`;});break;
       case 'song':P_(()=>{if(!ok.v)return null;BT.pt.forEach(t=>{t.ab=t.db=sk.turns;t.av=t.dv=sk.amt;});
         const um=(cmd.k==='umekaze'&&hasUmegae(m.id))?1.5:1;NOW(BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,healAmt(sk.p*um));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;}));return um>1?'梅枝の笏から 東風が 吹きわたる！\nみかたの 攻撃力と 守備力が あがった！':'みかたの 攻撃力と 守備力が あがった！';});break;
     }
@@ -2096,9 +2131,10 @@ function autoCmd(i){
   {const db=mySk.find(k=>can(k)&&SK[k].k==='debuff');if(db&&BT.en.some(e=>e.alive&&!(e.deb>0))&&rnd()<.5)return{type:'skill',k:db};}
   const bf=mySk.find(k=>can(k)&&(SK[k].k==='buff'||SK[k].k==='song'));if(bf&&BT.pt.some(t=>isAlive(t)&&(SK[bf].st==='d'?t.db:t.ab)<=0)&&rnd()<.7)return{type:'skill',k:bf};
   const en=BT.en.map((e,j)=>j).filter(j=>BT.en[j].alive),weak=en.sort((a,b)=>BT.en[a].hp-BT.en[b].hp)[0];
-  const aoe=mySk.find(k=>can(k)&&(SK[k].k==='phys'||SK[k].k==='mag')&&SK[k].tg==='enemies');
+  const best=f=>mySk.filter(f).sort((a,b)=>(SK[b].p||1)*(SK[b].hits||1)-(SK[a].p||1)*(SK[a].hits||1))[0];/* いちばん 強い 技を えらぶ（武器の 専用スキルも） */
+  const aoe=best(k=>can(k)&&(SK[k].k==='phys'||SK[k].k==='mag')&&SK[k].tg==='enemies');
   if(aoe&&en.length>=2&&c.mp>=SK[aoe].mp*2)return{type:'skill',k:aoe};
-  const single=mySk.find(k=>can(k)&&(SK[k].k==='phys'||SK[k].k==='mag'||SK[k].k==='drain')&&SK[k].tg==='enemy'&&c.mp>=SK[k].mp*2);
+  const single=best(k=>can(k)&&(SK[k].k==='phys'||SK[k].k==='mag'||SK[k].k==='drain')&&SK[k].tg==='enemy'&&c.mp>=SK[k].mp*2);
   if(single&&rnd()<.6)return{type:'skill',k:single,t:weak};
   if(aoe&&rnd()<.35)return{type:'skill',k:aoe};
   return{type:'atk',t:weak};
@@ -2149,7 +2185,7 @@ function selAlly(filter,cb,prev){const list=BT.pt.map((m,i)=>i).filter(i=>filter
   BT.sub={kind:'ally',list,cb,prev,m:mkMenu(list.map(i=>{const m=BT.pt[i];return{t:CH[m.id].short,r:'H'+fmt(G.chars[m.id].hp)};}),{x:124,y:150,w:132,rows:Math.min(4,list.length)})};return true;}
 function selSkill(){
   const m=BT.pt[BT.ai],d=CH[m.id],c=G.chars[m.id],ks=skillsOf(m.id);
-  BT.sub={kind:'skill',ks,m:mkMenu(ks.map(k=>({t:SK[k].name,r:fmt(skCost(m.id,k))+'MP',dis:c.mp<skCost(m.id,k),col:SK[k].k==='xr'?'#f8d878':null})),{x:124,y:150,w:132,rows:Math.min(4,ks.length)})};
+  BT.sub={kind:'skill',ks,m:mkMenu(ks.map(k=>({t:SK[k].name,r:fmt(skCost(m.id,k))+'MP',dis:c.mp<skCost(m.id,k),col:SK[k].k==='xr'||k==='sakatari'?'#f8d878':/^ws_/.test(k)?'#68ccfc':null})),{x:124,y:150,w:132,rows:Math.min(4,ks.length)})};
 }
 function battleUpd(){
   BT.en.forEach(e=>{if(e.flash>0)e.flash--;if(e.die>0)e.die--;});if(BT.shake>0)BT.shake--;
