@@ -2036,7 +2036,7 @@ function startBattle(boss,rift=null,sp=null){
   if(!boss&&!sp)fitEnemies(en);
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);}const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
@@ -2152,7 +2152,7 @@ function pExtra(i){const m=BT.pt[i];if(!isAlive(m)||!(m.extra>0))return;BT.pend.
   P_(`${nm}の 追加攻撃！`);P_(()=>{const e=BT.en.filter(x=>x.alive).sort((a,b)=>a.hp-b.hp)[0];if(!e)return null;return dmgEnemy(e,phys(cstat(m.id,m).atk,e.def,1.2));});}
 function eAct(i){
   const e=BT.en[i];if(!e.alive)return;const al=BT.pt.filter(isAlive);if(!al.length)return;BT.pend.push('\f');
-  if(e.stun>0){P_(e.charm===2?`${e.label}は 雷に しびれて 動けない！`:e.charm?`${e.label}は ももに 見とれて 動けない…`:`${e.label}は 荒波に のまれて 動けない！`);return;}
+  if(e.passive){P_(`${e.label}は 静かに 脈打っている…`);return;}if(e.stun>0){P_(e.charm===2?`${e.label}は 雷に しびれて 動けない！`:e.charm?`${e.label}は ももに 見とれて 動けない…`:`${e.label}は 荒波に のまれて 動けない！`);return;}
   const tz=BT.taunt&&BT.taunt.t>0&&isAlive(BT.pt[BT.taunt.i])?BT.pt[BT.taunt.i]:null;
   if(tz){const p=e.heavy&&rnd()<.25?1.8:1;P_(`${e.label}は 仏陀に 引きよせられた！`);P_(()=>isAlive(tz)?dmgParty(tz,Math.max(phys(e.atk,cstat(tz.id,tz).def,p),e.magic?magd(e.mag,cstat(tz.id,tz).def,.8):0)):null);return;}
   if(e.boss&&rnd()<.4){P_(`${e.label}は 八つの首から 炎を はいた！`);P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>()=>isAlive(m)?dmgParty(m,magd(e.mag,cstat(m.id,m).def,.9)):null));return null;});return;}
@@ -5352,8 +5352,8 @@ const SKSTG={
     intro:sp=>sp.wave<3?`地下実験場　第${sp.wave}区画\n培養槽の 中で 何かが 動いた…`:'主任 シロガネ「被験体の 補充か。\nちょうど 足りなかった ところだ」'},
   sk_nizu1:{waves:1,f:()=>1.02,mk:()=>[['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3],['総帥 ニズゥーイッツァイ','oni','#1c1c24','#8c0c24',26,1.85,1],['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3]],intro:()=>'ニズゥーイッツァイ「神の 前に ひれ伏せ、 実験体ども。」'},
   sk_nizu2:{waves:2,f:w=>w<2?1.02:1.06,mk:(sp,w)=>w<2?[['コブシデの 複製','oni','#3c2858','#f8b800',10,1.6,1],['錨ケンドウの 複製','oni','#fcfcfc','#f8b800',14,1.65,1,'kendo'],['クロヌマの 複製','oni','#5c5c5c','#f8b800',10,1.6,1]]
-      :[['ニズゥーイッツァイ 幼体','oni','#000000','#d82800',40,1.95,1]],
-    intro:sp=>sp.wave<2?'マイナス宇宙が 過去の 敵を 写し取った！\n複製「……ジッケンタイ……」':'赤い 闇の 奥で 胎児が 脈打っている…\n「ウマレ…ル……」'},
+      :[['ニズゥーイッツァイ 幼体','oni','#000000','#d82800',60,1.95,1]],
+    intro:sp=>sp.wave<2?'マイナス宇宙が 過去の 敵を 写し取った！\n複製「……ジッケンタイ……」':'赤い 闇の 奥で 胎児が 脈打っている…\n「ウマレ…ル……」\n（攻撃は してこない… だが 異常に 硬い！\n　最大HPを 削る スキルが 効きそうだ）'},
   sk_nizu3:{waves:1,f:()=>1.1,mk:()=>[['ニズゥーイッツァイ 生体','oni','#000000','#d82800',70,2.1,1]],intro:()=>'「ワタシハ……カミニ ナッタ」\n天使の 輪を 背負った 神が 降臨した！'}};
 Object.assign(GSTG,SKSTG);
 
