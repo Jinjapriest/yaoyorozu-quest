@@ -3512,9 +3512,10 @@ function slotScr(vi,mc){
     else{do{target=[0,1,2].map(()=>Math.floor(rnd()*21));}while(sym(0,target[0])===3||(sym(0,target[0])===sym(1,target[1])&&sym(1,target[1])===sym(2,target[2])));}
   };
   const lever=()=>{
+    if(!bonus&&!pachiOpen()){auto=false;sfx('ng');pop();dialog(['♪ 蛍の光が 流れてきた…','店内放送「本日は ご来店 まことに\nありがとう ございました。\n22時45分を もちまして 閉店です」','（遊技を 終了した）']);return;}
     if(bonus&&lamp){ph='spin';stopped=[false,false,false];out=bonus;setDisplay(bonus);t=0;msg='7を ねらえ！';sfx('ok');return;}
     if(!free){if(P.medals<3){msg='メダルが ありません';auto=false;sfx('ng');return;}P.medals-=3;mc.diff-=3;sd-=3;}
-    free=false;mc.spins++;if(card){card.pt=(card.pt||0)+(mc.spins%10===0?1:0);}
+    free=false;mc.spins++;G.pachi.sc=(G.pachi.sc||0)+1;if(G.pachi.sc%12===0)timeAdd(1);if(card){card.pt=(card.pt||0)+(mc.spins%10===0?1:0);}
     const s=mc.s,r=rnd();let o='lose';let a=0;
     if(!bonus){if(r<(a+=1/(hana?HANA_B:SET_B)[s]))o='BIGF';else if(r<(a+=1/(hana?HANA_R:SET_R)[s]))o='REGF';}
     if(o==='lose'&&hana){const r2=rnd();let b=0;if(r2<(b+=1/HANA_BELL[s]))o='bell';else if(r2<(b+=1/7.3))o='replay';else if(r2<(b+=1/40))o='cherry';}
@@ -3558,7 +3559,30 @@ function slotScr(vi,mc){
       region(44,44,168,74,()=>{vA=true;});
     }});
 }
-function pachiFac(){
+/* 営業時間（9:00〜22:45）と アツい日の 入場抽選 */
+const PACHI_OPEN=9*60,PACHI_CLOSE=22*60+45;
+const pachiOpen=()=>{const m=nowMin();return m>=PACHI_OPEN&&m<PACHI_CLOSE;};
+const pachiCrowd=vi=>{const dt=hallDay(vi);return isKaso(vi)?[0,6,10,15][dt]:[0,80,150,300][dt];};
+/* 先に 入った 客に 取られた 台（番号が 若いほど 良い台が 残る） */
+function pachiTaken(vi,ms){const dt=hallDay(vi);if(!dt)return new Set();const L=G.pachi.lot,mine=L&&L.vi===vi&&L.day===G.day,A=mine?L.no-1:pachiCrowd(vi);
+  const T=Math.min(ms.length-1,Math.round(ms.length*A/(A+12))),r=lcg(vi*313+G.day*17+5);
+  return new Set(ms.map(mc=>({no:mc.no,k:mc.s+r()*2.2})).sort((a,b)=>b.k-a.k).slice(0,T).map(x=>x.no));}
+function pachiFac(){const vi=curVil,dt=hallDay(vi),m=nowMin();
+  if(m>=PACHI_CLOSE||m<5*60){dialog(['シャッターが 下りている。','「営業時間 9:00〜22:45」\n本日の 営業は 終了しました。']);return;}
+  if(m<PACHI_OPEN){
+    if(!dt){choice('開店前だ。（9:00 開店）',['開店まで 待つ','やめる'],r=>{if(r!==0)return;timeAdd(PACHI_OPEN-nowMin());pachiHall();});return;}
+    const L=G.pachi.lot;if(L&&L.vi===vi&&L.day===G.day){choice(`抽選番号 ${L.no}番を 持っている。\n開店（9:00）まで 待ちますか？`,['待つ','やめる'],r=>{if(r!==0)return;timeAdd(PACHI_OPEN-nowMin());pachiHall();});return;}
+    const crowd=pachiCrowd(vi);
+    dialog([`店の 前に 長い 行列が できている！\n（本日 ${DAYN[dt]}）`,`並んでいる 市民は およそ ${crowd}人…`,'店員「8時30分から 入場抽選を\n行いまーす！ 最後尾は こちらでーす！」'],()=>
+      choice('列に 並んで 入場抽選を 受けますか？',['並ぶ','やめる'],r=>{if(r!==0)return;
+        const no=1+Math.floor(rnd()*(crowd+1));G.pachi.lot={vi,day:G.day,no};timeAdd(Math.max(0,PACHI_OPEN-nowMin()));save();
+        const ms=machinesFor(vi),tk=pachiTaken(vi,ms);sfx(no<=10?'g5':'ok');
+        dialog(['8時30分。 入場抽選が 始まった。','抽選機の ボタンを 押した…',`抽選番号 ${no}番！`+(no<=10?'\n（すばらしい 好番号だ！）':no<=crowd/3?'\n（まずまずの 番号だ）':'\n（…かなり 後ろの 番号だ）'),
+          `9時。 開店！\n番号順に 市民が 店内へ なだれこむ…`,tk.size?`先に 入った 客が ${tk.size}台を 確保した。\n（残りの 台から えらぼう）`:'一番乗りだ！ 好きな 台を えらべる！'],()=>pachiHall());},120));
+    return;}
+  if(dt&&!(G.pachi.lot&&G.pachi.lot.vi===vi&&G.pachi.lot.day===G.day)&&!pachiFac.seen){pachiFac.seen=1;dialog(['店内は 満席に 近い…','（入場抽選は もう 終わっている。\nアツい日は 開店前に 並ぼう）'],()=>{pachiFac.seen=0;pachiHall();});return;}
+  pachiHall();}
+function pachiHall(){
   const vi=curVil,P=G.pachi,[rate,rn]=hallRate(vi),cardOf=()=>P.cards['v'+vi];
   if(P.hall!==vi){P.hall=vi;P.medals=0;}
   const m=mkMenu([],{x:4,y:118,w:156,rh:14,rows:6});
@@ -3580,7 +3604,7 @@ function pachiFac(){
       if(r===4){const sc=hallSchedule(vi);dialog([`本日は ${DAYN[hallDay(vi)]}です。\n特日・イベ日・周年日は 高設定が 増えます。`,'これからの 予定：\n'+sc.slice(0,3).join('\n'),...(sc.length>3?[sc.slice(3,6).join('\n')]:[])]);return;}
       if(r==='cancel'||r===5){if(P.medals>0){choice(`持ちメダルが ${P.medals}枚 あります。`,[cardOf()?'貯メダルにして でる':'景品に 交換して でる','もどる'],k=>{if(k!==0)return;
           if(cardOf()){cardOf().stored+=P.medals;P.medals=0;save();pop();toast('貯メダルに しました');}else exchange(()=>pop());},150);return;}pop();save();return;}
-      if(r===0){const ms=machinesFor(vi);listPick('台えらび（今日の データ）',ms.map(mc=>({t:`${mc.no} ${mc.type==='hana'?'ハイビスカス':'ピエロ'}`,r:`${fmt(mc.spins)}G B${mc.big} R${mc.reg}`})),i=>slotScr(vi,ms[i]),
+      if(r===0){if(!pachiOpen()){dialog('店内放送「まもなく 閉店です」\n（もう 遊技できない）');return;}const ms=machinesFor(vi),tk=pachiTaken(vi,ms);listPick('台えらび（今日の データ）',ms.map(mc=>({t:`${mc.no} ${mc.type==='hana'?'ハイビスカス':'ピエロ'}`,r:tk.has(mc.no)?'使用中':`${fmt(mc.spins)}G B${mc.big} R${mc.reg}`,col:tk.has(mc.no)?'#7c7c7c':null})),i=>{if(tk.has(ms[i].no)){sfx('ng');toast('その 台は 使用中です');return;}slotScr(vi,ms[i]);},
         sel=>{const mc=ms[sel];return mc?`合成 ${mc.big+mc.reg?'1/'+Math.round(mc.spins/(mc.big+mc.reg)):'---'}　BIG確率 ${mc.big?'1/'+Math.round(mc.spins/mc.big):'---'}\nREG確率 ${mc.reg?'1/'+Math.round(mc.spins/mc.reg):'---'}\n設定は ないしょ。 データから 読もう。`:'';});}
       if(r===1){const opts=[[1000,50],[5000,250],[10000,500]].filter(([c])=>c<=G.coins);if(!opts.length){toast('イェソが たりません');return;}
         choice(`貸し出し：100イェソで 5枚（1枚20イェソ）\n当店の 交換率：${rn}`,opts.map(([c,n])=>`${fmt(c)}イェソ→${n}枚`),k=>{if(k<0)return;const [c,n]=opts[k];G.coins-=c;P.medals+=n;sfx('coin');save();toast(`${n}枚 借りました`);},150);}
@@ -3597,11 +3621,12 @@ function pachiFac(){
       for(let row=0;row<2;row++)for(let k=0;k<10;k++){if(ks&&(row===1||k<3||k>6))continue;const x=6+k*25,y=14+row*48;R(x,y,20,40,'#3c3c3c');R(x+2,y+2,16,10,(frame>>3)%10===k?'#f878f8':'#d82800');R(x+3,y+16,14,10,'#fcfcfc');
         R(x+4,y+18,3,6,'#d82800');R(x+9,y+18,3,6,'#d82800');R(x+14,y+18,2,6,'#d82800');R(x+2,y+30,6,4,(frame+k*7)%40<20?'#f8b800':'#3c3c3c');}
       big(ks?'パチンコ さびれ屋':'パーラー 八百万',128,2,ks?'#bcbcbc':'#f8b800','center',8);if(ks)txt('（客は まばらだ…）',128,70,'#7c7c7c','center');
+      if(G.pachi.lot&&G.pachi.lot.vi===vi&&G.pachi.lot.day===G.day)txt(`抽選 ${G.pachi.lot.no}番`,6,2,'#f8d878');
       R(0,100,W,14,DAYC[dt]);txt(`本日 ${DAYN[dt]}`+(dt===3?'！ 全台 高設定 期待大':dt?'！ 高設定 増量中':''),128,103,dt?'#000':'#fcfcfc','center',240);
       menuDraw(m,a);win(164,118,88,118);
       txt('交換率',172,126,'#bcbcbc');txt(rn,172,138,'#f8b800','left',72);txt('持ちメダル',172,154,'#bcbcbc');txt(fmt(P.medals)+'枚',244,166,'#fcfcfc','right');
       const c=cardOf();txt('会員カード',172,182,'#bcbcbc');txt(c?`貯${fmt(c.stored)} ${c.pt}pt`:'なし',244,194,'#fcfcfc','right',72);
-      txt(`小景品 ${prizeMedals(vi,2)}枚`,172,214,'#bcbcbc','left',72);
+      txt(`小景品 ${prizeMedals(vi,2)}枚`,172,206,'#bcbcbc','left',72);txt('営業 9:00〜22:45',172,222,'#7c7c7c','left',76);
     }});
 }
 function kokanFac(){
