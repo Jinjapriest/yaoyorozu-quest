@@ -537,6 +537,7 @@ const BASE_SKILLS={
   tg_kinri:{name:'イカサマ 暴き',mp:16,target:'enemies',kind:'mag',power:3.2,verb:'突きつけた'},
   tg_kurofuku:{name:'元幹部の 采配',mp:14,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'ふるった'},
   tg_shakusho:{name:'借用書 破棄',mp:16,target:'allies',kind:'heal',power:2.2,revive:true,verb:'破り捨てた'},
+  goddice:{name:'ジャッジメント・ゴッドダイス',mp:0,target:'enemies',kind:'gd',verb:'天に 投げた'},
   teiaiou:{name:'シゴロ返し',mp:60,target:'enemies',kind:'xr',verb:'しかけた'},
   sakatari:{name:'佐加太利',mp:70,target:'enemies',kind:'xr',verb:'降ろした'},
   cg_omu:{name:'ケチャップ アート',mp:4,target:'enemy',kind:'mag',power:1.8,verb:'描いた'},
@@ -678,7 +679,7 @@ function checkPack(p){
   const sk=Object.assign({},SK,p.skills||{});
   for(const [id,s] of Object.entries(p.skills||{})){
     if(!s||!s.name)errs.push(`スキル ${id}：name がありません。`);
-    if(!['phys','mag','heal','revive','buff','drain','song','gamble','debuff','xr','mprec'].includes(s&&s.kind))errs.push(`スキル ${id}：kind は phys / mag / heal / revive / buff / drain / song のどれかです。`);
+    if(!['phys','mag','heal','revive','buff','drain','song','gamble','debuff','xr','mprec','gd'].includes(s&&s.kind))errs.push(`スキル ${id}：kind は phys / mag / heal / revive / buff / drain / song のどれかです。`);
     if(!['enemy','enemies','ally','allies','dead'].includes(s&&s.target))errs.push(`スキル ${id}：target は enemy / enemies / ally / allies / dead のどれかです。`);
   }
   const ids=new Set();
@@ -1035,7 +1036,9 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));return b;};
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
+/* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
+function gdPinch(){if(typeof BT==='undefined'||!BT||!BT.pt)return false;const n=BT.pt.length,dead=BT.pt.filter(t=>!isAlive(t)).length;let hp=0,mx=0;BT.pt.forEach(t=>{hp+=Math.max(0,G.chars[t.id].hp);mx+=cstat(t.id,t).hp;});return (n>1&&dead>=Math.ceil(n/2))||hp/Math.max(1,mx)<=.3;}
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
 const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
@@ -2089,6 +2092,7 @@ function pAct(i){
       case 'revive':P_(()=>{if(!ok.v)return null;const t=BT.pt[cmd.t];if(!t||isAlive(t))return 'しかし なにも おこらなかった。';G.chars[t.id].hp=Math.round(cstat(t.id).hp*.5);return `${CH[t.id].short}は 生きかえった！`;});break;
       case 'buff':P_(()=>{if(!ok.v)return null;BT.pt.forEach(t=>{if(sk.st==='d'){t.db=sk.turns;t.dv=sk.amt;}else{t.ab=sk.turns;t.av=sk.amt;}});
         return `みかたの ${sk.st==='d'?'守備力':'攻撃力'}が あがった！`;});break;
+      case 'gd':P_(()=>{if(!ok.v)return null;BT.gdUsed=1;const r=gdRoll();BT.gdRes=r;push(godDiceScr(r));return 'タガバソウ「神の 賽よ… 審判を 下せ！！」';});P_(()=>ok.v?gdApply(BT.gdRes):null);break;
       case 'mprec':P_(()=>{if(!ok.v)return null;sfx('heal');NOW(BT.pt.filter(isAlive).map(t=>()=>{const tc=G.chars[t.id],mx=cstat(t.id,t).mp,v=Math.min(mx-tc.mp,Math.round(mx*(t===m?.15:.35)));tc.mp+=v;return `${CH[t.id].short}の MPが ${fmt(v)} 回復した！`;}));return '日輪の 光が みかたの 魔力を 満たしていく！';});break;
       case 'xr':if(cmd.k==='neongenesis'){P_(()=>{if(!ok.v)return null;BT.ng=1;BT.ngUsed=1;sfx('g5');BT.shake=30;
             BT.pt.forEach(t=>{const tc=G.chars[t.id],cs=cstat(t.id,t);tc.hp=cs.hp;tc.mp=cs.mp;});
@@ -2144,6 +2148,7 @@ function autoCmd(i){
   const idx=BT.pt.map((x,j)=>j),alive=idx.filter(j=>isAlive(BT.pt[j])),dead=idx.filter(j=>!isAlive(BT.pt[j]));
   const hr=j=>G.chars[BT.pt[j].id].hp/cstat(BT.pt[j].id).hp,low=alive.filter(j=>hr(j)<.45).sort((a,b)=>hr(a)-hr(b));
   const mySk=myAll;
+  if(can('goddice'))return{type:'skill',k:'goddice'};
   if(can('nichirin')&&BT.pt.some(t=>isAlive(t)&&t!==m&&G.chars[t.id].mp<cstat(t.id,t).mp*.5)&&rnd()<.7)return{type:'skill',k:'nichirin'};
   if(can('neongenesis')&&BT.en.some(e=>e.alive)&&(BT.pt.some(t=>!isAlive(t))||alive.some(j=>hr(j)<.5)||rnd()<.25))return{type:'skill',k:'neongenesis'};
   if(can('addimpact')&&BT.en.some(e=>e.alive)&&!G.party.some(p=>ngReady(p))&&rnd()<.6)return{type:'skill',k:'addimpact'};
@@ -2201,6 +2206,7 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
+    case 'gd':return 'タガバソウの 固有スキル（1戦に 1回）\n味方が 負けそうな ときだけ 使える\n（半数以上が 戦闘不能 か HP合計 30%以下）\n神の 賽の 出目で 大逆転…！';
     case 'phys':return `${tg}に 物理攻撃（威力 ×${s.p}${s.hits>1?`・${s.hits}回 攻撃`:''}）\n攻撃力で ダメージが きまる`;
     case 'mag':return `${tg}に 魔法攻撃（威力 ×${s.p}）\n魔力で ダメージが きまる`;
     case 'heal':return `${tg}の HPを 回復（回復力 ×${s.p}）${s.rev?'\n倒れた 味方も 生きかえる':''}`;
@@ -2219,7 +2225,7 @@ function selAlly(filter,cb,prev){const list=BT.pt.map((m,i)=>i).filter(i=>filter
   BT.sub={kind:'ally',list,cb,prev,m:mkMenu(list.map(i=>{const m=BT.pt[i];return{t:CH[m.id].short,r:'H'+fmt(G.chars[m.id].hp)};}),{x:124,y:150,w:132,rows:Math.min(4,list.length)})};return true;}
 function selSkill(){
   const m=BT.pt[BT.ai],d=CH[m.id],c=G.chars[m.id],ks=skillsOf(m.id);
-  BT.sub={kind:'skill',ks,m:mkMenu(ks.map(k=>({t:SK[k].name,r:fmt(skCost(m.id,k))+'MP',dis:c.mp<skCost(m.id,k),col:SK[k].k==='xr'||k==='sakatari'?'#f8d878':/^ws_/.test(k)?'#68ccfc':null})),{x:124,y:150,w:132,rows:Math.min(4,ks.length)})};
+  BT.sub={kind:'skill',ks,m:mkMenu(ks.map(k=>({t:SK[k].name,r:fmt(skCost(m.id,k))+'MP',dis:c.mp<skCost(m.id,k),col:SK[k].k==='xr'||k==='sakatari'||k==='goddice'?'#f8d878':/^ws_/.test(k)?'#68ccfc':null})),{x:124,y:150,w:132,rows:Math.min(4,ks.length)})};
 }
 function battleUpd(){
   BT.en.forEach(e=>{if(e.flash>0)e.flash--;if(e.die>0)e.die--;});if(BT.shake>0)BT.shake--;
@@ -5049,6 +5055,42 @@ function tiWin(sp,back0,pages){const T=tiS(),back=more=>dialog(pages,()=>{return
     dialog(pages,()=>{BT=null;scene('chika',['コブシデ「ぐ… ぐおお… まだだ……！」','コブシデは 自分の 首に 同期装置を 突き立てた！\n「出力… 最大……！」','コブシデの 体から 赤黒い 光が あふれだす…\n暴走だ！','コブシデ「実験体を 逃がしては…\nニズゥーイッツァイ様に 顔向けが……！！」','タガバソウが コブシデに 組みついた！','タガバソウ「ここは わしが 止める！\n行け！ 地上へ！！」','裏・賭郎「じいさん…！」\nタガバソウ「振り向くな！ 行くんじゃ！」','昇降機の 扉が 閉まる… タガバソウの 背中が\n赤い 光の 中に 消えていった…','…まぶしい！ 地上の 光だ！','裏・賭郎「…あのじいさんに 救われたな」','「暴走した コブシデが 口に した 名…\nニズゥーイッツァイ…」','裏・賭郎「そいつが すべての 黒幕だ。\n…埼玉の 方角に 根城が あると 聞いた」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
       dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）','── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
   back([]);}
+/* ===================== ジャッジメント・ゴッドダイス（タガバソウ 固有） ===================== */
+function gdRoll(){const x=rnd();let d,k;
+  if(x<1/6){d=[1,1,1];k='pin';}else if(x<1/3){const n=ri(2,6);d=[n,n,n];k='zoro';}else if(x<2/3){d=[4,5,6];k='shigoro';}else if(x<11/12){const a=ri(1,6);let n=ri(1,6);while(n===a)n=ri(1,6);d=[a,a,n];k='me';}else{d=[1,2,3];k='hifumi';}
+  return{d,k,n:k==='me'?d[2]:d[0]};}
+const GD_NAME={pin:'ピンゾロ',zoro:'ゾロ目',shigoro:'シゴロ',me:'目',hifumi:'ヒフミ'};
+function gdApply(r){const live=()=>BT.en.filter(e=>e.alive),pt=BT.pt,L=[];
+  const heal=f=>pt.forEach(t=>{const c=G.chars[t.id],mx=cstat(t.id,t).hp;c.hp=Math.max(c.hp,Math.round(mx*f));});
+  const hit=f=>L.push(...live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*f))):null));
+  let msg;
+  if(r.k==='pin'){heal(1);L.push(...live().map(e=>()=>e.alive?dmgEnemy(e,e.boss||e.dboss?Math.ceil(e.maxhp*.5):e.hp):null));msg='ピンゾロ！！ 神の 審判が 下った！\nみかた 全員 全回復・復活！\n敵は 審判の 雷に 打たれた！';}
+  else if(r.k==='zoro'){heal(1);hit(.5);live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.5);e.mag=Math.round(e.mag*.5);e.def=Math.round(e.def*.5);}e.deb=5;});msg=`${r.n}の ゾロ目！ 3倍づけの 審判！\nみかた 全員 全回復・復活！\n敵の 最大HPの 50%を 削り 力を 半分に！`;}
+  else if(r.k==='shigoro'){heal(1);hit(.35);msg='シゴロ！ 2倍づけの 審判！\nみかた 全員 全回復・復活！\n敵の 最大HPの 35%を 削る！';}
+  else if(r.k==='me'){heal(r.n*.15);hit(r.n*.05);msg=`${r.n}の 目！\nみかた 全員が HP ${r.n*15}%で 立ち上がる！\n敵に 最大HPの ${r.n*5}%の ダメージ！`;}
+  else{heal(.3);msg='ヒフミ…！ 神は 試練を 与えた。\n…だが 見捨ては しない。\nみかた 全員が HP 30%で 立ち上がる！';}
+  NOW(L);sfx('heal');BT.shake=20;return msg;}
+/* 専用演出：暗転 → 金の 光 → 神の 賽が 3つ 舞う → 出目 確定 → 審判 */
+function godDiceScr(r){let t=0;const END=230,tumble=[[0,0,0],[0,0,0],[0,0,0]],seed=[rnd(),rnd(),rnd()];
+  const pip=(x,y,v,sz,col)=>{const P=[[],[[0,0]],[[-1,-1],[1,1]],[[-1,-1],[0,0],[1,1]],[[-1,-1],[1,-1],[-1,1],[1,1]],[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]][v];const q=sz*.28;P.forEach(([a,b])=>{ctx.fillStyle=v===1?'#d82800':col;ctx.fillRect(Math.round(x+a*q-(v===1?3:2)),Math.round(y+b*q-(v===1?3:2)),v===1?6:4,v===1?6:4);});};
+  const die=(x,y,v,rot,sz)=>{ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle='#7c5800';ctx.fillRect(-sz/2-1,-sz/2-1,sz+2,sz+2);ctx.fillStyle='#f8d878';ctx.fillRect(-sz/2,-sz/2,sz,sz);ctx.fillStyle='#fce8a8';ctx.fillRect(-sz/2,-sz/2,sz,3);pip(0,0,v,sz,'#3c2400');ctx.restore();};
+  return{full:true,upd(){t++;
+      if(t<40&&t%10===0)tone(55+t,.3,'triangle',.35);
+      if(t===40){noise(.4,.2);tone(220,.4,'sawtooth',.15,880);}
+      if(t>40&&t<130&&t%5===0){tone(900+ri(0,400),.03,'square',.08);for(let i=0;i<3;i++)tumble[i]=[ri(1,6),0,0];}
+      if(t===130){sfx('g5');noise(.8,.4);tone(110,1.2,'triangle',.4,40);}
+      if(t===150)[523,659,784,1047,1319].forEach((f,k)=>tone(f,.5,'square',.12,null,k*.08));
+      if(t>=END||(t>150&&I.A))pop();},
+    drw(){const f=Math.min(1,t/30);R(0,0,W,H,'#000');
+      ctx.globalAlpha=f*.9;for(let k=0;k<16;k++){const a=k/16*Math.PI*2+t*.01;ctx.fillStyle=k%2?'#3c2800':'#5c4000';ctx.beginPath();ctx.moveTo(128,96);ctx.lineTo(128+Math.cos(a)*260,96+Math.sin(a)*260);ctx.lineTo(128+Math.cos(a+.2)*260,96+Math.sin(a+.2)*260);ctx.fill();}ctx.globalAlpha=1;
+      const ty=Math.round(Math.max(0,30-t*.8));ctx.save();ctx.translate(128,138+ty);ctx.scale(1.4,1.4);drawTagaba(0,0,t,0);ctx.restore();
+      if(t>15){ctx.globalAlpha=Math.min(1,(t-15)/20);big('JUDGMENT',128,14,'#f8d878','center',20);txt('ジャッジメント・ゴッドダイス',128,40,'#fcfcfc','center');ctx.globalAlpha=1;}
+      if(t>=40){const land=t>=130;for(let i=0;i<3;i++){const p=Math.min(1,(t-40)/90),sx=40+i*88,x=land?92+i*36:sx+(92+i*36-sx)*p,y=land?146:70+Math.abs(Math.sin((t+seed[i]*30)/7))*-40+p*76;
+          const v=land?r.d[i]:tumble[i][0]||1,rot=land?0:(t*.35+seed[i]*6);die(x,y,v,rot,land?28:22);}}
+      if(t>=130&&t<140){ctx.globalAlpha=1-(t-130)/10;R(0,0,W,H,'#fcfcfc');ctx.globalAlpha=1;}
+      if(t>=140){const nm=r.k==='zoro'?`${r.n}の ゾロ目`:r.k==='me'?`${r.n}の 目`:GD_NAME[r.k],col=r.k==='hifumi'?'#a4e4fc':r.k==='pin'?'#fc7460':'#f8d878';
+        win(28,168,200,58);big(nm,128,174,col,'center',r.k==='pin'?24:20);txt(r.k==='hifumi'?'神は 試練を 与えた…':'神の 審判が 下る！',128,208,'#fcfcfc','center');}
+      region(0,0,W,H,()=>{vA=true;});}};}
 /* ===================== TAインダストリアル（地下帝国編の クリア報酬） ===================== */
 function tiTaInit(){if(!G.ta)G.ta={cash:1e9,fin:{out:0,rate:0,susp:0,last:null},hall:{vi:null,set:null,rep:1,ev:0,last:null}};}
 const TA_RN=['法定金利（年15%）','グレーゾーン（年29.2%）','帝愛式（10日で4割）'],TA_DR=[.00041,.0008,.034],TA_DEF=[.00006,.00018,.012],TA_DEM=[1,.75,.45];
