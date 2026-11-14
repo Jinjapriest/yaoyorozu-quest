@@ -5772,9 +5772,19 @@ function ajDrawAll(npcs,P,mv){ajRoomBg();
   npcs.forEach(n=>list.push({y:n.y,d:()=>drawChar(n.id,AJ_OX+n.x*16,AJ_OY+n.y*16-2,(frame>>4)&1)}));
   if(P){const ox=mv?mv.dx*mv.t:0,oy=mv?mv.dy*mv.t:0;list.push({y:P.y+.5,d:()=>drawChar(G.party[0],AJ_OX+P.x*16+ox,AJ_OY+P.y*16-2+oy,(frame>>3)&1)});}
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());}
+/* ---------- 電気の 契約（昇圧）・ブレーカー ---------- */
+const AJ_AMP=[{n:'30A',w:3000,cost:0,fee:30},{n:'40A',w:4000,cost:20000,fee:40},{n:'60A',w:6000,cost:50000,fee:60},{n:'200V 昇圧工事',w:10000,cost:200000,fee:100},{n:'高圧受電（キュービクル）',w:30000,cost:2000000,fee:500}];
+const AJ_LW={pcd:500,pcn:150,mon:40,slot:300,ih:1400,water:350,hmini:60,hbair:30,hbpro:100,hstudio:200,hpro:900};
+function ajLoad(){const A=ajS();let w=500;A.furn.forEach(f=>{if(f.k==='pcj'){const b=(A.builds||[])[f.b];if(b)w+=pcNeedW(b);}else if(f.k==='rack')w+=(f.n||0)*400;else w+=AJ_LW[f.k]||0;});return w;}
+const ajCap=()=>AJ_AMP[ajS().amp||0].w,ajTrip=()=>ajLoad()>ajCap();
+function ajAmpScr(){const A=ajS(),cur=A.amp||0,ld=ajLoad();
+  listPick(`電気の 契約（今：${AJ_AMP[cur].n}）`,AJ_AMP.map((a,i)=>({t:(i===cur?'▶':'')+a.n,r:i>cur?`工事費 ${fmt(a.cost)}`:i===cur?'契約中':'変更 無料'})),i=>{if(i===cur)return;const a=AJ_AMP[i];
+    const go=()=>{A.amp=i;save();sfx('ok');dialog([i>cur?(i>=3?'電気工事の 人が 来て 配線を 引き直した。':'電力会社に 連絡して 契約を 変更した。'):'契約を 小さくした。',`契約：${a.n}（最大 ${fmt(a.w)}W）\n使っている 電力：${fmt(ld)}W`,ld>a.w?'まだ 足りない… ブレーカーが 落ちる！':'ブレーカーは 大丈夫だ！',`基本料金：1日 ${fmt(a.fee)}イェソ（電気代に 加算）`]);};
+    if(i>cur){if(G.coins<a.cost){dialog('イェソが たりない…（工事費は 所持金から）');return;}choice(`${a.n}に 昇圧しますか？\n工事費 ${fmt(a.cost)}イェソ`,['する','やめる'],r=>{if(r!==0)return;G.coins-=a.cost;go();},88);}else go();},
+    s=>`使っている 電力：${fmt(ld)}W／契約 ${fmt(AJ_AMP[cur].w)}W${ld>AJ_AMP[cur].w?'（オーバー！）':''}\n${AJ_AMP[s].n}：最大 ${fmt(AJ_AMP[s].w)}W　基本料金 1日 ${AJ_AMP[s].fee}イェソ\n（家具を 置きすぎると ブレーカーが 落ちる）`);}
 /* ---------- アジトの 光熱費（銀行口座から 引き落とし） ---------- */
 const AJ_EW={pcd:300,pcn:80,mon:30,slot:120,ih:100,water:40,hmini:30,hbair:20,hbpro:60,hstudio:80,hpro:150},AJ_ELEC=new Set(['pcd','pcn','pcj','mon','rack','slot','ih','water','hmini','hbair','hbpro','hstudio','hpro']);
-function ajBill(){const A=ajS();if(A.x==null)return null;let e=200,w=100;const it=[['照明・冷蔵庫など',200,'e'],['生活用水',100,'w']];
+function ajBill(){const A=ajS();if(A.x==null)return null;const am=AJ_AMP[A.amp||0];let e=200+am.fee,w=100;const it=[[`基本料金（${am.n}）`,am.fee,'e'],['照明・冷蔵庫など',200,'e'],['生活用水',100,'w']];
   A.furn.forEach(f=>{let v=0;if(f.k==='pcj'){const b=(A.builds||[])[f.b];v=b?Math.round(pcNeedW(b)*.6):0;}else if(f.k==='rack')v=(f.n||0)*150;else v=AJ_EW[f.k]||0;if(v){e+=v;it.push([f.k==='rack'?`サーバー ${f.n||0}台`:f.k==='pcj'?`自作PC「${((A.builds||[])[f.b]||{}).name||''}」`:AJ_F[f.k].n,v,'e']);}});
   if(A.furn.some(f=>f.k==='water')){w+=80;it.push(['ウォーターサーバーの 水',80,'w']);}if(A.furn.some(f=>f.k==='ih')){w+=40;it.push(['台所の 水',40,'w']);}
   (G.garden||[]).forEach((g,i)=>{if(g&&g.c){const v=i<4?30:60;w+=v;it.push([i<4?'畑の 水やり':'田んぼの 水',v,'w']);}});return{e,w,it};}
@@ -5785,7 +5795,7 @@ function ajDaily(){if(!ajOK())return[];const A=ajS(),bl=ajBill();if(!bl)return[]
   if(A.bill.d>=7){out.push(`アジトの 光熱費（${A.bill.d}日分）が\n口座から 引き落とされた。\n電気代 ${fmt(A.bill.e)}イェソ／水道代 ${fmt(A.bill.w)}イェソ`);A.bill={e:0,w:0,d:0};}return out;}
 function ajBillScr(){const A=ajS(),bl=ajBill();if(!bl){dialog('アジトが ない。');return;}const E=bl.it.filter(x=>x[2]==='e'),Wt=bl.it.filter(x=>x[2]==='w');
   dialog([`【光熱費（1日あたり）】\n電気代 ${fmt(bl.e)}イェソ／水道代 ${fmt(bl.w)}イェソ\n毎日 銀行の 普通預金から 引き落とし`,'電気：\n'+E.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),...(E.length>4?['電気（つづき）：\n'+E.slice(4,8).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n')]:[]),'水道：\n'+Wt.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),
-    A.cut?`※ 滞納中（${fmt(A.debt||0)}イェソ）\n電気と 水道が 止まっている！`:`普通預金：${fmt(G.bank.sav)}イェソ`]);}
+    A.cut?`※ 滞納中（${fmt(A.debt||0)}イェソ）\n電気と 水道が 止まっている！`:`普通預金：${fmt(G.bank.sav)}イェソ\n使用電力 ${fmt(ajLoad())}W／契約 ${fmt(ajCap())}W`+(ajTrip()?'\n（ブレーカーが 落ちている！）':'')]);}
 function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
   const P={x:AJ_DX,y:AJ_H-1,dir:'u'},npcs=[],spots=[[3,5],[10,5],[4,8],[10,8],[2,3],[11,3],[6,3]];
   const busy=(x,y,self)=>!ajFloor(x,y)||ajFurnAt(x,y)||(P.x===x&&P.y===y)||npcs.some(n=>n!==self&&n.x===x&&n.y===y);
@@ -5803,17 +5813,17 @@ function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
       P.dir=dy<0?'u':dy>0?'d':dx<0?'l':'r';
       if(dy>0&&P.x===AJ_DX&&P.y===AJ_H-1){pop();sfx('ok');save();return;}
       const nx=P.x+dx,ny=P.y+dy;if(!busy(nx,ny))this.mv={x1:nx,y1:ny,dx,dy,t:0};},
-    drw(){ajDrawAll(npcs,P,this.mv);if(A.cut){ctx.globalAlpha=.55;R(0,AJ_OY,W,AJ_H*16+4,'#000010');ctx.globalAlpha=1;txt('（電気が 止まっている）',128,AJ_OY+4,'#fc7460','center');}const tot=AJ_KA.filter(k=>k!=='rsv').reduce((s,k)=>s+(A.inv[k]||0),0);
+    drw(){ajDrawAll(npcs,P,this.mv);if(A.cut||ajTrip()){ctx.globalAlpha=.55;R(0,AJ_OY,W,AJ_H*16+4,'#000010');ctx.globalAlpha=1;txt(A.cut?'（電気が 止まっている）':`（ブレーカーが 落ちている ${fmt(ajLoad())}W／${fmt(ajCap())}W）`,128,AJ_OY+4,'#fc7460','center',230);}const tot=AJ_KA.filter(k=>k!=='rsv').reduce((s,k)=>s+(A.inv[k]||0),0);
       txt(`仲間 ${A.chars.length}/3　家具 ${A.furn.length}/${tot}`,8,22,'#bcbcbc');
       if(P.x===AJ_DX&&P.y===AJ_H-1)txt('↓ 外に 出る',248,22,'#f8d878','right');}};
   push(scr);
   {const dl=fkDone()?amzDeliver():null;if(dl)dialog(dl);}
-  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&A.cut){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=ns*5000*d;A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
+  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&(A.cut||ajTrip())){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=ns*5000*d;A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
   if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」、 パソコン関係は\n「Dスパラ」か「アークン」で 買える。']);}
 }
 function ajRoomMenu(P,npcs,sync){const A=ajS();
-  const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['光熱費を 見る','外に 出る','とじる']);
-  choice('',OPT,rr=>{const lab=OPT[rr];if(lab==='庭に 出る'){gardenScr();return;}if(lab==='料理を 食べる'){eatScr();return;}if(lab==='光熱費を 見る'){ajBillScr();return;}const r=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'].indexOf(lab);
+  const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['光熱費を 見る','電気の 契約（昇圧）','外に 出る','とじる']);
+  choice('',OPT,rr=>{const lab=OPT[rr];if(lab==='庭に 出る'){gardenScr();return;}if(lab==='料理を 食べる'){eatScr();return;}if(lab==='光熱費を 見る'){ajBillScr();return;}if(lab==='電気の 契約（昇圧）'){ajAmpScr();return;}const r=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'].indexOf(lab);
     if(r===0){const ks=AJ_KA.filter(k=>ajLeft(k)>0);if(!ks.length){dialog(A.furn.length?'置ける 家具が もう ない。\n（太陽家具で 買い足そう）':'まだ 家具を 持っていない。\n規模「大」以上の 町の「太陽家具」で 買おう。');return;}
       listPick('どの 家具を 置く？',ks.map(k=>({t:AJ_F[k].n,r:`のこり${ajLeft(k)}`})),i=>ajPlace(ks[i],P,npcs));}
     else if(r===1){if(!A.furn.length){dialog('置いてある 家具は ない。');return;}
@@ -5831,12 +5841,13 @@ function ajPlace(k,P,npcs){const A=ajS(),h=AJ_F[k].h||1,wd=AJ_F[k].w||1;let cx=M
   push({full:true,upd(){if(I.B){pop();return;}
       if(I.pu)cy=Math.max(2,cy-1);if(I.pd)cy=Math.min(AJ_H-h,cy+1);if(I.pl)cx=Math.max(0,cx-1);if(I.pr)cx=Math.min(AJ_W-wd,cx+1);
       if(I.A){if(!ok(cx,cy)){sfx('bump');if(k==='rsv')toast('サーバーラックの 上で 置こう');return;}if(k==='rsv'){const r=ajFurnAt(cx,cy);r.n=(r.n||0)+1;if(A.srvDay==null)A.srvDay=G.day;save();sfx('ok');pop();toast('サーバーを ラックに 載せた！');return;}
-        const o={k,x:cx,y:cy};if(k==='pcj'){const used=A.furn.filter(f=>f.k==='pcj').map(f=>f.b);o.b=(A.builds||[]).findIndex((_,i)=>!used.includes(i));}A.furn.push(o);save();sfx('ok');pop();toast(`${AJ_F[k].n}を 置いた！`);}},
+        const o={k,x:cx,y:cy};if(k==='pcj'){const used=A.furn.filter(f=>f.k==='pcj').map(f=>f.b);o.b=(A.builds||[]).findIndex((_,i)=>!used.includes(i));}A.furn.push(o);save();if(ajTrip())setTimeout(()=>toast('電気が 足りない！ ブレーカーに 注意'),0);sfx('ok');pop();toast(`${AJ_F[k].n}を 置いた！`);}},
     drw(){ajDrawAll(npcs,P,null);const good=ok(cx,cy),sx=AJ_OX+cx*16,sy=AJ_OY+cy*16;
       if((frame>>3)&1&&k!=='rsv'){ctx.globalAlpha=.75;ajDrawF(k,sx,sy,false,k==='pcj'?{b:(A.builds||[]).length-1}:null);ctx.globalAlpha=1;}
       ctx.strokeStyle=good?'#58f898':'#fc7460';ctx.lineWidth=1;ctx.strokeRect(sx+.5,sy+.5,wd*16-1,h*16-1);
       win(4,216,248,22);txt(k==='rsv'?'サーバーラックを 選ぶ　A：載せる　B：やめる':`${AJ_F[k].n}：十字で 移動　A：置く　B：やめる`,10,222,good?'#fcfcfc':'#fc7460','left',236);}});}
 function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
+  if(!A.cut&&ajTrip()&&AJ_ELEC.has(f.k)){sfx('bump');dialog(['バチン！ ……ブレーカーが 落ちた！',`電気の 使いすぎだ。\n（${fmt(ajLoad())}W／契約 ${fmt(ajCap())}W）`,'（メニューの「電気の 契約（昇圧）」で\n　容量を 上げるか、 家具を 減らそう）']);return;}
   if(A.cut&&AJ_ELEC.has(f.k)){dialog([`${F.n}は 動かない…`,'電気と 水道が 止められている。\n（銀行の 普通預金に お金を 入れよう）']);return;}
   if(f.k==='bed'){choice('ベッドで 休みますか？',['はい','いいえ'],r=>{if(r!==0)return;fullHeal();sfx('heal');save();dialog(['……','ぐっすり 眠った。\n仲間全員の HP・MPが 全回復した！']);});return;}
   if(f.k==='shelf'){const B=['『八百万の 神々 図鑑』\n…ずいぶん 読みこんである。','『人類保管計画 調査報告書』\n…あの 戦いの 記録だ。','『TAインダストリアル 社史』\n帝愛の 子会社の あゆみが 書いてある。','『ネギの 育て方 〜サキタマ篇〜』\n深谷の 土が いいらしい。','『パチスロ 必勝本』\n「設定6は 甘い」…そりゃ そうだ。','『アイヂ 旅行ガイド』\n…次の 旅に 備えておこう。'];
@@ -6079,6 +6090,10 @@ function mahjongScr(){const HN=['東','南','西','北','白','發','中'],SU=['
       const t=all();t.forEach((k,i)=>tile(k,6+i*17+(i===13?4:0),150,i===cur,false));if(!over)txt('▲',14+cur*17+(cur===13?4:0),176,'#f8d878','center');
       if(over&&res){R(20,74,216,64,'#000');txt(res.Y.map(y=>`${y[0]} ${y[1]}翻`).join('　'),128,82,'#fcfcfc','center',200);big(`${res.h}翻　${pts(res.h)}`,128,104,'#f8d878','center',14);}
       win(4,190,248,46);txt(msg,128,198,over&&!res?'#fc7460':'#fcfcfc','center');txt(over?'A：とじる':'←→：選ぶ　A：捨てる　↑：ツモ和了　B：やめる',128,214,'#7c7c7c','center',240);}});}
+function psuSwap(back){const A=ajS(),L=A.builds||[];if(!L.length){dialog('まだ PCを 組んでいない。',back);return;}const PS=PCP.find(p=>p[1]==='psu')[2];
+  listPick('どの PCの 電源を 交換する？',L.map(b=>({t:b.name,r:`${pcPart(b,'psu')[3]}W／必要 ${pcNeedW(b)}W`+(b.unst?' ⚠':'')})),i=>{const b=L[i];
+    listPick(`${b.name}の 新しい 電源`,PS.map(o=>({t:o[0],r:fmt(o[1])})),j=>{const o=PS[j];if(G.coins<o[1]){dialog('イェソが たりない…',back);return;}G.coins-=o[1];b.psu=j;b.unst=o[3]<pcNeedW(b)?1:0;save();sfx('ok');
+      dialog([`${b.name}の 電源を ${o[0]}に 交換した！`,b.unst?`まだ 足りない…（必要 ${pcNeedW(b)}W）`:'これで 安心して 回せる！'],back);},s=>`容量 ${PS[s][3]}W（必要 目安 ${pcNeedW(b)}W）${PS[s][3]<pcNeedW(b)?'\n足りない！':''}`);});}
 function pcBuild(back){const A=ajS(),b={v:2};let i=0;
   const total=()=>PCP.reduce((t,[,k,L])=>t+(b[k]!=null?L[b[k]][1]:0),0);
   const step=()=>{if(i>=PCP.length){confirm();return;}const [n,k,L]=PCP[i],vis=L.map((o,j)=>j).filter(j=>!(L[j][4]&&L[j][4].ura)||A.ura);
@@ -6093,13 +6108,13 @@ function pcBuild(back){const A=ajS(),b={v:2};let i=0;
       const ev=low?['電源ON！　……ピッ。 …プツン。','…落ちた。 もう一度。','……起動した！ でも なんだか 不安だ。\n（電源容量が 足りない）']:rnd()<.3?['…ネジを 1本 なくした。','（ケースの 底から 出てきた）','電源ON！　……ピッ。']:rnd()<.3?['…電源が 入らない！？','（電源ユニットの スイッチが OFFだった）','電源ON！　……ピッ。']:['電源ON！　……ピッ。'];
       dialog(['パーツが 届いた。 さっそく 組み立てる！',`${pcPart(b,'mb')[0]}に ${pcPart(b,'cpu')[0]}を 載せて…\nグリスを 塗って ${pcPart(b,'cool')[0].replace(/（.*$/,'')}を 取り付けた。`,`${pcPart(b,'mem')[0].replace(/（.*$/,'')}を カチッと 差しこむ。`+(b.gpu?`\n${pcPart(b,'gpu')[0]}を 挿して…`:''),`${pcPart(b,'psu')[0]}から 配線して… ケースを 閉じた。`,...ev,`起動した！ 自作PC「${b.name}」の 完成だ！\n（アジトの「もようがえ」で 置ける）`],back);},104);};
   step();}
-function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:AJ_K).filter(k=>!AJ_F[k].hk||A.hack);};reKS();const SN=pcShop||'太陽家具',bo=pcShop?1:0;
+function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:AJ_K).filter(k=>!AJ_F[k].hk||A.hack);};reKS();const SN=pcShop||'太陽家具',bo=pcShop?2:0;
   if(!ajOK()){dialog([`${SN}の 入口に 張り紙が ある。`,'「ただいま 開店準備中です」']);return;}
-  let open=()=>listPick(SN,(pcShop?[{t:'★ PCを 自分で 組む',r:'パーツ選び'}]:[]).concat(KS.map(k=>({t:AJ_F[k].n,r:fmt(AJ_F[k].p)+'イェソ'}))),ii=>{if(pcShop&&ii===0){pcBuild(open);return;}const i=ii-bo,k=KS[i],f=AJ_F[k];
+  let open=()=>listPick(SN,(pcShop?[{t:'★ PCを 自分で 組む',r:'パーツ選び'},{t:'★ 自作PCの 電源を 交換',r:`${(A.builds||[]).length}台`}]:[]).concat(KS.map(k=>({t:AJ_F[k].n,r:fmt(AJ_F[k].p)+'イェソ'}))),ii=>{if(pcShop&&ii===0){pcBuild(open);return;}if(pcShop&&ii===1){psuSwap(open);return;}const i=ii-bo,k=KS[i],f=AJ_F[k];
     if(G.coins<f.p){dialog('イェソが たりない…',open);return;}
     G.coins-=f.p;A.inv[k]=(A.inv[k]||0)+1;sfx('coin');save();
     dialog([`${f.n}を 買った！`,ajOK()?(A.x==null?'メニューの「アジト」から アジトを 建てて\n部屋に 置こう。':'アジトの 中の「もようがえ」で 置ける。'):'（アジトを 持てば 部屋に 置ける）'],open);
-  },s=>pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
+  },s=>pcShop&&s===1?`組んだ PCの 電源ユニットを 入れ替える。\n電源が 足りない PCも これで 安定する。`:pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
   const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・\nスナップタイガー エリート・RTZ イナズマ','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
   dialog([pcShop==='Dスパラ'?'店員「いらっしゃいませ！ Dスパラへ ようこそ！\nパーツも 完成品も そろってます！」':pcShop?'店員「アークンへ ようこそ！\n自作の ご相談も どうぞ！」':'太陽家具「いらっしゃいませ！\nお部屋を 明るく 太陽家具です」'],open);}
 function ajMenu(){const A=ajS(),x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
