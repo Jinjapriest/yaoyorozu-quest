@@ -538,6 +538,12 @@ const BASE_SKILLS={
   tg_kinri:{name:'イカサマ 暴き',mp:16,target:'enemies',kind:'mag',power:3.2,verb:'突きつけた'},
   tg_kurofuku:{name:'元幹部の 采配',mp:14,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'ふるった'},
   tg_shakusho:{name:'借用書 破棄',mp:16,target:'allies',kind:'heal',power:2.2,revive:true,verb:'破り捨てた'},
+  tm_kessho:{name:'結晶斬り',mp:14,target:'enemy',kind:'phys',power:3.0,verb:'斬りつけた'},
+  tm_totsugeki:{name:'レジスタンス 突撃',mp:12,target:'enemy',kind:'phys',power:.9,hits:3,verb:'しかけた'},
+  jc_tsuta:{name:'毒ツタ',mp:12,target:'enemies',kind:'mag',power:2.0,verb:'はなった'},
+  jc_chogo:{name:'薬草の 調合',mp:14,target:'allies',kind:'heal',power:2.0,verb:'ふるまった'},
+  kakuhyper:{name:'覚醒ハイパー',mp:60,target:'enemies',kind:'xr',verb:'解き放った'},
+  predplant:{name:'プレデタープラント',mp:60,target:'enemies',kind:'xr',verb:'解き放った'},
   goddice:{name:'ジャッジメント・ゴッドダイス',mp:0,target:'enemies',kind:'gd',verb:'天に 投げた'},
   teiaiou:{name:'シゴロ返し',mp:60,target:'enemies',kind:'xr',verb:'しかけた'},
   sakatari:{name:'佐加太利',mp:70,target:'enemies',kind:'xr',verb:'降ろした'},
@@ -580,6 +586,8 @@ const BASE_PACK={
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
+    {id:'tomoya',name:'可能性の獣 トモヤヨシダ',short:'トモヤヨシダ',rarity:'XR',weight:1,weapon:'any',hp:175,mp:100,atk:52,mag:30,def:32,spd:26,skills:['tm_kessho','tm_totsugeki'],look:{head:'hair',hair:'#282828',body:'#4a6a24',accent:'#d82800',legs:'#24306c',held:'両手剣'}},
+    {id:'jouchan',name:'捕食植物 タケウチジョウチャン',short:'ジョウチャン',rarity:'XR',weight:1,weapon:'any',hp:185,mp:110,atk:44,mag:44,def:36,spd:20,skills:['jc_tsuta','jc_chogo'],look:{head:'band',hair:'#88501c',body:'#f0e0b0',accent:'#38b838',legs:'#b09060',held:'杖'}},
     {id:'tagaba',name:'救世主 タガバソウ',short:'タガバソウ',rarity:'XR',weight:1,weapon:'any',hp:170,mp:110,atk:48,mag:46,def:34,spd:22,skills:['tg_kinri','tg_kurofuku','tg_shakusho'],look:{head:'hair',hair:'#1c1c24',body:'#1c1c1c',accent:'#f0ece0',legs:'#6c6448',held:'スマホ'}},
     {id:'momo',name:'幻のコンカフェ嬢 もも',short:'もも',rarity:'XR',weight:1,weapon:'any',special:'hostess',hp:150,mp:110,atk:30,mag:54,def:28,spd:34,skills:['momochk','momopocky','momoomu'],look:{head:'momo',hair:'#f8b0c8',body:'#a80020',accent:'#fcfcfc',legs:'#a80020',held:'杖'}},
     {id:'izanami',name:'伊邪那美命',short:'伊邪那美',rarity:'XR',weight:1,weapon:'any',special:'god',hp:145,mp:100,atk:30,mag:52,def:28,spd:24,skills:['gekko','jihi'],look:{head:'miko',hair:'#000000',body:'#3c1c5c',accent:'#d82800',legs:'#000000',held:'神器'}},
@@ -1036,7 +1044,7 @@ function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
-const XRSK={tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
+const XRSK={tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
 const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
 /* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
@@ -1265,7 +1273,7 @@ function drawEnemy(e,x,y,t){
     case 'kendo':drawKendo(x,y,t);break;
     case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
-    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;
+    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -1733,7 +1741,7 @@ function rollRar(min){
   return k;
 }
 /* ガチャに 出ない キャラ（宝箱などで 入手） */
-const NOGACHA_C=['michizane'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear));
+const NOGACHA_C=['michizane'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
 function poolFor(b,rar){
   const all=(b.type==='weapon'?wpList():chList().filter(p=>!noGachaC(p.id))).filter(p=>p.rar===rar);
   return all;
@@ -1792,7 +1800,8 @@ function activeBanners(){
     const d=t==='weapon'?WPD:CH;ids.sort((a,b)=>d[b].rar-d[a].rar);
     L.push({id:`lim_${P}_${L.length}`,name:`【期間限定】${PRE[Math.floor(r()*PRE.length)]}${SUF[Math.floor(r()*SUF.length)]}`,type:t,pickup:ids,lim:1,left,src:'期間限定'});}
   const TB=G&&G.ti&&G.ti.clear?[{id:'pu_tagaba',name:'【解放】XR 救世主 タガバソウ',type:'char',pickup:['tagaba','gambler'],src:'特別'}]:[];
-  return [...CB,...TB,{id:'std_char',name:'通常ガチャ（キャラ）',type:'char',pickup:[],src:'通常'},{id:'std_weapon',name:'通常ガチャ（武器）',type:'weapon',pickup:[],src:'通常'},...L,...extra];
+  const SB=G&&G.sk&&G.sk.clear?[{id:'pu_namegawa',name:'【解放】XR トモヤヨシダ＆ジョウチャン',type:'char',pickup:['tomoya','jouchan'],src:'特別'}]:[];
+  return [...CB,...TB,...SB,{id:'std_char',name:'通常ガチャ（キャラ）',type:'char',pickup:[],src:'通常'},{id:'std_weapon',name:'通常ガチャ（武器）',type:'weapon',pickup:[],src:'通常'},...L,...extra];
 }
 function openGacha(){
   const GB=activeBanners();
@@ -2027,10 +2036,11 @@ function startBattle(boss,rift=null,sp=null){
   if(!boss&&!sp)fitEnemies(en);
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;e.w=oc==='kobushide_r'?70:36;e.h=oc==='kobushide_r'?80:56;}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
+  if(sp&&sp.guests)sp.guests.forEach(id=>{if(G.chars[id]&&!G.party.includes(id))BT.pt.push({id,ab:0,av:0,db:0,dv:0,guard:false,guest:1});});
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
@@ -2125,6 +2135,16 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='yomotsu'){NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.4))):null));live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.4);e.mag=Math.round(e.mag*.4);e.def=Math.round(e.def*.4);}e.deb=5;});sfx('magic');BT.shake=16;return '黄泉の 国の 主が 姿を あらわす…\n敵全体の HPを 最大HPの 40% 削る！\n敵の 攻撃・魔力・守備が 5ターン -60%！';}
         if(k==='moekyun'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;t.ab=t.db=4;t.av=t.dv=.8;});live().forEach(e=>{e.stun=3;e.charm=1;});sfx('heal');BT.shake=10;return 'もも色の 光が はじけた！\n「萌え萌え きゅん♡」\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵は ももに 見とれて 3ターン 動けない！';}
         if(k==='sakatari'){sfx('magic');BT.shake=26;const L=live();L.forEach(e=>{e.stun=Math.max(e.stun||0,2);e.charm=2;});NOW(['雷光が 敵全体を 打ちすえる！',...L.map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))+magd(me.mag,e.def,4)):null),()=>BT.en.some(e=>e.alive)?'敵は しびれて 2ターン 動けない！':null,'梅の 香りが みかたを つつむ…',...BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,Math.round(cstat(t.id,t).hp*.5));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;})]);return '酒垂（さかたり）の 山に 神光が 降りる！';}
+        if(k==='kakuhyper'){const seq=[];let n=0,stock=0;
+          while(n<300){n++;if(stock<4&&rnd()<.05){stock++;seq.push({n,add:1});}else seq.push({n});if(rnd()<.81)continue;if(stock>0){stock--;seq.push({fever:1});continue;}break;}
+          push(hyperScr(seq));const L=[];
+          seq.forEach(s_=>{if(s_.fever){L.push('Fever!?\n保留が 発動！ ループが 再開した！');return;}L.push(()=>{const al=live();if(!al.length)return null;const e=al[ri(0,al.length-1)];return `${s_.n} Hyper!${s_.n>=20?'!!':s_.n>=10?'!':''}\n`+dmgEnemy(e,phys(me.atk,e.def,1.5)+Math.ceil(e.maxhp*(e.dboss?.02:.05)));});});
+          L.push(()=>`覚醒ハイパー 終了！　合計 ${n} Hyper`);NOW(L);sfx('g5');BT.shake=16;return '可能性の 獣が 目を 覚ます…！\n全身を エメラルドの 結晶が 覆っていく！';}
+        if(k==='predplant'){const al=live();if(!al.length)return null;const e=al.slice().sort((a,b)=>b.maxhp-a.maxhp)[0];
+          const hpA=Math.max(1,Math.round(e.hp*(e.dboss?.08:.25))),atA=Math.max(1,Math.round(e.atk*(e.dboss?.15:.3))),base=Math.max(1,cstat(m.id,m).atk);
+          push(predScr(hpA,atA));e.atk=Math.max(1,e.atk-atA);if(e._deb)e._deb.atk=Math.max(1,e._deb.atk-atA);
+          NOW([()=>`${e.label}に 捕食植物が 食らいついた！\n`+dmgEnemy(e,hpA),()=>`${e.label}の 攻撃力を ${fmt(atA)} 吸収した！`,()=>{if(!isAlive(m))return null;const v=healM(m,hpA);return `${CH[m.id].short}の HPが ${fmt(v)} 回復した！`;},()=>{m.ab=Math.max(m.ab||0,5);m.av=Math.min(4,(m.av||0)+atA/base);return `${CH[m.id].short}の 攻撃力が ${fmt(atA)} あがった！`;}]);
+          sfx('magic');BT.shake=12;return '「喰らい尽くせ……！」\n大地を 割って 紫の 捕食植物が 現れた！';}
         if(k==='teiaiou'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;});live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.5);e.mag=Math.round(e.mag*.5);e.def=Math.round(e.def*.7);}e.deb=4;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))):null));sfx('heal');BT.shake=14;return '4・5・6！ 大逆転の シゴロ返し！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵の 攻撃・魔力 半減（4ターン）＋最大HPの 30% 削る！';}
         if(k==='yuiga'){m.db=5;m.dv=4;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
         return null;}
@@ -2166,6 +2186,7 @@ function autoCmd(i){
     if(xk==='yuiga'&&anyEn&&!(BT.taunt&&BT.taunt.t>0))return{type:'skill',k:xk};
     if(xk==='kuniumi'&&(dead.length||low.length||BT.pt.some(t=>isAlive(t)&&t.ab<=0)))return{type:'skill',k:xk};
     if(xk==='yomotsu'&&anyEn&&rnd()<.6)return{type:'skill',k:xk};
+    if((xk==='kakuhyper'||xk==='predplant')&&anyEn&&rnd()<.6)return{type:'skill',k:xk};
     if(xk==='teiaiou'&&anyEn&&(dead.length||low.length||rnd()<.3))return{type:'skill',k:xk};
     if(xk==='moekyun'&&anyEn&&(dead.length||low.length||!BT.en.some(e=>e.alive&&e.stun>0)))return{type:'skill',k:xk};}}
   if(dead.length){const rv=mySk.find(k=>can(k)&&(SK[k].k==='revive'||(SK[k].k==='heal'&&SK[k].rev)));if(rv)return SK[rv].k==='revive'?{type:'skill',k:rv,t:dead[0]}:{type:'skill',k:rv};}
@@ -2206,6 +2227,8 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
   neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
+  kakuhyper:'可能性の 獣が 目覚める。\n強攻撃（最大HPの 2%＋物理）が 81%で ループ、19%で 終了\n（ループ中 5%で 保留が たまり 最大4つ。\n　終了時に 保留が あれば「Fever!?」で 再開）',
+  predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ',
   teiaiou:'みかた 全員の HPを 全回復（倒れた 仲間も 復活）\n＋敵全体の 攻撃・魔力 -50%・守備 -30%（4ターン）\n＋敵全体の HPを 最大HPの 30% 削る',
   sakatari:'梅枝の笏を 装備した 道真公 専用。\n敵全体に 最大HPの 30%＋強力な 雷撃、\n敵全体を 2ターン 行動不能に し、\n味方全体の HPを 最大HPの 50% 回復する',
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
@@ -2272,18 +2295,18 @@ function battleUpd(){
 const battleScr={full:true,upd:battleUpd,drw(a){
   const sx=BT.shake>0?((frame&2)?3:-3):0;
   R(0,0,W,H,'#000');ctx.save();ctx.translate(sx,0);
-  if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='minus')drawMinusBG(6,48,244,98,frame);else if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='teio'){R(6,48,244,98,'#0c0814');for(let x=14;x<244;x+=30){R(x,52,6,66,'#1c1428');R(x,52,6,2,'#5c4410');}R(6,118,244,28,'#241c30');R(108,118,40,28,'#5c0000');R(108,118,40,1,'#a07800');}else{R(6,48,244,98,BT.bg[0]);R(6,118,244,28,BT.bg[1]);R(6,118,244,1,'#000');}
+  if(BT.sp&&BT.sp.kind==='gunma'&&/^sk_/.test(BT.sp.st))skBattleBG(BT.sp);else if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='minus')drawMinusBG(6,48,244,98,frame);else if(BT.sp&&BT.sp.kind==='gunma'&&BT.sp.st==='teio'){R(6,48,244,98,'#0c0814');for(let x=14;x<244;x+=30){R(x,52,6,66,'#1c1428');R(x,52,6,2,'#5c4410');}R(6,118,244,28,'#241c30');R(108,118,40,28,'#5c0000');R(108,118,40,1,'#a07800');}else{R(6,48,244,98,BT.bg[0]);R(6,118,244,28,BT.bg[1]);R(6,118,244,1,'#000');}
   R(6,48,244,1,'#fcfcfc');R(6,145,244,1,'#fcfcfc');R(6,48,1,98,'#fcfcfc');R(249,48,1,98,'#fcfcfc');
   BT.en.forEach((e,i)=>{if(!e.alive&&e.die<=0)return;if(e.flash>0&&(frame&2))return;if(!e.alive&&(e.die&2))return;drawEnemy(e,e.x,e.y,frame);});
   if(BT.ph==='cmd'&&BT.sub&&BT.sub.kind==='enemy'&&a){const s=BT.sub,e=BT.en[s.list[s.m.sel]];if(e&&frame%30<20)txtS('▼',e.x-4,e.y-e.h-14,'#f8b800');
     s.list.forEach((ei,k)=>{const en=BT.en[ei];region(en.x-en.w/2,en.y-en.h,en.w,en.h,()=>{s.m.click=k;});});}
   ctx.restore();
   win(0,0,256,46);
-  BT.pt.forEach((m,i)=>{const x=2+i*63,c=G.chars[m.id],d=CH[m.id],s=cstat(m.id,m),dead=c.hp<=0,lowhp=c.hp<s.hp*.3;
+  BT.pt.forEach((m,i)=>{const nw=BT.pt.length>4,cw=nw?42:63,x=2+i*cw,c=G.chars[m.id],d=CH[m.id],s=cstat(m.id,m),dead=c.hp<=0,lowhp=c.hp<s.hp*.3;
     const col=dead?'#d82800':lowhp?'#f8b800':'#fcfcfc';
-    if(BT.ph==='cmd'&&BT.ai===i&&!G.auto){R(x+3,4,58,38,'#24188c');}
-    txt(d.short,x+6,7,col,'left',54);txt('H'+fmt(c.hp),x+6,19,col,'left',54);txt('M'+fmt(c.mp),x+6,30,'#fcfcfc','left',34);txt('L'+c.lv,x+60,30,'#bcbcbc','right');
-    if(m.ab>0||m.db>0)txt('↑',x+60,7,'#7ee07e','right');if(m.shield>0)txt('◆',x+50,7,'#3cbcfc','right');});
+    if(BT.ph==='cmd'&&BT.ai===i&&!G.auto){R(x+3,4,cw-5,38,'#24188c');}
+    txt(d.short,x+(nw?4:6),7,col,'left',cw-(nw?6:9));txt('H'+fmt(c.hp),x+(nw?4:6),19,col,'left',cw-(nw?6:9));txt('M'+fmt(c.mp),x+(nw?4:6),30,'#fcfcfc','left',nw?cw-6:34);if(!nw)txt('L'+c.lv,x+60,30,'#bcbcbc','right');
+    if(m.ab>0||m.db>0)txt('↑',x+cw-3,7,'#7ee07e','right');if(m.shield>0)txt('◆',x+cw-13,7,'#3cbcfc','right');});
   if(BT.ph==='cmd'&&!G.auto){
     menuDraw(BT.cm,a&&!BT.sub);
     if(BT.sub)menuDraw(BT.sub.m,a);
@@ -2358,7 +2381,7 @@ function loseBattle(){
   if(BT.sp&&BT.sp.kind==='trial'){trialLose();return;}
   G.townBack=null;
   if(BT.sp&&BT.sp.kind==='gimwild'){gimWildLose();return;}
-  dialog(['ぜんめつ してしまった…'],()=>{noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
+  dialog(['ぜんめつ してしまった…'],()=>{if(G.sk)skGuestOff();noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
     enterVillage(G.home,true);dialog(`…${v.shrine}の 御神徳により\nめを さました。\nイェソが はんぶんに なった。`);});
 }
 function ngClamp(){G.party.forEach(id=>{const c=G.chars[id];if(!c)return;const t=cstat(id);if(c.hp>t.hp)c.hp=t.hp;if(c.mp>t.mp)c.mp=t.mp;});}
@@ -4407,7 +4430,7 @@ function drawMinusBG(x0,y0,w,h,t){const cl=[x0,y0,x0+w,y0+h],cx=x0+w/2,vy=y0+h*.
   for(let i=0;i<26;i++){const px=x0+((i*53+t*(1+i%3)*.2)%w),py=y0+((i*37)%h);R(px,py,1,1,i%4?'#6844a0':'#a4e4fc');}}
 /* 帝王 錨ケンドウ：白髪の 総髪・軍服と 和装の 礼装・錨の 紋・法典 */
 /* ===================== オリジナル キャラの 敵（ギム総書記・書記代 ジョソウソ・ギムトモコ） ===================== */
-const OC_OF=n=>/ニズゥーイッツァイ/.test(n)?'nizu':/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+const OC_OF=n=>/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
 function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
 /* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
 function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
@@ -4645,7 +4668,7 @@ function gmLines(){const ch=gmS().ch;
   return['ていこくに ふこうは そんざいしない。','このまちは なんでも そろう。\nただし じぶんで えらぶことだけは むずかしい。','ていこくに ふこうは そんざいしない。','夜に なると となりの 人が いなくなるの。\nでも 朝には 戻ってるわ… 同じ 顔で。','ていこくに ふこうは そんざいしない。','しゅっこく？ そんな ことを\nかんがえる ひとは いないよ。','看板「帝国に 不幸は 存在しない」','役人「規則なので。」'];}
 /* 紙芝居の 背景 */
 function drawScene(k){
-  if(tiSceneBg(k))return;
+  if(tiSceneBg(k))return;if(skSceneBg(k))return;
   if(k==='gs'||k==='gsend'){const e=k==='gsend';R(0,0,W,H,e?'#fc9838':'#1c0008');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%70,1,1,e?'#fce0a8':'#7c3c3c');R(60,70,136,80,e?'#5c3c24':'#24101c');R(56,64,144,8,e?'#a05000':'#3c1c24');for(let i=0;i<5;i++)R(72+i*26,84,10,66,e?'#7c4c10':'#3c1c24');
     R(116,104,24,46,'#a80020');R(112,98,32,8,'#f8b800');R(120,92,16,8,'#f8b800');if(!e)for(let i=0;i<8;i++)R(10+i*30,160+((frame>>3)+i)%4,14,8,'#d82800');R(0,150,W,90,e?'#3c2410':'#100008');return;}
   if(k==='kq'||k==='kqpeace'){const pc_=k==='kq';R(0,0,W,H,pc_?'#2c0000':'#000030');for(let i=0;i<40;i++)R((i*53)%W,(i*29)%80,1,1,pc_?'#7c3c3c':'#fcfcfc');
@@ -4709,6 +4732,7 @@ function startGm(st,extra){fullHeal();G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}
 const gmGive=(b,o,u,c)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)+o;if(u)G.items.urtk=(G.items.urtk||0)+u;if(c)noCount(()=>{G.coins+=c;});
   return `経験値祝詞×${b}・極上鉱石×${o}`+(u?`\nUR確定チケット×${u}`:'')+(c?`・${fmt(c)}イェソ`:'')+'を 手に入れた！';};
 function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS(),NW=gmWaves(sp);
+  if(sp.st.startsWith('sk_')){skWin(sp,more=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more);}),pages);return;}
   if(w<NW){
     if(sp.st==='gs_final'&&w===3){pages.push('ジョソウソと ギムトモコは 膝を ついた…');dialog(pages,()=>{BT=null;scene('gs',['ジョソウソ「ぐ… まだだ… まだ 終わらん…！」','そのとき 帝城の 地下から\n赤黒い 霧が 噴き出した！','霧「…ワガ 理想ハ… 終ワラセハ セヌ…」','ギムトモコ「この 声… お父さま…！？」','ギムの残滓が ジョソウソと ギムトモコに\n憑依した！','二人の 目が 赤く 光る…！\n（HP・MPは 回復しない）'],()=>startBattle(false,null,Object.assign({},sp,{wave:4})));});return;}
     if(sp.st==='minus'&&w===NW-1){pages.push('記憶の 層を 抜けた…');dialog(pages,()=>{BT=null;scene('minus',['宙に 浮かぶ 城壁と 役所の 向こうに\n帝王の 姿は もう なかった。','人間を捨てた神「わたしは ひとを すくうため\nひとを すてた。」','「かなしみも あらそいも ない\nせかいを みせてやろう。」','「それでも じゆうを えらぶというのか。」','（苦しみを 消すために\n喜びも 選択も 奪うことは 救済ではない！）','記憶の 光が 体を つつみ\nHPと MPが 回復した！'],()=>{fullHeal();startBattle(false,null,Object.assign({},sp,{wave:NW}));});});return;}
@@ -4864,7 +4888,7 @@ function gsTeijo(){const S=gsS();
   if(S.ch===4){choice('帝城の 地下から 地鳴りが ひびく…\nギムの遺産を 止めに いきますか？\n（3連戦・推奨Lv29999）',['地下へ いく','やめる'],r=>{if(r===0)startGm('gs_izo');},96);return;}
   if(S.ch===5){choice('総選挙 当日。 帝城の 大広間の 開票所が\nキョーサン派に 占拠された！\n取り戻しますか？（3連戦・最終決戦）',['取り戻す','やめる'],r=>{if(r===0)startGm('gs_final');},96);return;}
   if(S.ch===6&&!S.chief){gsChief();return;}
-  if(tiOpen()){const T=tiS();if(T.ch===0){tiStart();return;}choice(`総長 ${S.chief.n}「ようこそ 帝城へ。」\n${T.clear?'帝愛の 地下帝国は 解放された。':'帝愛の 地下帝国への 昇降機が 動いている…'}`,['地下帝国へ 行く','やめる'],r=>{if(r===0)tiHub();},96);return;}
+  if(tiOpen()){const T=tiS();if(T.ch===0){tiStart();return;}choice(`総長 ${S.chief.n}「ようこそ 帝城へ。」\n${T.clear?'帝愛の 地下帝国は 解放された。':'帝愛の 地下帝国への 昇降機が 動いている…'}`,T.clear?['地下帝国へ 行く','サキタマへ 向かう','やめる']:['地下帝国へ 行く','やめる'],r=>{if(r===0)tiHub();else if(r===1&&T.clear)skHub();},96);return;}
   dialog([`総長 ${S.chief?S.chief.n:''}「ようこそ 帝城へ。\nグンマーは 自由な 国に 生まれ変わりました」`,'玉座の 間には 新しい 総長の 旗が かかげられている。','（本土の 政治メニューで 連立政権を 組める）']);}
 /* 三山の 神主の 推薦状 */
 function gsRec(g){const S=gsS();if(S.rec[g.id]){dialog(`${g.n.split(' ')[0]}の 神主「推薦状は もう 渡したぞ。\nグンマーを 頼んだ」`);return;}
@@ -4937,17 +4961,6 @@ function drawKobushide(x,y,t,rage){if(rage)ocAura(x,y,t,'#d82800');const S=rage?
    ＋ 地下民の 姿（首に 手ぬぐい・腕まくり・作業ズボンと 地下足袋・顔の すす汚れ・胸の 番号札・ペリコ袋） */
 /* 黒幕 ニズゥーイッツァイ（オリジナルキャラ・埼玉編の ボス）：長身。 黒と 深緑の ロングコートに 金の 縁取り、
    銀の 長髪、 右目に 赤く 光る 同期レンズ、 背後に 浮かぶ 意識同期の 輪（実験装置） */
-function drawNizu(x,y,t,sil){const C=sil?'#000':'#0c2018',C2=sil?'#000':'#1c3c2c',Gd=sil?'#000':'#c8a040',Hr=sil?'#000':'#c8c8d8',Sk=sil?'#000':'#e0c8b0';
-  if(!sil){ctx.globalAlpha=.55+.2*Math.sin(t/10);for(let k=0;k<24;k++){const a=k/24*Math.PI*2+t*.02;R(Math.round(x+Math.cos(a)*22),Math.round(y-52+Math.sin(a)*22),2,2,k%3?'#a80020':'#f8b800');}ctx.globalAlpha=1;}
-  R(x-8,y-5,6,5,'#000');R(x+2,y-5,6,5,'#000');
-  R(x-13,y-40,26,36,C);R(x-14,y-10,28,6,C);R(x-13,y-40,2,36,Gd);R(x+11,y-40,2,36,Gd);R(x-14,y-5,28,1,Gd);
-  R(x-4,y-40,8,14,C2);R(x-1,y-39,2,12,sil?'#000':'#a80020');R(x-3,y-34,1,1,Gd);R(x+2,y-34,1,1,Gd);R(x-3,y-30,1,1,Gd);R(x+2,y-30,1,1,Gd);
-  R(x-17,y-38,4,22,C);R(x+13,y-38,4,22,C);R(x-17,y-16,4,3,sil?'#000':'#1c1c1c');R(x+13,y-16,4,3,sil?'#000':'#1c1c1c');
-  R(x-15,y-44,30,5,C2);R(x-15,y-44,30,1,Gd);
-  R(x-6,y-55,12,12,Sk);R(x-8,y-58,16,5,Hr);R(x-9,y-55,3,20,Hr);R(x+6,y-55,3,20,Hr);R(x-6,y-57,4,3,Hr);
-  R(x-5,y-50,4,1,sil?'#000':'#3c3c3c');R(x+1,y-51,4,3,sil?'#000':'#5c5c5c');R(x+2,y-50,2,1,(t>>4)&1?'#f80000':'#fc7460');
-  if(sil){R(x+2,y-50,2,1,'#f80000');R(x-4,y-50,2,1,'#f80000');}
-  R(x-2,y-46,4,1,sil?'#000':'#7c4c4c');}
 /* 暴走した コブシデ：同期装置を 自分に 突き立て 人間を やめかけた 姿（ケンドウほどではなく 人の 部分が 残る）
    背中と 首から のたうつ 同期ケーブル・胸の バッジが 赤い コアに・右腕は 巨大な 拳に 変異・左腕と 脚は 人の まま・
    破れた 紫の スーツ・割れた 眼鏡・顔の 半分に 赤黒い 脈 */
@@ -5028,7 +5041,7 @@ function tiHub(){const T=tiS();
   if(T.ch===1){it.push({t:`はたらく（1日・${fmt(TI_WAGE)}ペリコ）`,k:'work'},{t:'坑道の 魔物退治（1日・報酬は 返済に）',k:'dun'});if(T.casino)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});if(T.exposed)it.push({t:'班長と 最後の 大勝負（456賽 返し）',k:'final'});
     it.push({t:`借金を 返す（残り ${fmt(T.debt)}）`,k:'pay'},...(tiHintN()?[{t:`ひろった 物を 見る（${tiHintN()}）`,k:'hint'}]:[]),{t:'地下の 売店（ペリコ）',k:'shop'},{t:'タガバソウと 話す',k:'talk'},{t:'昇降機の 前へ（帝城に もどる）',k:'out'});}
   else{if(T.ch===2)it.push({t:'地上への 昇降機（脱出）',k:'esc'});if(T.clear)it.push({t:`余った ペリコを 交換（${fmt(T.per)}P）`,k:'swap'});it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:T.ch===2?'タガバソウと 話す':'労働者と 話す',k:'talk'},{t:'帝城に もどる',k:'out'});}
-  const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（黒幕 ニズゥーイッツァイ… 埼玉編へ つづく）';
+  const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：裏・賭郎と 地上へ 脱出する':'地下帝国の 乱は 終わった。\n（帝城から サキタマへ 向かえる）';
   listPick(T.ch===1?`帝愛 地下帝国　${Math.min(T.day,TI_DAYS)}日目　${fmt(T.per)}ペリコ`:`帝愛 地下帝国　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
     if(k==='work')tiWork();else if(k==='dun')tiDungeon();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='hint')tiHintList();else if(k==='esc')tiEscBattle();else if(k==='swap')tiSwap();
     else if(k==='talk')tiTalk();else {save();dialog(T.ch===1?['昇降機の 前は 黒服が 見張っている。','（帝城から いつでも 地下へ もどれる。\n地下の 日数は 働いた 日だけ 進む）']:['帝城に もどった。']);}},goal);}
@@ -5210,6 +5223,197 @@ function godDiceScr(r){let t=0;const END=230,tumble=[[0,0,0],[0,0,0],[0,0,0]],se
       if(t>=140){const nm=r.k==='zoro'?`${r.n}の ゾロ目`:r.k==='me'?`${r.n}の 目`:GD_NAME[r.k],col=r.k==='hifumi'?'#a4e4fc':r.k==='pin'?'#fc7460':'#f8d878';
         win(28,168,200,58);big(nm,128,174,col,'center',r.k==='pin'?24:20);txt(r.k==='hifumi'?'神は 試練を 与えた…':'神の 審判が 下る！',128,208,'#fcfcfc','center');}
       region(0,0,W,H,()=>{vA=true;});}};}
+/* ===================== ぶっ飛びサキタマ編 〜ナメガワマチを 取り戻せ〜（人類保管計画編 完結・帝愛 地下帝国編 クリア後） ===================== */
+function skS(){if(!G.sk)G.sk={ch:0};const S=G.sk;if(S.gtmp&&S.gtmp.length&&!BT)skGuestOff();return S;}
+const skOpen=()=>!!(G&&G.ti&&G.ti.clear);
+const SK_GUESTS=['tomoya','jouchan'];
+/* 最終決戦だけ トモヤヨシダと ジョウチャンが 加わる（未所持なら 一時的な 助っ人） */
+function skGuestOn(){const S=G.sk||(G.sk={ch:0});S.gtmp=S.gtmp||[];const lv=Math.max(1,...G.party.map(id=>G.chars[id]?G.chars[id].lv:1));
+  SK_GUESTS.forEach(id=>{if(!G.chars[id]){G.chars[id]={lv,exp:0,dup:0,wpn:null,hp:1,mp:0,guest:1};S.gtmp.push(id);}const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;});}
+function skGuestOff(){const S=G.sk;if(!S||!S.gtmp)return;S.gtmp.forEach(id=>{if(G.chars[id]&&G.chars[id].guest)delete G.chars[id];});S.gtmp=[];}
+
+/* ---------- ドット絵（グリッド） ---------- */
+function skGrid(rows,pal,x,y,s){for(let j=0;j<rows.length;j++){const r=rows[j];for(let i=0;i<r.length;i++){const c=r[i];if(c!=='.'&&pal[c])R(x+i*s,y+j*s,s,s,pal[c]);}}}
+const SKPAL={K:'#181818',S:'#fcbcb0',H:'#282828',W:'#fcfcfc',G:'#4a6a24',g:'#7c9c3c',R:'#d82800',Y:'#f8b800',B:'#7c4800',N:'#24306c',D:'#88501c',L:'#38b838',l:'#186818',P:'#f878f8',M:'#c00080',C:'#f0e0b0',k:'#b09060',E:'#00a844',e:'#58f898',F:'#005828',
+  V:'#d8d8e0',q:'#3c0414',r:'#8c0c24',Z:'#1c1c24',z:'#3c3c4c'};
+const SKPURP=Object.assign({},SKPAL,{L:'#4c2c64',l:'#2c1840',R:'#801030',M:'#d82848',S:'#c89880',W:'#d8d0b0',K:'#080808'});
+const SK_TN=["................",".....HHHHHH.....","....HHHHHHHH....","...HHYYHHYYHH...","...HHSSSSSSHH...","....SKSSSSKS....","....SSSSSSSS....",".....SSKKSS.....","......SSSS......","....GGGRRGGG....","...GGgGRRGgGG...","..SGGgGGGGgGGS..","..SGRGGGGGGGGS..","..SGRGgGGgGGGS..","..SS.GGGGGG.SS..",".....KKYKKK.....",".....NNNNNN.....",".....NNN.NNN....",".....NNN.NNN....",".....NN...NN....","....BBB...BBB...","....BBB...BBB..."];
+const SK_TA=["..e.e...e..e....","..EeE.eEe.eEe...","..eEEEeEEeEEe...","..EEeEEeEEeEE...","..eEESSSSSSEEe..","...EEeSSSSeEE...","....ESSSSSSE....",".....SSKKSE.....",".eE...ESSE...Ee.","eEEEEFEEEEFEEEEe",".FEeEEEeEEEeEEF.","..EEEeEFFEeEEE..","..eEFEEeeEEFEe..","..EEEeEEEEeEEE..","..eEe.EeeE.eEe..",".....FEEEEF.....",".....EEeEEE.....","....eEEE.EEEe...",".....EeE.EeE....",".....EE...EE....","....FEEe..eEEF..","...eEEEE..EEEEe."];
+const SK_JN=["................",".....LLLLLL.....","....LLLLLLLL....","...DLLLLLLLLD...","...DDSSSSSSDD...","....SKSSSSKS....","....SSSSSSSS....",".....SSKKSS.....","......SSSS......","....CCCCCCCC....","...CCWWWWWWCC...","..SCCWWWWWWCCS..","..SC.WWLLWW.CS..","..SS.WWWWWW.SS..",".....KKKKKK.....",".....kkkkkk.....",".....kkk.kkk....",".....kkk.kkk....",".....kk...kk....",".....kk...kk....","....BBB...BBB...","....BBB...BBB..."];
+const SK_JA=["................llll....","..............llLLLLl...","....L.L.L.L..lLLWLWLLl..","....LLLLLLLL.lRRRRRRRl..","...lLLLLLLLLl.lRRRRRRl..","...lLSSSSSSLl..lWLWLl...","....SMSSSSMS....llll....","....SSSSSSSS.....ll.....",".....SSKKSS......ll.....","......SSSS.......l......","....lLLLLLLl....ll......","...lLLlLLlLLl..ll.......","..SlLLLLLLLLlSll........","..SlL.LLLL.LlSl.........","..SS.lLLLLl.SS..........",".....KKKKKK.............",".....lLL.LLl............",".....LLl.lLL............",".....LL...LL............",".....lL...Ll............","...l.BB...BBl...........","..lll.......lll........."];
+const SK_NN=["........VVVVVV........",".......VVVVVVVV.......","......VVVVVVVVVV......","......VVSSSSSSVV......",".....VVKRSSSSRKVV.....",".....V.SSSSSSSS.V.....",".....V.SKKSSKKS.V.....","....qrYY.SSSS.YYrq....","...qrrYYZZWWZZYYrrq...","..qrrZZZZZRRZZZZZrrq..","..qrrZZZZYRRYZZZZrrq..",".qrrZZZZZZRRZZZZZZrrq.",".qrrWZZZZZZZZZZZZWrrq.",".qrrWWZZZZZZZZZZWWrrq.",".qrr..ZZZZZZZZZZ..rrq.",".qrr..ZZzZZZZzZZ..rrq.",".qrr..ZZZZZZZZZZ..rrq.",".qrr..ZZZZZZZZZZ..rrq.","qrrr..YZZZZZZZZY..rrrq","qrrr..YZZZZZZZZY..rrrq","qrrr..YYYYYYYYYY..rrrq","qrrrr..KK....KK..rrrrq","qqrrr..KK....KK..rrrqq",".qqqq.KKK....KKK.qqqq."];
+const SKSIL=new Proxy({},{get:(o,c)=>c==='R'?'#f80000':'#000'});
+/* 総帥 ニズゥーイッツァイ（悪の 組織の 首領）：銀髪・黒衣に 深紅の 裏地の マント・金の 紋章・白手袋・裂けた 薄笑い */
+function drawNizu(x,y,t,sil){const bob=(t>>5)&1;skGrid(SK_NN,sil?SKSIL:SKPAL,x-22,y-48-bob,2);if(!sil&&(t>>4)%4===0){R(x-8,y-48-bob+8,2,2,'#f80000');R(x+6,y-48-bob+8,2,2,'#f80000');}}
+/* 幼体：赤い 闇に 浮かぶ 胎児。 頭に 赤い 溝の 目、 胸に 脈打つ コア */
+let _nyc=null;
+function drawNizuY(x,y,t){if(!_nyc){_nyc=document.createElement('canvas');_nyc.width=70;_nyc.height=60;}const g=_nyc.getContext('2d');g.clearRect(0,0,70,60);
+  const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(px),Math.round(py),w,h);},E=(cx,cy,rx,ry,c,a)=>{g.globalAlpha=a==null?1:a;g.fillStyle=c;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill();g.globalAlpha=1;};
+  E(35,32,34,27,'#a01020',.35);
+  g.globalAlpha=.85;for(const [cx,cy] of [[8,7],[35,4],[62,7],[9,54],[61,54]]){P(cx-5,cy,11,1,'#f8a060');P(cx,cy-5,1,11,'#f8a060');}g.globalAlpha=1;
+  const by=Math.round(Math.sin(t/15)*1.5);
+  const parts=[[24,24+by,16,13],[42,34+by,15,16],[22,40+by,8,3],[16,46+by,6,2.5],[34,50+by,12,3.5],[26,52+by,5,2.5],[50,22+by,6,5]];
+  parts.forEach(([a,b,c,d])=>E(a,b,c+1.2,d+1.2,'#5c0c14'));parts.forEach(([a,b,c,d])=>E(a,b,c,d,'#050102'));
+  P(12,22+by,16,3,'#c00000');P(12,23+by,16,1,'#ff3030');P(15,23+by,9,1,'#fce0e0');const dr=(t>>2)%10;P(12,25+by,1,8,'#b01020');P(12,25+by+dr,1,2,'#ff4040');
+  const pul=(t>>4)&1;E(44,33+by,4+pul,4+pul,'#ff2828',.4);E(44,33+by,3,3,'#ff2828');P(43,32+by,1,1,'#ffe0d0');
+  for(let s=0;s<14;s++)P(52+s*1.2,44+by+s*.9+Math.sin(s*.6+t/10)*1.5,2,2,'#7c0010');
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(_nyc,x-42,y-72,84,72);}
+/* 生体：縦長の 虚無の 胴体・赤い 溝の 目・胸の 赤い コア・牙の 縦の 口・半透明の 手と 触手・背中の 天使の 輪 */
+let _ngc=null;
+function drawNizuG(x,y,t){if(!_ngc){_ngc=document.createElement('canvas');_ngc.width=64;_ngc.height=78;}const g=_ngc.getContext('2d');g.clearRect(0,0,64,78);const cx=32;
+  const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(px),Math.round(py),w,h);};
+  g.globalAlpha=.47;g.strokeStyle='#fce8a8';g.lineWidth=4;g.beginPath();g.ellipse(cx,22,24,19,0,0,7);g.stroke();
+  g.globalAlpha=.92;g.strokeStyle='#fffbe8';g.lineWidth=1;g.beginPath();g.ellipse(cx,22,23,18,0,0,7);g.stroke();
+  g.globalAlpha=.8;for(let a=0;a<12;a++){const q=a/12*Math.PI*2+t*.01;P(cx+Math.cos(q)*26,22+Math.sin(q)*21,1,1,'#fcfcfc');}
+  g.globalAlpha=.47;g.strokeStyle='#d0283c';g.lineWidth=2;
+  [[-3,-1],[3,1],[-3,-1],[3,1],[-2,-1],[2,1]].forEach(([sx,d],k)=>{const y0=44+k*4;g.beginPath();for(let s=0;s<26;s++){const px=cx+sx+d*s*1.15,py=y0+s*.9+Math.sin(s*.45+k+t/12)*3.5;if(s)g.lineTo(px,py);else g.moveTo(px,py);}g.stroke();});
+  g.globalAlpha=1;
+  const B=[[0,1],[5,7],[7,18],[6,38],[5,56],[3,70],[0,77],[-3,70],[-5,56],[-6,38],[-7,18],[-5,7]];g.fillStyle='#060204';g.strokeStyle='#9c1424';g.lineWidth=1;g.beginPath();B.forEach(([a,b],i)=>{if(i)g.lineTo(cx+a,b);else g.moveTo(cx+a,b);});g.closePath();g.fill();g.stroke();
+  P(cx-1,0,2,4,'#e01818');P(cx-6,4,1,4,'#e01818');P(cx+5,4,1,4,'#e01818');
+  P(cx-6,12,13,3,'#c00000');P(cx-6,13,13,1,'#ff3030');P(cx-3,13,7,1,'#fce0e0');
+  const dr=(t>>2)%14;P(cx-6,15,1,12,'#b01020');P(cx-6,15+dr,1,2,'#ff4040');P(cx+6,15,1,7,'#b01020');
+  const pul=(t>>4)&1;g.globalAlpha=.35;g.fillStyle='#ff2828';g.beginPath();g.ellipse(cx,31,6+pul,6+pul,0,0,7);g.fill();g.globalAlpha=1;g.beginPath();g.ellipse(cx,31,4,4,0,0,7);g.fill();P(cx-2,29,2,2,'#ffe0d0');
+  P(cx-1,42,3,13,'#7c0010');for(let yy=43;yy<55;yy+=2){P(cx-1,yy,1,1,'#f0e8d8');P(cx+1,yy+1,1,1,'#f0e8d8');}
+  g.globalAlpha=.45;g.strokeStyle='#f0b8c0';g.fillStyle='#f0c8d0';
+  for(const sd of [-1,1]){const hx=cx+sd*20,hy=34+Math.round(Math.sin(t/20+sd));g.lineWidth=3;g.beginPath();g.moveTo(cx+sd*6,22);g.lineTo(cx+sd*12,30);g.lineTo(hx,hy);g.stroke();g.beginPath();g.ellipse(hx,hy,5,4.5,0,0,7);g.fill();g.lineWidth=2;for(let f=0;f<4;f++){const fx=hx-4+f*2.6;g.beginPath();g.moveTo(fx,hy+3);g.lineTo(fx+sd*1.5,hy+11-Math.abs(f-1.5));g.stroke();}}
+  g.globalAlpha=1;ctx.imageSmoothingEnabled=false;ctx.drawImage(_ngc,x-37,y-90,74,90);}
+
+/* ---------- 紙芝居の 背景 ---------- */
+function skCity(dark){R(0,0,W,H,dark?'#1c1c2c':'#7cc8fc');for(let i=0;i<7;i++){const x=6+i*36,h=50+(i*23)%40;R(x,150-h,28,h,dark?'#3c3c4c':'#fcfcfc');for(let yy=150-h+6;yy<146;yy+=10)for(let xx=x+4;xx<x+26;xx+=8)R(xx,yy,4,5,dark?'#5c5c2c':'#a4e4fc');}
+  R(0,150,W,90,dark?'#2c2c34':'#bcbcbc');R(0,150,W,2,'#fcfcfc');R(86,58,84,18,'#fcfcfc');R(88,60,80,14,'#3cbcfc');txt('完全平和都市',128,63,'#fcfcfc','center');
+  for(let i=0;i<8;i++){const x=16+i*30,y=170;R(x-5,y,10,14,['#f878f8','#3cbcfc','#f8b800','#00a800'][i%4]);R(x-4,y-9,8,8,'#fcbcb0');R(x-3,y-6,1,1,'#000');R(x+2,y-6,1,1,'#000');R(x-2,y-3,5,1,'#000');R(x-3,y-4,1,1,'#000');R(x+3,y-4,1,1,'#000');}}
+function skLab(){R(0,0,W,H,'#081414');R(0,150,W,90,'#102020');for(let i=0;i<5;i++){const x=14+i*50;R(x,40,30,110,'#1c3c3c');R(x+3,52,24,94,'#2c6c6c');R(x+3,52+((frame>>3)+i*7)%60,24,2,'#5cacac');R(x+8,92,14,24,'#0c2020');pc(x+15,88,6,'#0c2020');R(x,36,30,6,'#3c5c5c');}}
+function skThrone(){R(0,0,W,H,'#08080c');for(let y=0;y<150;y+=8)R(0,y,W,1,'#101824');for(const x of [10,40,186,216]){R(x,40,24,100,'#1c3c3c');R(x+3,70,18,68,'#2c6c6c');}
+  R(70,150,116,90,'#4c0814');for(let k=0;k<4;k++)R(70-k*6,150+k*14,116+k*12,2,'#7c5c10');}
+function skSky(t){R(0,0,W,H,'#3c1018');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%120,1,1,'#fc9c9c');const rise=Math.min(60,t*.4);
+  for(let i=0;i<10;i++)R((i*31+(t>>1))%W-10,170+(i%3)*14,40,8,'#7c3c44');
+  const by=150-rise;R(50,by,156,12,'#5c3c2c');for(let k=0;k<10;k++)R(56+k*15,by+12+((k*7)%3)*6,10,10+((k*5)%4)*6,'#3c2418');
+  for(let i=0;i<6;i++){const h=22+(i*13)%26;R(60+i*24,by-h,18,h,'#bcbcbc');}R(116,by-62,24,62,'#fcfcfc');R(124,by-74,8,12,'#d82800');}
+function skSceneBg(k){
+  if(k==='skcity'){skCity(0);return true;}
+  if(k==='skcity2'){skCity(1);return true;}
+  if(k==='sklab'){skLab();return true;}
+  if(k==='skthrone'){skThrone();drawNizu(128,150,frame,0);return true;}
+  if(k==='sktagaba'){skLab();R(0,0,W,H,'rgba(0,0,0,.35)');drawTagaba(128,160,frame,1);return true;}
+  if(k==='sksky'){skSky(frame);return true;}
+  if(k==='skminus'){drawMinusBG(0,0,W,H,frame);return true;}
+  if(k==='skyoutai'){R(0,0,W,H,'#3c0810');drawNizuY(128,170,frame);return true;}
+  if(k==='skgod'){R(0,0,W,H,'#34080e');for(let i=0;i<24;i++)R((i*47)%W,(i*31)%H,1,1,'#e01818');drawNizuG(128,190,frame);return true;}
+  if(k==='skwake'){R(0,0,W,H,'#120206');skGrid(SK_TA,SKPAL,40,90,3);skGrid(SK_JA,SKPURP,138,90,3);return true;}
+  if(k==='skend'){R(0,0,W,H,'#fc9838');for(let i=0;i<20;i++)R((i*37)%W,(i*23)%80,2,2,'#fce0a8');skCity(0);R(0,0,W,40,'rgba(252,152,56,.5)');return true;}
+  return false;}
+function skBattleBG(sp){const st=sp.st;
+  if(st==='sk_nizu2'&&(sp.wave||1)<2){drawMinusBG(6,48,244,98,frame);return;}
+  if(st==='sk_nizu2'){R(6,48,244,98,'#3c0810');for(const [cx,cy] of [[30,62],[128,56],[226,62],[30,132],[226,132]]){R(cx-6,cy,13,1,'#f8a060');R(cx,cy-6,1,13,'#f8a060');}return;}
+  if(st==='sk_nizu3'){R(6,48,244,98,'#34080e');for(let i=0;i<30;i++)R(6+(i*47)%244,48+(i*31)%98,1,1,'#e01818');for(let i=0;i<6;i++)R(6+((i*41+(frame>>2))%240),128+(i%3)*5,30,5,'#5c1c24');return;}
+  if(st==='sk_nizu1'){R(6,48,244,98,'#08080c');for(const x of [14,40,196,222]){R(x,56,18,62,'#1c3c3c');R(x+3,72,12,44,'#2c6c6c');}R(6,118,244,28,'#1c0810');R(98,118,60,28,'#4c0814');return;}
+  if(st==='sk_lab'){R(6,48,244,98,'#081414');for(let x=14;x<244;x+=40){R(x,54,22,64,'#1c3c3c');R(x+3,62,16,54,'#2c6c6c');}R(6,118,244,28,'#102020');return;}
+  R(6,48,244,98,'#7cc8fc');for(let x=10;x<244;x+=34){R(x,70,26,48,'#fcfcfc');}R(6,118,244,28,'#bcbcbc');}
+
+/* ---------- 専用演出 ---------- */
+/* 覚醒ハイパー：結晶が 全身を 覆い、 ループごとに「n Hyper!」、保留連で「Fever!?」 */
+function hyperScr(seq){let t=0;const ST=Math.max(3,Math.min(8,Math.floor(220/Math.max(1,seq.length)))),T0=70,END=T0+seq.length*ST+50;
+  return{full:true,upd(){t++;if(t===20){sfx('magic');}if(t===60)sfx('g5');if(t>T0&&(t-T0)%ST===0){const s=seq[Math.floor((t-T0)/ST)-1];if(s)sfx(s.fever?'g5':'hit');}if(t>=END||(t>40&&I.A&&t>T0+10))pop();},
+    drw(){const ph=t<T0;R(0,0,W,H,ph?(t<30?'#000':'#04140a'):'#0c2418');
+      if(!ph){for(let i=0;i<40;i++){const a=i*2.4+t*.05;R(128+Math.cos(a)*(40+(i*7+t*3)%90),110+Math.sin(a)*(30+(i*5+t*2)%70),2,2,i%3?'#58f898':'#00a844');}}
+      if(ph){skGrid(SK_TN,SKPAL,104,80,3);const k=Math.max(0,(t-20)/2.2);const rows=SK_TA.map((r,j)=>Math.abs(j-10)<=k?r:'.'.repeat(r.length));skGrid(rows,SKPAL,104,80,3);
+        if(t>40){R(118,0,20,H,'rgba(120,232,168,.25)');big('覚醒ハイパー',128,30,'#58f898','center',22);}if(t>20&&t<40)txtS('パキ… パキパキッ',128,60,'#58f898','center');}
+      else{skGrid(SK_TA,SKPAL,104,90,3);const i=Math.min(seq.length-1,Math.floor((t-T0)/ST));const s=seq[Math.max(0,i)];let stock=0;for(let j=0;j<=i&&j<seq.length;j++){if(seq[j].add)stock++;if(seq[j].fever)stock--;}
+        if(s&&s.fever){big('Fever!?',128,40,(t>>2)&1?'#f8b800':'#fc7460','center',30);}
+        else if(s){const n=s.n,cols=['#f83800','#f8b800','#fcfc00','#58f898','#3cbcfc','#6888fc','#f878f8'];const tx=`${n} Hyper!${n>=20?'!!':n>=10?'!':''}`;big(tx,128,40,n>=20?cols[(t>>2)%7]:n>=10?'#f8b800':'#fcfcfc','center',n>=10?28:24);}
+        for(let j=0;j<4;j++){const x=92+j*20;pc(x,206,6,j<stock?(j===3?'#f83800':'#58f898'):'#202020');}txt('保留',128,218,'#bcbcbc','center');}
+      region(0,0,W,H,()=>{vA=true;});}};}
+/* プレデタープラント：紫の 捕食植物が 食らいつき、 HPと 攻撃力を 吸い取る */
+function predScr(hpA,atA){let t=0;const END=170;
+  return{full:true,upd(){t++;if(t===20)sfx('magic');if(t===70)sfx('hit');if(t===110)sfx('heal');if(t>=END||(t>50&&I.A))pop();},
+    drw(){R(0,0,W,H,t<30?'#140c1c':'#100818');
+      if(t<30){R(0,170,W,70,'#3c2c20');for(const cx of [60,128,196]){R(cx,170,2,10+t,'#9c6cc8');}skGrid(SK_JN,SKPAL,104,110,3);txtS('「喰らい尽くせ……！」',128,40,'#fcfcfc','center');}
+      else if(t<60){if(t<34)R(0,0,W,H,'#e8c8fc');skGrid(SK_JA,SKPURP,92,100,3);big('プレデタープラント',128,30,'#e8c8fc','center',18);}
+      else if(t<100){skGrid(SK_JA,SKPURP,20,110,3);const hx=Math.min(150,60+(t-60)*4);skGrid(SK_JA.slice(0,10).map(r=>r.slice(13)),SKPURP,hx,70,6);if(t>70)big('ガブッ！！',150,180,'#fcfcfc','center',26);}
+      else{skGrid(SK_JA,SKPURP,92,100,3);for(let x=10;x<W;x+=18){const y=200+(x%3);R(x-2,y,5,1,'#9c6cc8');R(x,y-2,1,5,'#9c6cc8');R(x,y,1,1,'#f8d8f8');}
+        txtS(`HP -${fmt(hpA)}　攻撃 -${fmt(atA)}`,128,40,'#fc7460','center');if(t>120)txtS(`HP +${fmt(hpA)}　攻撃 +${fmt(atA)}`,128,60,'#f8d8f8','center');}
+      region(0,0,W,H,()=>{vA=true;});}};}
+/* 物語用：ふたりの 覚醒（改良型 ネブカドネザル） */
+function skAwakeScr(cb){let t=0;const END=200;
+  return{full:true,upd(){t++;if(t===30||t===110)sfx('magic');if(t===80||t===160)sfx('g5');if(t>=END||(t>60&&I.A)){pop();cb&&cb();}},
+    drw(){R(0,0,W,H,'#120206');const k1=Math.max(0,(t-30)/2.5),k2=Math.max(0,(t-110)/2.5);
+      skGrid(SK_TN,SKPAL,30,90,3);skGrid(SK_TA.map((r,j)=>Math.abs(j-10)<=k1?r:'.'.repeat(r.length)),SKPAL,30,90,3);
+      if(t<110)skGrid(SK_JN,SKPAL,150,90,3);else skGrid(SK_JA,SKPURP,138,90,3);
+      if(t>60)txtS('可能性の 獣',54,70,'#58f898','center');if(t>140)txtS('捕食植物',186,70,'#c89cf8','center');
+      if(t<30)txtS('改良型 ネブカドネザル……！',128,30,'#f8b800','center');
+      if(t>170)big('覚醒',128,24,'#fcfcfc','center',24);
+      region(0,0,W,H,()=>{vA=true;});}};}
+
+/* ---------- ステージ ---------- */
+const SKSTG={
+  sk_kenmon:{waves:1,f:()=>.92,mk:()=>[['白服の 治安部隊','bones','#fcfcfc','#3cbcfc',1.6,1.2],['白服の 隊長','oni','#fcfcfc','#d82800',8,1.5,1],['白服の 治安部隊','bones','#fcfcfc','#3cbcfc',1.6,1.2]],intro:()=>'白服「笑顔の ない 者は\n平和の 敵と みなす。」'},
+  sk_lab:{waves:3,f:w=>.94+w*.03,mk:(sp,w)=>w<3?[['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.8,1.2],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',1.8,1.2],['神に なり損ねた 残骸','spirit','#3c0c14','#d82800',1.8,1.2]]
+      :[['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.25],['実験場 主任 シロガネ','oni','#fcfcfc','#3cbcfc',18,1.7,1],['培養槽の 失敗作','blob','#5c0c1c','#fc7460',2,1.25]],
+    intro:sp=>sp.wave<3?`地下実験場　第${sp.wave}区画\n培養槽の 中で 何かが 動いた…`:'主任 シロガネ「被験体の 補充か。\nちょうど 足りなかった ところだ」'},
+  sk_nizu1:{waves:1,f:()=>1.02,mk:()=>[['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3],['総帥 ニズゥーイッツァイ','oni','#1c1c24','#8c0c24',26,1.85,1],['白服の 親衛隊','bones','#fcfcfc','#d82800',2.2,1.3]],intro:()=>'ニズゥーイッツァイ「神の 前に ひれ伏せ、 実験体ども。」'},
+  sk_nizu2:{waves:2,f:w=>w<2?1.02:1.06,mk:(sp,w)=>w<2?[['コブシデの 複製','oni','#3c2858','#f8b800',10,1.6,1],['錨ケンドウの 複製','oni','#fcfcfc','#f8b800',14,1.65,1,'kendo'],['クロヌマの 複製','oni','#5c5c5c','#f8b800',10,1.6,1]]
+      :[['ニズゥーイッツァイ 幼体','oni','#000000','#d82800',40,1.95,1]],
+    intro:sp=>sp.wave<2?'マイナス宇宙が 過去の 敵を 写し取った！\n複製「……ジッケンタイ……」':'赤い 闇の 奥で 胎児が 脈打っている…\n「ウマレ…ル……」'},
+  sk_nizu3:{waves:1,f:()=>1.1,mk:()=>[['ニズゥーイッツァイ 生体','oni','#000000','#d82800',70,2.1,1]],intro:()=>'「ワタシハ……カミニ ナッタ」\n天使の 輪を 背負った 神が 降臨した！'}};
+Object.assign(GSTG,SKSTG);
+
+/* ---------- 物語 ---------- */
+function skStart(){const S=skS();
+  scene('skcity',['帝城を 出る 前に 裏・賭郎が 言った。','裏・賭郎「コブシデが 口にした 名…\nニズゥーイッツァイの 根城は サキタマだ」','── サキタマ　ナメガワマチ ──','看板「完全平和都市 ナメガワマチへ ようこそ」','街の 人々は みな 同じ 笑顔で\nこちらに 手を ふっている…','住民「ここは 完全平和都市。\nかなしみも あらそいも ありません」','住民「かなしみも あらそいも ありません」\n（…さっきと 一言一句 同じだ）'],()=>
+  scene('skcity2',['…路地裏から 手招きする 影が ある。','トモヤヨシダ「おい、 こっちだ！\n笑ってる 連中には 近づくな」','タケウチジョウチャン「俺たちは レジスタンス。\nこの 街は 平和都市なんかじゃ ない」','トモヤヨシダ「ナメガワマチの 地下は 実験場だ。\n地下に 送られた 人間は 二度と 戻らない」','ジョウチャン「黒幕は ニズゥーイッツァイ。\n人類保管装置を 作り変えて\n人間を 神に する 薬を 作ってる」','ジョウチャン「その 薬の 名は\n『ネブカドネザルの 鍵』……」','トモヤヨシダ「…あんたたち、 帝愛の 地下を\n抜けてきたんだろ？ 力を 貸してくれ」','【ぶっ飛びサキタマ編】\n〜ナメガワマチを 取り戻せ〜'],()=>{S.ch=1;save();
+    dialog(['目標：白服の 検問を 突破し\n地下への 入口を 探す'],skHub);}));}
+function skHub(){const S=skS();if(S.ch===0){skStart();return;}
+  const it=[];
+  if(S.ch===1)it.push({t:'白服の 検問を 突破する',k:'kenmon'});
+  if(S.ch===2)it.push({t:'地下実験場へ 潜入する（3連戦）',k:'lab'});
+  if(S.ch===3)it.push({t:'中枢の 塔へ 乗りこむ（最終決戦）',k:'n1'});
+  if(S.ch===4)it.push({t:'天空の マイナス宇宙へ（幼体）',k:'n2'});
+  if(S.ch===5)it.push({t:'最終決戦　ニズゥーイッツァイ 生体',k:'n3'});
+  if(S.ch>=6)it.push({t:'神の 残響と 再戦する',k:'re'});
+  it.push({t:'街を しらべる',k:'look'},{t:'レジスタンスと 話す',k:'talk'},{t:'帝城に もどる',k:'back'});
+  const goal=['','目標：白服の 検問を 突破し 地下への 入口を 探す','目標：地下実験場の 真相を 暴く','目標：中枢の 塔で ニズゥーイッツァイを 止める','目標：天空へ 浮上した 街で 神を 追う','目標：神と化した ニズゥーイッツァイを 倒す','ナメガワマチは 取り戻された。'][Math.min(6,S.ch)];
+  listPick('サキタマ　ナメガワマチ',it.map(x=>({t:x.t})),i=>{const k=it[i].k;
+    if(k==='kenmon')choice('白服の 検問所を 突破しますか？',['突破する','やめる'],r=>{if(r===0)startGm('sk_kenmon');else skHub();},96);
+    else if(k==='lab')choice('地下実験場へ 潜入しますか？\n（3連戦）',['潜入する','やめる'],r=>{if(r===0)startGm('sk_lab');else skHub();},96);
+    else if(k==='n1')choice('中枢の 塔の 最上階…\nニズゥーイッツァイが 待っている。\n乗りこみますか？（最終決戦）',['乗りこむ','やめる'],r=>{if(r===0)skN1();else skHub();},96);
+    else if(k==='n2')choice('天空に 浮かぶ ナメガワマチ。\nマイナス宇宙の 奥へ 進みますか？（2連戦）',['進む','やめる'],r=>{if(r===0)scene('skminus',['マイナス宇宙…\n何もかもが 存在し、 何もかもが 存在しない。','トモヤヨシダ「残骸は 俺たちが 抑える！\n行け！」'],()=>startGm('sk_nizu2'));else skHub();},96);
+    else if(k==='n3')choice('神と化した ニズゥーイッツァイに\n挑みますか？（6人で 戦う）',['挑む','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});}else skHub();},96);
+    else if(k==='re')choice('マイナス宇宙に 残る 神の 残響と\n再戦しますか？（6人で 戦う）',['再戦する','やめる'],r=>{if(r===0){skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS,re:1});}else skHub();},96);
+    else if(k==='look')skLook();else if(k==='talk')skTalk();else{save();dialog(['帝城に もどった。']);}},goal);}
+function skLook(){const S=skS();const L=S.ch>=6?['街の 人々が 思い思いの 顔で 笑っている。','子ども「おかあさんが 泣いてるの。\nでも うれしいんだって」','看板の「完全」の 二文字は 誰かに 塗りつぶされていた。']
+  :S.ch>=3?['空が 不気味に 赤く 染まっている…','住民「かなしみも あらそいも ありません」\n（住民の 首すじに 小さな 注射の 痕が ある）']
+  :['住民「かなしみも あらそいも ありません」','白服の 治安部隊が 笑っていない 者を 探して 歩いている。','マンホールの ふたに「関係者以外 立入禁止　地下第七層」と 刻まれている。'];
+  dialog(L,skHub);}
+function skTalk(){const S=skS();const L=S.ch>=6?['トモヤヨシダ「…生きてるよな、 俺たち」','ジョウチャン「ああ。 タガバソウの 薬の おかげだ」','トモヤヨシダ「また どこかで 会おうぜ。\n今度は 酒でも 飲みながら な」']
+  :S.ch>=3?['タガバソウ「改良型は 理性を 保てるが\n体への 負担は 大きい。」','「…使うのは 本当に 追いつめられた 時だけだ」','トモヤヨシダ「わかってるさ」']
+  :['トモヤヨシダ「俺は この 街で 生まれた。\n親父も お袋も 地下に 送られた」','ジョウチャン「俺は 薬草屋だった。\nあの 注射の 中身を 調べて 気づいたんだ」','ジョウチャン「人間を 神に する？\n…神に なり損ねた 連中を 何人も 見たよ」'];
+  dialog(L,skHub);}
+function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「人類は 保管されるべき 資源。\nそして わたしは その 管理者… 神と なる」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
+function skWin(sp,back,pages){const S=skS(),w=sp.wave||1,NW=GSTG[sp.st].waves;
+  if(w<NW){pages.push(sp.st==='sk_nizu2'?'複製たちは マイナス宇宙に 溶けて 消えた…':`第${w}区画を 突破した！\n（HP・MPは 回復しない）`);dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
+  const hub=more=>dialog(pages,()=>{returnField();dialog(more&&more.length?more:['（ナメガワマチに もどった）'],skHub);});
+  if(sp.st==='sk_kenmon'){const first=S.ch<2;S.ch=Math.max(S.ch,2);save();hub(first?['白服の 隊長「笑え… 笑うんだ……」','検問所の 奥に 地下へ 続く 階段が あった！','トモヤヨシダ「地下第七層… 実験場だ」',gmGive(10,10)]:['白服たちは 逃げていった。',gmGive(5,5)]);return;}
+  if(sp.st==='sk_lab'){if(S.ch>2){hub(['実験場の 残骸を 退けた。',gmGive(8,8)]);return;}
+    dialog(pages,()=>{BT=null;scene('sklab',['主任 シロガネは 培養槽に 倒れこんだ。','実験記録が 残されている…','「被験者 第三千二百号… 神化に 失敗。\n　残骸として 保管」','「ネブカドネザルの 鍵　完成。\n　総帥 自らが 投与を 開始」','ジョウチャン「…自分に 打ったのか！」'],()=>
+      scene('sktagaba',['そのとき 培養槽の 影から\n聞き覚えの ある 声が した。','？？？「…相変わらず 無茶を するな」','タガバソウ「よう。 生きてたぜ」','（帝愛の 地下で コブシデを 止めた あの 男だ！）','タガバソウ「コブシデの 同期装置から\n奴らの 薬の 設計を 抜き取った」','「理性を 保ったまま 覚醒できる…\n改良型の ネブカドネザルだ」','タガバソウは 小さな アンプルを 二本\nトモヤヨシダと ジョウチャンに 渡した。','タガバソウ「使うのは 本当に\n追いつめられた 時だけだ。 いいな」','トモヤヨシダ「…ああ」\nジョウチャン「恩に 着る」',gmGive(20,20,5),'目標：中枢の 塔で ニズゥーイッツァイを 止める'],()=>{S.ch=3;save();returnField();skHub();}));});return;}
+  if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,4);save();
+    dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」','ニズゥーイッツァイは 首すじに\n『ネブカドネザルの 鍵』を 打ち込んだ！'],()=>
+      scene('sksky',['塔が… いや 街 全体が 激しく 揺れる！','ナメガワマチが 大地から 引き剥がされ…\n天空へと 浮上していく！！','住民たちの 笑顔の まま 街は 雲を 越えた…'],()=>
+      scene('skminus',['ニズゥーイッツァイの 体が 裂け\n人の 形が 崩れていく……','空間が 反転した。\n── マイナス宇宙 ──','何もかもが 存在し、 何もかもが 存在しない…','闇の 中から 神に なり損ねた 残骸が\n無数に 這い出してきた！','トモヤヨシダ「…今が その 時だな、 ジョウチャン」','ジョウチャン「ああ」\nふたりは タガバソウの アンプルを 飲み干した！'],()=>push(skAwakeScr(()=>
+      scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「ここは 俺たちに 任せて 行け！」'],()=>startGm('sk_nizu2')))))));});return;}
+  if(sp.st==='sk_nizu2'){S.ch=Math.max(S.ch,5);save();
+    dialog(pages,()=>{BT=null;scene('skyoutai',['胎児の 殻に ひびが 走る……','「ウマレ……ル…… カミガ……」'],()=>
+      scene('skgod',['殻を 破って 現れたのは\n人の 姿を 捨てた 縦長の 異形。','背中には 天使の 輪…\n目の 位置には 赤い 溝が 一文字に 走る。','「ワタシハ……カミニ ナッタ」'],()=>
+      scene('skwake',['そのとき 背後から 足音が 響いた。','トモヤヨシダ「待たせたな！」','ジョウチャン「残骸は 片付けた。\nここからは 6人で 行くぞ！」','（トモヤヨシダと タケウチジョウチャンが\n戦いに 加わった！）'],()=>{skGuestOn();startGm('sk_nizu3',{guests:SK_GUESTS});})));});return;}
+  if(sp.st==='sk_nizu3'){
+    if(sp.re||S.clear){dialog(pages,()=>{BT=null;skGuestOff();returnField();dialog(['神の 残響は 光の 粒に なって 消えた…',gmGive(30,30,5)],skHub);});return;}
+    const rw=gmGive(50,50,20,2e11);S.ch=6;S.clear=1;save();
+    dialog(pages,()=>{BT=null;skGuestOff();scene('skgod',['胸の 赤い コアに 亀裂が 走る！','「ワタシハ… カミ… ダ……\nカミ……ナノ…ダ………」','コアが 砕け散った！','天使の 輪が 崩れ 虚無の 胴体は\n音も なく 崩れ去っていく…','ニズゥーイッツァイは 跡形も なく 消滅した。'],()=>
+      scene('sksky',['マイナス宇宙が 閉じていく…','天空の ナメガワマチは ゆっくりと\n大地へ 降りていった。'],()=>
+      scene('skend',['地下第七層の 扉が 開かれ\n地下に 送られた 人々が 地上へ 戻ってきた。','トモヤヨシダ「親父…！ お袋…！」','ジョウチャン「…生きてる。 俺たちも な」','タガバソウ「人類保管計画は… これで 終わりだ」','住民たちは もう 同じ 言葉を くりかえさない。\n泣いたり 笑ったり している。'],()=>
+      titleCard('人類保管計画編　完',()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！',rw],skHub);}))));});return;}
+  back([]);}
+
 /* ===================== TAインダストリアル（地下帝国編の クリア報酬） ===================== */
 function tiTaInit(){if(!G.ta)G.ta={cash:1e9,fin:{out:0,rate:0,susp:0,last:null},hall:{vi:null,set:null,rep:1,ev:0,last:null}};}
 const TA_RN=['法定金利（年15%）','グレーゾーン（年29.2%）','帝愛式（10日で4割）'],TA_DR=[.00041,.0008,.034],TA_DEF=[.00006,.00018,.012],TA_DEM=[1,.75,.45];
