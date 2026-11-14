@@ -1489,6 +1489,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++)drawTile(tileAt(tx,ty),tx*16-camX,ty*16-camY);
     for(const q of G.rifts){const sx=q.x*16-camX,sy=q.y*16-camY;if(sx<-16||sy<-16||sx>W||sy>H)continue;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,4,'#6800a8');
       for(let k=0;k<6;k++){const an=k/6*Math.PI*2+frame*.1;R(Math.round(sx+8+Math.cos(an)*5),Math.round(sy+8+Math.sin(an)*5),2,2,k%2?'#d82800':'#f878f8');}}
+    if(G.ajito&&G.ajito.x!=null&&ajOK()){const sx=G.ajito.x*16-camX,sy=G.ajito.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAjHouse(sx,sy);}
     drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();
     const vi=nearestVil(G.pos.x,G.pos.y),v=VIL[vi],t=v.tier;
     const bl=G.bless&&G.bless.left>0;win(4,4,128,bl?56:44);
@@ -1501,6 +1502,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
 function startField(){setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
 function onStep(pv){timeAdd(5);
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
+  if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
   if(t===T.KQSPOT){kqFac('kqcable');return;}
@@ -1556,9 +1558,11 @@ function openShop(vi){
 function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right',G.coins>=1e9?92:62);
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
 function openMenu(){
-  const m=mkMenu(['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],{x:8,y:20,w:96});m.rows=12;
+  const NM=['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
+  if(ajOK()){NM.splice(8,0,'アジト');FN.splice(8,0,ajMenu);}
+  const m=mkMenu(NM,{x:8,y:20,w:96});m.rows=12;
   push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();save();return;}if(r==null)return;
-      [statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr][r]();},
+      FN[r]();},
     drw(a){menuDraw(m,a);coinWin(140,20);win(140,58,108,62);txt(`${G.day}日目`,148,65,'#fcfcfc');txt(`研修歴${G.career}`,240,65,'#bcbcbc','right');
       txt(G.job?`仕事：${G.job.prog}/${G.job.need}`:'仕事：なし',148,78,'#bcbcbc','left',92);txt(G.meal&&G.meal.left>0?`食事：${G.meal.n}`:'食事：なし',148,91,'#bcbcbc','left',92);txt(`チケット ${G.items.tk}枚`,148,104,'#f8b800','left',92);if(titleOf()){win(140,122,108,20);txt('称号 '+titleOf(),148,128,'#f8d878','left',92);}
       {const y=titleOf()?144:122,lv=plv();win(140,y,108,30);txt(`プレイヤーLv ${lv}`,148,y+6,'#68ccfc','left',92);const r=lv>=PLV_MAX?1:Math.min(1,(G.pexp||0)/pneed(lv));R(148,y+19,92,4,'#3c3c3c');R(148,y+19,Math.round(92*r),4,'#68ccfc');}}});
@@ -2447,7 +2451,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -2463,7 +2467,7 @@ let TW=null;
 function buildTown(vi){
   const v=VIL[vi],sz=v.size,r=lcg(vi*97+13),w=sz>=6?31:sz>=4?27:sz>=3?23:19,cx=Math.floor(w/2),city=sz>=4,edge=sz>=3?'wall':'tree';
   const D=v.depop?dep(vi):null,ruin=!!(D&&!D.revived);
-  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=4&&!v.depop&&!v.tokoyo?['kanraku']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:v.kyotei?['race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]);
+  const fac=v.tokoyo?['inn','shop','boat','gate']:v.depop?(D.revived?['hall','inn','shop','gacha']:v.depop==='ruin'?['hall']:['hall','shop']):(FAC_SIZE[Math.min(3,sz)]).concat(sz>=4?['stock']:[]).concat(sz>=4&&!v.depop&&!v.tokoyo?['kanraku']:[]).concat(sz>=3&&!v.gm?['jogai']:[]).concat(['yakusho']).concat(v.port?['boat','race']:v.kyotei?['race']:[]).concat(sz>=3?['kinyu']:[]).concat(v.port&&!v.tokoyo&&casinoToday(vi)?['casino']:[]).concat(v.shugen?['shugyo']:[]).concat(v.gm==='cap'?['gkan','kosho','hokan']:[]).concat(v.kqf||[]).concat(sz>=2?['kaitaku']:[]).concat(sz>=3&&!v.tokoyo&&!v.depop?['kagu']:[]);
   const streets=Math.max(sz>=3?3:2,Math.ceil(fac.length/(w>=27?6:4))),h=4+5*streets+2;/* 道は2マス幅（5行で1区画） */
   const C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'g'});}
   const set=(x,y,o)=>{if(x>=0&&y>=0&&x<w&&y<h)C[y][x]=o;};
@@ -2908,7 +2912,7 @@ function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kagu'){kaguFac();return;}if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -5677,9 +5681,146 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
     dialog(pages,()=>{BT=null;skGuestOff();scene('skgod',['胸の 赤い コアに 亀裂が 走る！','「ワタシハ… カミ… ダ……\nカミ……ナノ…ダ………」','コアが 砕け散った！','天使の 輪が 崩れ 虚無の 胴体は\n音も なく 崩れ去っていく…','ニズゥーイッツァイは 跡形も なく 消滅した。'],()=>
       scene('sksky',['マイナス宇宙が 閉じていく…','天空の ナメガワマチは ゆっくりと\n大地へ 降りていった。'],()=>
       scene('skend',['地下第七層の 扉が 開かれ\n保管されていた 人々が 地上へ 戻ってきた。','クマガヤから 来た 若者たちも\nアツミの もとへ 帰っていく。','ジョウチャン「…生きてる。 俺たちも な」','ワクさん「マツゥヤマの みんな… 帰るぞ。\n自分の 家に」','タガバソウ「人類保管計画は… これで 終わりだ」','前玉神社の 宮司「玉は 閉じこめる ものでは ない。\n人の 幸せを 守る ものです」','住民たちは もう 同じ 言葉を くりかえさない。\n泣いたり 笑ったり している。'],()=>
-      titleCard('人類保管計画編　完',()=>push(skEndingScr(()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！','トモヤヨシダから「ダイナムミソノの 会員カード」、\nジョウチャンから「なかなか 開かない がま口財布」を\n託された！（ふたりの 専用武器）',rw]);}))))));});return;}
+      titleCard('人類保管計画編　完',()=>push(skEndingScr(()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！','トモヤヨシダから「ダイナムミソノの 会員カード」、\nジョウチャンから「なかなか 開かない がま口財布」を\n託された！（ふたりの 専用武器）','さらに 好きな 場所に\n「アジト」を 建てられる ように なった！\n（メニューの「アジト」から）','アジトには 仲間を 3人まで 呼べる。\n家具は 規模「大」以上の 町の\n「太陽家具」で 買える。',rw]);}))))));});return;}
   back([]);}
 
+/* ===================== アジト（サキタマ編 クリア報酬） ===================== */
+const AJ_F={bed:{n:'ベッド',p:3000,h:2,d:'寝ると 仲間全員の HP・MPが 全回復'},shelf:{n:'本棚',p:2000,d:'いろいろな 本が 読める'},
+  ih:{n:'IHコンロ',p:8000,d:'自炊すると 攻撃 +10%（3戦）'},pcd:{n:'ゲーミングPC（デスクトップ）',p:50000,d:'静かで よく冷える タワー型'},
+  pcn:{n:'ゲーミングPC（ノート）',p:30000,d:'どこでも 遊べる ノート型'},mon:{n:'4Kモニター',p:15000,d:'PCと いっしょに 置くと 映像が きれいに'},
+  slot:{n:'スロット台',p:100000,d:'家で 回し放題（イェソは 増えない）'}};
+const AJ_K=Object.keys(AJ_F),AJ_W=14,AJ_H=11,AJ_OX=16,AJ_OY=34,AJ_DX=7;
+const ajOK=()=>!!(G&&G.sk&&G.sk.clear);
+function ajS(){if(!G.ajito)G.ajito={x:null,y:null,chars:[],furn:[],inv:{},big:0};const A=G.ajito;A.chars=(A.chars||[]).filter(id=>G.chars[id]);A.furn=A.furn||[];A.inv=A.inv||{};return A;}
+const ajLeft=k=>{const A=ajS();return (A.inv[k]||0)-A.furn.filter(f=>f.k===k).length;};
+const ajName=id=>CH[id]?(CH[id]._base?CH[id]._base.name:CH[id].name):id;
+const ajFurnAt=(x,y)=>ajS().furn.find(f=>f.x===x&&(f.y===y||(AJ_F[f.k].h===2&&f.y+1===y)));
+const ajFloor=(x,y)=>x>=0&&x<AJ_W&&y>=2&&y<AJ_H;
+function drawAjHouse(x,y){R(x+2,y+7,12,9,'#e8d8b0');R(x+1,y+5,14,3,'#2c7c1c');R(x+3,y+3,10,2,'#2c7c1c');R(x+5,y+1,6,2,'#1c5c10');
+  R(x+7,y+11,3,5,'#7c4c10');R(x+3,y+9,3,3,'#68ccfc');R(x+11,y+9,3,3,'#68ccfc');R(x+13,y-2,1,6,'#3c3c3c');R(x+14,y-2,2,2,'#d82800');}
+function ajDrawF(k,x,y,on){
+  const desk=()=>{R(x,y+9,16,3,'#8c5c2c');R(x+1,y+12,2,4,'#6c3c10');R(x+13,y+12,2,4,'#6c3c10');};
+  if(k==='bed'){R(x+1,y+1,14,30,'#7c4c10');R(x+2,y+2,12,27,'#fcfcfc');R(x+3,y+3,10,5,'#e0e0f0');R(x+2,y+12,12,17,'#3858c8');R(x+2,y+12,12,2,'#6888f8');R(x+1,y+29,14,2,'#5c3410');}
+  else if(k==='shelf'){R(x+1,y,14,16,'#6c3c10');R(x+2,y+1,12,4,'#2a1606');R(x+2,y+6,12,4,'#2a1606');R(x+2,y+11,12,4,'#2a1606');
+    const C=['#d82800','#0058f8','#00a800','#f8b800','#6844fc','#fcfcfc'];for(let r=0;r<3;r++)for(let i=0;i<5;i++)R(x+2+i*2+(r&1),y+1+r*5+((i+r)%2),2,4-((i+r)%2),C[(i*3+r)%6]);}
+  else if(k==='ih'){R(x,y+5,16,11,'#d8d8d8');R(x+1,y+7,14,1,'#a8a8a8');R(x+7,y+10,2,2,'#7c7c7c');R(x,y+2,16,4,'#181818');
+    const c=on?'#f83800':'#5c1c10';R(x+2,y+3,5,2,c);R(x+9,y+3,5,2,c);}
+  else if(k==='pcd'){desk();R(x+1,y+1,9,7,'#181818');R(x+2,y+2,7,5,'#3858c8');R(x+5,y+8,1,1,'#3c3c3c');R(x+11,y,4,9,'#4c3c2c');R(x+12,y+1,2,1,'#a08060');R(x+12,y+3,2,3,'#7c6c5c');R(x+13,y+7,1,1,on?'#58f898':'#2c7c1c');}
+  else if(k==='pcn'){desk();R(x+3,y+2,10,6,'#3c3c3c');R(x+4,y+3,8,4,on?'#58f898':'#1c5c3c');R(x+2,y+8,12,1,'#7c7c7c');}
+  else if(k==='mon'){desk();R(x,y,16,8,'#101010');R(x+1,y+1,14,6,'#68ccfc');R(x+1,y+5,14,2,'#2c9c3c');R(x+3,y+3,4,2,'#fcfcfc');R(x+11,y+2,2,2,'#f8d878');R(x+7,y+8,2,1,'#3c3c3c');}
+  else if(k==='slot'){R(x+1,y,14,16,'#a81000');R(x+3,y,10,2,(frame>>3)&1?'#f8d878':'#f8b800');R(x+2,y+4,12,6,'#fcfcfc');
+    for(let i=0;i<3;i++){const xx=x+3+i*4;R(xx,y+5,3,1,'#d82800');R(xx+2,y+6,1,3,'#d82800');}R(x+2,y+11,12,2,'#600000');R(x+15,y+4,1,6,'#bcbcbc');R(x+14,y+3,2,2,'#d82800');}
+}
+function ajRoomBg(){R(0,0,W,H,'#0c0806');
+  for(let y=0;y<2;y++)for(let x=0;x<AJ_W;x++){const sx=AJ_OX+x*16,sy=AJ_OY+y*16;R(sx,sy,16,16,'#d8c8a0');R(sx,sy,1,16,'#c8b890');}
+  R(AJ_OX,AJ_OY+28,AJ_W*16,4,'#7c5028');
+  for(const wx of [2,10]){const sx=AJ_OX+wx*16,sy=AJ_OY+4;R(sx,sy,32,18,'#7c5028');R(sx+2,sy+2,28,14,'#a8e4fc');R(sx+15,sy+2,2,14,'#7c5028');R(sx+2,sy+8,28,1,'#7c5028');}
+  for(let y=2;y<AJ_H;y++)for(let x=0;x<AJ_W;x++){const sx=AJ_OX+x*16,sy=AJ_OY+y*16;R(sx,sy,16,16,'#b07c44');R(sx,sy+15,16,1,'#8c5c2c');R(sx+((x+y)%2?4:11),sy,1,15,'#9c6c38');}
+  R(AJ_OX+5*16,AJ_OY+4*16,64,48,'#9c3c28');R(AJ_OX+5*16+3,AJ_OY+4*16+3,58,42,'#b85840');
+  R(AJ_OX-4,AJ_OY,4,AJ_H*16+4,'#5c3410');R(AJ_OX+AJ_W*16,AJ_OY,4,AJ_H*16+4,'#5c3410');R(AJ_OX-4,AJ_OY+AJ_H*16,AJ_W*16+8,4,'#5c3410');
+  R(AJ_OX+AJ_DX*16,AJ_OY+AJ_H*16,16,4,'#3c2a14');R(AJ_OX+AJ_DX*16+1,AJ_OY+AJ_H*16-4,14,4,'#3c5c8c');
+  txt('アジト',8,8,'#58f898');txt('B：メニュー　A：しらべる',248,8,'#7c7c7c','right');}
+function ajDrawAll(npcs,P,mv){ajRoomBg();
+  const A=ajS(),list=[];A.furn.forEach(f=>list.push({y:f.y+(AJ_F[f.k].h||1)-1,d:()=>ajDrawF(f.k,AJ_OX+f.x*16,AJ_OY+f.y*16,f.on>0)}));
+  npcs.forEach(n=>list.push({y:n.y,d:()=>drawChar(n.id,AJ_OX+n.x*16,AJ_OY+n.y*16-2,(frame>>4)&1)}));
+  if(P){const ox=mv?mv.dx*mv.t:0,oy=mv?mv.dy*mv.t:0;list.push({y:P.y+.5,d:()=>drawChar(G.party[0],AJ_OX+P.x*16+ox,AJ_OY+P.y*16-2+oy,(frame>>3)&1)});}
+  list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());}
+function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
+  const P={x:AJ_DX,y:AJ_H-1,dir:'u'},npcs=[],spots=[[3,5],[10,5],[4,8],[10,8],[2,3],[11,3],[6,3]];
+  const busy=(x,y,self)=>!ajFloor(x,y)||ajFurnAt(x,y)||(P.x===x&&P.y===y)||npcs.some(n=>n!==self&&n.x===x&&n.y===y);
+  const sync=()=>{for(let i=npcs.length-1;i>=0;i--)if(!A.chars.includes(npcs[i].id))npcs.splice(i,1);
+    A.chars.forEach(id=>{if(npcs.some(n=>n.id===id))return;const s=spots.find(([x,y])=>!busy(x,y));if(s)npcs.push({id,x:s[0],y:s[1],t:60+Math.floor(rnd()*120)});});};
+  sync();
+  const scr={full:true,mv:null,
+    upd(){A.furn.forEach(f=>{if(f.on>0)f.on--;});
+      npcs.forEach(n=>{if(--n.t>0)return;n.t=90+Math.floor(rnd()*150);const d=[[1,0],[-1,0],[0,1],[0,-1]][Math.floor(rnd()*4)];if(!busy(n.x+d[0],n.y+d[1],n)&&!(n.x+d[0]===AJ_DX&&n.y+d[1]===AJ_H-1)){n.x+=d[0];n.y+=d[1];}});
+      if(this.mv){this.mv.t+=2;if(this.mv.t>=16){P.x=this.mv.x1;P.y=this.mv.y1;this.mv=null;}return;}
+      if(I.B||I.menu){ajRoomMenu(P,npcs,sync);return;}
+      const fx=P.x+(P.dir==='l'?-1:P.dir==='r'?1:0),fy=P.y+(P.dir==='u'?-1:P.dir==='d'?1:0);
+      if(I.A){const n=npcs.find(q=>q.x===fx&&q.y===fy);if(n){ajTalk(n.id);return;}const f=ajFurnAt(fx,fy);if(f){ajUse(f);return;}return;}
+      let dx=0,dy=0;if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;if(!dx&&!dy)return;
+      P.dir=dy<0?'u':dy>0?'d':dx<0?'l':'r';
+      if(dy>0&&P.x===AJ_DX&&P.y===AJ_H-1){pop();sfx('ok');save();return;}
+      const nx=P.x+dx,ny=P.y+dy;if(!busy(nx,ny))this.mv={x1:nx,y1:ny,dx,dy,t:0};},
+    drw(){ajDrawAll(npcs,P,this.mv);const tot=AJ_K.reduce((s,k)=>s+(A.inv[k]||0),0);
+      txt(`仲間 ${A.chars.length}/3　家具 ${A.furn.length}/${tot}`,8,22,'#bcbcbc');
+      if(P.x===AJ_DX&&P.y===AJ_H-1)txt('↓ 外に 出る',248,22,'#f8d878','right');}};
+  push(scr);
+  if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」で 買える。']);}
+}
+function ajRoomMenu(P,npcs,sync){const A=ajS();
+  choice('',['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'],r=>{
+    if(r===0){const ks=AJ_K.filter(k=>ajLeft(k)>0);if(!ks.length){dialog(A.furn.length?'置ける 家具が もう ない。\n（太陽家具で 買い足そう）':'まだ 家具を 持っていない。\n規模「大」以上の 町の「太陽家具」で 買おう。');return;}
+      listPick('どの 家具を 置く？',ks.map(k=>({t:AJ_F[k].n,r:`のこり${ajLeft(k)}`})),i=>ajPlace(ks[i],P,npcs));}
+    else if(r===1){if(!A.furn.length){dialog('置いてある 家具は ない。');return;}
+      listPick('どの 家具を しまう？',A.furn.map(f=>({t:AJ_F[f.k].n,r:`(${f.x+1},${f.y-1})`})),i=>{const f=A.furn.splice(i,1)[0];save();dialog(`${AJ_F[f.k].n}を しまった。`);});}
+    else if(r===2){if(A.chars.length>=3){dialog('アジトに 呼べるのは 3人まで。\n（「仲間を 帰す」で 入れかえよう）');return;}
+      const ids=ownedChars().filter(id=>!A.chars.includes(id)&&id!==G.party[0]);if(!ids.length){dialog('呼べる 仲間が いない。');return;}
+      listPick(`アジトに 呼ぶ 仲間（${A.chars.length}/3）`,ids.map(id=>({t:ajName(id),r:RAR[CH[id].rar]?RAR[CH[id].rar].n||'':''})),i=>{const id=ids[i];A.chars.push(id);sync();
+        if(!npcs.some(n=>n.id===id)){A.chars.pop();dialog('部屋が いっぱいで 入れない…\n家具を 少し 片付けよう。');return;}save();sfx('ok');dialog(`${ajName(id)}が アジトに やってきた！`);});}
+    else if(r===3){if(!A.chars.length){dialog('アジトに いる 仲間は いない。');return;}
+      listPick('帰ってもらう 仲間',A.chars.map(id=>({t:ajName(id),r:''})),i=>{const id=A.chars.splice(i,1)[0];sync();save();dialog(`${ajName(id)}「じゃあ またね！」`);});}
+    else if(r===4){pop();sfx('ok');save();}
+  },96);}
+function ajPlace(k,P,npcs){const A=ajS(),h=AJ_F[k].h||1;let cx=Math.min(AJ_W-1,Math.max(0,P.x)),cy=Math.max(2,Math.min(AJ_H-h,P.y-1));
+  const ok=(x,y)=>{for(let d=0;d<h;d++){const yy=y+d;if(!ajFloor(x,yy)||ajFurnAt(x,yy)||(P.x===x&&P.y===yy)||npcs.some(n=>n.x===x&&n.y===yy)||(x===AJ_DX&&yy===AJ_H-1))return false;}return true;};
+  push({full:true,upd(){if(I.B){pop();return;}
+      if(I.pu)cy=Math.max(2,cy-1);if(I.pd)cy=Math.min(AJ_H-h,cy+1);if(I.pl)cx=Math.max(0,cx-1);if(I.pr)cx=Math.min(AJ_W-1,cx+1);
+      if(I.A){if(!ok(cx,cy)){sfx('bump');return;}A.furn.push({k,x:cx,y:cy});save();sfx('ok');pop();toast(`${AJ_F[k].n}を 置いた！`);}},
+    drw(){ajDrawAll(npcs,P,null);const good=ok(cx,cy),sx=AJ_OX+cx*16,sy=AJ_OY+cy*16;
+      if((frame>>3)&1){ctx.globalAlpha=.75;ajDrawF(k,sx,sy,false);ctx.globalAlpha=1;}
+      ctx.strokeStyle=good?'#58f898':'#fc7460';ctx.lineWidth=1;ctx.strokeRect(sx+.5,sy+.5,15,h*16-1);
+      win(4,216,248,22);txt(`${AJ_F[k].n}：十字で 移動　A：置く　B：やめる`,10,222,good?'#fcfcfc':'#fc7460','left',236);}});}
+function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
+  if(f.k==='bed'){choice('ベッドで 休みますか？',['はい','いいえ'],r=>{if(r!==0)return;fullHeal();sfx('heal');save();dialog(['……','ぐっすり 眠った。\n仲間全員の HP・MPが 全回復した！']);});return;}
+  if(f.k==='shelf'){const B=['『八百万の 神々 図鑑』\n…ずいぶん 読みこんである。','『人類保管計画 調査報告書』\n…あの 戦いの 記録だ。','『TAインダストリアル 社史』\n帝愛の 子会社の あゆみが 書いてある。','『ネギの 育て方 〜サキタマ篇〜』\n深谷の 土が いいらしい。','『パチスロ 必勝本』\n「設定6は 甘い」…そりゃ そうだ。','『アイヂ 旅行ガイド』\n…次の 旅に 備えておこう。'];
+    dialog(B[Math.floor(rnd()*B.length)]);return;}
+  if(f.k==='ih'){f.on=120;G.meal={n:'アジトの 自炊カレー',atk:.1,all:0,exp:0,left:3};G.party.forEach(fixHp);sfx('ok');save();dialog(['IHコンロで カレーを 作った。','うまい！\n攻撃 +10%（3戦）']);return;}
+  if(f.k==='pcd'||f.k==='pcn'){f.on=180;const L=['ゲームを 起動した。\n…気づいたら 2時間 たっていた。','ランクマッチで 3連勝！\n気分が いい。','攻略 wikiを 読んで\n次の 冒険の 作戦を 練った。','PCの パーツを ながめて\nうっとり している…'];
+    const pages=[L[Math.floor(rnd()*L.length)]];if(has('mon'))pages.push('4Kモニターに つないでいるので\n映像が とても きれいだ！');else pages.push('（4Kモニターを 置くと もっと きれいに なりそうだ）');
+    if(f.k==='pcd')pages.push('デスクトップは 静かで よく 冷えている。');dialog(pages);return;}
+  if(f.k==='mon'){dialog(has('pcd')||has('pcn')?'4Kモニターだ。\nPCを 起動すると 映る。':'4Kモニターだ。\n…つなぐ PCが ない。');return;}
+  if(f.k==='slot'){ajSlotScr();return;}
+  dialog(F.n);}
+function ajTalk(id){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),n=ajName(id),L=[];
+  if(id==='tomoya')L.push(has('slot')?'7を 揃えるのは 得意だぜ！\n覚醒ハイパー 見せてやろうか？':'スロット台は ないのか？\n…いや 別に 打ちたい わけじゃ ないけどな。');
+  if(id==='jouchan')L.push('このがま口… やっぱり 開かない。','アジトの 植物… 食べないから 安心しろ。');
+  if(has('bed'))L.push('ベッド ふかふかだった！');else L.push('ベッドが あったら 泊まれるのになあ。');
+  if(has('ih'))L.push('IHコンロで 何か 作ってよ。');
+  if(has('pcd')||has('pcn'))L.push('あとで PC 貸してね。');else L.push('ゲーミングPC ほしいなあ。');
+  if(has('slot'))L.push('スロット 打っても いい？');
+  L.push('ここ 落ち着くね。','次は アイヂ だっけ？\n準備 しなきゃね。','アジト いいね。 また 来るよ。');
+  dialog(`${n}「${L[Math.floor(rnd()*L.length)]}」`);}
+function ajSlotScr(){const A=ajS(),S=['7','BAR','ベル','チェ','リプ','ベル','リプ','BAR','チェ','ベル'],C={'7':'#d82800','BAR':'#fcfcfc','ベル':'#f8d878','チェ':'#f878f8','リプ':'#68ccfc'};
+  const pos=[0,3,6],spin=[false,false,false];let bigW=false,ph='idle',msg='A：レバー　B：やめる',fan=0,t=0,games=0;
+  push({full:true,upd(){t++;if(fan>0)fan--;for(let i=0;i<3;i++)if(spin[i])pos[i]=(pos[i]+.45)%S.length;
+      if(I.B&&ph==='idle'){pop();save();return;}
+      if(!I.A)return;
+      if(ph==='idle'){spin.fill(true);ph=0;bigW=rnd()<.04;games++;msg='A：とめる';tone(392,.08,'square',.1);return;}
+      if(typeof ph==='number'){spin[ph]=false;pos[ph]=bigW?0:Math.round(pos[ph])%S.length;tone(523,.05,'square',.1);ph++;
+        if(ph===3){ph='idle';const r=pos.map(p=>S[Math.round(p)%S.length]);
+          if(r.every(s=>s==='7')){A.big=(A.big||0)+1;fan=180;msg='BIG BONUS！！（家スロなので イェソは でない）';sfx('g5');}
+          else if(r.every(s=>s===r[0])){msg=`${r[0]} 揃い！`;sfx('coin');}else msg='A：レバー　B：やめる';save();}}},
+    drw(){R(0,0,W,H,fan>0&&(fan>>3)&1?'#3c0800':'#100808');R(48,20,160,196,'#a81000');R(56,26,144,14,(t>>3)&1?'#f8d878':'#f8b800');big('アジトの スロット台',128,28,'#600000','center',10);
+      R(60,60,136,72,'#202020');for(let i=0;i<3;i++){const x=64+i*44;R(x,64,40,64,'#fcfcfc');
+        for(let k=-1;k<=1;k++){const p=pos[i],idx=((Math.floor(p)+k)%S.length+S.length)%S.length,off=(p-Math.floor(p))*20,sy=96+k*20-off+ (spin[i]?0:0);if(sy<60||sy>124)continue;const s=S[idx];big(s,x+20,sy-6,C[s]==='#fcfcfc'?'#202020':C[s],'center',s.length>1?10:16);}}
+      R(60,95,136,1,'#d82800');R(56,140,144,30,'#600000');txt(`回転数 ${games}　BIG 通算 ${A.big||0}回`,128,150,'#f8d878','center');
+      win(8,184,240,46);txt(msg,128,200,fan>0?'#f8d878':'#fcfcfc','center',224);}});}
+function kaguFac(){const A=ajS();
+  const open=()=>listPick('太陽家具',AJ_K.map(k=>({t:AJ_F[k].n,r:fmt(AJ_F[k].p)+'イェソ'})),i=>{const k=AJ_K[i],f=AJ_F[k];
+    if(G.coins<f.p){dialog('イェソが たりない…',open);return;}
+    G.coins-=f.p;A.inv[k]=(A.inv[k]||0)+1;sfx('coin');save();
+    dialog([`${f.n}を 買った！`,ajOK()?(A.x==null?'メニューの「アジト」から アジトを 建てて\n部屋に 置こう。':'アジトの 中の「もようがえ」で 置ける。'):'（アジトを 持てば 部屋に 置ける）'],open);
+  },s=>`${AJ_F[AJ_K[s]].d}\n持っている数：${A.inv[AJ_K[s]]||0}　所持金：${fmt(G.coins)}イェソ`);
+  dialog(['太陽家具「いらっしゃいませ！\nお部屋を 明るく 太陽家具です」'],open);}
+function ajMenu(){const A=ajS(),x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
+  const okHere=[T.GRASS,T.ROAD,T.SAND,T.FOREST].includes(t)&&!RES.some(r=>r.x===x&&r.y===y)&&!G.rifts.some(q=>q.x===x&&q.y===y);
+  const O=[];if(A.x!=null)O.push(['アジトに 帰る',()=>{while(stack.length>1)pop();G.pos.x=A.x;G.pos.y=A.y;fieldScr.mv=null;save();ajEnter();}]);
+  O.push([A.x==null?'ここに 建てる':'ここに 移す',()=>{if(!okHere){dialog('ここには 建てられない。\n（草原・森・道・砂地に 建てられる）');return;}
+    choice(A.x==null?'ここに アジトを 建てますか？':'アジトを ここに 移しますか？\n（家具も 仲間も いっしょに 引っ越す）',['はい','いいえ'],r=>{if(r!==0)return;
+      const first=A.x==null;A.x=x;A.y=y;save();while(stack.length>1)pop();sfx('lvup');dialog([first?'アジトを 建てた！':'アジトを 引っ越した！','（アジトの 上に 乗ると 中に 入れる）'],()=>ajEnter());});}]);
+  O.push(['やめる',()=>{}]);
+  choice(A.x==null?'アジトを どこに 建てる？\n（今 立っている 場所に 建てる）':`アジト：${VIL[nearestVil(A.x,A.y)].name} 周辺`,O.map(o=>o[0]),r=>{if(r>=0)O[r][1]();},96);}
 /* ===================== TAインダストリアル（地下帝国編の クリア報酬） ===================== */
 function tiTaInit(){if(!G.ta)G.ta={cash:1e9,fin:{out:0,rate:0,susp:0,last:null},hall:{vi:null,set:null,rep:1,ev:0,last:null}};}
 const TA_RN=['法定金利（年15%）','グレーゾーン（年29.2%）','帝愛式（10日で4割）'],TA_DR=[.00041,.0008,.034],TA_DEF=[.00006,.00018,.012],TA_DEM=[1,.75,.45];
