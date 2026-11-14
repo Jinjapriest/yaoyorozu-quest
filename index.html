@@ -5749,9 +5749,9 @@ function ajDrawF(k,x,y,on,o){
   else if(k==='water'){R(x+4,y-3,8,8,'#68ccfc');R(x+5,y-2,6,6,'#a8e4fc');R(x+3,y+5,10,11,'#fcfcfc');R(x+3,y+5,10,1,'#bcbcbc');R(x+5,y+8,2,2,'#3c7cfc');R(x+9,y+8,2,2,'#d82800');R(x+4,y+11,8,1,'#7c7c7c');}
   else if(AJ_F[k]&&AJ_F[k].hk){const SV='#d8d8e0',SD='#a8a8b4';R(x,y+9,16,3,'#e8e8e8');R(x+1,y+12,1,4,'#bcbcbc');R(x+14,y+12,1,4,'#bcbcbc');
     if(k==='hmini'){R(x+2,y+1,10,7,'#181818');R(x+3,y+2,8,5,on?'#a8e4fc':'#3c5c8c');R(x+6,y+8,2,1,SD);R(x+11,y+6,4,3,SV);R(x+11,y+8,4,1,SD);}
-    else if(k==='hbair'||k==='hbpro'){R(x+2,y+1,12,7,k==='hbpro'?'#5c5c64':SV);R(x+3,y+2,10,5,on?'#a8e4fc':'#202838');R(x+1,y+8,14,1,k==='hbpro'?'#5c5c64':SV);}
+    else if(k==='hbair'||k==='hbpro'){R(x+2,y+1,12,7,k==='hbpro'?'#5c5c64':SV);R(x+7,y+8,2,1,'#f89820');R(x+3,y+2,10,5,on?'#a8e4fc':'#202838');R(x+1,y+8,14,1,k==='hbpro'?'#5c5c64':SV);}
     else if(k==='hstudio'){R(x+1,y,10,8,'#181818');R(x+2,y+1,8,6,on?'#a8e4fc':'#3c5c8c');R(x+5,y+8,2,1,SD);R(x+11,y+4,4,5,SV);R(x+12,y+5,2,1,SD);}
-    else{R(x+9,y-2,6,11,SV);for(let i=0;i<4;i++)for(let j=0;j<2;j++)pc(x+11+j*2,y+i*2,0,SD);for(let i=0;i<5;i++)R(x+10+(i%2),y-1+i*2,1,1,SD);R(x+1,y+1,7,7,'#181818');R(x+2,y+2,5,5,on?'#a8e4fc':'#3c5c8c');}}
+    else{R(x+9,y-2,6,11,SV);R(x+11,y+7,2,1,'#f89820');for(let i=0;i<4;i++)for(let j=0;j<2;j++)pc(x+11+j*2,y+i*2,0,SD);for(let i=0;i<5;i++)R(x+10+(i%2),y-1+i*2,1,1,SD);R(x+1,y+1,7,7,'#181818');R(x+2,y+2,5,5,on?'#a8e4fc':'#3c5c8c');}}
   else if(k==='pcj'){const b=(o&&ajS().builds&&ajS().builds[o.b])||{v:2};R(x,y+9,16,3,'#8c5c2c');R(x+1,y+12,2,4,'#6c3c10');R(x+13,y+12,2,4,'#6c3c10');
     R(x+1,y+1,9,7,'#181818');R(x+2,y+2,7,5,on?'#58f898':'#3858c8');R(x+5,y+8,1,1,'#3c3c3c');const cc=PC_CASE[pcX(b,'case').c||0];R(x+10,y-1,5,10,cc);R(x+11,y,3,8,b.case===1?'#bcbcbc':b.case===2?'#a07040':'#3c3c3c');
     if(pcLit(b))R(x+11,y+1+((frame>>3)%3)*2,3,2,['#f878f8','#68ccfc','#58f898'][(frame>>4)%3]);else if(pcX(b,'cool').quiet)R(x+12,y+2,1,1,'#a08060');}
@@ -5901,6 +5901,7 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
     s=>['行ったことの ある 町の パチンコ店の\n交換率・イベント日・公約が 見られる。','今日 イベントの ある 店と 公約の 一覧。','設定ごとの ボーナス確率と 小役確率。'][s]);
   dialog(['スロ攻略ナビ「全国の ホール情報と\n機種解析を お届け！」'],menu);}
 /* ---------- パソコンの 画面（ウィンドウ風／hack風） ---------- */
+const mikanLogo=(x,y,r,c)=>{pc(x,y,r,c||'#f89820');if(r>=4){R(x-Math.round(r*.5),y-Math.round(r*.4),1,1,'#fcd8a0');}R(x,y-r-1,1,2,'#5c3410');R(x+1,y-r-2,Math.max(2,Math.round(r*.7)),Math.max(1,Math.round(r*.35)),'#2c9c3c');};
 function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[])[f.b]:PC_FIX[f.k];
   const AP=[].concat(fkDone()?[{n:'アマゾソ',ic:'amz',go:amzScr}]:[]).concat([{n:'スロ攻略ナビ',ic:'slot',go:slotSite},{n:'オセロ',ic:'oth',go:othelloScr},{n:'5五将棋',ic:'sho',go:shogiScr},{n:'一人麻雀',ic:'mj',go:mahjongScr},{n:'ベンチマーク',ic:'bench',go:()=>benchScr(spec)}])
     .concat(f.k==='pcj'?[{n:'システム情報',ic:'chip',go:()=>dialog([PCP.slice(0,4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),PCP.slice(4).map(([n,k])=>`${n}：${pcPart(spec,k)[0]}`).join('\n'),`消費電力 目安 ${pcNeedW(spec)}W／電源 ${pcPart(spec,'psu')[3]}W`])}]:[{n:'システム情報',ic:'chip',go:()=>dialog([`${spec.name}`,mac?'hackOS　N1 チップ搭載\n統合メモリで AIも 得意':'ウィンドウ OS　ゲーミング仕様'])}])
@@ -5921,9 +5922,9 @@ function pcDesktop(f){const mac=!!AJ_F[f.k].hk,spec=f.k==='pcj'?(ajS().builds||[
       const n=AP.length;if(mac){if(I.pl)sel=(sel+n-1)%n;if(I.pr)sel=(sel+1)%n;}else{if(I.pu)sel=Math.max(0,sel-1);if(I.pd)sel=Math.min(n-1,sel+1);if(I.pr)sel=Math.min(n-1,sel+4);if(I.pl)sel=Math.max(0,sel-4);}
       if(I.A){const a=AP[sel];sfx('cur');if(!a.go){off=0;tone(330,.2,'triangle',.08);return;}a.go();}},
     drw(){const now=nowMin(),clk=`${Math.floor(now/60)}:${String(now%60).padStart(2,'0')}`;
-      if(boot>0){R(0,0,W,H,mac?'#000':'#081830');if(mac){txt('h',128,100,'#fcfcfc','center');R(98,130,60,3,'#3c3c3c');R(98,130,Math.round(60*(1-boot/40)),3,'#fcfcfc');}else{for(let i=0;i<6;i++){const a=t*.25+i*.6;pc(128+Math.round(Math.cos(a)*10),140+Math.round(Math.sin(a)*10),1,'#fcfcfc');}txt('ようこそ',128,100,'#fcfcfc','center');}return;}
+      if(boot>0){R(0,0,W,H,mac?'#000':'#081830');if(mac){mikanLogo(128,104,12,'#f89820');R(98,130,60,3,'#3c3c3c');R(98,130,Math.round(60*(1-boot/40)),3,'#fcfcfc');}else{for(let i=0;i<6;i++){const a=t*.25+i*.6;pc(128+Math.round(Math.cos(a)*10),140+Math.round(Math.sin(a)*10),1,'#fcfcfc');}txt('ようこそ',128,100,'#fcfcfc','center');}return;}
       if(mac){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3c2c8c');g.addColorStop(.6,'#c85c8c');g.addColorStop(1,'#f8a050');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-        R(0,0,W,12,'rgba(250,250,255,.75)');txt('h',6,2,'#202020');txt('Finder　ファイル　編集　表示',18,2,'#202020','left',150);txt(clk,250,2,'#202020','right');
+        R(0,0,W,12,'rgba(250,250,255,.75)');mikanLogo(8,6,3,'#f89820');txt('Finder　ファイル　編集　表示',18,2,'#202020','left',150);txt(clk,250,2,'#202020','right');
         const n=AP.length,dw=n*26+8,dx=128-dw/2;R(dx,206,dw,30,'rgba(250,250,255,.45)');
         AP.forEach((a,i)=>{const up=i===sel?-5:0;icon(a.ic,dx+6+i*26,210+up);if(i===sel)R(dx+15+i*26,234,2,1,'#202020');});
         win(60,40,136,50);big(AP[sel].n,128,50,'#fcfcfc','center',14);txt('A：ひらく　B：システム終了',128,72,'#bcbcbc','center');}
@@ -6081,7 +6082,7 @@ function kaguFac(pcShop){const A=ajS();let KS;const reKS=()=>{KS=(pcShop?AJ_KP:A
     G.coins-=f.p;A.inv[k]=(A.inv[k]||0)+1;sfx('coin');save();
     dialog([`${f.n}を 買った！`,ajOK()?(A.x==null?'メニューの「アジト」から アジトを 建てて\n部屋に 置こう。':'アジトの 中の「もようがえ」で 置ける。'):'（アジトを 持てば 部屋に 置ける）'],open);
   },s=>pcShop&&s===0?`CPU・クーラー・メモリ・グラボ・SSD・ケースを\n選んで 自分で 組み立てる。（工賃 0イェソ）\n組んだ PC：${(A.builds||[]).length}台`:`${AJ_F[KS[s-bo]].d}\n持っている数：${A.inv[KS[s-bo]]||0}　所持金：${fmt(G.coins)}イェソ`);
-  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・\nスナップタイガー エリート・RTZ イナズマ','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
+  const open0=open;if(pcShop){const SEQ=['u','u','d','d','l','r','l','r'],SEQ2=['l','r','l','r','u','u','d','d'];const wrapOpen=()=>{open0();const sc=stack[stack.length-1],ou=sc.upd;let q=[];sc.upd=function(){const k=I.pu?'u':I.pd?'d':I.pl?'l':I.pr?'r':null;if(k){q.push(k);q=q.slice(-8);if(!A.hack&&q.join()===SEQ2.join()){A.hack=1;reKS();save();sfx('g5');pop();dialog(['店員「……お客さん、 そちらの 世界の 方でしたか」','店の 奥の 白い 扉が 静かに 開いた…\n（扉には みかんの マークが ついている）','【隠し商品 解放】\nhack シリーズ\n（hack mini／hack Book Air／hack Book Pro／\n　hack Studio／hack Pro）'],wrapOpen);return;}if(!A.ura&&q.join()===SEQ.join()){A.ura=1;save();sfx('g5');pop();dialog(['店員「……お客さん、 わかってますね」','店員「裏メニューです。\n他の 人には ナイショで」','【裏メニュー 解放】\nジーオソ・スリッパ・兆芯・\nスナップタイガー エリート・RTZ イナズマ','（PCを 組むときに ★付きで 選べる）'],wrapOpen);return;}}return ou.call(this);};};open=wrapOpen;}
   dialog([pcShop==='Dスパラ'?'店員「いらっしゃいませ！ Dスパラへ ようこそ！\nパーツも 完成品も そろってます！」':pcShop?'店員「アークンへ ようこそ！\n自作の ご相談も どうぞ！」':'太陽家具「いらっしゃいませ！\nお部屋を 明るく 太陽家具です」'],open);}
 function ajMenu(){const A=ajS(),x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   const okHere=[T.GRASS,T.ROAD,T.SAND,T.FOREST].includes(t)&&!RES.some(r=>r.x===x&&r.y===y)&&!G.rifts.some(q=>q.x===x&&q.y===y);
