@@ -5024,14 +5024,46 @@ function tiEscBattle(){const T=tiS();choice('昇降機の 前に 黒服の 部�
 function tiTimeout(){const T=tiS(),rest=T.debt;
   dialog([`地下 ${TI_DAYS}日目を 迎えた…`,`借金は まだ ${fmt(rest)}ペリコ 残っている。`,'黒服「時間切れだ。 延長の 地下労働に 回せ」'],()=>
     scene('chika',['タガバソウ「待て！」','タガバソウは 黒い 上着の 裏地を 破り\n分厚い 札束を 取り出した。','タガバソウ「幹部時代に 隠しておいた ペリコだ。\n残りは おれが 払う」',`タガバソウが ${fmt(rest)}ペリコを 融資してくれた！`,'黒服「……チッ。 完済を 確認した」','タガバソウ「礼は いらない。\n…あんたたちを 地上に 帰すと 決めたんだ」'],()=>{T.loan=rest;T.debt=0;sfx('coin');save();tiEscape();}));}
-const TI_SHOP=[{n:'冷えた 缶ビール',p:30000,d:'パーティ 全回復＋明日まで 経験値1.2倍',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);return '冷えた ビールが 五臓六腑に しみわたる…！';}},
-  {n:'焼き鳥（つくね）',p:20000,d:'やくそう ×10',f:()=>{G.items.herb+=10;return 'やくそうを 10個 もらった。';}},
+/* 地下の 売店：1日の 労働の あとの ビールと 焼き鳥（給料を 吸い上げる 班長の 商売でも ある） */
+const TI_SHOP=[{n:'冷えた 缶ビール',p:50000,sc:'beer',d:'パーティ 全回復＋明日まで 経験値1.2倍\n（5日分の 給料…）',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);return 'パーティの HPが 全回復した！\n明日まで 経験値が 1.2倍！';}},
+  {n:'焼き鳥（タレ）',p:30000,sc:'yaki',d:'やくそう ×10＋MP 全回復',f:()=>{G.items.herb+=10;G.party.forEach(id=>{const c=G.chars[id];if(c)c.mp=cstat(id).mp;});return 'やくそうを 10個 もらった。\nMPが 全回復した！';}},
+  {n:'柿ピー',p:20000,sc:'kaki',d:'やくそう ×5',f:()=>{G.items.herb+=5;return 'やくそうを 5個 もらった。';}},
+  {n:'贅沢セット（ビール＋焼き鳥＋柿ピー）',p:90000,sc:'set',d:'全部 まとめて（少し お得）\n…班長の 思うつぼ かも しれない',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);G.items.herb+=15;G.party.forEach(id=>{const c=G.chars[id];if(c)c.mp=cstat(id).mp;});return 'HP・MP 全回復＋やくそう ×15\n明日まで 経験値 1.2倍！';}},
   {n:'ガチャチケット',p:100000,d:'ガチャチケット ×1',f:()=>{G.items.tk++;return 'ガチャチケットを 1枚 手に入れた。';}},
   {n:'経験値書（極）',p:200000,d:'経験値書（極）×3',f:()=>{G.items.b[3]+=3;return '経験値書（極）を 3冊 手に入れた。';}},
   {n:'UR確定チケット',p:2000000,d:'UR確定チケット ×1',f:()=>{G.items.urtk=(G.items.urtk||0)+1;return 'UR確定チケットを 手に入れた。';}}];
-function tiShop(){const T=tiS();
-  listPick(`地下の 売店　ペリコ ${fmt(T.per)}`,TI_SHOP.map(s=>({t:s.n,r:`${fmt(s.p)}P`,dis:T.per<s.p})),i=>{const s=TI_SHOP[i];if(T.per<s.p){toast('ペリコが たりない');tiShop();return;}
-    T.per-=s.p;sfx('coin');const m=s.f();save();dialog(m,tiShop);},i=>TI_SHOP[i]?TI_SHOP[i].d+'\n（1ペリコ＝イェソの 100分の1）':'');}
+function tiShop(){const T=tiS(),hancho=T.ch===1&&!T.exposed;
+  listPick(`${hancho?'班長の 特別販売':'地下の 売店'}　ペリコ ${fmt(T.per)}`,TI_SHOP.map(s=>({t:s.n,r:`${fmt(s.p)}P`,dis:T.per<s.p})),i=>{const s=TI_SHOP[i];if(T.per<s.p){toast('ペリコが たりない');tiShop();return;}
+    T.per-=s.p;sfx('coin');T.treat=(T.treat||0)+(s.sc?1:0);const m=s.f();save();
+    const after=()=>{const extra=s.sc==='set'&&hancho&&T.treat>=2?['タガバソウ「…うまいよな。 わかる。」','「でも それが 班長の 狙いだ。\nペリコを 使わせて 地下に 長く 縛りつける」']:[];dialog([m,...extra],tiShop);};
+    if(s.sc)tiTreatScene(s.sc,after);else after();},i=>TI_SHOP[i]?TI_SHOP[i].d+'\n（1ペリコ＝イェソの 100分の1）':'');}
+/* 専用演出：1日の 終わりの ビール・炭火の 焼き鳥 */
+function tiTreatScene(kind,cb){let t=0;const END=kind==='set'?300:220,bub=[];
+  const lines={beer:['プシュッ……！','……っ！！ のどを 冷たい ビールが\n一気に 駆け下りていく…！','1日 掘りつづけた 体に しみわたる……','（地下でも… 生きてて よかった……！）'],
+    yaki:['ジュウウ… 炭火の 香りが 立ちのぼる','あまい タレが 炭に 落ちて\nけむりと 一緒に 鼻を くすぐる…','ひと口… やわらかい 肉汁が あふれる…！','（明日も… がんばれる……！）'],
+    kaki:['ポリッ… ポリッ…','しょっぱい あられと ピーナッツ…\nこれが 地下の ささやかな ぜいたく'],
+    set:['プシュッ……！ ビール、 焼き鳥、 柿ピー…','ビールで 流しこみ、 焼き鳥に かぶりつき\n柿ピーで ひと息…','……とまらない……！！','（ペリコが… 消えていく… でも うまい……！）']}[kind];
+  const at=kind==='beer'?[0,50,110,160]:kind==='yaki'?[0,60,120,170]:kind==='kaki'?[0,80]:[0,70,140,210];
+  push({full:true,upd(){t++;
+      if(t===10&&(kind==='beer'||kind==='set')){noise(.25,.3);tone(1800,.1,'square',.06,600);}
+      if(kind==='beer'&&t>50&&t<110&&t%12===0)tone(150,.12,'triangle',.25,90);
+      if((kind==='yaki'||kind==='set')&&t%20===0&&t<200)noise(.15,.04);
+      if(kind==='kaki'&&t%25===0&&t<120)noise(.05,.15);
+      if(t===at[at.length-1]+10)sfx('heal');
+      if(t>=END||(t>40&&I.A&&t>at[at.length-1]))pop(),cb&&cb();},
+    drw(){R(0,0,W,H,'#0c0806');ctx.globalAlpha=.25;pc(128,70,70,'#f8d878');ctx.globalAlpha=1;R(124,0,8,14,'#3c3c3c');R(118,14,20,5,'#5c5c5c');R(122,19,12,4,'#f8d878');
+      R(0,150,W,90,'#2c2014');R(30,140,196,14,'#5c4428');R(30,140,196,2,'#7c5c38');
+      const beer=(x,y,tilt)=>{ctx.save();ctx.translate(x,y);ctx.rotate(tilt);R(-12,-34,24,40,'#d8d8d8');R(-12,-28,24,24,'#c8a000');R(-12,-28,24,3,'#f8d878');big('B',0,-24,'#fcfcfc','center',12);R(-10,-36,20,3,'#a4a4a4');R(-3,-37,6,2,'#7c7c7c');
+        for(let k=0;k<6;k++){const dy=((t*.6+k*13)%36);R(-10+((k*7)%20),-30+dy,1,2,'#fcfcfc');}ctx.restore();};
+      const skewer=(x,y)=>{R(x-1,y-44,2,52,'#c89058');for(let k=0;k<4;k++){pc(x,y-34+k*9,5,k%2?'#7c3c10':'#a05000');R(x-3,y-36+k*9,3,1,'#e8a858');}for(let k=0;k<4;k++){const ph=(t*.8+k*15)%40;ctx.globalAlpha=.4*(1-ph/40);pc(x-6+k*4,y-50-ph,3,'#bcbcbc');ctx.globalAlpha=1;}};
+      const kaki=(x,y)=>{pe(x,y,22,6,'#fcfcfc');for(let k=0;k<12;k++)R(x-16+(k*7)%30,y-6+(k*5)%6,4,2,k%3?'#e45c10':'#f8d878');};
+      if(kind==='beer')beer(128,130,t>50&&t<110?-.9:0);
+      else if(kind==='yaki')skewer(128,128);
+      else if(kind==='kaki')kaki(128,134);
+      else{beer(80,130,t>70&&t<130?-.9:0);skewer(132,128);kaki(186,134);}
+      if((kind==='beer'||kind==='set')&&t>=10&&t<40)for(let k=0;k<8;k++){const a=k/8*Math.PI*2;R((kind==='set'?80:128)+Math.cos(a)*(t-10)*.8,96+Math.sin(a)*(t-10)*.4-(t-10)*.3,2,2,'#fcfcfc');}
+      let li=0;at.forEach((a,k)=>{if(t>=a)li=k;});win(8,164,240,68);lines[li].split('\n').forEach((l,k)=>txt(l,18,174+k*14,'#fcfcfc','left',222));
+      region(0,0,W,H,()=>{vA=true;});}});}
 /* ===== 班長の 裏カジノ：チンチロリン（456賽の イカサマ） ===== */
 function chHand(d){const s=d.slice().sort((a,b)=>a-b),[a,b,c]=s;
   if(a===1&&b===1&&c===1)return{r:100,m:5,n:'ピンゾロ'};if(a===b&&b===c)return{r:90+a,m:3,n:`${a}のゾロ目`};
