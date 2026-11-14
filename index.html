@@ -579,7 +579,7 @@ const BASE_PACK={
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
-    {id:'tagaba',name:'救世主 タガバソウ',short:'タガバソウ',rarity:'XR',weight:1,weapon:'any',hp:170,mp:110,atk:48,mag:46,def:34,spd:22,skills:['tg_kinri','tg_kurofuku','tg_shakusho'],look:{head:'hair',hair:'#fcfcfc',body:'#3c3c3c',accent:'#f8b800',legs:'#3c3c3c',held:'神器'}},
+    {id:'tagaba',name:'救世主 タガバソウ',short:'タガバソウ',rarity:'XR',weight:1,weapon:'any',hp:170,mp:110,atk:48,mag:46,def:34,spd:22,skills:['tg_kinri','tg_kurofuku','tg_shakusho'],look:{head:'hair',hair:'#e4e4e4',body:'#1c1c1c',accent:'#fcfcfc',legs:'#1c1c1c',held:'神器'}},
     {id:'momo',name:'幻のコンカフェ嬢 もも',short:'もも',rarity:'XR',weight:1,weapon:'any',special:'hostess',hp:150,mp:110,atk:30,mag:54,def:28,spd:34,skills:['momochk','momopocky','momoomu'],look:{head:'momo',hair:'#f8b0c8',body:'#a80020',accent:'#fcfcfc',legs:'#a80020',held:'杖'}},
     {id:'izanami',name:'伊邪那美命',short:'伊邪那美',rarity:'XR',weight:1,weapon:'any',special:'god',hp:145,mp:100,atk:30,mag:52,def:28,spd:24,skills:['gekko','jihi'],look:{head:'miko',hair:'#000000',body:'#3c1c5c',accent:'#d82800',legs:'#000000',held:'神器'}},
     {id:'susanoo',name:'須佐之男命',short:'須佐之男',rarity:'UR',weight:2,weapon:'any',hp:150,mp:40,atk:40,mag:14,def:28,spd:20,skills:['yakumo','kabuto'],look:{head:'storm',hair:'#000000',body:'#0058f8',accent:'#fcfcfc',legs:'#24188c',held:'両手剣'}},
@@ -4926,16 +4926,20 @@ function drawKobushide(x,y,t,rage){if(rage)ocAura(x,y,t,'#d82800');const S=rage?
   R(x-6,y-49,12,12,'#e8c098');R(x-7,y-53,14,5,'#1c1c1c');R(x-7,y-49,2,5,'#1c1c1c');R(x+5,y-49,2,5,'#1c1c1c');
   R(x-5,y-45,4,3,'#fcfcfc');R(x+1,y-45,4,3,'#fcfcfc');R(x-5,y-45,4,1,'#000');R(x+1,y-45,4,1,'#000');R(x-1,y-44,2,1,'#000');
   const ec=rage?'#f80000':'#000';R(x-4,y-43,2,1,ec);R(x+2,y-43,2,1,ec);R(x-3,y-39,6,1,rage?'#d82800':'#7c4c3c');}
-function drawTagaba(x,y,t,big_){const Wt='#fcfcfc',Gd='#f8b800';
-  if(big_){ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);}
-  for(let k=0;k<10;k++){const ph=(t*1.2+k*41)%40;R(x-18+(k*13)%36,y-8-ph,2,2,k%2?Gd:'#fce0a8');}
-  R(x-9,y-5,7,5,'#000');R(x+2,y-5,7,5,'#000');R(x-10,y-18,20,13,Wt);
-  R(x-12,y-38,24,21,Wt);R(x-3,y-38,6,12,'#000');R(x-1,y-37,2,13,Gd);R(x-12,y-18,24,2,'#bcbcbc');R(x-11,y-34,3,2,Gd);
-  R(x-16,y-36,4,18,Wt);R(x+12,y-36,4,16,Wt);R(x-16,y-18,4,3,'#e8c098');R(x+12,y-20,4,3,'#e8c098');
-  R(x+15,y-22,2,22,'#3c2410');R(x+13,y-25,6,4,Gd);
-  R(x-7,y-51,14,13,'#e8c098');R(x-7,y-51,14,2,'#fce0c8');R(x-9,y-47,3,6,Wt);R(x+6,y-47,3,6,Wt);
-  R(x-6,y-46,5,3,'#3c2410');R(x+1,y-46,5,3,'#3c2410');R(x-1,y-45,2,1,Gd);R(x-6,y-46,5,1,Gd);R(x+1,y-46,5,1,Gd);
-  R(x-3,y-41,6,2,'#7c3c3c');R(x-2,y-41,1,1,Gd);R(x+1,y-41,1,1,Gd);R(x-4,y-38,8,2,'#e4e4e4');
+/* 救世主 タガバソウ：元幹部。 くたびれた 黒服スーツ（すり切れ・つぎあて）、 ゆるめた 黒ネクタイ、
+   ひびの 入った サングラス、 白髪と 白い 無精ひげ、 くすんだ 金の 幹部バッジ、 杖 */
+function drawTagaba(x,y,t,big_){const S='#1c1c1c',S2='#3c3c3c',Wt='#fcfcfc',Hr='#e4e4e4',Gd='#a88a3c';
+  if(big_){ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);for(let k=0;k<10;k++){const ph=(t*1.2+k*41)%40;R(x-18+(k*13)%36,y-8-ph,2,2,k%2?'#f8b800':'#fce0a8');}}
+  R(x-9,y-5,7,5,'#3c2410');R(x+2,y-5,7,5,'#3c2410');R(x-10,y-18,20,13,S);R(x-8,y-12,3,2,S2);R(x+4,y-9,3,3,'#5c5048');
+  R(x-12,y-38,24,21,S);R(x-12,y-38,24,1,S2);
+  R(x-4,y-38,8,9,Wt);R(x-3,y-29,6,2,Wt);R(x-1,y-37,2,4,'#000');R(x,y-33,2,9,'#000');R(x+1,y-25,2,2,'#000');
+  R(x-11,y-30,3,7,S2);R(x+7,y-24,4,4,'#5c5048');R(x+7,y-24,4,1,'#7c6c5c');R(x-9,y-34,3,2,Gd);
+  R(x-12,y-18,24,1,'#000');
+  R(x-16,y-36,4,18,S);R(x+12,y-36,4,16,S);R(x-16,y-21,4,1,S2);R(x-16,y-18,4,3,'#e8c098');R(x+12,y-20,4,3,'#e8c098');R(x-16,y-19,4,1,Wt);
+  R(x+15,y-22,2,22,'#5c3c1c');R(x+13,y-25,6,3,'#7c5c2c');
+  R(x-7,y-51,14,13,'#e8c098');R(x-7,y-52,14,3,Hr);R(x-9,y-50,3,8,Hr);R(x+6,y-50,3,8,Hr);R(x-6,y-40,12,3,'#d8d0c8');R(x-5,y-39,1,1,Hr);R(x+3,y-39,1,1,Hr);
+  R(x-7,y-47,14,3,'#000');R(x-6,y-46,4,1,'#3c3c3c');R(x+2,y-46,4,1,'#3c3c3c');R(x+3,y-47,1,2,'#7c7c7c');R(x+4,y-46,1,1,'#7c7c7c');
+  R(x-2,y-41,4,1,'#7c3c3c');
   if(big_)ctx.restore();}
 /* 背景 */
 function tiSceneBg(k){
