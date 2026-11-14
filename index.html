@@ -1265,7 +1265,7 @@ function drawEnemy(e,x,y,t){
     case 'kendo':drawKendo(x,y,t);break;
     case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
-    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushide(x,y,t,1);break;
+    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -2027,7 +2027,7 @@ function startBattle(boss,rift=null,sp=null){
   if(!boss&&!sp)fitEnemies(en);
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;e.w=36;e.h=56;}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;e.w=oc==='kobushide_r'?70:36;e.h=oc==='kobushide_r'?80:56;}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
@@ -4948,6 +4948,34 @@ function drawNizu(x,y,t,sil){const C=sil?'#000':'#0c2018',C2=sil?'#000':'#1c3c2c
   R(x-5,y-50,4,1,sil?'#000':'#3c3c3c');R(x+1,y-51,4,3,sil?'#000':'#5c5c5c');R(x+2,y-50,2,1,(t>>4)&1?'#f80000':'#fc7460');
   if(sil){R(x+2,y-50,2,1,'#f80000');R(x-4,y-50,2,1,'#f80000');}
   R(x-2,y-46,4,1,sil?'#000':'#7c4c4c');}
+/* 暴走した コブシデ：同期装置を 自分に 突き立て 人間を やめかけた 姿（ケンドウほどではなく 人の 部分が 残る）
+   背中と 首から のたうつ 同期ケーブル・胸の バッジが 赤い コアに・右腕は 巨大な 拳に 変異・左腕と 脚は 人の まま・
+   破れた 紫の スーツ・割れた 眼鏡・顔の 半分に 赤黒い 脈 */
+function drawKobushideR(x,y,t){const top=y-80,S='#3c2858',S2='#2c1c40',Sk='#e8c098',V='#a80020',M='#5c4c6c',M2='#3c2c4c';
+  /* 背後の 同期の 輪（ケンドウの 名残） */
+  for(let a=0;a<360;a+=6){const q=a*Math.PI/180;if((a+t*2)%48<30)R(x+Math.cos(q)*30,top+30+Math.sin(q)*22,1,1,'#7c1020');}
+  /* 背中・首から のたうつ ケーブル */
+  for(let s_=0;s_<5;s_++){const sd=s_%2?1:-1,ph=t/16+s_*1.3;for(let k=0;k<18;k++){const px=x+sd*(8+k*1.6),py=top+22+s_*5-k*.9+Math.sin(ph+k*.4)*3;R(px,py,2,2,k%6===0?V:'#4c4c54');if(k===17)R(px-1,py-1,3,3,'#f80000');}}
+  /* 脚（人の まま・スーツの ズボン） */
+  R(x-9,y-14,7,14,S);R(x+2,y-14,7,14,S);R(x-10,y-2,9,2,'#000');R(x+2,y-2,9,2,'#000');R(x+3,y-10,3,3,'#1c1028');
+  /* 胴：破れた スーツ・シャツ・ネクタイ */
+  R(x-13,top+30,26,37,S);R(x-13,top+30,26,1,S2);R(x-4,top+30,8,16,'#e8e0d8');R(x-1,top+31,2,15,V);
+  R(x+6,top+50,6,6,'#1c1028');R(x-12,top+56,4,8,'#1c1028');R(x+9,top+40,3,3,'#1c1028');
+  /* 胸の 赤い コア（元の 金バッジ） */
+  {const cy=top+40,pl=(t>>3)%6<3;pc(x-7,cy,4,'#3c0000');pc(x-7,cy,3,pl?'#fc4020':'#d82800');R(x-8,cy-1,1,1,'#fcfcfc');for(let k=0;k<5;k++){R(x-7-k*2,cy+3+k,1,2,V);R(x-4+k,cy+3+k*2,1,2,V);}}
+  /* 左腕：人の 手（だらりと 下がる） */
+  R(x-17,top+32,4,22,S);R(x-17,top+54,4,4,Sk);R(x-17,top+57,4,1,'#c89878');
+  /* 右腕：巨大な 拳に 変異 */
+  {const sw=Math.round(Math.sin(t/12)*2);for(let k=0;k<7;k++){const w=7+Math.floor(k*.8);R(x+12+Math.floor(k*.6),top+32+k*3+sw*(k>4?1:0),w,4,k%3?M:M2);if(k%3===1)R(x+13+k,top+33+k*3,1,2,V);}
+    const fx=x+13,fy=top+52+sw;R(fx-2,fy,20,16,M);R(fx-2,fy,20,2,'#7c6c8c');for(let f=0;f<4;f++){R(fx-2+f*5,fy+2,4,6,M2);R(fx-1+f*5,fy+3,2,1,'#9c8cac');}R(fx-2,fy+8,20,1,M2);
+    for(let k=0;k<6;k++)R(fx+1+k*3,fy+10+(k%2),1,4,V);R(fx+6,fy-2,3,2,'#f8b800');}
+  /* 頭：人の 顔が 残る（左半分）・右半分に 赤黒い 脈と 光る 目・割れた 眼鏡・首の 同期装置 */
+  R(x-7,top+16,14,14,Sk);R(x-8,top+12,16,5,'#1c1c1c');R(x-8,top+16,2,5,'#1c1c1c');R(x+6,top+16,2,4,'#1c1c1c');
+  R(x+1,top+17,6,12,'#7c3c4c');for(let k=0;k<4;k++)R(x+1+k,top+18+k*3,3,1,V);
+  R(x-6,top+20,4,3,'#fcfcfc');R(x-6,top+20,4,1,'#000');R(x-5,top+21,2,1,'#f80000');R(x-2,top+21,2,1,'#000');
+  R(x+2,top+20,4,2,(t>>3)&1?'#f80000':'#fc7460');R(x+2,top+19,5,1,'#000');R(x+5,top+22,1,2,'#bcbcbc');
+  R(x-4,top+26,7,1,'#a81000');R(x-3,top+27,1,1,'#fcfcfc');R(x+1,top+27,1,1,'#fcfcfc');
+  R(x-3,top+30,6,3,'#5c5c64');R(x-1,top+29,2,5,'#f80000');R(x-5,top+31,2,1,'#7c7c84');R(x+3,top+31,2,1,'#7c7c84');}
 function drawTagaba(x,y,t,big_){const S='#1c1c1c',S2='#3c3c3c',Wt='#fcfcfc',Hr='#e4e4e4',Gd='#a88a3c',Wk='#6c6448',Sk='#e8c098',Dirt='#8c7058';
   if(big_){ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);for(let k=0;k<10;k++){const ph=(t*1.2+k*41)%40;R(x-18+(k*13)%36,y-8-ph,2,2,k%2?'#f8b800':'#fce0a8');}}
   /* 地下足袋と 作業ズボン */
@@ -4975,6 +5003,7 @@ function tiSceneBg(k){
     for(let i=0;i<4;i++){const lx=24+i*64;R(lx,0,2,20,'#3c3c3c');R(lx-5,20,12,4,'#5c5c5c');ctx.globalAlpha=.18+.06*Math.sin((frame+i*20)/9);pc(lx+1,30,18,'#f8d878');ctx.globalAlpha=1;R(lx-3,24,8,3,'#f8d878');}
     R(0,150,W,90,'#0c0806');for(let i=0;i<6;i++){const wx=20+i*40;R(wx,128,10,22,'#5c5c4c');R(wx+2,120,6,8,'#e8c098');R(wx-2,140+((frame>>4)+i)%2*2,14,3,'#7c4c10');}
     R(96,60,64,30,'#000');big('地下帝国',128,66,'#a81000','center',16);return true;}
+  if(k==='rampage'){tiSceneBg('chika');if((frame>>2)%6===0){ctx.globalAlpha=.35;R(0,0,W,H,'#d82800');ctx.globalAlpha=1;}R(0,96,W,54,'#0c0806');drawKobushideR(128,150,frame);return true;}
   if(k==='kaicho'){R(0,0,W,H,'#000010');for(let i=0;i<50;i++)R((i*53)%W,90+(i*29)%60,2,2,['#f8d878','#fcfcfc','#68ccfc'][i%3]);
     R(0,0,W,24,'#3c2c00');R(0,150,W,90,'#2c1c00');for(let x=0;x<W;x+=32)R(x,0,3,150,'#5c4400');R(0,148,W,3,'#f8b800');
     R(70,118,116,32,'#5c0000');R(66,114,124,6,'#f8b800');drawTagaba(128,112,frame,0);return true;}
@@ -5142,8 +5171,8 @@ function tiWin(sp,back0,pages){const T=tiS(),back=more=>dialog(pages,()=>{return
   if(sp.st==='ti_hancho'){const first=!T.exposed;T.exposed=1;if(first)T.per+=50000000;save();back(first?['班長 クロヌマは 地面に へたりこんだ。','労働者たちが 歓声を あげた！\nイカサマで 巻き上げられた ペリコが もどってきた。（+50,000,000ペリコ）','裏・賭郎「……456賽……\nこいつは… 使える……」\n（裏・賭郎が 班長の サイコロを 拾い上げた）','タガバソウ「やったな！\nあとは 班長との 大勝負で 一気に 返すぞ」',gmGive(10,10,2),'（班長との 最後の 大勝負が 解放）']:['班長は ふたたび 倒れた。',gmGive(5,5)]);return;}
   if(sp.st==='ti_escape'){if(T.clear){back(['黒服たちは 散り散りに 逃げていった。',gmGive(8,8)]);return;}
     const rw=gmGive(25,25,10,1e11);addWeapon('w_tgphone');
-    dialog(pages,()=>{BT=null;scene('chika',['コブシデ「ぐ… ぐおお… まだだ……！」','コブシデは 自分の 首に 同期装置を 突き立てた！\n「出力… 最大……！」','コブシデの 体から 赤黒い 光が あふれだす…\n暴走だ！','コブシデ「実験体を 逃がしては…\nニズゥーイッツァイ様に 顔向けが……！！」','タガバソウが コブシデに 組みついた！','タガバソウ「ここは おれが 止める！\n行け！ 地上へ！！」','裏・賭郎「タガバソウ…！」\nタガバソウ「振り向くな！ 行け！」','昇降機の 扉が 閉まる… タガバソウの 背中が\n赤い 光の 中に 消えていった…','…まぶしい！ 地上の 光だ！','裏・賭郎「…タガバソウに 救われたな」','「暴走した コブシデが 口に した 名…\nニズゥーイッツァイ…」','裏・賭郎「そいつが すべての 黒幕だ。\n…埼玉の 方角に 根城が あると 聞いた」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
-      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','XR専用武器「元幹部の スマホ」を 手に入れた！\n（タガバソウが 最後に 投げてよこした ものだ）','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）',...(tiS().per>=TI_SWAP?[`返済で 余った ${fmt(tiS().per)}ペリコは\n帝城から 地下へ 行くと 交換できる。\n（1,000万ペリコ → UR確定チケット 10枚）`]:[]),'── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);});});return;}
+    dialog(pages,()=>{BT=null;scene('chika',['コブシデ「ぐ… ぐおお… まだだ……！」','コブシデは 自分の 首に 同期装置を 突き立てた！\n「出力… 最大……！」'],()=>scene('rampage',['コブシデの 体から 赤黒い 光が あふれだす…\n背中から ケーブルが 噴き出し 右腕が\n巨大な 拳に 変わっていく…！','暴走だ！ …もはや 人間の 姿では ない…','コブシデ「実験体を 逃がしては…\nニズゥーイッツァイ様に 顔向けが……！！」','タガバソウが コブシデに 組みついた！','タガバソウ「ここは おれが 止める！\n行け！ 地上へ！！」'],()=>scene('chika',['裏・賭郎「タガバソウ…！」\nタガバソウ「振り向くな！ 行け！」','昇降機の 扉が 閉まる… タガバソウの 背中が\n赤い 光の 中に 消えていった…','…まぶしい！ 地上の 光だ！','裏・賭郎「…タガバソウに 救われたな」','「暴走した コブシデが 口に した 名…\nニズゥーイッツァイ…」','裏・賭郎「そいつが すべての 黒幕だ。\n…埼玉の 方角に 根城が あると 聞いた」',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
+      dialog(['【クリア報酬】','XR「救世主 タガバソウ」が\nガチャに 登場する ように なった！','タガバソウから 託された 権利書で\n帝愛の 子会社 TAインダストリアルを 引き継いだ。','XR専用武器「元幹部の スマホ」を 手に入れた！\n（タガバソウが 最後に 投げてよこした ものだ）','TAインダストリアルを 事業継承した！\n・TAファイナンス（消費者金融）を 開業\n・TAホール（パチンコ店）の 運営権','（メニュー →「不動産」→「TAインダストリアル」）',...(tiS().per>=TI_SWAP?[`返済で 余った ${fmt(tiS().per)}ペリコは\n帝城から 地下へ 行くと 交換できる。\n（1,000万ペリコ → UR確定チケット 10枚）`]:[]),'── 帝愛産業 地下帝国の乱　完 ──\n（埼玉編へ つづく）']);})));});return;}
   back([]);}
 /* ===================== ジャッジメント・ゴッドダイス（タガバソウ 固有） ===================== */
 function gdRoll(){const x=rnd();let d,k;
