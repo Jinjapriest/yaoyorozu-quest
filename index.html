@@ -2692,9 +2692,12 @@ const townScr={full:true,mv:null,bt:0,
       else if(c.b&&c.b.kind==='kanraku'&&(c.t==='roof'||c.t==='front'||c.t==='door'))kanGateCell(c,X,Y,c.t==='roof'?0:1,TW.city,1);
       else if(c.t==='door'&&c.b&&c.b.kind!=='house'){ctx.globalAlpha=.35;R(X+3,Y+2,10,14,'#f8d878');ctx.globalAlpha=1;}}}
     if(!TW.ship&&!TW.jogai&&!TW.diet)clockBadge();
+    /* 画面の 上端に いるときは 町名の 窓を 下へ（宝箱などが 隠れないように） */
+    const hdDown=TW.py<=(TW.top||0)+3;ctx.save();if(hdDown)ctx.translate(0,H-40);
     win(4,4,140,32);txt(TW.title||TW.v.name,12,10,'#f8b800','left',TW.ship||TW.kjo||TW.jogai||TW.diet||TW.kanIn||TW.kanShop?120:88);if(!TW.ship&&!TW.kjo&&!TW.jogai&&!TW.diet&&!TW.kanIn&&!TW.kanShop)txt(hatan(TW.vi)?'財政破綻':SIZES[TW.sz].n,136,10,hatan(TW.vi)?'#fc7460':'#7ee07e','right');
     if(TW.ship){txt(`チップ ${fmt(G.chips||0)}枚`,12,22,'#f8b800','left',60);txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',70);}
     else{const dw=G.day>=1000?44:36;txt(`${G.day}日目`,12,22,'#bcbcbc');if(shocked())txt('ショック',58,22,'#fc7460');txt(`${fmt(G.coins)}イェソ`,136,22,'#fcfcfc','right',124-dw);}
+    ctx.restore();
   }
 };
 function townCam(){
@@ -4703,8 +4706,12 @@ function gsealScr(g){const st=gmS(),E=GSEAL_EN[g.id];
 
 /* 宝箱（防府天満宮の 本殿の 裏手） */
 function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は からっぽだ。');return;}
-  if(c.id==='michizane'){dialog(['本殿の 裏手に まわると…','梅の 花びらが 舞う 中に\n古びた 宝箱が ある。','宝箱を 開けた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
-    dialog(nw?['まばゆい 雷光が ほとばしった…！','「東風吹かば にほひおこせよ 梅の花…」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）']:['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);});return;}}
+  if(c.id==='michizane'){dialog(['本殿の 裏手に まわると…','梅の 花びらが 舞う 中に\n古びた 宝箱が ある。','宝箱の ふたに 文字が 刻まれている。\n「東風吹かば にほひおこせよ 梅の花」','…続きの 下の句を 唱えれば\n開きそうだ。'],()=>askText('下の句を 入力してください',[{label:'東風吹かば にほひおこせよ 梅の花…',placeholder:'ひらがなでも 漢字でも',max:30}],v=>{if(!v)return;
+    const norm=x=>String(x||'').replace(/[\s　、。・,.!！?？「」]/g,'').replace(/[ァ-ン]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)).replace(/主/g,'あるじ').replace(/無し|無/g,'なし').replace(/春/g,'はる').replace(/忘/g,'わす');
+    const ok=['あるじなしとてはるなわすれそ','あるじなしとてはるなわすれぞ','あるじなしとてはるをわするな'].includes(norm(v[0]));
+    if(!ok){sfx('ng');dialog(['…宝箱は しんと 静まりかえっている。','（下の句が ちがうようだ）']);return;}
+    sfx('ok');dialog(['「あるじなしとて 春な忘れそ」','宝箱が かすかに ふるえ…\nふたが ひとりでに 開いた！'],()=>{G.tbox[c.id]=1;const nw=!G.chars.michizane;addChar('michizane');save();sfx('g5');
+    dialog(nw?['まばゆい 雷光が ほとばしった…！','「東風吹かば にほひおこせよ 梅の花…」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）']:['天神 菅原道真公の 力が 高まった！（基礎Lv＋1）']);});}));return;}}
 /* ===================== グンマー帝国 総長総選挙編（グンマー解放後・立党で 解放） ===================== */
 function gsS(){if(!G.gs)G.gs={ch:0,rec:{},sup:{},day:{}};for(const k of ['rec','sup','day'])if(!G.gs[k])G.gs[k]={};return G.gs;}
 const gsOpen=()=>gmS().ch>=8&&!!G.pol,GS_NEED=5;
