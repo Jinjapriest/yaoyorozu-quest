@@ -2182,6 +2182,14 @@ function pAct(i){
     }
   }
 }
+function predEatAlly(m,i){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return '（捕食植物は 味方の 方を 見たが… 誰も いなかった）';
+  const a=al[ri(0,al.length-1)],an=CH[a.id].short;G.chars[a.id].hp=0;a.stun=0;BT.shake=12;
+  const ng=['predplant','kakuhyper','krmz_kikoku','gogo'];const pool=[...new Set(skillsOf(a.id).concat(XRSK[a.id]?[XRSK[a.id]]:[]))].filter(k=>SK[k]&&!ng.includes(k)&&SK[k].k!=='krmz2');
+  const msg=`捕食植物の つるが ${an}に 巻きついた！\n${an}は 丸のみに された…（戦闘不能）`;
+  if(!pool.length){NOW([()=>`${an}の 力を 取りこんだが…\n使える 技が なかった！`]);return msg;}
+  const k=pool[ri(0,pool.length-1)],sk=SK[k],en=BT.en.map((e,j)=>j).filter(j=>BT.en[j].alive);
+  const keep=BT.cmds[i];BT.cmds[i]={type:'skill',k,t:sk.tg==='enemy'?(en.length?en[ri(0,en.length-1)]:0):i};G.chars[m.id].mp+=skCost(m.id,k);
+  NOW([()=>`${an}の 力を 取りこんだ！\n${CH[m.id].short}の 体から 「${sk.name}」が あふれだす！`]);pAct(i);BT.cmds[i]=keep;return msg;}
 function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='ujigami'){BT.pt.forEach(t=>{t.ab=t.db=5;t.av=t.dv=.6;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.25))):null));sfx('magic');BT.shake=14;return '氏神の 光が 降りそそぐ！\nみかたの 攻撃と 守備が あがり\n敵全体の HPが 25% けずられた！';}
         if(k==='unabarising'){live().forEach(e=>{e.stun=5;e.charm=0;});m.extra=5;BT.shake=16;return '大海原が 荒れくるう！\n敵は 5ターン 動けない！\n須佐之男は 5ターン 追加攻撃する！';}
@@ -2203,7 +2211,7 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='predplant'){const al=live();if(!al.length)return null;const e=al.slice().sort((a,b)=>b.maxhp-a.maxhp)[0];
           const gm=hasSkW(m.id,'w_gamaguchi')?1.5:1,hpA=Math.max(1,Math.round(e.hp*(e.dboss?.08:.25)*gm)),atA=Math.max(1,Math.round(e.atk*(e.dboss?.15:.3)*gm)),base=Math.max(1,cstat(m.id,m).atk);
           push(predScr(hpA,atA));e.atk=Math.max(1,e.atk-atA);if(e._deb)e._deb.atk=Math.max(1,e._deb.atk-atA);
-          NOW([()=>`${e.label}に 捕食植物が 食らいついた！\n`+dmgEnemy(e,hpA),()=>`${e.label}の 攻撃力を ${fmt(atA)} 吸収した！`,()=>{if(!isAlive(m))return null;const v=healM(m,hpA);return `${CH[m.id].short}の HPが ${fmt(v)} 回復した！`;},()=>{m.ab=Math.max(m.ab||0,5);m.av=Math.min(4,(m.av||0)+atA/base);return `${CH[m.id].short}の 攻撃力が ${fmt(atA)} あがった！`;}]);
+          NOW([()=>`${e.label}に 捕食植物が 食らいついた！\n`+dmgEnemy(e,hpA),()=>`${e.label}の 攻撃力を ${fmt(atA)} 吸収した！`,()=>{if(!isAlive(m))return null;const v=healM(m,hpA);return `${CH[m.id].short}の HPが ${fmt(v)} 回復した！`;},()=>{m.ab=Math.max(m.ab||0,5);m.av=Math.min(4,(m.av||0)+atA/base);return `${CH[m.id].short}の 攻撃力が ${fmt(atA)} あがった！`;},()=>predEatAlly(m,i)]);
           sfx('magic');BT.shake=12;return '「喰らい尽くせ……！」\n大地を 割って 紫の 捕食植物が 現れた！';}
         if(k==='teiaiou'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;});live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*.5);e.mag=Math.round(e.mag*.5);e.def=Math.round(e.def*.7);}e.deb=4;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))):null));sfx('heal');BT.shake=14;return '4・5・6！ 大逆転の シゴロ返し！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵の 攻撃・魔力 半減（4ターン）＋最大HPの 30% 削る！';}
         if(k==='yuiga'){m.db=5;m.dv=4;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
@@ -2291,7 +2299,7 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
   neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
   kakuhyper:'可能性の 獣が 目覚める。\n強攻撃（最大HPの 2%＋物理）が 81%で ループ、19%で 終了\n（転落は 偶数揃い。 偶数揃いの うち 約20%は\n　復活して 7に 変化）\n（ループ中 5%で 保留が たまり 最大4つ。\n　終了時に 保留が あれば「Fever!?」で 再開）',
-  predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ',
+  predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ\nさらに 味方を 1人 捕食し（戦闘不能）\nその 味方の 技を ランダムで 発動する',
   teiaiou:'みかた 全員の HPを 全回復（倒れた 仲間も 復活）\n＋敵全体の 攻撃・魔力 -50%・守備 -30%（4ターン）\n＋敵全体の HPを 最大HPの 30% 削る',
   sakatari:'梅枝の笏を 装備した 道真公 専用。\n敵全体に 最大HPの 30%＋強力な 雷撃、\n敵全体を 2ターン 行動不能に し、\n味方全体の HPを 最大HPの 50% 回復する',
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
