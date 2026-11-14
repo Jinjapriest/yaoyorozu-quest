@@ -5624,8 +5624,16 @@ function skEndingScr(cb){let t=0,y=0;const L=[
   ['h','STAFF'],['',''],['s','企画・シナリオ・キャラクター'],['','田村企画'],['',''],['s','制作'],['','田村企画　×　Claude'],['',''],['s','テストプレイ'],['','遊んでくれた みんな'],['',''],['',''],
   ['h','SPECIAL THANKS'],['',''],['','グンマー・サキタマの 八百万の 神々'],['','そして ここまで 遊んでくれた あなた'],['',''],['',''],['',''],['e','人類保管計画編　完'],['',''],['','…物語は まだ 続く']];
   const LH=16,TOTAL=L.length*LH+H;
-  return{full:true,upd(){t++;y+=I.A?2.4:.6;if(t%120===1)tone([392,440,523,587][(t/120|0)%4],.6,'triangle',.08);if(y>=TOTAL){pop();cb&&cb();}},
-    drw(){R(0,0,W,H,'#05030a');for(let i=0;i<40;i++)R((i*53)%W,((i*29)+(t>>2))%H,1,1,i%3?'#3c3c5c':'#c8a040');
+  let nx=0;
+  return{full:true,upd(){t++;if(nx){nx++;if(nx===20)tone(262,.5,'triangle',.12);if(nx===60){tone(196,1.2,'square',.12);tone(98,1.4,'triangle',.18);noise(.5,.18);}if(nx===110)[523,659,784,1047].forEach((f,k)=>tone(f,1.4,'triangle',.12,null,k*.06));if((nx>150&&(I.A||I.B))||nx>=600){pop();cb&&cb();}return;}y+=I.A?2.4:.6;if(t%120===1)tone([392,440,523,587][(t/120|0)%4],.6,'triangle',.08);if(y>=TOTAL)nx=1;},
+    drw(){if(nx){const cl=v=>Math.max(0,Math.min(1,v));R(0,0,W,H,'#05030a');
+        for(let i=0;i<48;i++){const sx=(i*67)%W,sy=((i*41)+(nx>>1))%H;R(sx,sy,1,1,i%4?'#3c2a14':'#c8a040');}
+        if(nx>=60){const g=cl((nx-60)/40);ctx.globalAlpha=g*.35;R(0,92,W,64,'#600010');ctx.globalAlpha=g;R(0,92,W,1,'#c8a040');R(0,155,W,1,'#c8a040');ctx.globalAlpha=1;}
+        ctx.globalAlpha=cl((nx-15)/25);big('次回　新編',128,58,'#c8a040','center',14);ctx.globalAlpha=1;
+        if(nx>=60){const sh=nx<70?(70-nx)/2:0;if(nx<64){ctx.globalAlpha=.8;R(0,0,W,H,'#fcfcfc');ctx.globalAlpha=1;}big('アイヂ大戦',128+Math.round((Math.random()-.5)*sh),104,'#fcfcfc','center',28);}
+        ctx.globalAlpha=cl((nx-110)/30);big('〜ヲワリミカワ大戦〜',128,166,'#f8d878','center',14);ctx.globalAlpha=1;
+        if(nx>150&&(nx>>4)%2)txt('（ボタンで つづく）',128,218,'#5c5c7c','center');region(0,0,W,H,()=>{vA=true;});return;}
+      R(0,0,W,H,'#05030a');for(let i=0;i<40;i++)R((i*53)%W,((i*29)+(t>>2))%H,1,1,i%3?'#3c3c5c':'#c8a040');
       L.forEach(([k,v],i)=>{const yy=Math.round(H+i*LH-y);if(yy<-40||yy>H+20)return;
         if(k==='h')big(v,128,yy,'#c8a040','center',16);else if(k==='s')txt(v,128,yy,'#58f898','center');else if(k==='e')big(v,128,yy,'#fcfcfc','center',20);
         else if(k==='p'){if(v==='tomoya')skGrid(SK_TA,SKPAL,112,yy-34,2);else if(v==='jouchan')skGrid(SK_JA,SKPURP,104,yy-34,2);else if(v==='waku')skGrid(SK_WAKU,SKPAL,112,yy-34,2);else if(v==='nizu')drawNizu(128,yy+6,t,1);}
