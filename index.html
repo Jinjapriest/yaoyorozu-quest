@@ -4151,24 +4151,24 @@ function drawECard(x,y,k,face,hi){R(x,y,36,52,hi?'#f8b800':'#fcfcfc');R(x+2,y+2,
   if(k===1){pc(x+18,y+16,5,'#fcbcb0');R(x+11,y+23,14,16,'#00a800');R(x+16,y+14,1,1,'#000');R(x+20,y+14,1,1,'#000');}
   if(k===2){pc(x+18,y+16,5,'#d8b0a8');R(x+11,y+23,14,16,'#7c4c10');for(let i=0;i<4;i++)R(x+8+i*6,y+32,4,3,'#7c7c7c');R(x+8,y+33,22,1,'#3c3c3c');}
   txt(EC[k],x+18,y+40,'#000','center',32);}
-function ecardScr(){
+function ecardScr(o){o=o||{};
   G.gambDone=G.gambDone||{};G.gambDone['v'+curVil]=G.day;save();
   let ph='dice',t=0,die=1,side=0,me=[],op=[],sel=0,myC=-1,opC=-1,round=0,res='',log=['ダイスを 振って 皇帝側か 奴隷側かを 決める。','（Aで ダイスを 止める）'],done=null;
   const setSide=()=>{side=die<=3?0:2;me=[side,1,1,1,1];op=[side===0?2:0,1,1,1,1];log=[`ダイスの 目は ${die}！`,side===0?'あなたは 皇帝側だ。（1〜3）':'あなたは 奴隷側だ。（4〜6）'];};
-  const opPick=()=>{const i=Math.floor(rnd()*op.length);return i;};
+  const opPick=(mine)=>{if(o.rig){/* 操られた 裏・賭郎：すべての 手を 読んでくる */let want;if(side===0)want=mine===0?2:1;else want=mine===2?1:0;const j=op.indexOf(want);if(j>=0)return j;}const i=Math.floor(rnd()*op.length);return i;};
   const kinds=()=>[...new Set(me)];
   const S={full:true,
     upd(){t++;
       if(ph==='dice'){if(t%4===0)die=1+Math.floor(rnd()*6);if(I.A&&t>20){sfx('ok');setSide();ph='side';t=0;}return;}
       if(ph==='side'){if(I.A&&t>15){ph='pick';t=0;sel=0;log=[`第${round+1}戦　どの カードを 出す？`];}return;}
       if(ph==='pick'){const ks=kinds();if(I.pl||I.pr){sel=(sel+(I.pr?1:ks.length-1))%ks.length;sfx('cur');}
-        if(I.A){const k=ks[sel];me.splice(me.indexOf(k),1);myC=k;const oi=opPick();opC=op[oi];op.splice(oi,1);round++;ph='reveal';t=0;sfx('ok');}return;}
+        if(I.A){const k=ks[sel];me.splice(me.indexOf(k),1);myC=k;const oi=opPick(k);opC=op[oi];op.splice(oi,1);round++;ph='reveal';t=0;sfx('ok');}return;}
       if(ph==='reveal'){if(t===40){sfx(ecWin(myC,opC)?'lvup':ecWin(opC,myC)?'hurt':'cur');
           if(ecWin(myC,opC)){res='win';log=[`あなた：${EC[myC]}　裏・賭郎：${EC[opC]}`,'あなたの 勝ちだ！！'];}
           else if(ecWin(opC,myC)){res='lose';log=[`あなた：${EC[myC]}　裏・賭郎：${EC[opC]}`,'裏・賭郎「クク… 終わりだ。」'];}
           else{res='';log=[`あなた：${EC[myC]}　裏・賭郎：${EC[opC]}`,'市民どうし… 引き分けだ。'];}}
         if(t>40&&I.A){if(res){ph='end';t=0;}else{ph='pick';t=0;sel=0;log=[`第${round+1}戦　どの カードを 出す？`];}}return;}
-      if(ph==='end'){if(t>5){pop();res==='win'?uraWin():uraLose();}}
+      if(ph==='end'){if(t>5){pop();if(o.onEnd){o.onEnd(res);return;}res==='win'?uraWin():uraLose();}}
     },
     drw(){R(0,0,W,H,'#100010');R(0,60,W,110,'#004000');R(0,60,W,2,'#7c4c10');R(0,168,W,2,'#7c4c10');
       txt('Eカード',8,6,'#f8b800');txt('裏・賭郎',248,6,'#fc7460','right');
@@ -4887,9 +4887,8 @@ function gsWin(sp,back,pages){const S=gsS();
     dialog(pages,()=>{BT=null;scene('gs',['ギムの残滓が 悲鳴を あげて\n霧散していく…！','ギムの残滓「ワガ… 理想ガ……」','憑依が 解けた ジョソウソと ギムトモコは\nよろめきながら 立ち上がった。','ジョソウソ「…覚えて いろ。 キョーサン派は\nこれで 終わりでは ない…！」','書記代 ジョソウソと ギムトモコは\n国境の 向こうへ 逃げていった。','グンマーを 乗っ取る キョーサン派の\n企みは 打ち砕かれた！'],()=>scene('gsend',['開票所に 投票箱が 戻された。','…開票速報。','保守派、 帝国議会で 第一党！\nキョーサン派は 議席を 大きく 減らした。','役人「総長は 第一党の 党首が\n当選した 議員の 中から 指名します」',rw],()=>{returnField();gsChief();}));});return;}
   back([]);}
 /* ===================== 帝愛産業 地下帝国編（総長総選挙編 クリア後） ===================== */
-function tiS(){if(!G.ti)G.ti={ch:0,per:0,work:0,dice:0};return G.ti;}
+function tiS(){if(!G.ti)G.ti={ch:0,per:0,v:2};if(G.ti.v!==2){if(!G.ti.clear)G.ti={ch:0,per:0};G.ti.v=2;}return G.ti;}
 const tiOpen=()=>gsS().ch>=6&&!!gsS().chief;
-const TI_WORK=300;
 /* 地下の 黒服・班長・側近・会長（オリジナルの パロディキャラ） */
 function drawKurofuku(x,y,t){const S='#101010';
   R(x-8,y-5,6,5,'#000');R(x+2,y-5,6,5,'#000');R(x-9,y-18,18,13,S);
@@ -4937,76 +4936,102 @@ function tiSceneBg(k){
     for(let i=0;i<9;i++){const bx=i*30-6,h=60+(i*37)%70;R(bx,H-h,24,h,'#101028');for(let j=0;j<h-8;j+=8)for(let q=0;q<3;q++)if(((i+j+q)*7)%5<2)R(bx+3+q*7,H-h+4+j,4,3,'#f8d878');}
     R(0,118,W,6,'#7c7c7c');R(0,118,W,1,'#bcbcbc');return true;}
   return false;}
-/* 入口（帝城で 総長から 話を 聞く） */
+/* 入口：帝城の 前で 操られた 裏・賭郎が 待ち構える */
+const TI_DEBT=100000000,TI_WAGE=10000,TI_DAYS=365;/* 借金 100万イェソ＝1億ペリコ（1ペリコ＝イェソの 100分の1） */
 function tiStart(){const T=tiS();
-  scene('gs',[`総長 ${gsS().chief.n}「…ひとつ 気になる 帳簿が 見つかりました。」`,'「キョーサン派の 逃走資金…\nその 出どころは 本土の 帝愛産業です。」','「帝愛は 借金を 背負わせた 人々を\n地下に 集め、働かせて いるとか…」','…そのとき 背後に 黒い 影が 立った。','黒服「お客様… 帝愛産業 会長が\nお会いしたいと 申しております。」','両腕を つかまれ 目隠しを された！'],()=>
-    scene('chika',['…目隠しが 外される。','薄暗い 地下に 何百人もの 人々が\nうつむいて 働いている。','黒服「ようこそ 帝愛の 地下帝国へ。」','「ここでの 給料は ペリコ。\n1日 働けば 100ペリコだ。」','「会長に 会いたければ\nまず 地下で 生き残る ことだな。」','労働者の じいさん「…あんたも 連れて こられたのか。」','「地上に 出る 方法は ある。\nペリコを 貯めて 班長の 裏カジノで…\nいや、 まずは 働くことじゃ」'],()=>{T.ch=1;save();tiHub();}));}
+  scene('gs',[`総長 ${gsS().chief.n}「…ひとつ 気になる 帳簿が 見つかりました。」`,'「キョーサン派の 逃走資金…\nその 出どころは 本土の 帝愛産業です。」','…帝城を 出ると 門の 前に\n白い 髪の 男が 立っていた。','裏・賭郎…？\nだが その 目には 光が ない…','裏・賭郎「……Eカード……\n勝負……しろ……」','（様子が おかしい… まるで 誰かに 操られて いるようだ）'],()=>
+    choice('裏・賭郎と Eカードで 勝負しますか？\n（負けると 借金 100万イェソ＋地下労働 1年）',['勝負する','やめる'],k=>{if(k!==0){dialog('裏・賭郎は 光の ない 目で こちらを 見つめている……');return;}
+      ecardScr({rig:true,onEnd:()=>tiSent()});},96));}
+function tiSent(){const T=tiS();
+  dialog(['裏・賭郎「……」','（…すべての 手を 読まれていた。\n絶対に 勝てない 勝負だった…）','黒服「お客様の 負けで ございます。」','「借金 100万イェソ。\n地下で 1年間 働いて 返して いただきます」','黒服「…それと 裏・賭郎さん。\nあなたも ご苦労さまでした。 地下へ どうぞ」','裏・賭郎も 一緒に 連れて いかれる…'],()=>
+    scene('chika',['…目隠しが 外される。','帝愛 地下帝国。\n日の 光は 届かない。','黒服「借金は 1億ペリコ。\nペリコは 地下の 通貨で イェソの 100分の1だ」',`「給料は 1日 ${fmt(TI_WAGE)}ペリコ。\n${TI_DAYS}日目を 迎えるまでに 返せなければ…\nわかって いるな？」`,'（1日 1万ペリコでは 1年 働いても\n365万… とても 足りない…）','となりで 裏・賭郎が 光の ない 目で\n座りこんでいる……'],()=>{Object.assign(T,{ch:1,per:0,debt:TI_DEBT,day:1,casino:0,exposed:0});save();tiHub();}));}
 /* 地下帝国の 拠点 */
 function tiHub(){const T=tiS();
-  const it=[{t:'はたらく（ペリコ +100）',k:'work'},{t:'地下の 売店（ペリコ）',k:'shop'}];
-  if(T.ch>=2)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});
-  if(T.ch>=3)it.push({t:T.card?'側近 ヒムロと 再戦（カード）':'側近 ヒムロとの カード勝負',k:'card'});
-  if(T.ch>=4)it.push({t:'鉄骨渡り（会長室への 道）',k:'tek'});
-  if(T.ch>=5)it.push({t:T.clear?'会長室（再戦）':'会長室へ',k:'boss'});
-  it.push({t:'話を 聞く',k:'talk'},{t:'地上に もどる',k:'out'});
-  const goal=T.ch===1?`目標：働いて ${TI_WORK}ペリコ 貯める`:T.ch===2?'目標：班長の イカサマを 見破る':T.ch===3?'目標：側近 ヒムロに カードで 勝つ':T.ch===4?'目標：鉄骨を 渡りきる':T.ch===5?'目標：会長 タガバソウを 倒す':'地下帝国は 解放された';
-  listPick(`帝愛 地下帝国　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
-    if(k==='work')tiWork();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='card')tiCardIntro();else if(k==='tek')tiTekIntro();else if(k==='boss')tiBoss();
-    else if(k==='talk')tiTalk();else {save();dialog(['地上への 昇降機に 乗った。','（帝城から いつでも 地下帝国へ もどれる）']);}},goal);}
-function tiTalk(){const T=tiS(),L=[['じいさん「班長の 裏カジノは 気をつけろ。\n大きく 張られると 班長の 目つきが 変わる…」','「あいつの サイコロ、 1・2・3の 目を\n見た 者が おらんのじゃ」'],
-    ['若い 労働者「側近の ヒムロは 冷静な 男だが…\n切り札を 出す 直前だけ\n額に 汗が にじむらしい」'],
-    ['元 会社員「会長室は 地上 74階…\n地下から 行くには 隣の ビルとの 間の\n鉄骨を 渡るしか ないんだ」','「強い 風が 吹いたら ←→で\n体の 傾きを もどすんだぞ」'],
-    ['黒服「会長は 金が すべてと おっしゃる。\n金で 買えぬ ものなど ない… とな」']];
-  dialog(L[Math.min(L.length-1,Math.max(0,T.ch-2))].concat(T.ch===1?[]:[]),tiHub);}
-function tiWork(){const T=tiS();timeAdd(8*60);T.per+=100;T.work++;sfx('coin');
-  const pg=[`8時間 働いた…\n100ペリコ もらった。（所持 ${fmt(T.per)}ペリコ）`];
-  if(T.ch===1&&T.per>=TI_WORK){T.ch=2;save();dialog(pg,()=>scene('chika',['…夜。 地下の 片隅で\nサイコロの 音が 聞こえる。','班長 クロヌマ「ペリコが 貯まったようだな。」','「どうだ、 その ペリコ… 一晩で 倍に しないか？\nワシの 裏カジノで チンチロだ」','（班長の 裏カジノが 開いた）'],tiHub));return;}
+  if(T.ch===1&&T.day>TI_DAYS&&T.debt>0){tiTimeout();return;}
+  const it=[];
+  if(T.ch===1){it.push({t:`はたらく（1日・${fmt(TI_WAGE)}ペリコ）`,k:'work'});if(T.casino)it.push({t:'班長の 裏カジノ（チンチロ）',k:'chin'});if(T.exposed)it.push({t:'班長と 最後の 大勝負（456賽 返し）',k:'final'});
+    it.push({t:`借金を 返す（残り ${fmt(T.debt)}）`,k:'pay'},{t:'地下の 売店（ペリコ）',k:'shop'},{t:'話を 聞く',k:'talk'},{t:'昇降機の 前へ（帝城に もどる）',k:'out'});}
+  else{if(T.ch>=2)it.push({t:T.card?'側近 ヒムロと 再戦（カード）':'側近 ヒムロとの カード勝負',k:'card'});if(T.ch>=3)it.push({t:'鉄骨渡り（会長室への 道）',k:'tek'});if(T.ch>=4)it.push({t:T.clear?'会長室（再戦）':'会長室へ',k:'boss'});
+    it.push({t:'地下の 売店（ペリコ）',k:'shop'},{t:'話を 聞く',k:'talk'},{t:'帝城に もどる',k:'out'});}
+  const goal=T.ch===1?(T.exposed?'目標：大勝負で ペリコを 増やし 借金を 返す':T.casino?'目標：班長の イカサマを 暴け（サイコロ？ 椀？）':'目標：働きながら 地下の 様子を さぐる')+`\n地下 ${Math.min(T.day,TI_DAYS)}日目 / ${TI_DAYS}日　借金 ${fmt(T.debt)}ペリコ`:T.ch===2?'目標：側近 ヒムロに カードで 勝つ':T.ch===3?'目標：鉄骨を 渡りきる':T.ch<6?'目標：会長 タガバソウを 倒す':'帝愛は 倒れた。 地下帝国は 解放された';
+  listPick(T.ch===1?`帝愛 地下帝国　${Math.min(T.day,TI_DAYS)}日目　${fmt(T.per)}ペリコ`:`帝愛産業　ペリコ ${fmt(T.per)}`,it.map(x=>({t:x.t})),i=>{const k=it[i].k;
+    if(k==='work')tiWork();else if(k==='shop')tiShop();else if(k==='chin')tiChin();else if(k==='final')tiFinal();else if(k==='pay')tiPay();else if(k==='card')tiCardIntro();else if(k==='tek')tiTekIntro();else if(k==='boss')tiBoss();
+    else if(k==='talk')tiTalk();else {save();dialog(T.ch===1?['昇降機の 前は 黒服が 見張っている。','（帝城から いつでも 地下へ もどれる。\n地下の 日数は 働いた 日だけ 進む）']:['帝城に もどった。']);}},goal);}
+function tiTalk(){const T=tiS();let L;
+  if(T.ch===1){L=!T.casino?['じいさん「…あんたも 裏・賭郎に やられたか。\nあの 男、 少し 前から 様子が おかしくてな」','「目から 光が 消えて… 誰かの 言いなりじゃ」','裏・賭郎「……」']
+    :!T.exposed?['じいさん「班長の チンチロは 気をつけろ。\n大きく 張ると なぜか 班長ばかり 勝つ」','「4・5・6… また 4・5・6…\nそんな 出目ばかり 見る 気がするんじゃ」','裏・賭郎「……サイコロ……」\n（裏・賭郎が 何かを 言いかけた）']
+    :['裏・賭郎「…班長の 456賽…\n今度は こっちが 使う 番だ」','（裏・賭郎の 目に わずかに 光が もどってきた）'];}
+  else L=T.ch===2?['裏・賭郎「おれを 操ったのは 帝愛の 会長…\nタガバソウだ」','「側近の ヒムロは カードの 名人。\nだが 切り札を 出す 直前だけ 額に 汗が にじむ」']
+    :T.ch===3?['裏・賭郎「会長室は 地上 74階。\n隣の ビルから 鉄骨 一本で つながっている」','「風が 吹いたら ←→で 立て直せ」']
+    :T.ch<6?['裏・賭郎「あとは 会長だけだ。\n…行くぞ、 相棒」']:['裏・賭郎「地上の 光は まぶしいな…」'];
+  dialog(L,tiHub);}
+function tiWork(){const T=tiS();timeAdd(24*60);T.day++;T.per+=TI_WAGE;T.work=(T.work||0)+1;sfx('coin');
+  const pg=[`1日 働いた… ${fmt(TI_WAGE)}ペリコ もらった。\n地下 ${Math.min(T.day,TI_DAYS)}日目　所持 ${fmt(T.per)}P`];
+  if(!T.casino&&T.day>=3){T.casino=1;save();dialog(pg,()=>scene('chika',['…夜。 地下の 片隅で\nサイコロの 音が 聞こえる。','班長 クロヌマ「新入り、 ペリコが 貯まったようだな。」','「どうだ… その ペリコ、 一晩で 倍に しないか？\nワシの 裏カジノで チンチロリンだ」','（このままでは 1年で 借金は 返せない…\n班長の 裏カジノが 開いた）'],tiHub));return;}
   save();dialog(pg,tiHub);}
-const TI_SHOP=[{n:'冷えた 缶ビール',p:300,d:'パーティ 全回復＋明日まで 経験値1.2倍',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);return '冷えた ビールが 五臓六腑に しみわたる…！';}},
-  {n:'焼き鳥（つくね）',p:200,d:'やくそう ×10',f:()=>{G.items.herb+=10;return 'やくそうを 10個 もらった。';}},
-  {n:'ガチャチケット',p:1000,d:'ガチャチケット ×1',f:()=>{G.items.tk++;return 'ガチャチケットを 1枚 手に入れた。';}},
-  {n:'経験値書（極）',p:2000,d:'経験値書（極）×3',f:()=>{G.items.b[3]+=3;return '経験値書（極）を 3冊 手に入れた。';}},
-  {n:'UR確定チケット',p:20000,d:'UR確定チケット ×1',f:()=>{G.items.urtk=(G.items.urtk||0)+1;return 'UR確定チケットを 手に入れた。';}}];
+function tiPay(){const T=tiS();if(T.per<=0){dialog('返す ペリコが ない…',tiHub);return;}
+  const p=Math.min(T.per,T.debt);T.per-=p;T.debt-=p;sfx('coin');save();
+  if(T.debt>0){dialog(`${fmt(p)}ペリコ 返した。\n借金は のこり ${fmt(T.debt)}ペリコ。`,tiHub);return;}
+  tiEscape();}
+function tiEscape(){const T=tiS();
+  scene('chika',['借金を 完済した！','黒服「…ほう。 1年を 待たずに 返し切るとはな」','裏・賭郎が ゆっくりと 顔を あげた。\n…その 目に 光が もどっている！','裏・賭郎「……おれは 何を…\nずっと 悪い 夢を 見ていた 気がする」','「帝愛の 会長… タガバソウに\n催眠を かけられて いたんだ」','「あんたを 地下に 落とす ための\n道具に されて いた… すまねえ」','裏・賭郎「…一緒に 出るぞ。 地上へ」'],()=>{
+    T.ch=2;T.per+=0;save();returnField();
+    dialog(['昇降機が 上がっていく…','…まぶしい！ 地上の 光だ！','裏・賭郎「タガバソウを 止めないと\nまた 誰かが 地下に 落とされる」','「会長の 側近 ヒムロを 倒して\n帝愛本社の 会長室へ 乗りこむぞ」','（帝城から 帝愛産業へ 向かえる）']);});}
+function tiTimeout(){const T=tiS();
+  dialog([`地下 ${TI_DAYS}日目を 迎えた…`,`借金は まだ ${fmt(T.debt)}ペリコ 残っている。`,'黒服「時間切れだ。 地上へ 放り出せ」'],()=>{G.shockUntil=G.day+5;G.shockHard=1;G.party.forEach(fixHp);G.ti={ch:0,per:0};save();returnField();
+    dialog(['地上に 放り出された…','あまりの ショックで 力が 100分の1に なった…\n5日の あいだ ショック状態が 続く。','（帝城を 訪ねると もう一度 挑める）']);});}
+const TI_SHOP=[{n:'冷えた 缶ビール',p:30000,d:'パーティ 全回復＋明日まで 経験値1.2倍',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);return '冷えた ビールが 五臓六腑に しみわたる…！';}},
+  {n:'焼き鳥（つくね）',p:20000,d:'やくそう ×10',f:()=>{G.items.herb+=10;return 'やくそうを 10個 もらった。';}},
+  {n:'ガチャチケット',p:100000,d:'ガチャチケット ×1',f:()=>{G.items.tk++;return 'ガチャチケットを 1枚 手に入れた。';}},
+  {n:'経験値書（極）',p:200000,d:'経験値書（極）×3',f:()=>{G.items.b[3]+=3;return '経験値書（極）を 3冊 手に入れた。';}},
+  {n:'UR確定チケット',p:2000000,d:'UR確定チケット ×1',f:()=>{G.items.urtk=(G.items.urtk||0)+1;return 'UR確定チケットを 手に入れた。';}}];
 function tiShop(){const T=tiS();
   listPick(`地下の 売店　ペリコ ${fmt(T.per)}`,TI_SHOP.map(s=>({t:s.n,r:`${fmt(s.p)}P`,dis:T.per<s.p})),i=>{const s=TI_SHOP[i];if(T.per<s.p){toast('ペリコが たりない');tiShop();return;}
-    T.per-=s.p;sfx('coin');const m=s.f();save();dialog(m,tiShop);},i=>TI_SHOP[i]?TI_SHOP[i].d+'\n（ペリコは 1日 働くと 100）':'');}
-/* ===== 班長の 裏カジノ：チンチロ ===== */
+    T.per-=s.p;sfx('coin');const m=s.f();save();dialog(m,tiShop);},i=>TI_SHOP[i]?TI_SHOP[i].d+'\n（1ペリコ＝イェソの 100分の1）':'');}
+/* ===== 班長の 裏カジノ：チンチロリン（456賽の イカサマ） ===== */
 function chHand(d){const s=d.slice().sort((a,b)=>a-b),[a,b,c]=s;
   if(a===1&&b===1&&c===1)return{r:100,m:5,n:'ピンゾロ'};if(a===b&&b===c)return{r:90+a,m:3,n:`${a}のゾロ目`};
   if(a===4&&b===5&&c===6)return{r:80,m:2,n:'シゴロ（4・5・6）'};if(a===1&&b===2&&c===3)return{r:-1,m:2,n:'ヒフミ（1・2・3）'};
   if(a===b)return{r:c,m:1,n:`${c}の目`};if(b===c)return{r:a,m:1,n:`${a}の目`};return null;}
-function tiChin(){const T=tiS();if(T.per<100){dialog(['班長「ペリコが ないなら 帰んな。」','（働いて ペリコを 貯めよう）'],tiHub);return;}
-  const ST={d:[1,1,1],p:[1,1,1],anim:0,who:null,msg:'',loaded:false};
-  push({full:true,upd(){if(ST.anim>0){ST.anim--;if(ST.anim%3===0){const f=ST.who==='d'&&ST.loaded?[4,5,6]:[1,2,3,4,5,6];ST[ST.who]=[0,1,2].map(()=>f[ri(0,f.length-1)]);}if(ST.anim===0&&ST.done)ST.done();}},
+function tiDiceScr(ST){const T=tiS();
+  push({full:true,upd(){if(ST.anim>0){ST.anim--;if(ST.anim%3===0){const f=(ST.who==='d'&&ST.loaded)||(ST.who==='p'&&ST.pload)?[4,5,6]:[1,2,3,4,5,6];ST[ST.who]=[0,1,2].map(()=>f[ri(0,f.length-1)]);}if(ST.anim===0&&ST.done)ST.done();}},
     drw(){tiSceneBg('chika');R(40,150,176,60,'#3c2410');pe(128,176,40,14,'#fcfcfc');pe(128,176,36,11,'#e4e4e4');
-      drawHancho(60,150,frame);txt('班長 クロヌマ',60,98,'#f8d878','center');
+      drawHancho(60,150,frame);txt('班長 クロヌマ',60,98,'#f8d878','center');drawNPC({gambler:true,ura:true},196,124,(frame>>4)&1);txt('裏・賭郎',204,112,'#bcbcbc','center');
       const dd=(arr,x,y)=>arr.forEach((v,k)=>{const bx=x+k*14;R(bx,y,12,12,'#fcfcfc');R(bx,y+11,12,1,'#7c7c7c');const P=[[],[[6,6]],[[3,3],[9,9]],[[3,3],[6,6],[9,9]],[[3,3],[9,3],[3,9],[9,9]],[[3,3],[9,3],[6,6],[3,9],[9,9]],[[3,3],[9,3],[3,6],[9,6],[3,9],[9,9]]][v];P.forEach(([px,py])=>R(bx+px-1,y+py-1,v===1?3:2,v===1?3:2,v===1?'#d82800':'#000'));});
       txt('班長',112,148,'#bcbcbc','center');dd(ST.d,108,154);txt('あなた',162,148,'#bcbcbc','center');dd(ST.p,140,174);
-      win(150,8,100,22);txt(`${fmt(T.per)}ペリコ`,240,14,'#f8d878','right');}});
-  const bets=[100,300,1000,3000].filter(b=>b<=T.per);
+      win(150,8,100,22);txt(`${fmt(T.per)}P`,240,14,'#f8d878','right');}});
   const roll=(who,cb)=>{ST.who=who;ST.anim=24;sfx('clap');ST.done=()=>{ST.done=null;cb();};};
-  const rollUpTo3=(who,cb,n=1)=>roll(who,()=>{const h=chHand(ST[who]);if(h||n>=3){cb(h,n);return;}dialog(`${who==='d'?'班長':'あなた'}：目なし…（${n}回目）`,()=>rollUpTo3(who,cb,n+1));});
-  choice(`班長「いくら 張る？」\n（ペリコ ${fmt(T.per)}）`,[...bets.map(b=>`${fmt(b)}ペリコ`),'やめる'],k=>{if(k<0||k>=bets.length){pop();tiHub();return;}const bet=bets[k];
-    ST.loaded=bet>=300&&T.ch>=2;
-    rollUpTo3('d',(dh,dn)=>{const dline=`班長：${dh?dh.n:'目なし'}`;
-      const allHigh=ST.d.every(v=>v>=4);
-      const after=()=>{if(dh&&dh.r===-1){T.per+=bet*2;sfx('coin');save();dialog([dline,`班長の ヒフミ！ ${fmt(bet*2)}ペリコ 勝った！`],()=>{pop();tiChin();});return;}
-        if(dh&&dh.r>=90){T.per=Math.max(0,T.per-bet*dh.m);sfx('ng');save();dialog([dline,`班長の 勝ち… ${fmt(bet*dh.m)}ペリコ 取られた。`],()=>{pop();tiChin();});return;}
-        rollUpTo3('p',(ph)=>{const pr=ph?ph.r:0,dr=dh?dh.r:0;let res,delta;
-          if(ph&&ph.r===-1){delta=-bet*2;res='ヒフミ… 2倍 払い。';}
-          else if(pr>dr){delta=bet*(ph?ph.m:1);res=`勝った！ ${fmt(delta)}ペリコ もらった！`;}
-          else if(pr<dr){delta=-bet*(dh?dh.m:1);res=`負けた… ${fmt(-delta)}ペリコ 取られた。`;}
-          else{delta=0;res='引き分け。';}
-          T.per=Math.max(0,T.per+delta);sfx(delta>0?'coin':delta<0?'ng':'ok');save();
-          dialog([`あなた：${ph?ph.n:'目なし'}`,res],()=>{pop();tiChin();});});};
-      const opts=['勝負を つづける','サイコロを あらためる！'];
-      choice(`${dline}${allHigh?'\n（…班長の 出目、 4・5・6 ばかりだ）':''}`,opts,r=>{
-        if(r!==1){after();return;}
-        if(ST.loaded){T.ch=Math.max(T.ch,2);sfx('g5');save();dialog(['班長の 手から サイコロを うばい 取った！','…どの 面を 見ても 4・5・6 しか ない！\n「456賽（シゴロさい）」だ！','労働者たち「イカサマだ！！」\n「おれたちの ペリコを 返せ！」','班長 クロヌマ「き、 きさま……！\n黒服ども、 こいつを 黙らせろ！」'],()=>{pop();startGm('ti_hancho');});return;}
-        const pen=Math.min(T.per,200);T.per-=pen;sfx('ng');save();dialog(['サイコロを 調べた… ふつうの サイコロだ。','班長「言いがかりは 高くつくぞ？」',`迷惑料 ${fmt(pen)}ペリコを 取られた…`],()=>{pop();tiChin();});},140);});},120);}
+  const upTo3=(who,cb,n=1)=>roll(who,()=>{const h=chHand(ST[who]);if(h||n>=3){cb(h,n);return;}dialog(`${who==='d'?'班長':'あなた'}：目なし…（${n}回目）`,()=>upTo3(who,cb,n+1));});
+  return upTo3;}
+/* 1回の 勝負：dh＝班長の 役、 ph＝自分の 役 → 増減 */
+function chSettle(bet,dh,ph){if(dh&&dh.r===-1)return bet*2;if(ph&&ph.r===-1)return -bet*2;const pr=ph?ph.r:0,dr=dh?dh.r:0;if(pr>dr)return bet*(ph?ph.m:1);if(pr<dr)return -bet*(dh?dh.m:1);return 0;}
+function tiChin(){const T=tiS();if(T.per<10000){dialog(['班長「ペリコが ないなら 帰んな。」','（働いて ペリコを 貯めよう）'],tiHub);return;}
+  const ST={d:[1,1,1],p:[1,1,1],anim:0,who:null,loaded:false,pload:false},up=tiDiceScr(ST);
+  const bets=[10000,100000,1000000,10000000].filter(b=>b<=T.per);
+  const end=()=>{pop();tiChin();};
+  choice(`班長「いくら 張る？」\n（所持 ${fmt(T.per)}ペリコ）`,[...bets.map(b=>`${fmt(b)}ペリコ`),'やめる'],k=>{if(k<0||k>=bets.length){pop();tiHub();return;}const bet=bets[k];
+    ST.loaded=bet>=100000&&!T.exposed;
+    up('d',dh=>{const dline=`班長：${dh?dh.n:'目なし'}`,allHigh=ST.d.every(v=>v>=4);
+      const play=()=>{if(dh&&(dh.r===-1||dh.r>=90)){const v=chSettle(bet,dh,null);T.per=Math.max(0,T.per+v);sfx(v>0?'coin':'ng');save();dialog([dline,v>0?`班長の ヒフミ！ ${fmt(v)}ペリコ 勝った！`:`班長の 勝ち… ${fmt(-v)}ペリコ 取られた。`],end);return;}
+        up('p',ph=>{const v=chSettle(bet,dh,ph);T.per=Math.max(0,T.per+v);sfx(v>0?'coin':v<0?'ng':'ok');save();
+          dialog([`あなた：${ph?ph.n:'目なし'}`,v>0?`勝った！ ${fmt(v)}ペリコ もらった！`:v<0?`負けた… ${fmt(-v)}ペリコ 取られた。`:'引き分け。'],end);});};
+      choice(`${dline}${allHigh?'\n（…4・5・6？ また？）':''}`,['勝負を つづける','サイコロを あらためる！','椀を あらためる！'],r=>{
+        if(r<=0){play();return;}
+        if(r===1&&ST.loaded){sfx('g5');save();dialog(['班長の 手から サイコロを うばい 取った！','…どの 面を 見ても 4・5・6 しか ない！\n仕組まれた サイコロ「456賽（シゴロさい）」だ！','労働者たち「イカサマだ！！」\n「おれたちの ペリコを 返せ！」','班長 クロヌマ「き、 きさま……！\n黒服ども、 こいつを 黙らせろ！」'],()=>{pop();startGm('ti_hancho');});return;}
+        const pen=Math.min(T.per,Math.max(10000,Math.round(bet/2)));T.per-=pen;sfx('ng');save();
+        dialog([r===2?'椀を 調べた… ただの 椀だ。 すり替えも ない。':'サイコロを 調べた… ふつうの サイコロだ。','班長「言いがかりは 高くつくぞ？」',`迷惑料 ${fmt(pen)}ペリコを 取られた…`],end);},150);});},120);}
+/* 456賽 返し：暴いた 456賽を 裏・賭郎が こっそり 使わせる */
+function tiFinal(){const T=tiS();if(T.per<1000000){dialog(['裏・賭郎「大勝負には 元手が いる。\n…せめて 100万ペリコは 用意しろ」'],tiHub);return;}
+  dialog(['裏・賭郎「…班長は まだ 懲りてねえ。\n取り返そうと 大勝負を 持ちかけて くるはずだ」','「そこで これだ」\n（裏・賭郎の 手に 例の 456賽が…！）','班長 クロヌマ「ワシと 最後の 大勝負だ…！\n有り金 全部 賭けてもらおう」'],()=>
+    choice(`有り金 ${fmt(T.per)}ペリコを 全部 賭けますか？\n（勝てば シゴロ＝2倍づけ）`,['賭ける','やめる'],k=>{if(k!==0){tiHub();return;}const bet=T.per;
+      const ST={d:[1,1,1],p:[1,1,1],anim:0,who:null,loaded:false,pload:true},up=tiDiceScr(ST);
+      up('d',dh=>{const dl=`班長：${dh?dh.n:'目なし'}`;
+        if(dh&&(dh.r===-1||dh.r>=90)){const v=chSettle(bet,dh,null);T.per=Math.max(0,T.per+v);save();sfx(v>0?'g5':'ng');dialog([dl,v>0?`班長の ヒフミ！ ${fmt(v)}ペリコ 勝った！`:'まさかの 班長の ゾロ目… 有り金を 失った…'],()=>{pop();tiHub();});return;}
+        dialog([dl,'裏・賭郎が すばやく サイコロを すり替えた…！'],()=>up('p',ph=>{const v=chSettle(bet,dh,ph);T.per=Math.max(0,T.per+v);save();sfx(v>0?'g5':'ng');
+          dialog([`あなた：${ph?ph.n:'目なし'}`,v>0?`シゴロ！ ${fmt(v)}ペリコ 勝った！！`:'…負けた。',v>0?'班長 クロヌマ「4・5・6…！？ ま、 まさか\nワシの 456賽を……！」':'',v>0?`（所持 ${fmt(T.per)}ペリコ。 借金は ${fmt(T.debt)}ペリコ）`:''],()=>{pop();tiHub();});}));});},120));}
 /* ===== 側近 ヒムロとの カード勝負（皇帝・市民・奴隷） ===== */
 function tiCardIntro(){const T=tiS();
-  dialog(T.card?['ヒムロ「…まだ やるのか。」']:['会長側近 ヒムロ「班長を 倒したそうだな。」','「会長に 会いたければ 私と カードで 勝負だ。」','「カードは 皇帝・市民・奴隷。\n皇帝は 市民に 勝ち、 市民は 奴隷に 勝つ。\nそして 奴隷だけが 皇帝を 倒せる。」','「4回戦。 皇帝側で 勝てば 1点、\n奴隷側で 勝てば 3点。 3点 取れば きみの 勝ちだ。」'],tiCard);}
+  dialog(T.card?['ヒムロ「…まだ やるのか。」']:['会長側近 ヒムロ「地下から 這い上がって きたか。\n裏・賭郎まで 正気に もどすとはな」','「会長に 会いたければ 私と カードで 勝負だ。」','「カードは 皇帝・市民・奴隷。\n皇帝は 市民に 勝ち、 市民は 奴隷に 勝つ。\nそして 奴隷だけが 皇帝を 倒せる。」','「4回戦。 皇帝側で 勝てば 1点、\n奴隷側で 勝てば 3点。 3点 取れば きみの 勝ちだ。」'],tiCard);}
 function tiCard(){const T=tiS();let set=0,pts=0,hand,ai,aiK,turn,log='';
   const NM={E:'皇帝',C:'市民',S:'奴隷'},startSet=()=>{const emp=set%2===0;hand=[emp?'E':'S','C','C','C','C'];ai=[emp?'S':'E','C','C','C','C'];aiK=ri(0,4);turn=0;};
   const ST={show:null};
@@ -5035,7 +5060,7 @@ function tiTek(){const T=tiS(),ST={d:0,b:0,v:0,t:0,fall:0,done:false,gust:0};con
       ST.v+=ST.gust*.35+Math.sin(ST.t/37)*amp*.4+ST.b*.0016;
       if(I.l||touchL)ST.v-=.0042;if(I.r||touchR)ST.v+=.0042;ST.v*=.95;ST.b+=ST.v;ST.d+=3;
       if(Math.abs(ST.b)>1){ST.fall=1;sfx('hurt');}
-      if(ST.d>=LEN){ST.done=true;pop();sfx('win');T.ch=Math.max(T.ch,5);save();
+      if(ST.d>=LEN){ST.done=true;pop();sfx('win');T.ch=Math.max(T.ch,4);save();
         scene('kaicho',['鉄骨を 渡りきった！','ガラス張りの 会長室。\n眼下には 帝都と 本土の 夜景が 広がる。','帝愛グループ会長 タガバソウ「ククク…\nよくぞ 来た。 地下の ネズミが。」','「金こそ 力。 金さえ あれば\n国も 人も 買える。 キョーサン派も\nワシが 買った 駒の ひとつに すぎん」','「さあ 見せてみろ。\n金で 買えぬ ものが ある などと\n言うなら な……！」'],()=>startGm('ti_kaicho'));}},
     drw(){tiSceneBg('tekkotsu');const p=Math.min(1,ST.d/LEN);
       R(0,118,W,6,'#7c7c7c');for(let x=-((ST.d*2)%32);x<W;x+=32)R(x,119,2,4,'#3c3c3c');
@@ -5057,8 +5082,8 @@ const TISTG={
     intro:sp=>sp.wave<4?`帝愛本社ビル　第${sp.wave}防衛線\n黒服の 群れが 押し寄せる！`:'タガバソウ「ククク… 金の 力を 思い知れ！」'}};
 Object.assign(GSTG,TISTG);
 function tiWin(sp,back0,pages){const T=tiS(),back=more=>dialog(pages,()=>{returnField();dialog(more&&more.length?more:['（地下帝国に もどった）'],()=>tiHub());});
-  if(sp.st==='ti_hancho'){const first=T.ch<3;if(first)T.ch=3;T.per+=2000;save();back(first?['班長 クロヌマは 地面に へたりこんだ。','クロヌマ「ま、 待て… 会長には\n言わんで くれ……！」','労働者たちが 歓声を あげた！\nイカサマで 巻き上げられた ペリコが もどってきた。（+2,000ペリコ）','じいさん「ありがとうよ… 次は 会長の 側近\nヒムロだ。 あいつは カードの 名人じゃ」',gmGive(10,10,2)]:['班長は ふたたび 倒れた。（+2,000ペリコ）',gmGive(5,5)]);return;}
-  if(sp.st==='ti_himuro'){const first=T.ch<4;if(first)T.ch=4;save();back(first?['ヒムロ「……私の 負けだ。」','「会長室は 地上 74階。\n地下からの 道は 鉄骨 一本だけだ。」','「渡りきれたら… 会長は きみに 会うだろう」',gmGive(12,12,3),'（鉄骨渡りが 解放）']:['ヒムロは 静かに 道を 開けた。',gmGive(6,6)]);return;}
+  if(sp.st==='ti_hancho'){const first=!T.exposed;T.exposed=1;if(first)T.per+=50000000;save();back(first?['班長 クロヌマは 地面に へたりこんだ。','クロヌマ「ま、 待て… 会長には\n言わんで くれ……！」','労働者たちが 歓声を あげた！\nイカサマで 巻き上げられた ペリコが もどってきた。（+50,000,000ペリコ）','裏・賭郎「……456賽……\nこいつは… 使える……」\n（裏・賭郎が 班長の サイコロを 拾い上げた）',gmGive(10,10,2),'（班長との 最後の 大勝負が 解放）']:['班長は ふたたび 倒れた。',gmGive(5,5)]);return;}
+  if(sp.st==='ti_himuro'){const first=T.ch<3;if(first)T.ch=3;save();back(first?['ヒムロ「……私の 負けだ。」','「会長室は 地上 74階。\n地下からの 道は 鉄骨 一本だけだ。」','「渡りきれたら… 会長は きみに 会うだろう」',gmGive(12,12,3),'（鉄骨渡りが 解放）']:['ヒムロは 静かに 道を 開けた。',gmGive(6,6)]);return;}
   if(sp.st==='ti_kaicho'){if(T.clear){back(['タガバソウの 亡霊は 札束と ともに 消えた。',gmGive(10,10,2)]);return;}
     const rw=gmGive(25,25,10,1e11);
     dialog(pages,()=>{BT=null;scene('kaicho',['タガバソウ「ば、 バカな…\nワシの 金が… 力が……！」','「金で… 買えぬ もの… だと……？」','地下の 労働者たちが 次々と\n地上へ 出てきた。 歓声が 帝都に ひびく！','タガバソウ「……ククク。 いいだろう。\n帝愛は きさまに くれてやる。」','「ただし 子会社の TAインダストリアル だけだ。\n消費者金融と パチンコ店…\nワシが 育てた 金の なる木よ」','タガバソウは 札束の 山を 残して\nヘリで 夜空へ 消えた……',rw],()=>{T.clear=1;T.ch=6;tiTaInit();save();returnField();
