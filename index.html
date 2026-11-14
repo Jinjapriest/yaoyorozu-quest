@@ -2154,9 +2154,12 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st();
         if(k==='moekyun'){BT.pt.forEach(t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=mx;t.ab=t.db=4;t.av=t.dv=.8;});live().forEach(e=>{e.stun=3;e.charm=1;});sfx('heal');BT.shake=10;return 'もも色の 光が はじけた！\n「萌え萌え きゅん♡」\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵は ももに 見とれて 3ターン 動けない！';}
         if(k==='sakatari'){sfx('magic');BT.shake=26;const L=live();L.forEach(e=>{e.stun=Math.max(e.stun||0,2);e.charm=2;});NOW(['雷光が 敵全体を 打ちすえる！',...L.map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))+magd(me.mag,e.def,4)):null),()=>BT.en.some(e=>e.alive)?'敵は しびれて 2ターン 動けない！':null,'梅の 香りが みかたを つつむ…',...BT.pt.filter(isAlive).map(t=>()=>{const v=healM(t,Math.round(cstat(t.id,t).hp*.5));return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;})]);return '酒垂（さかたり）の 山に 神光が 降りる！';}
         if(k==='kakuhyper'){const seq=[];let n=0,stock=0;
-          while(n<300){n++;if(stock<4&&rnd()<.05){stock++;seq.push({n,add:1});}else seq.push({n});if(rnd()<.81)continue;if(stock>0){stock--;seq.push({fever:1});continue;}break;}
+          /* 継続81%（うち 約4.75%は 偶数揃いの 転落演出→復活）／転落19%は 偶数揃い。 偶数が 出たうち 約20%が 復活の 7に 化ける */
+          let rev=0;const EV=()=>[2,4,6,8][ri(0,3)];
+          while(n<300){n++;const h={n};if(rev){h.rev=EV();rev=0;}if(stock<4&&rnd()<.05){stock++;h.add=1;}seq.push(h);
+            if(rnd()<.81){if(rnd()<.0586)rev=1;continue;}seq.push({fall:EV()});if(stock>0){stock--;seq.push({fever:1});continue;}break;}
           push(hyperScr(seq));const L=[];
-          seq.forEach(s_=>{if(s_.fever){L.push('Fever!?\n保留が 発動！ ループが 再開した！');return;}L.push(()=>{const al=live();if(!al.length)return null;const e=al[ri(0,al.length-1)];return `${s_.n} Hyper!${s_.n>=20?'!!':s_.n>=10?'!':''}\n`+dmgEnemy(e,phys(me.atk,e.def,1.5)+Math.ceil(e.maxhp*(e.dboss?.02:.05)));});});
+          seq.forEach(s_=>{if(s_.fever){L.push('Fever!?\n保留が 発動！ ループが 再開した！');return;}if(s_.fall){L.push(`${s_.fall}揃い… 転落`);return;}L.push(()=>{const al=live();if(!al.length)return null;const e=al[ri(0,al.length-1)];return `${s_.rev?`${s_.rev}揃い… からの 復活！ 7に 変化！\n`:''}${s_.n} Hyper!${s_.n>=20?'!!':s_.n>=10?'!':''}\n`+dmgEnemy(e,phys(me.atk,e.def,1.5)+Math.ceil(e.maxhp*(e.dboss?.02:.05)));});});
           L.push(()=>`覚醒ハイパー 終了！　合計 ${n} Hyper`);NOW(L);sfx('g5');BT.shake=16;return '可能性の 獣が 目を 覚ます…！\n全身を エメラルドの 結晶が 覆っていく！';}
         if(k==='predplant'){const al=live();if(!al.length)return null;const e=al.slice().sort((a,b)=>b.maxhp-a.maxhp)[0];
           const hpA=Math.max(1,Math.round(e.hp*(e.dboss?.08:.25))),atA=Math.max(1,Math.round(e.atk*(e.dboss?.15:.3))),base=Math.max(1,cstat(m.id,m).atk);
@@ -2247,7 +2250,7 @@ const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も �
   kuniumi:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方全体の 攻撃・守備 +100%（5ターン）',
   yomotsu:'敵全体の HPを 最大HPの 40% 削る\n＋敵全体の 攻撃・魔力・守備 -60%（5ターン）',
   neongenesis:'ガイウスの槍の 固有スキル（1戦に1回）。\nみかたの 最大HP・MPを 1.5倍にして 全回復、\n敵全体に 超絶ダメージ ＋アディショナルインパクト。\n※ロンギヌス・カシウスとは 同じ編成に できない',
-  kakuhyper:'可能性の 獣が 目覚める。\n強攻撃（最大HPの 2%＋物理）が 81%で ループ、19%で 終了\n（ループ中 5%で 保留が たまり 最大4つ。\n　終了時に 保留が あれば「Fever!?」で 再開）',
+  kakuhyper:'可能性の 獣が 目覚める。\n強攻撃（最大HPの 2%＋物理）が 81%で ループ、19%で 終了\n（転落は 偶数揃い。 偶数揃いの うち 約20%は\n　復活して 7に 変化）\n（ループ中 5%で 保留が たまり 最大4つ。\n　終了時に 保留が あれば「Fever!?」で 再開）',
   predplant:'捕食植物が 最もHPの 多い 敵に 食らいつき\nHPと 攻撃力を 吸収する。\n吸収した HPぶん 回復し、 攻撃力ぶん パワーアップ',
   teiaiou:'みかた 全員の HPを 全回復（倒れた 仲間も 復活）\n＋敵全体の 攻撃・魔力 -50%・守備 -30%（4ターン）\n＋敵全体の HPを 最大HPの 30% 削る',
   sakatari:'梅枝の笏を 装備した 道真公 専用。\n敵全体に 最大HPの 30%＋強力な 雷撃、\n敵全体を 2ターン 行動不能に し、\n味方全体の HPを 最大HPの 50% 回復する',
@@ -5358,34 +5361,39 @@ function skBattleBG(sp){const st=sp.st;
 /* ---------- 専用演出 ---------- */
 /* 覚醒ハイパー：結晶が 全身を 覆い、 ループごとに「n Hyper!」、保留連で「Fever!?」 */
 /* 覚醒ハイパー：攻撃が 当たるたびに 結晶の「7」が 3つ そろう（左→右→中）。 保留連は「Fever!?」 */
-function sk7(x,y,sz,hot,t){/* 結晶に 包まれた 7（オリジナル） */
-  for(let k=0;k<10;k++){const a=k/10*Math.PI*2+(k%2?.2:0),r=sz*(.95+(k%3)*.18);ctx.fillStyle=k%2?'#00a844':'#58f898';ctx.beginPath();ctx.moveTo(x+Math.cos(a-.25)*sz*.45,y+Math.sin(a-.25)*sz*.45);ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);ctx.lineTo(x+Math.cos(a+.25)*sz*.45,y+Math.sin(a+.25)*sz*.45);ctx.fill();}
-  pc(x,y,Math.round(sz*.55),'#005828');
-  ctx.font=`${Math.round(sz*1.3)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#3c1000';ctx.fillText('7',x+2,y+3);ctx.fillStyle=hot?((t>>2)&1?'#fcfc80':'#f8b800'):'#f87800';ctx.fillText('7',x,y+1);ctx.textBaseline='top';}
-function hyperScr(seq){let t=0;const ST=Math.max(10,Math.min(22,Math.floor(640/Math.max(1,seq.length)))),T0=70,END=T0+seq.length*ST+50;
-  const sym=['7','BAR','◆','★','チェ'];
+function sk7(x,y,sz,hot,t,d){/* 結晶に 包まれた 数字（7＝金とエメラルド／偶数＝くすんだ 銀） */const ev=d&&d!==7;
+  for(let k=0;k<10;k++){const a=k/10*Math.PI*2+(k%2?.2:0),r=sz*(.95+(k%3)*.18);ctx.fillStyle=ev?(k%2?'#5c6470':'#8c94a0'):(k%2?'#00a844':'#58f898');ctx.beginPath();ctx.moveTo(x+Math.cos(a-.25)*sz*.45,y+Math.sin(a-.25)*sz*.45);ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);ctx.lineTo(x+Math.cos(a+.25)*sz*.45,y+Math.sin(a+.25)*sz*.45);ctx.fill();}
+  pc(x,y,Math.round(sz*.55),ev?'#2c3038':'#005828');
+  ctx.font=`${Math.round(sz*1.3)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#1c0800';ctx.fillText(String(d||7),x+2,y+3);ctx.fillStyle=ev?'#bcc4d0':hot?((t>>2)&1?'#fcfc80':'#f8b800'):'#f87800';ctx.fillText(String(d||7),x,y+1);ctx.textBaseline='top';}
+function hyperScr(seq){let t=0;const ST=Math.max(12,Math.min(22,Math.floor(700/Math.max(1,seq.length)))),T0=70;
+  const dur=e=>e.rev?Math.round(ST*1.9):ST,starts=[];let acc=T0;seq.forEach(e=>{starts.push(acc);acc+=dur(e);});const END=acc+50;
+  const at=()=>{let i=0;while(i+1<seq.length&&t>=starts[i+1])i++;return i;};
+  const sym=['7','BAR','◆','★','チェ','2','4'];
   return{full:true,upd(){t++;if(t===20){sfx('magic');}if(t===60)sfx('g5');
-      if(t>T0){const f=(t-T0)%ST,s=seq[Math.floor((t-T0)/ST)];if(s&&!s.fever){if(f===Math.round(ST*.18)||f===Math.round(ST*.32))tone(660,.05,'square',.1);if(f===Math.round(ST*.46)){sfx('hit');tone(1320,.15,'square',.12);}}else if(s&&f===1)sfx('g5');}
+      if(t>T0){const i=at(),s=seq[i],f=t-starts[i],D=dur(s);if(s.fever){if(f===1)sfx('g5');}else{const a=s.rev?D*.5:D;if(f===Math.round(a*.18)||f===Math.round(a*.32))tone(660,.05,'square',.1);
+        if(f===Math.round(a*.46)){if(s.fall||s.rev)tone(220,.4,'triangle',.2,110);else{sfx('hit');tone(1320,.15,'square',.12);}}if(s.rev&&f===Math.round(D*.6)){sfx('g5');noise(.3,.2);tone(1760,.3,'square',.12);}}}
       if(t>=END||(t>40&&I.A&&t>T0+10))pop();},
     drw(){const ph=t<T0;R(0,0,W,H,ph?(t<30?'#000':'#04140a'):'#1c0800');
-      if(!ph){R(0,0,W,H,'#2c2000');
-        for(let k=0;k<24;k++){const a=k/24*Math.PI*2+t*.015,c=['#a87800','#00a844','#f8c838','#005828'][k%4];ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(128,96);
+      const i=ph?0:at(),s=seq[i],f=ph?0:t-starts[i],D=ph?1:dur(s),dark=!ph&&s&&(s.fall||(s.rev&&f<D*.6));
+      if(!ph){R(0,0,W,H,dark?'#101418':'#2c2000');
+        for(let k=0;k<24;k++){const a=k/24*Math.PI*2+t*.015,c=dark?['#2c3038','#3c4450','#1c2028','#4c5460'][k%4]:['#a87800','#00a844','#f8c838','#005828'][k%4];ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(128,96);
           for(let j=1;j<=5;j++){const r=j*52,jit=(j%2?.07:-.05)+((k*13+j*7)%5)*.012;ctx.lineTo(128+Math.cos(a+jit)*r,96+Math.sin(a+jit)*r);}
           for(let j=5;j>=1;j--){const r=j*52-(j%2?14:0),jit=.13+((k*7+j*11)%5)*.012;ctx.lineTo(128+Math.cos(a+jit)*r,96+Math.sin(a+jit)*r);}ctx.fill();}
-        /* ゴツゴツした 結晶の かけら（金と エメラルド） */
-        for(let i=0;i<34;i++){const a=i*2.39+t*.01,rr=50+((i*37+t*2)%150),x=128+Math.cos(a)*rr,y=96+Math.sin(a)*rr*.8,sz=5+(i%5)*3,c=i%3===0?'#fcd040':i%3===1?'#58f898':'#00a844',ang=a+i;
-          ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+Math.cos(ang)*sz,y+Math.sin(ang)*sz);ctx.lineTo(x+Math.cos(ang+2.2)*sz*.6,y+Math.sin(ang+2.2)*sz*.6);ctx.lineTo(x+Math.cos(ang+3.4)*sz*.9,y+Math.sin(ang+3.4)*sz*.9);ctx.lineTo(x+Math.cos(ang+4.8)*sz*.5,y+Math.sin(ang+4.8)*sz*.5);ctx.fill();
-          if(i%4===0){ctx.fillStyle='#fcfce0';ctx.fillRect(Math.round(x),Math.round(y),2,2);}}
-        ctx.globalAlpha=.35;pc(128,96,40+((t>>2)&3)*3,'#fcf080');ctx.globalAlpha=1;}
+        for(let q=0;q<34;q++){const a=q*2.39+t*.01,rr=50+((q*37+t*2)%150),x=128+Math.cos(a)*rr,y=96+Math.sin(a)*rr*.8,sz=5+(q%5)*3,c=dark?(q%2?'#5c6470':'#8c94a0'):(q%3===0?'#fcd040':q%3===1?'#58f898':'#00a844'),ang=a+q;
+          ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+Math.cos(ang)*sz,y+Math.sin(ang)*sz);ctx.lineTo(x+Math.cos(ang+2.2)*sz*.6,y+Math.sin(ang+2.2)*sz*.6);ctx.lineTo(x+Math.cos(ang+3.4)*sz*.9,y+Math.sin(ang+3.4)*sz*.9);ctx.lineTo(x+Math.cos(ang+4.8)*sz*.5,y+Math.sin(ang+4.8)*sz*.5);ctx.fill();}
+        if(!dark){ctx.globalAlpha=.35;pc(128,96,40+((t>>2)&3)*3,'#fcf080');ctx.globalAlpha=1;}}
       if(ph){skGrid(SK_TN,SKPAL,104,80,3);const k=Math.max(0,(t-20)/2.2);const rows=SK_TA.map((r,j)=>Math.abs(j-10)<=k?r:'.'.repeat(r.length));skGrid(rows,SKPAL,104,80,3);
         if(t>40){R(118,0,20,H,'rgba(120,232,168,.25)');big('覚醒ハイパー',128,30,'#58f898','center',22);}if(t>20&&t<40)txtS('パキ… パキパキッ',128,60,'#58f898','center');}
-      else{const i=Math.min(seq.length-1,Math.floor((t-T0)/ST)),f=(t-T0)%ST,s=seq[Math.max(0,i)];let stock=0;for(let j=0;j<=i&&j<seq.length;j++){if(seq[j].add)stock++;if(seq[j].fever)stock--;}
+      else{let stock=0;for(let j=0;j<=i&&j<seq.length;j++){if(seq[j].add)stock++;if(seq[j].fever)stock--;}
         skGrid(SK_TA,SKPAL,116,150,2);
-        if(s&&s.fever){big('Fever!?',128,70,(t>>2)&1?'#f8b800':'#fc7460','center',34);}
-        else if(s){const stopL=f>=ST*.18,stopR=f>=ST*.32,stopC=f>=ST*.46,all=stopC;
-          [[50,stopL],[206,stopR],[128,stopC]].forEach(([x,st],k)=>{if(st)sk7(x,96,k===2?40:34,all,t);else{win(x-26,70,52,52,'#58f898');big(sym[(t+k*2)%sym.length],x,86,'#fcfcfc','center',14);}});
-          if(all){if(f<Math.round(ST*.46)+3){ctx.globalAlpha=.6;R(0,0,W,H,'#fcfce0');ctx.globalAlpha=1;}
-            const n=s.n,cols=['#f83800','#f8b800','#fcfc00','#58f898','#3cbcfc','#6888fc','#f878f8'];big(`${n} Hyper!${n>=20?'!!':n>=10?'!':''}`,128,20,n>=20?cols[(t>>2)%7]:n>=10?'#f8b800':'#fcfcfc','center',n>=10?24:20);}}
+        if(s.fever){big('Fever!?',128,70,(t>>2)&1?'#f8b800':'#fc7460','center',34);}
+        else{const a=s.rev?D*.5:D,stopL=f>=a*.18,stopR=f>=a*.32,stopC=f>=a*.46,revived=s.rev&&f>=D*.6,d=s.fall||(s.rev&&!revived?s.rev:7);
+          [[50,stopL],[206,stopR],[128,stopC]].forEach(([x,st],k)=>{if(st)sk7(x,96,k===2?40:34,stopC&&d===7,t,d);else{win(x-26,70,52,52,'#58f898');big(sym[(t+k*2)%sym.length],x,86,'#fcfcfc','center',14);}});
+          if(stopC){if(s.fall){big(`${s.fall}揃い… 転落`,128,20,'#8c94a0','center',18);}
+            else if(s.rev&&!revived){big(`${s.rev}揃い…？`,128,20,'#8c94a0','center',18);}
+            else{const g=s.rev?f-Math.round(D*.6):f-Math.round(a*.46);if(g<4){ctx.globalAlpha=.6;R(0,0,W,H,'#fcfce0');ctx.globalAlpha=1;}
+              if(s.rev&&g<24)big('復活！！',128,140,(t>>1)&1?'#fcfc80':'#58f898','center',22);
+              const n=s.n,cols=['#f83800','#f8b800','#fcfc00','#58f898','#3cbcfc','#6888fc','#f878f8'];big(`${n} Hyper!${n>=20?'!!':n>=10?'!':''}`,128,20,n>=20?cols[(t>>2)%7]:n>=10?'#f8b800':'#fcfcfc','center',n>=10?24:20);}}}
         for(let j=0;j<4;j++){const x=92+j*20;pc(x,214,6,j<stock?(j===3?'#f83800':'#58f898'):'#202020');}txt('保留',128,224,'#bcbcbc','center');}
       region(0,0,W,H,()=>{vA=true;});}};}
 /* プレデタープラント：紫の 捕食植物が 食らいつき、 HPと 攻撃力を 吸い取る */
