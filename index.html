@@ -2132,9 +2132,9 @@ function pAct(i){
             return 'ガイウスの槍が 希望の 光を 放つ…！\nneonGenesis！\nみかたの 最大HP・MPが 1.5倍に なり 全回復した！';});
           P_(()=>{const me=st();sfx('magic');BT.shake=24;NOW(BT.en.filter(e=>e.alive).map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.5)+phys(me.atk,e.def,8))):null));return '希望の 槍が 天を 貫く…！\n敵全体に 超絶ダメージ！';});
           P_(()=>'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！');
-          const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
+          const pool=Object.values(XRSK).filter(q=>q!=='kakuhyper'&&q!=='predplant');for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
         if(cmd.k==='addimpact'){P_(()=>{if(!ok.v)return null;BT.aiUsed=1;sfx('g5');BT.shake=20;return 'ロンギヌスと カシウスが 共鳴する…！\nアディショナルインパクト！';});
-          const pool=Object.values(XRSK);for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
+          const pool=Object.values(XRSK).filter(q=>q!=='kakuhyper'&&q!=='predplant');for(let n=0;n<2;n++){P_(()=>{const k=pool[ri(0,pool.length-1)],own=Object.keys(XRSK).find(c=>XRSK[c]===k);const r=xrEffect(k,m,i,st);return r?`【${n+1}回目】${CH[own]?CH[own].short:''}の ${SK[k].name}！\n`+r:null;});}break;}
         P_(()=>{if(!ok.v)return null;return xrEffect(cmd.k,m,i,st);});break;
       case 'debuff':P_(()=>{if(!ok.v)return null;const L=BT.en.filter(e=>e.alive);if(!L.length)return null;sfx('ng');
         L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def,spd:e.spd};e.atk=Math.round(e.atk*sk.amt);e.mag=Math.round(e.mag*sk.amt);e.def=Math.round(e.def*sk.amt);if(e.spd)e.spd=Math.round(e.spd*sk.amt);}e.deb=Math.max(e.deb||0,sk.turns);});
