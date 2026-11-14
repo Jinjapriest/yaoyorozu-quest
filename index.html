@@ -5498,6 +5498,24 @@ function skNizuAct(e,al){const all=pw=>P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>
     if(x<.62){P_(`天使の 輪が 赤く 輝いた…！`);P_(()=>{BT.pt.filter(isAlive).forEach(t=>{t.ab=0;t.db=0;t.av=0;t.dv=0;});return 'みかたの 強化が すべて 消し去られた！';});return true;}
     return false;}
   return false;}
+/* ニズゥーイッツァイが 黒血漿を 首に 打ち込む 演出 */
+function nizuInjectScr(cb){let t=0;const END=230;
+  return{full:true,upd(){t++;if(t===20)sfx('ng');if(t===80){sfx('hit');noise(.3,.2);}if(t===110)tone(80,1.5,'sawtooth',.2,40);if(t===170){sfx('g5');noise(.8,.4);}if(t>=END||(t>90&&I.A)){pop();cb&&cb();}},
+    drw(){const sh=t>110&&t<200?((t>>1)&1?2:-2):0;R(0,0,W,H,t<80?'#0c0408':'#140004');
+      if(t>110){ctx.globalAlpha=Math.min(.6,(t-110)/120);for(let k=0;k<12;k++){const a=k/12*Math.PI*2+t*.01;ctx.fillStyle='#3c0008';ctx.beginPath();ctx.moveTo(128,90);ctx.lineTo(128+Math.cos(a)*240,90+Math.sin(a)*240);ctx.lineTo(128+Math.cos(a+.15)*240,90+Math.sin(a+.15)*240);ctx.fill();}ctx.globalAlpha=1;}
+      ctx.save();ctx.translate(128+sh,214);ctx.scale(3,3);drawNizu(0,0,t,0);ctx.restore();
+      /* 首すじ（大きく 描いた 顔の 下） */const nx=146+sh,ny=112;
+      /* 鍵：手元から 首すじへ */const p=Math.min(1,Math.max(0,(t-30)/50)),kx=Math.round(206+(nx+35-206)*p),ky=Math.round(170+(ny-28-170)*p);
+      if(t<150){ctx.save();ctx.translate(kx,ky);ctx.rotate(p*.9);ctx.scale(.7,.7);drawSkKey(0,0,0,t);ctx.restore();}
+      if(t>=80&&t<90){R(0,0,W,H,'#fcfcfc');}
+      if(t>=80&&t<120)big('ズブッ',nx+30,ny-30,'#fcfcfc','center',18);
+      /* 黒い 血漿が 首から 体へ 広がる */
+      if(t>=90){const n=Math.min(40,Math.floor((t-90)/2));for(let k=0;k<n;k++){const a=k*2.39,r=4+k*2.6;R(Math.round(nx-10+Math.cos(a)*r*.7),Math.round(ny+Math.sin(a)*r),2+(k%2),8+(k%5)*2,'#000');if(k%4===0)R(Math.round(nx-10+Math.cos(a)*r*.7),Math.round(ny+Math.sin(a)*r),1,6,'#a01020');}}
+      if(t>=150){ctx.globalAlpha=Math.min(1,(t-150)/30);for(let k=0;k<8;k++){R(100+((k*37)%60),90+((k*23)%110),2,14+(k%3)*6,'#ff2828');}ctx.globalAlpha=1;}
+      if(t>=120&&t<170)big('「カミニ…… ナル……」',128,16,'#ff6070','center',14);
+      if(t>=170)big('人の 形が 崩れていく…',128,16,'#fcfcfc','center',14);
+      if(t>=170&&t<178)R(0,0,W,H,'#ff2828');
+      region(0,0,W,H,()=>{vA=true;});}};}
 function skZanLeft(){const S=skS();return SK_ZAN_N-(S.zd||[]).length;}
 function skN1(){scene('skthrone',['中枢の 塔　最上階。\n培養槽が 並ぶ 玉座の 間。','黒衣に 深紅の マントの 男が\n玉座から ゆっくりと 立ち上がった。','ニズゥーイッツァイ「よくぞ 来た、 実験体ども」','「コブシデも ケンドウも 失敗した。\nだが わたしは 違う」','「古の 民は 魂を 玉に 宿した。\nわたしは 人類 すべてを 玉に 保管する」','「かなしみも あらそいも ない 永遠の 平和。\nその 管理者こそが… 神だ」','トモヤヨシダ「親父と お袋を 返せ！！」'],()=>startGm('sk_nizu1'));}
 
@@ -5522,10 +5540,10 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
   if(sp.st==='sk_zan'){S.zd=S.zd||[];if(sp.zk!=null&&!S.zd.includes(sp.zk))S.zd.push(sp.zk);save();const n=skZanLeft();
     after(n>0?['残骸は 崩れて 消えた…',`（のこり ${n}体）`]:['街の 残骸を すべて 倒した！','塔の 方から トモヤヨシダの 声が 響く。\n「よし！ 道が 開いた！ 塔へ 戻ってこい！」','目標：中枢の 塔から マイナス宇宙へ']);return;}
   if(sp.st==='sk_nizu1'){S.ch=Math.max(S.ch,7);S.zd=[];save();
-    dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」'],()=>scene('skkey',['ニズゥーイッツァイが 懐から 取り出したのは\n黒い 血漿が 満ちた 勾玉の アンプル…','ジョウチャン「黒血漿…！」','ニズゥーイッツァイ「これが ネブカドネザルの 鍵。\n人の 魂を 玉に 封じ、 神へと 昇華させる」','ニズゥーイッツァイは 首すじに\n鍵を 突き立てた！'],()=>
+    dialog(pages,()=>{BT=null;scene('skthrone',['ニズゥーイッツァイ「……くく。 よかろう」','「神の 誕生を その 目に 焼きつけるが いい」'],()=>scene('skkey',['ニズゥーイッツァイが 懐から 取り出したのは\n黒い 血漿が 満ちた 勾玉の アンプル…','ジョウチャン「黒血漿…！」','ニズゥーイッツァイ「これが ネブカドネザルの 鍵。\n人の 魂を 玉に 封じ、 神へと 昇華させる」','ニズゥーイッツァイ「人類は 玉に 還り…\nわたしは 神に なる」'],()=>push(nizuInjectScr(()=>
       scene('sksky',['塔が… いや 街 全体が 激しく 揺れる！','ナメガワマチが 大地から 引き剥がされ…\n天空へと 浮上していく！！','住民たちの 笑顔の まま 街は 雲を 越えた…'],()=>
       scene('skminus',['ニズゥーイッツァイの 体が 裂け\n人の 形が 崩れていく……','空間が 反転した。\n── マイナス宇宙 ──','何もかもが 存在し、 何もかもが 存在しない…','闇の 中から 神に なり損ねた 残骸が\n無数に 這い出してきた！','トモヤヨシダ「…今が その 時だな、 ジョウチャン」','ジョウチャン「ああ」','ふたりは 白く 光る 白血漿の アンプルを 握りしめた。','トモヤヨシダ＆ジョウチャン\n「俺の 誇れる 俺に\nなるんだぁぁぁぁぁ！！！」','ふたりは 白血漿を 首すじに 突き立てた！'],()=>push(skAwakeScr(()=>
-      scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「残骸が 街中に あふれだした！\n俺たちは 塔の 入口を 守る！」','ジョウチャン「街の 残骸を 片付けてくれ。\nそれまで ここは 一歩も 通さない！」'],()=>{returnField();dialog(['── 天空の ナメガワマチ ──','雲の 上に 浮かんだ 街の あちこちで\n神に なり損ねた 残骸が うごめいている…',`目標：街の 残骸を 倒す（のこり ${skZanLeft()}体）`]);})))))));});return;}
+      scene('skwake',['トモヤヨシダの 全身を エメラルドの 結晶が 覆う！\n「可能性は… まだ 終わっちゃいない！」','ジョウチャンの 背から 紫の 捕食植物が！\n「喰らい尽くせ……！」','トモヤヨシダ「残骸が 街中に あふれだした！\n俺たちは 塔の 入口を 守る！」','ジョウチャン「街の 残骸を 片付けてくれ。\nそれまで ここは 一歩も 通さない！」'],()=>{returnField();dialog(['── 天空の ナメガワマチ ──','雲の 上に 浮かんだ 街の あちこちで\n神に なり損ねた 残骸が うごめいている…',`目標：街の 残骸を 倒す（のこり ${skZanLeft()}体）`]);})))))))));});return;}
   if(sp.st==='sk_nizu2'){S.ch=Math.max(S.ch,8);save();
     dialog(pages,()=>{BT=null;scene('skyoutai',['胎児の 殻に ひびが 走る……','「ウマレ……ル…… カミガ……」'],()=>
       scene('skgod',['殻を 破って 現れたのは\n人の 姿を 捨てた 縦長の 異形。','背中には 天使の 輪…\n目の 位置には 赤い 溝が 一文字に 走る。','「ワタシハ……カミニ ナッタ」'],()=>
