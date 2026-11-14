@@ -1075,8 +1075,8 @@ function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
-const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?Math.ceil(cstat(id).mp*XR_MPR):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(isXR(id)&&XRSK[id]&&SK[XRSK[id]])b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
+const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*2.2)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
+const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
 /* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
 function gdPinch(){if(typeof BT==='undefined'||!BT||!BT.pt)return false;const n=BT.pt.length,dead=BT.pt.filter(t=>!isAlive(t)).length;let hp=0,mx=0;BT.pt.forEach(t=>{hp+=Math.max(0,G.chars[t.id].hp);mx+=cstat(t.id,t).hp;});return (n>1&&dead>=Math.ceil(n/2))||hp/Math.max(1,mx)<=.3;}
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
@@ -2322,7 +2322,7 @@ function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',en
     case 'gamble':return '丁半博打！ ダメージ倍率が ×0〜×5の\nどれかに なる 運まかせの 攻撃';
     case 'debuff':return `${tg}の 攻撃・魔力・守備・素早さ\n-${pct(1-s.amt)}（${s.turns}ターン）`;
     case 'mprec':return '味方全体の MPを 最大MPの 35% 回復\n（自分は 15%）';
-    case 'xr':return (XR_DESC[k]||'')+`\n消費MP：最大MPの ${Math.round(XR_MPR*100)}%`;
+    case 'xr':return (XR_DESC[k]||'')+`\n消費MP：最大MPの ${Math.round(XR_MPR*100)}%`+(Object.values(XRSK).includes(k)?'\n（XR状態で ない ときは 2.2倍＝最大MPの 全部）':'');
   }return '';}
 function selEnemy(cb,prev){const list=BT.en.map((e,i)=>i).filter(i=>BT.en[i].alive);BT.sub={kind:'enemy',list,cb,prev,m:mkMenu(list.map(i=>BT.en[i].label),{x:124,y:150,w:132,rows:Math.min(4,list.length)})};}
 function selAlly(filter,cb,prev){const list=BT.pt.map((m,i)=>i).filter(i=>filter==='dead'?!isAlive(BT.pt[i]):isAlive(BT.pt[i]));
