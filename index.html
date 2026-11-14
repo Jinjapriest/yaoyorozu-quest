@@ -3497,7 +3497,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...taDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...taDaily());msgs.push(...ajDaily());
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
@@ -5540,9 +5540,11 @@ function skFac(kind){const S=skS(),q=skQ();
       scene('skcity2',['ワクさん「正面から 塔に 乗りこんでも\n住民が 盾に される。 準備が いる」','ワクさん「頼みが 三つ ある」','「ひとつ。 ギョウダの さきたま古墳。\n奴が 何を 調べていたのか 知りたい」','「ふたつ。 フカヤの ネギ畑。\n白服が 畑を 焼こうと してる。 理由が ある はずだ」','「みっつ。 チチブの 武甲山 坑道。\n地下第七層へ 通じる 抜け道が あるらしい」','トモヤヨシダ「頼む。 この 街を… 取り戻したいんだ」','ワクさん「ここに いる 連中は みんな\n家族を 地下に 奪われた。 …俺も だ」','ワクさん「マツゥヤマの 総力で 支える。\n頼んだぞ」'],()=>{S.ch=3;save();dialog([skGoal()]);}));return;}
     const it=[];if(S.ch===4)it.push({t:'地下第七層へ 潜入する（3連戦）',k:'lab'});
     if(S.ch>=2&&S.ch<9)it.push({t:'集落の 人と 話す',k:'vil'});
+    if(S.clear&&!S.ajm)it.push({t:'ワクさんと 話す（渡したい ものが あるらしい）',k:'ajm'});
     it.push({t:'話を 聞く',k:'talk'},{t:'目標を 確かめる',k:'goal'},{t:'やめる',k:'x'});
     listPick('マツゥヤマ　レジスタンスの アジト',it.map(x=>({t:x.t})),i=>{const k=it[i].k;
       if(k==='lab')scene('skchichibu',['武甲山の 抜け道から 地下へ 降りていく…','トモヤヨシダ「この 先が 地下第七層だ」','ジョウチャン「勾玉を 持っていれば\n同期装置の 声に 飲まれずに すむ」'],()=>startGm('sk_lab'));
+      else if(k==='ajm')scene('skhqin',['ワクさん「来てくれたか。 待ってたよ」','ワクさん「この 集落の アジトは\n一枚の 絵巻から 始まったんだ」','ワクさん「描かれた 場所に\n自分だけの 隠れ家が 立ち上がる…\nマツゥヤマ 秘伝の 絵巻さ」','ワクさん「集落は もう 畳む。\nこいつは あんたたちが 持っていてくれ」','【大事なもの】\n「アジトの ヌヌメの 絵巻」を 受け取った！','ワクさん「好きな 場所で 広げてみな。\n仲間を 呼んで、 家具も 置ける。\nあんたたちの 帰る 場所だ」'],()=>{S.ajm=1;save();dialog(['好きな 場所に「アジト」を 建てられる ように なった！\n（メニューの「アジト」から）','アジトには 仲間を 3人まで 呼べる。','家具は 規模「大」以上の 町の「太陽家具」、\nパソコンは「Dスパラ」か「アークン」で 買える。\n（お店も 開店した）']);});
       else if(k==='talk')skTalk();else if(k==='vil')dialog(['集落の 母親「娘が 地下に 送られたの。\n…まだ 生きてるって 信じてる」','元白服の 青年「おれは 毎日 笑えと 命令されてた。\nネギの 匂いで 目が 覚めたんだ」','長老「ここは 箭弓稲荷の 丘。\nお稲荷さまが 逃げ道を 守って くださる」','長老「ワクさんは 26で この 集落を\nまとめあげた。 大した 若者じゃよ」']);else if(k==='goal')dialog([skGoal()]);},skGoal());return;}
   if(kind==='sktower'){
     if(S.ch<6){dialog(['街の 中心に そびえる 白い 塔だ。','白服「関係者以外 立入禁止です。\n笑顔で お引き取りを」']);return;}
@@ -5684,7 +5686,7 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
     dialog(pages,()=>{BT=null;skGuestOff();scene('skgod',['胸の 赤い コアに 亀裂が 走る！','「ワタシハ… カミ… ダ……\nカミ……ナノ…ダ………」','コアが 砕け散った！','天使の 輪が 崩れ 虚無の 胴体は\n音も なく 崩れ去っていく…','ニズゥーイッツァイは 跡形も なく 消滅した。'],()=>
       scene('sksky',['マイナス宇宙が 閉じていく…','天空の ナメガワマチは ゆっくりと\n大地へ 降りていった。'],()=>
       scene('skend',['地下第七層の 扉が 開かれ\n保管されていた 人々が 地上へ 戻ってきた。','クマガヤから 来た 若者たちも\nアツミの もとへ 帰っていく。','ジョウチャン「…生きてる。 俺たちも な」','ワクさん「マツゥヤマの みんな… 帰るぞ。\n自分の 家に」','タガバソウ「人類保管計画は… これで 終わりだ」','前玉神社の 宮司「玉は 閉じこめる ものでは ない。\n人の 幸せを 守る ものです」','住民たちは もう 同じ 言葉を くりかえさない。\n泣いたり 笑ったり している。'],()=>
-      titleCard('人類保管計画編　完',()=>push(skEndingScr(()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！','トモヤヨシダから「ダイナムミソノの 会員カード」、\nジョウチャンから「なかなか 開かない がま口財布」を\n託された！（ふたりの 専用武器）','さらに 好きな 場所に\n「アジト」を 建てられる ように なった！\n（メニューの「アジト」から）','アジトには 仲間を 3人まで 呼べる。\n家具は 規模「大」以上の 町の\n「太陽家具」で 買える。',rw]);}))))));});return;}
+      titleCard('人類保管計画編　完',()=>push(skEndingScr(()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！','トモヤヨシダから「ダイナムミソノの 会員カード」、\nジョウチャンから「なかなか 開かない がま口財布」を\n託された！（ふたりの 専用武器）','ワクさんが「渡したい ものが ある」と\n言っていた。（マツゥヤマへ 行ってみよう）',rw]);}))))));});return;}
   back([]);}
 
 /* ===================== アジト（サキタマ編 クリア報酬） ===================== */
@@ -5722,7 +5724,7 @@ const pcNeedW=b=>pcPart(b,'cpu')[3]+pcPart(b,'gpu')[3]+100;
 const pcLit=b=>PCP.some(([,k])=>pcX(b,k).lit);
 const pcMig=b=>{if(!b||b.v===2)return b;const M={cpu:[0,2,4],cool:[0,2,3],mem:[0,1,3],gpu:[0,2,4],ssd:[0,1,2]};Object.keys(M).forEach(k=>{b[k]=M[k][b[k]||0];});b.mb=0;b.psu=1;b.v=2;return b;};
 const AJ_K=Object.keys(AJ_F).filter(k=>!AJ_F[k].nb&&!AJ_F[k].pc),AJ_KP=Object.keys(AJ_F).filter(k=>AJ_F[k].pc),AJ_KA=Object.keys(AJ_F),AJ_W=14,AJ_H=11,AJ_OX=16,AJ_OY=34,AJ_DX=7;
-const ajOK=()=>!!(G&&G.sk&&G.sk.clear);
+const ajOK=()=>!!(G&&G.sk&&G.sk.clear&&(G.sk.ajm||(G.ajito&&G.ajito.x!=null)));
 function ajS(){if(!G.ajito)G.ajito={x:null,y:null,chars:[],furn:[],inv:{},big:0};const A=G.ajito;A.chars=(A.chars||[]).filter(id=>G.chars[id]);A.furn=A.furn||[];A.inv=A.inv||{};(A.builds||[]).forEach(pcMig);return A;}
 const ajLeft=k=>{const A=ajS();if(k==='rsv')return (A.inv.rsv||0)-A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);return (A.inv[k]||0)-A.furn.filter(f=>f.k===k).length;};
 const ajName=id=>CH[id]?(CH[id]._base?CH[id]._base.name:CH[id].name):id;
@@ -5770,6 +5772,20 @@ function ajDrawAll(npcs,P,mv){ajRoomBg();
   npcs.forEach(n=>list.push({y:n.y,d:()=>drawChar(n.id,AJ_OX+n.x*16,AJ_OY+n.y*16-2,(frame>>4)&1)}));
   if(P){const ox=mv?mv.dx*mv.t:0,oy=mv?mv.dy*mv.t:0;list.push({y:P.y+.5,d:()=>drawChar(G.party[0],AJ_OX+P.x*16+ox,AJ_OY+P.y*16-2+oy,(frame>>3)&1)});}
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());}
+/* ---------- アジトの 光熱費（銀行口座から 引き落とし） ---------- */
+const AJ_EW={pcd:300,pcn:80,mon:30,slot:120,ih:100,water:40,hmini:30,hbair:20,hbpro:60,hstudio:80,hpro:150},AJ_ELEC=new Set(['pcd','pcn','pcj','mon','rack','slot','ih','water','hmini','hbair','hbpro','hstudio','hpro']);
+function ajBill(){const A=ajS();if(A.x==null)return null;let e=200,w=100;const it=[['照明・冷蔵庫など',200,'e'],['生活用水',100,'w']];
+  A.furn.forEach(f=>{let v=0;if(f.k==='pcj'){const b=(A.builds||[])[f.b];v=b?Math.round(pcNeedW(b)*.6):0;}else if(f.k==='rack')v=(f.n||0)*150;else v=AJ_EW[f.k]||0;if(v){e+=v;it.push([f.k==='rack'?`サーバー ${f.n||0}台`:f.k==='pcj'?`自作PC「${((A.builds||[])[f.b]||{}).name||''}」`:AJ_F[f.k].n,v,'e']);}});
+  if(A.furn.some(f=>f.k==='water')){w+=80;it.push(['ウォーターサーバーの 水',80,'w']);}if(A.furn.some(f=>f.k==='ih')){w+=40;it.push(['台所の 水',40,'w']);}
+  (G.garden||[]).forEach((g,i)=>{if(g&&g.c){const v=i<4?30:60;w+=v;it.push([i<4?'畑の 水やり':'田んぼの 水',v,'w']);}});return{e,w,it};}
+function ajDaily(){if(!ajOK())return[];const A=ajS(),bl=ajBill();if(!bl)return[];const B=G.bank,tot=bl.e+bl.w,out=[];
+  if(A.cut){const need=(A.debt||0)+tot;if(B.sav>=need){B.sav-=need;out.push(`アジトの 光熱費の 滞納分を 含め\n${fmt(need)}イェソが 引き落とされた。\n電気と 水道が 復旧した！`);A.cut=0;A.debt=0;A.srvDay=G.day;}else A.debt=(A.debt||0)+tot;return out;}
+  if(B.sav<tot){A.cut=1;A.debt=tot;out.push('アジトの 光熱費が 引き落とせなかった！\n（銀行の 普通預金が 足りない）','アジトの 電気と 水道が 止められた…\n（預金を 入れれば 次の 日に 復旧する）');return out;}
+  B.sav-=tot;A.bill=A.bill||{e:0,w:0,d:0};A.bill.e+=bl.e;A.bill.w+=bl.w;A.bill.d++;
+  if(A.bill.d>=7){out.push(`アジトの 光熱費（${A.bill.d}日分）が\n口座から 引き落とされた。\n電気代 ${fmt(A.bill.e)}イェソ／水道代 ${fmt(A.bill.w)}イェソ`);A.bill={e:0,w:0,d:0};}return out;}
+function ajBillScr(){const A=ajS(),bl=ajBill();if(!bl){dialog('アジトが ない。');return;}const E=bl.it.filter(x=>x[2]==='e'),Wt=bl.it.filter(x=>x[2]==='w');
+  dialog([`【光熱費（1日あたり）】\n電気代 ${fmt(bl.e)}イェソ／水道代 ${fmt(bl.w)}イェソ\n毎日 銀行の 普通預金から 引き落とし`,'電気：\n'+E.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),...(E.length>4?['電気（つづき）：\n'+E.slice(4,8).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n')]:[]),'水道：\n'+Wt.slice(0,4).map(x=>`${x[0]} ${fmt(x[1])}`).join('\n'),
+    A.cut?`※ 滞納中（${fmt(A.debt||0)}イェソ）\n電気と 水道が 止まっている！`:`普通預金：${fmt(G.bank.sav)}イェソ`]);}
 function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
   const P={x:AJ_DX,y:AJ_H-1,dir:'u'},npcs=[],spots=[[3,5],[10,5],[4,8],[10,8],[2,3],[11,3],[6,3]];
   const busy=(x,y,self)=>!ajFloor(x,y)||ajFurnAt(x,y)||(P.x===x&&P.y===y)||npcs.some(n=>n!==self&&n.x===x&&n.y===y);
@@ -5787,17 +5803,17 @@ function ajEnter(){if(!ajOK())return;const A=ajS();sfx('ok');
       P.dir=dy<0?'u':dy>0?'d':dx<0?'l':'r';
       if(dy>0&&P.x===AJ_DX&&P.y===AJ_H-1){pop();sfx('ok');save();return;}
       const nx=P.x+dx,ny=P.y+dy;if(!busy(nx,ny))this.mv={x1:nx,y1:ny,dx,dy,t:0};},
-    drw(){ajDrawAll(npcs,P,this.mv);const tot=AJ_KA.filter(k=>k!=='rsv').reduce((s,k)=>s+(A.inv[k]||0),0);
+    drw(){ajDrawAll(npcs,P,this.mv);if(A.cut){ctx.globalAlpha=.55;R(0,AJ_OY,W,AJ_H*16+4,'#000010');ctx.globalAlpha=1;txt('（電気が 止まっている）',128,AJ_OY+4,'#fc7460','center');}const tot=AJ_KA.filter(k=>k!=='rsv').reduce((s,k)=>s+(A.inv[k]||0),0);
       txt(`仲間 ${A.chars.length}/3　家具 ${A.furn.length}/${tot}`,8,22,'#bcbcbc');
       if(P.x===AJ_DX&&P.y===AJ_H-1)txt('↓ 外に 出る',248,22,'#f8d878','right');}};
   push(scr);
   {const dl=fkDone()?amzDeliver():null;if(dl)dialog(dl);}
-  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=ns*5000*d;A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
+  {const ns=A.furn.reduce((t,f)=>t+(f.k==='rack'?(f.n||0):0),0);if(ns&&A.cut){A.srvDay=G.day;}else if(ns&&A.srvDay!=null&&G.day>A.srvDay){const d=Math.min(30,G.day-A.srvDay),y=ns*5000*d;A.srvDay=G.day;G.coins+=y;save();dialog(['サーバーの 運用収入が 入っていた！',`サーバー ${ns}台 × ${d}日分\n${fmt(y)}イェソ`]);}else if(ns&&A.srvDay==null)A.srvDay=G.day;}
   if(!A.seen){A.seen=1;save();dialog(['ここが 自分だけの アジトだ！','Bボタンの メニューから 家具を 置いたり\n仲間を 3人まで 呼んだり できる。','家具は 規模「大」以上の 町の\n「太陽家具」、 パソコン関係は\n「Dスパラ」か「アークン」で 買える。']);}
 }
 function ajRoomMenu(P,npcs,sync){const A=ajS();
-  const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['外に 出る','とじる']);
-  choice('',OPT,rr=>{const lab=OPT[rr];if(lab==='庭に 出る'){gardenScr();return;}if(lab==='料理を 食べる'){eatScr();return;}const r=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'].indexOf(lab);
+  const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['光熱費を 見る','外に 出る','とじる']);
+  choice('',OPT,rr=>{const lab=OPT[rr];if(lab==='庭に 出る'){gardenScr();return;}if(lab==='料理を 食べる'){eatScr();return;}if(lab==='光熱費を 見る'){ajBillScr();return;}const r=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'].indexOf(lab);
     if(r===0){const ks=AJ_KA.filter(k=>ajLeft(k)>0);if(!ks.length){dialog(A.furn.length?'置ける 家具が もう ない。\n（太陽家具で 買い足そう）':'まだ 家具を 持っていない。\n規模「大」以上の 町の「太陽家具」で 買おう。');return;}
       listPick('どの 家具を 置く？',ks.map(k=>({t:AJ_F[k].n,r:`のこり${ajLeft(k)}`})),i=>ajPlace(ks[i],P,npcs));}
     else if(r===1){if(!A.furn.length){dialog('置いてある 家具は ない。');return;}
@@ -5821,6 +5837,7 @@ function ajPlace(k,P,npcs){const A=ajS(),h=AJ_F[k].h||1,wd=AJ_F[k].w||1;let cx=M
       ctx.strokeStyle=good?'#58f898':'#fc7460';ctx.lineWidth=1;ctx.strokeRect(sx+.5,sy+.5,wd*16-1,h*16-1);
       win(4,216,248,22);txt(k==='rsv'?'サーバーラックを 選ぶ　A：載せる　B：やめる':`${AJ_F[k].n}：十字で 移動　A：置く　B：やめる`,10,222,good?'#fcfcfc':'#fc7460','left',236);}});}
 function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
+  if(A.cut&&AJ_ELEC.has(f.k)){dialog([`${F.n}は 動かない…`,'電気と 水道が 止められている。\n（銀行の 普通預金に お金を 入れよう）']);return;}
   if(f.k==='bed'){choice('ベッドで 休みますか？',['はい','いいえ'],r=>{if(r!==0)return;fullHeal();sfx('heal');save();dialog(['……','ぐっすり 眠った。\n仲間全員の HP・MPが 全回復した！']);});return;}
   if(f.k==='shelf'){const B=['『八百万の 神々 図鑑』\n…ずいぶん 読みこんである。','『人類保管計画 調査報告書』\n…あの 戦いの 記録だ。','『TAインダストリアル 社史』\n帝愛の 子会社の あゆみが 書いてある。','『ネギの 育て方 〜サキタマ篇〜』\n深谷の 土が いいらしい。','『パチスロ 必勝本』\n「設定6は 甘い」…そりゃ そうだ。','『アイヂ 旅行ガイド』\n…次の 旅に 備えておこう。'];
     dialog(B[Math.floor(rnd()*B.length)]);return;}
@@ -6242,7 +6259,7 @@ function gardenScr(){ckS();let cur=0;const P=G.garden,kind=i=>i<4?0:1,pos=i=>i<4
   const stage=p=>{if(!p.c)return -1;const g=GD_C[p.c],d=G.day-p.d;return d>=g.d?2:d>=1?1:0;};
   push({full:true,upd(){if(I.B){pop();save();return;}
       if(I.pr)cur=cur<4?4+Math.floor(cur/2):cur;if(I.pl)cur=cur>=4?(cur-4)*2+1:cur%2?cur-1:cur;if(I.pd)cur=cur<4?Math.min(3,cur+2):5;if(I.pu)cur=cur<4?Math.max(0,cur-2):4;
-      if(!I.A)return;const p=P[cur],st=stage(p);
+      if(!I.A)return;if(ajS().cut){dialog('水道が 止まっていて 水やりが できない…\n（銀行の 普通預金に お金を 入れよう）');return;}const p=P[cur],st=stage(p);
       if(st===2){const g=GD_C[p.c];G.food[g.c]=(G.food[g.c]||0)+g.y;G.foodH[g.c]=(G.foodH[g.c]||0)+g.y;p.c=null;sfx('lvup');save();dialog([`${g.n}を ${g.y}つ 収穫した！`,'（自家製の 材料で 料理すると\n　成功しやすく 効果も 長く 続く）']);return;}
       if(st>=0){const g=GD_C[p.c];dialog(`${g.n}が 育っている。\n収穫まで あと ${g.d-(G.day-p.d)}日`);return;}
       const S=Object.keys(GD_C).filter(k=>GD_C[k].t===kind(cur)&&ckHave(k)>0);
