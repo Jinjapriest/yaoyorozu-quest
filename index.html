@@ -5007,9 +5007,9 @@ function tiEscape(){const T=tiS();
 function tiEscBattle(){const T=tiS();choice('昇降機の 前に 黒服の 部隊が 待ち構えている！\n強行突破しますか？（2連戦）',['突破する','やめる'],r=>{if(r!==0){tiHub();return;}
     if(T.clear){startGm('ti_escape');return;}
     scene('chika',['昇降機の 前に 黒服の 部隊…','その 奥から 紫の スーツの 男が 現れた。','タガバソウ「…コブシデ！」','帝愛 幹部 コブシデ「久しいな タガバソウ。\n実験に 反対して 地下に 落ちた 負け犬が」','「その 実験体は 返して もらおう。\n大事な データの 塊なのでな」','タガバソウ「…あんたたち、 これを 持っていけ」\n（TAインダストリアルの 権利書を 託された）','タガバソウ「いくぞ！」'],()=>startGm('ti_escape'));},96);}
-function tiTimeout(){const T=tiS();
-  dialog([`地下 ${TI_DAYS}日目を 迎えた…`,`借金は まだ ${fmt(T.debt)}ペリコ 残っている。`,'黒服「時間切れだ。 地上へ 放り出せ」'],()=>{G.shockUntil=G.day+5;G.shockHard=1;G.party.forEach(fixHp);G.ti={ch:0,per:0};save();returnField();
-    dialog(['地上に 放り出された…','あまりの ショックで 力が 100分の1に なった…\n5日の あいだ ショック状態が 続く。','（帝城を 訪ねると もう一度 挑める）']);});}
+function tiTimeout(){const T=tiS(),rest=T.debt;
+  dialog([`地下 ${TI_DAYS}日目を 迎えた…`,`借金は まだ ${fmt(rest)}ペリコ 残っている。`,'黒服「時間切れだ。 延長の 地下労働に 回せ」'],()=>
+    scene('chika',['タガバソウ「待て！」','タガバソウは 作業着の 裏地を 破り\n分厚い 札束を 取り出した。','タガバソウ「幹部時代に 隠しておいた ペリコじゃ。\n残りは わしが 払う」',`タガバソウが ${fmt(rest)}ペリコを 融資してくれた！`,'黒服「……チッ。 完済を 確認した」','タガバソウ「礼は いらん。\n…あんたたちを 地上に 帰すと 決めたんじゃ」'],()=>{T.loan=rest;T.debt=0;sfx('coin');save();tiEscape();}));}
 const TI_SHOP=[{n:'冷えた 缶ビール',p:30000,d:'パーティ 全回復＋明日まで 経験値1.2倍',f:()=>{fullHeal();G.morning=Math.max(G.morning||0,1);return '冷えた ビールが 五臓六腑に しみわたる…！';}},
   {n:'焼き鳥（つくね）',p:20000,d:'やくそう ×10',f:()=>{G.items.herb+=10;return 'やくそうを 10個 もらった。';}},
   {n:'ガチャチケット',p:100000,d:'ガチャチケット ×1',f:()=>{G.items.tk++;return 'ガチャチケットを 1枚 手に入れた。';}},
