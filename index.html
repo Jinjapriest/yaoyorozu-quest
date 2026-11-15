@@ -435,10 +435,10 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>{const fe=document.fullscreenElement||document.webkitFullscreenElement;if(!fe&&fsNative){fsNative=false;fsSet(false);}}));
 
 /* ===================== 基本データ（読み込みデータと同じ書式） ===================== */
-const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'}];
+const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'},{n:'XXR',c:'#f8d878',lab:'開発者'}];
 const RATES=[45,32,16,6,.9,.1];
-const rcol=r=>r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const rcol=r=>r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
+const WT={'パソコン':{a:1.6,m:1.6},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid'];
 const BASE_SKILLS={
@@ -606,6 +606,7 @@ const BASE_PACK={
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
+    {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
     {id:'shoin',name:'導きの師 吉田松陰',short:'松陰',rarity:'LR',weapon:'any',hp:170,mp:170,atk:14,mag:30,def:28,spd:14,skills:['ishin_vg','oyagokoro'],look:{head:'samurai',hair:'#202020',body:'#3c3c5c',accent:'#f8f0d8',legs:'#2c2c3c',held:'扇'}},
     {id:'pierrot',name:'ピエロ',short:'ピエロ',rarity:'SR',weapon:['メイス'],hp:64,mp:22,atk:16,mag:10,def:9,spd:13,skills:['gogo'],look:{head:'hood',hood:'#f8b800',body:'#d82800',accent:'#fcfcfc',legs:'#3cbcfc',held:'メイス'}},
     {id:'zangyo',name:'残業明けの サラリーマン',short:'サラリーマン',rarity:'N',weapon:['メイス'],hp:40,mp:8,atk:9,mag:3,def:6,spd:5,skills:['zg_drink','zg_punch'],look:{head:'hair',hair:'#282828',body:'#24306c',accent:'#d82800',legs:'#3c3c3c',held:'メイス'}},
@@ -637,7 +638,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_eiria','エイリア石','UR','神器',80],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',260],['w_eiria','エイリア石','UR','神器',80],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -761,12 +762,12 @@ function registerPack(p,src){
 function loadPacks(){try{const s=localStorage.getItem(PKEY);const a=s?JSON.parse(s):[];return Array.isArray(a)?a:[];}catch(e){return[];}}
 function savePacks(a){try{localStorage.setItem(PKEY,JSON.stringify(a));return true;}catch(e){return false;}}
 function rebuild(){
-  CH={};WPD={};SK={};BANNERS=[];
+  if(typeof ITSUKU_SK!=='undefined')ITSUKU_SK=null;CH={};WPD={};SK={};BANNERS=[];
   registerPack(BASE_PACK,'基本');
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho'];
+const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc'];
 const hasSkW=(cid,w)=>{const c=G&&G.chars[cid];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes(w);};
 const hasTgPhone=id=>{const c=G&&G.chars[id];return !!c&&id==='tagaba'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_tgphone');};
 const WSK={w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
@@ -1087,7 +1088,8 @@ function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
 const XRSK={takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*1.5)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(id==='takao'&&isXR(id)?['shoranjo','chogeishi']:(d.sk||[])).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
+var ITSUKU_SK=null;const itsukuSk=()=>{if(ITSUKU_SK)return ITSUKU_SK;const S=new Set();for(const d of Object.values(CH)){if(d.id==='itsuku')continue;(d.sk||[]).forEach(k=>S.add(k));}Object.values(XRSK).forEach(k=>S.add(k));['shoranjo','chogeishi'].forEach(k=>S.add(k));return ITSUKU_SK=[...S].filter(k=>SK[k]);};
+const skillsOf=id=>{if(id==='itsuku'){const b=itsukuSk().slice();if(typeof wSkills==='function')wSkills(id).forEach(k=>{if(!b.includes(k))b.push(k);});return b;}const d=CH[id];let b=(id==='takao'&&isXR(id)?['shoranjo','chogeishi']:(d.sk||[])).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
 /* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
 function gdPinch(){if(typeof BT==='undefined'||!BT||!BT.pt)return false;const n=BT.pt.length,dead=BT.pt.filter(t=>!isAlive(t)).length;let hp=0,mx=0;BT.pt.forEach(t=>{hp+=Math.max(0,G.chars[t.id].hp);mx+=cstat(t.id,t).hp;});return (n>1&&dead>=Math.ceil(n/2))||hp/Math.max(1,mx)<=.3;}
 let xrNews=[];const XR_MUL=2.4,XR_LV=100,XR_LVS={takao:40},xrCand=id=>!!CH[id]&&(id==='buddha'||id==='takao'||isGod(id));
@@ -1097,7 +1099,7 @@ const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.cha
 const XR_ALWAYS=['michizane'];/* 道真公は 他のXRと 並んでも 常に XR */
 const xrLead=()=>G&&G.party?G.party.find(id=>xrReady(id)&&!XR_ALWAYS.includes(id)):null;
 const isXR=id=>xrReady(id)&&(XR_ALWAYS.includes(id)||!G.party||!G.party.includes(id)||xrLead()===id);
-const crar=id=>isXR(id)?6:Math.min(5,CH[id].rar);
+const crar=id=>isXR(id)?6:CH[id].rar===7?7:Math.min(5,CH[id].rar);
 function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane'||id==='tagaba')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
   if(isXR(id)){if(id==='takao'){d.name='フルクマの守護者 タカヲマニワ';d.short='守護者タカヲ';}else{d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}}else{d.name=d._base.name;d.short=d._base.short;}}}
 function addWeapon(id){const w=G.weapons[id];if(w){w.dup=Math.min(999,w.dup+1);return false;}G.weapons[id]={lv:1,exp:0,dup:0};return true;}
@@ -1125,7 +1127,7 @@ const hasGaius=id=>{const c=G.chars[id];return !!c&&[baseW(c.wpn),baseW(c.wpn2)]
 function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=d.type;
   if(d.rar===6&&b!=='w_umegae'&&b!=='w_tgphone'&&b!=='w_misono'&&b!=='w_gamaguchi'&&b!=='w_kinsho')L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
   if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
-  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');else if(t==='書')L.push('導きの師 吉田松陰 専用（Lv制限なし）');
+  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');else if(t==='書')L.push('導きの師 吉田松陰 専用（Lv制限なし）');else if(t==='パソコン')L.push('開発者神主 タムライツク 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
   if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
   if(b==='w_kinbat')L.push('装備すると：','\t攻撃する たびに 金メッキが 剥がれ','\t攻撃力が 10%ずつ 下がる（戦闘中・最低 30%）','\t専用技「剥がれる」（強打。 攻撃力が 20% 下がる）');
@@ -1140,7 +1142,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -1265,6 +1267,7 @@ function drawHeld(t,P,acc){
     case '会員カード':P(12,8,4,3,'#d82800');P(12,9,4,1,'#f8b800');break;
     case 'がま口':P(12,8,4,4,'#a05000');P(12,7,4,1,'#f8b800');break;
     case '書':P(12,7,4,5,'#5c3c24');P(13,8,3,3,'#e8dcc0');P(12,7,1,5,'#2c1c10');break;
+    case 'パソコン':P(12,6,5,4,'#3c3c3c');P(13,7,3,2,'#1c1c2c');P(14,7,1,2,'#fcfcfc');P(11,10,7,2,'#7c7c7c');break;
     case '片手剣':P(14,4,1,7,'#d8d8d8');P(13,10,3,1,'#f8b800');break;
     case '両手剣':P(13,0,2,11,'#d8d8d8');P(12,10,4,1,'#f8b800');P(13,11,2,2,'#7c4c10');break;
     case '刀':P(14,2,1,9,'#fcfcfc');P(13,10,3,1,'#000');break;
@@ -1289,6 +1292,7 @@ function drawWIcon(id,x,y,sc=1){
     case '扇':for(let r=0;r<8;r++){const w=Math.round(Math.sqrt(64-r*r));P(8-w,9-r,w*2,1,r%2?col:'#fcfcfc');}P(7,9,2,6,'#7c4c10');break;
     case '弓':for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#a05000');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#bcbcbc');P(12,7,2,3,col);break;
     case '会員カード':P(2,4,12,8,'#d82800');P(2,4,12,2,'#f8b800');P(3,7,6,1,'#fcfcfc');P(3,9,4,1,'#fcfcfc');P(10,8,3,3,'#f8b800');P(13,3,1,2,col);break;
+    case 'パソコン':P(2,2,12,8,'#3c3c3c');P(3,3,10,6,'#14142c');P(4,4,3,2,'#3cbcfc');P(8,3,1,2,'#fcfcfc');P(9,5,1,2,'#fcfcfc');P(8,7,1,2,'#fcfcfc');P(10,4,1,1,'#fcfcfc');P(0,10,16,3,'#7c7c7c');P(1,10,14,1,'#bcbcbc');P(3,11,10,1,'#5c5c5c');P(12,12,2,2,col);P(13,1,1,1,'#f8f800');P(14,0,1,1,'#f8f800');break;
     case '書':P(3,3,10,11,'#5c3c24');P(4,4,8,9,'#e8dcc0');P(3,3,1,11,'#2c1c10');P(5,6,6,1,'#7c7c7c');P(5,8,6,1,'#7c7c7c');P(5,10,4,1,'#7c7c7c');P(7,4,2,2,'#d82800');break;
     case 'がま口':P(3,6,10,8,'#a05000');P(4,7,8,6,'#c87c3c');P(3,5,10,2,'#f8b800');P(5,3,2,3,'#f8b800');P(9,3,2,3,'#f8b800');P(6,2,1,1,'#fce0a8');P(10,2,1,1,'#fce0a8');P(13,3,1,2,col);break;
     case 'スマホ':P(5,1,7,14,'#1c1c1c');P(6,2,5,10,'#3cbcfc');P(6,2,5,2,'#a4e4fc');P(7,13,3,1,'#5c5c5c');P(7,5,3,1,'#fcfcfc');P(7,7,2,1,'#fcfcfc');P(12,3,1,2,col);break;
@@ -1322,6 +1326,7 @@ function drawEnemy(e,x,y,t){
   const c1=e.c1,c2=e.c2,K='#000000',Wt='#fcfcfc';
   switch(e.shape){
     case 'kendo':drawKendo(x,y,t);break;
+    case 'itsuku':drawItsuku(x,y,t);break;
     case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
     case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;
@@ -1706,7 +1711,7 @@ function charDetail(id,after){
       L.forEach((l,k)=>txt(l,12+(k%2)*120,76+Math.floor(k/2)*12,'#fcfcfc','left',116));
       txt('武器：'+(wNames(id)||'なし')+(spearPair(id)?'（双槍 全ステ+175%）':twoSlot(id)?'（2つまで）':''),12,114,spearPair(id)?rcol(6):'#fcfcfc','left',236);
       txt('装備：'+(d.wt==='any'?'すべて':d.wt.join('・'))+'（神器はだれでも'+(isGod(id)?'・神宝も':'')+(id==='buddha'?'・仏具も':id==='yarimasu'?'・飲料も':id==='beatkun'?'・マイクも':id==='snipekun'?'・狙撃銃も':'')+'）',12,126,'#bcbcbc','left',236);
-      txt('スキル：'+skillsOf(id).map(k=>SK[k].name).join('・'),12,140,isXR(id)?'#f8d878':'#fcfcfc','left',236);
+      txt(id==='itsuku'?`スキル：全キャラの 固有スキル（${skillsOf(id).length}種）`:'スキル：'+skillsOf(id).map(k=>SK[k].name).join('・'),12,140,id==='itsuku'?rcol(7):isXR(id)?'#f8d878':'#fcfcfc','left',236);
       if(d.src!=='基本')txt('追加データ：'+d.src,12,153,'#7c7c7c','left',236);
       menuDraw(m,a);
     }});
@@ -1803,7 +1808,7 @@ function rollRar(min){
   return k;
 }
 /* ガチャに 出ない キャラ（宝箱などで 入手） */
-const NOGACHA_C=['michizane'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
+const NOGACHA_C=['michizane','itsuku'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
 function poolFor(b,rar){
   const all=(b.type==='weapon'?wpList():chList().filter(p=>!noGachaC(p.id))).filter(p=>p.rar===rar);
   return all;
@@ -1926,7 +1931,7 @@ function openGacha(){
       }else if(st==='rates'){
         win(4,46,248,192);
         txt('提供割合',14,54,'#f8b800');
-        RAR.forEach((r,k)=>txt(`${r.n}${r.lab?'（'+r.lab+'）':''} ${RATES[k]}%`,14+(k%2)*120,68+Math.floor(k/2)*12,rcol(k),'left',116));
+        RAR.slice(0,7).forEach((r,k)=>txt(`${r.n}${r.lab?'（'+r.lab+'）':''} ${RATES[k]}%`,14+(k%2)*120,68+Math.floor(k/2)*12,rcol(k),'left',116));
         txt('10連ごとに SSR以上1つ・100連は UR以上1つ確定',14,106,'#fcfcfc','left',228);txt('かぶると 基礎Lv+1（基礎能力+10%）',14,118,'#fcfcfc','left',228);
         let y=132;txt('ラインナップ（★はピックアップ）',14,y,'#f8b800');y+=12;
         for(let r=5;r>=0&&y<224;r--){const l=poolFor(b,r);if(!l.length)continue;
@@ -2014,12 +2019,18 @@ function trialBoss(){const L=trialBossList(),d=L[Math.floor(rnd()*L.length)],e=m
   e.maxhp=e.hp=Math.max(10,Math.round(S.reduce((a,x)=>a+x.hp,0)*TK.hp*m));
   e.atk=Math.max(1,Math.round(Math.max(av('atk'),av('mag'))*TK.atk*m));e.mag=e.atk;e.def=Math.max(1,Math.round(av('def')*TK.def*m));e.spd=Math.round(av('spd')*1.05);
   e.magic=true;e.dboss=true;e.trial=1;return e;}
+/* 20回に 1回：開発者神主 タムライツク（超絶強敵） */
+function devBoss(){const e=trialBoss();e.name='開発者神主 タムライツク';e.c1='#fcfcfc';e.c2='#5cc8c8';e.shape='itsuku';e.w=56;e.h=74;
+  e.maxhp=e.hp=Math.round(e.maxhp*5);e.atk=Math.round(e.atk*1.8);e.mag=e.atk;e.def=Math.round(e.def*1.5);e.spd=Math.round(e.spd*1.3);e.multi=2;e.heavy=1;e.dev=1;return e;}
 function trialTalk(npc){const g=npc.trial==='guji',T_=G.trial||{w:0,l:0};
   const intro=g?['宮司 タムラダイジ「よう 参られた。\nわしは この 明木神社の 宮司、 タムラダイジじゃ」','「全てが 始まった この 地で\nそなたの 力、 試させて もらおう」']:['禰宜 タムライツク「禰宜の タムライツクです」','「万物が 生まれた この 地で…\nあなたの 本当の 力を 見せてください」'];
   dialog(intro,()=>choice(`明木の 試練に 挑みますか？\n相手は これまでの 強敵の 誰か…\n（試練 ${T_.w}勝 ${T_.l}敗）`,['挑む','やめる'],r=>{if(r!==0)return;
     G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'trial',by:npc.trial});},96));}
 function trialWin(pages){const T_=G.trial=G.trial||{w:0,l:0,m:1};T_.w++;T_.m=(T_.m||1)*1.06;G.items.b[4]=(G.items.b[4]||0)+10;G.items.o[4]=(G.items.o[4]||0)+10;
   const ur=rnd()<.2;if(ur)G.items.urtk=(G.items.urtk||0)+1;
+  if(BT.sp.dev){T_.dev=(T_.dev||0)+1;const lucky=rnd()<1/65536;pages.push('開発者神主 タムライツク「…まさか 開発者が 負けるとは。\nおみごとです」');
+    if(lucky){const nw=addChar('itsuku');addWeapon('w_brokenpc');fullHeal();sfx('g5');pages.push('タムライツク「…この ゲーム、 まだ バグだらけで。\nよければ 一緒に 直して いきましょう」',nw?'XXR 開発者神主 タムライツクが 仲間に なった！':`開発者神主 タムライツクの 基礎Lvが あがった！（基礎Lv ${G.chars.itsuku.dup+1}）`,'専用武器「壊れたパソコン」を 手に入れた！','（タムライツクは 全キャラの 固有スキルを 使える）');}
+    else pages.push('タムライツク「では、 開発に 戻ります。\n…あ、 バグ 見つけたら 教えてくださいね」','開発者は デバッグ画面の 中へ 消えていった…');}
   pages.push(BT.sp.by==='guji'?'宮司 タムラダイジ「見事じゃ…！\nそなたこそ まことの 勇者よ」':'禰宜 タムライツク「すごい…！\nあなたなら この 先も きっと 大丈夫です」',`明木の 試練を 乗りこえた！（${T_.w}勝目）\n経験値祝詞・極上鉱石 ×10${ur?'\nUR確定チケット ×1':''}`,'（次の 試練は 少し 手強くなる）');}
 function trialLose(){const T_=G.trial=G.trial||{w:0,l:0,m:1};T_.l++;T_.m=(T_.m||1)*.96;const by=BT.sp.by;
   dialog(['ぜんめつ してしまった…',by==='guji'?'宮司 タムラダイジ「まだまだ 修行が 足りぬのう。\nまた いつでも 来なされ」':'禰宜 タムライツク「大丈夫ですか？\n…また 挑戦してくださいね」','（試練では イェソは 減らない）'],()=>{fullHeal();returnField();});}
@@ -2058,7 +2069,7 @@ function startBattle(boss,rift=null,sp=null){
   else if(sp&&sp.kind==='dict'){const D=dinfo(VIL[sp.vi]),dt=VIL[sp.vi].tier>=11?11:9,ff=dt===11?DICT_F:1;for(let k=0;k<2;k++){const e=mkEnemy(dt,['しんえいたい','bones','#3c3c3c','#d82800']);e.name='親衛隊';for(const q of ['maxhp','hp','atk','def'])e[q]=Math.round(e[q]*1.2*ff);if(ff>1)e.mag=Math.round(e.mag*ff);en.push(e);}
     const g=mkEnemy(dt,[D.boss,D.shape,D.c1,D.c2]);if(ff>1)for(const q of ['maxhp','hp','atk','def','mag'])g[q]=Math.round(g[q]*ff);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*6);for(const q of ['atk','def','mag'])g[q]=Math.round(g[q]*1.6);g.mag=g.atk;g.magic=true;g.dboss=true;en.splice(1,0,g);}
   else if(sp&&sp.kind==='gunma')gmEnemies(sp,en);
-  else if(sp&&sp.kind==='trial'){en.push(trialBoss());}
+  else if(sp&&sp.kind==='trial'){if(sp.dev==null)sp.dev=rnd()<1/20;en.push(sp.dev?devBoss():trialBoss());}
   else if(sp&&sp.kind==='uorochi'){const g=mkEnemy(12,['裏オロチ','oni','#24003c','#a800a8']);g.shape='orochi';g.w=120;g.h=80;for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*20);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.8);g.magic=true;g.dboss=true;en.push(g);
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F);}
   else if(sp&&sp.kind==='ukaiho'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(12,ETIER[9][ri(0,2)]);e.name='裏峰の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F*.22*sp.mult);en.push(e);}}
@@ -2108,7 +2119,8 @@ function startBattle(boss,rift=null,sp=null){
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
-  if(sp&&sp.kind==='trial')BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ${en[0].name}！」`,`${en[0].name}が あらわれた！\n（明木の 試練）`);
+  if(sp&&sp.kind==='trial'&&sp.dev)BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ……ん？」`,'空間に ノイズが はしった…！\nデバッグ画面が ひらいていく…','？？？「…テストプレイ中に 失礼します。\nこの ゲームの 開発者です」',`${en[0].name}が あらわれた！\n（超絶強敵）`);
+  else if(sp&&sp.kind==='trial')BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ${en[0].name}！」`,`${en[0].name}が あらわれた！\n（明木の 試練）`);
   if(sp&&sp.kind==='uorochi')BT.pend.push('裏オロチ「千の 峰に 積もった 怨念…\nすべて 喰らいつくしてくれる！！」');
   if(sp&&sp.kind==='gimwild')BT.pend.push('残滓「血だ… 血を よこせえええ！！」\n総書記の 怨念が 襲いかかってきた！');
   if(sp&&sp.kind==='ura')BT.pend.push(sp.round<4?`裏闘技場　${URA_ROUNDS[sp.round-1]}`:'ギム総書記「死ねえええ！！」\n憎悪の 炎が 闘技場を つつんだ！');
@@ -2246,6 +2258,9 @@ function eAct(i){
   if(e.passive){P_(`${e.label}は 静かに 脈打っている…`);return;}if(e.stun>0){P_(e.charm===2?`${e.label}は 雷に しびれて 動けない！`:e.charm?`${e.label}は ももに 見とれて 動けない…`:`${e.label}は 荒波に のまれて 動けない！`);return;}
   const tz=BT.taunt&&BT.taunt.t>0&&isAlive(BT.pt[BT.taunt.i])?BT.pt[BT.taunt.i]:null;
   if(tz){const p=e.heavy&&rnd()<.25?1.8:1;P_(`${e.label}は 仏陀に 引きよせられた！`);P_(()=>isAlive(tz)?dmgParty(tz,Math.max(phys(e.atk,cstat(tz.id,tz).def,p),e.magic?magd(e.mag,cstat(tz.id,tz).def,.8):0)):null);return;}
+  if(e.dev){const r=rnd();if(r<.3){P_(`${e.label}は 開発者権限で\nみかたの ステータスを いじった！`);P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>()=>isAlive(m)?dmgParty(m,magd(e.mag,cstat(m.id,m).def,1)):null));return null;});return;}
+    if(r<.42&&e.hp<e.maxhp*.6){P_(`${e.label}は 大幣を ふった！\n「祓へ給へ 清め給へ」`);P_(()=>{const v=Math.min(e.maxhp-e.hp,Math.round(e.maxhp*.08));e.hp+=v;sfx('heal');return `${e.label}の HPが ${fmt(v)} 回復した！`;});return;}
+    if(r<.55){const m=al[ri(0,al.length-1)];P_(`${e.label}は 壊れたパソコンで なぐりかかった！`);P_(()=>isAlive(m)?dmgParty(m,phys(e.atk,cstat(m.id,m).def,2)):null);return;}}
   if(e.boss&&rnd()<.4){P_(`${e.label}は 八つの首から 炎を はいた！`);P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>()=>isAlive(m)?dmgParty(m,magd(e.mag,cstat(m.id,m).def,.9)):null));return null;});return;}
   if(e.magic&&rnd()<.45){P_(`${e.label}は あやしい ほのおを はなった！`);P_(()=>{NOW(BT.pt.filter(isAlive).map(m=>()=>isAlive(m)?dmgParty(m,magd(e.mag,cstat(m.id,m).def,.7)):null));return null;});return;}
   const m=al[ri(0,al.length-1)];let p=1;
@@ -4083,7 +4098,7 @@ const g4=(b,o)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)
 const LB3=[{t:'経験値祝詞×1000\n極上鉱石×1000\n金景品（大）×100',s:'祝詞・極上\n×1000\n大景品100',give:()=>{g4(1000,1000);G.items.tok[0]+=100;}},
   ...[2,3,4,5,6].map(()=>({t:'経験値祝詞×1000\n極上鉱石×1000',s:'祝詞・極上\n×1000',give:()=>g4(1000,1000)})),
   {t:'経験値祝詞×2000\n極上鉱石×2000\nガチャチケット×1000',s:'祝詞・極上\n×2000\n券×1000',give:()=>{g4(2000,2000);G.items.tk+=1000;}}];
-const LBH_EX=['w_gaius','w_umegae','w_misono','w_gamaguchi','w_tgphone','w_kinsho'];
+const LBH_EX=['w_gaius','w_umegae','w_misono','w_gamaguchi','w_tgphone','w_kinsho','w_brokenpc'];
 const LBH=[{t:'好きな URキャラ\n好きな UR・XR武器',s:'URキャラ\nUR・XR\n武器',give:()=>{G.lbPick=(G.lbPick||[]).concat(['urc','urw']);}},
   {t:'1,000億イェソ',s:'1,000億\nイェソ',give:()=>{noCount(()=>{G.coins+=1e11;});}},
   {t:'経験値祝詞×5000',s:'経験値\n祝詞\n×5000',give:()=>{G.items.b[4]=(G.items.b[4]||0)+5000;}}];
@@ -5121,6 +5136,22 @@ function drawKobushideR(x,y,t){const top=y-80,S='#3c2858',S2='#2c1c40',Sk='#e8c0
   R(x+2,top+20,4,2,(t>>3)&1?'#f80000':'#fc7460');R(x+2,top+19,5,1,'#000');R(x+5,top+22,1,2,'#bcbcbc');
   R(x-4,top+26,7,1,'#a81000');R(x-3,top+27,1,1,'#fcfcfc');R(x+1,top+27,1,1,'#fcfcfc');
   R(x-3,top+30,6,3,'#5c5c64');R(x-1,top+29,2,5,'#f80000');R(x-5,top+31,2,1,'#7c7c84');R(x+3,top+31,2,1,'#7c7c84');}
+/* 開発者神主 タムライツク：黒の 短髪・白衣・浅葱の 袴・白足袋。 手を 前で 組み、 横に 壊れたパソコンが 浮かぶ */
+function drawItsuku(x,y,t){const Sk='#f0c8a0',Hr='#141414',Wt='#fcfcfc',Ws='#d4d4e4',Hk='#5cc8c8',Hk2='#3c9ca4';
+  ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);
+  for(let k=0;k<10;k++){const ph=(t*1.1+k*37)%46;R(x-22+(k*11)%44,y-6-ph,1,3,k%3?'#00d800':'#7cfc7c');}/* 流れる コード */
+  R(x-8,y-3,6,3,Wt);R(x+2,y-3,6,3,Wt);/* 白足袋 */
+  for(let r=0;r<23;r++){const w=9+Math.floor(r*.22);R(x-w,y-26+r,w*2,1,Hk);}
+  R(x-5,y-24,1,21,Hk2);R(x+4,y-24,1,21,Hk2);R(x-1,y-22,1,19,Hk2);R(x-11,y-27,22,2,Hk2);/* 袴の ひだと 紐 */
+  R(x-10,y-44,20,18,Wt);for(let k=0;k<9;k++){R(x-5+(k>>1),y-44+k,1,1,Ws);R(x+4-(k>>1),y-44+k,1,1,Ws);}R(x-1,y-36,2,9,Ws);
+  R(x-17,y-42,7,17,Wt);R(x+10,y-42,7,17,Wt);R(x-17,y-26,7,1,Ws);R(x+10,y-26,7,1,Ws);R(x-11,y-40,1,14,Ws);R(x+10,y-40,1,14,Ws);/* 広い 袖 */
+  R(x-4,y-31,8,4,Sk);R(x-4,y-29,8,1,'#d8a880');R(x-2,y-31,1,4,'#d8a880');/* 組んだ 手 */
+  R(x-2,y-46,4,2,Sk);R(x-7,y-59,14,13,Sk);R(x-8,y-62,16,5,Hr);R(x-8,y-58,2,5,Hr);R(x+6,y-58,2,5,Hr);R(x-6,y-57,5,2,Hr);R(x,y-57,3,1,Hr);
+  R(x-4,y-53,2,1,'#000');R(x+2,y-53,2,1,'#000');R(x-2,y-49,4,1,'#b06050');R(x-6,y-51,2,1,'#f8a8a0');R(x+4,y-51,2,1,'#f8a8a0');
+  const b=(t>>4)&1,fl=(t>>2)&1;R(x+16,y-25+b,15,3,'#7c7c7c');R(x+17,y-25+b,13,1,'#bcbcbc');R(x+17,y-37+b,13,12,'#3c3c3c');R(x+18,y-36+b,11,10,fl?'#14142c':'#24306c');
+  R(x+19,y-35+b,3,2,'#3cbcfc');R(x+24,y-36+b,1,3,Wt);R(x+25,y-33+b,1,3,Wt);R(x+24,y-30+b,1,3,Wt);R(x+26,y-35+b,1,1,Wt);/* ひび */
+  if(fl){R(x+30,y-40+b,1,2,'#f8f800');R(x+31,y-42+b,1,2,'#f8f800');R(x+16,y-39+b,1,2,'#f8f800');}
+  ctx.restore();}
 function drawTagaba(x,y,t,big_){const S='#1c1c1c',S2='#3c3c3c',Wt='#fcfcfc',Hr='#e4e4e4',Gd='#a88a3c',Wk='#6c6448',Sk='#e8c098',Dirt='#8c7058';
   if(big_){ctx.save();ctx.translate(x,y);ctx.scale(1.2,1.2);ctx.translate(-x,-y);for(let k=0;k<10;k++){const ph=(t*1.2+k*41)%40;R(x-18+(k*13)%36,y-8-ph,2,2,k%2?'#f8b800':'#fce0a8');}}
   /* 地下足袋と 作業ズボン */
