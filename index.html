@@ -485,6 +485,7 @@ const BASE_SKILLS={
   yarimasu:{name:'やりますねぇ！',mp:14,target:'allies',kind:'song',power:1.3,amount:.7,turns:4,verb:'ほめちぎった'},
   senpaiage:{name:'先輩の背中',mp:12,target:'enemies',kind:'phys',power:2.1,verb:'見せつけた'},
   nichirin:{name:'日輪の恵み',mp:0,target:'allies',kind:'mprec',verb:'さずけた'},
+  nantoka:{name:'まぁ、なんとかなるやろ',mp:60,target:'enemies',kind:'xr',verb:'つぶやいた'},
   ujigami:{name:'氏神バースト',mp:60,target:'enemies',kind:'xr',verb:'解き放った'},
   unabarising:{name:'ウナバライジング',mp:60,target:'enemies',kind:'xr',verb:'巻き起こした'},
   nightparry:{name:'ナイトパーリィ',mp:60,target:'allies',kind:'xr',verb:'はじめた'},
@@ -1120,7 +1121,7 @@ function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
-const XRSK={takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
+const XRSK={takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga',umagami:'nantoka'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*1.5)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
 var ITSUKU_SK=null;const itsukuSk=()=>{if(ITSUKU_SK)return ITSUKU_SK;const S=new Set();for(const d of Object.values(CH)){if(d.id==='itsuku')continue;(d.sk||[]).forEach(k=>S.add(k));}Object.values(XRSK).forEach(k=>S.add(k));['shoranjo','chogeishi'].forEach(k=>S.add(k));return ITSUKU_SK=[...S].filter(k=>SK[k]);};
 const skillsOf=id=>{if(id==='itsuku'){const b=itsukuSk().slice();if(typeof wSkills==='function')wSkills(id).forEach(k=>{if(!b.includes(k))b.push(k);});return b;}const d=CH[id];let b=(id==='takao'&&isXR(id)?['shoranjo','chogeishi']:(d.sk||[])).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
@@ -2315,6 +2316,11 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st(),F=BT
           sfx('magic');BT.shake=12;return '「喰らい尽くせ……！」\n大地を 割って 紫の 捕食植物が 現れた！';}
         if(k==='teiaiou'){BT.pt.forEach(t=>FH(t));live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.5));e.mag=Math.round(e.mag*DB(.5));e.def=Math.round(e.def*DB(.7));}e.deb=4;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))):null));sfx('heal');BT.shake=14;return '4・5・6！ 大逆転の シゴロ返し！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵の 攻撃・魔力 半減（4ターン）＋最大HPの 30% 削る！';}
         if(k==='ranryo'){const L=live();NOW(L.map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))+phys(me.atk,e.def,3)):null));BT.pt.forEach(t=>{t.ab=Math.max(t.ab||0,4);t.av=Math.max(t.av||0,.8*F);});L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.6));e.mag=Math.round(e.mag*DB(.6));}e.deb=Math.max(e.deb||0,4);});sfx('magic');BT.shake=18;return '恐ろしい 仮面を つけた 陵王が 舞う…！\n敵全体に 大ダメージ！\nみかたの 攻撃力 +80%・敵の 攻撃・魔力 -40%（4ターン）';}
+        if(k==='nantoka'){const hk=rnd()<.5;push(nantokaScr(hk));BT.pt.forEach(t=>FH(t));
+          if(hk){NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*(e.dboss?.1:.45)*F))+phys(me.atk,e.def,6*F)):null));sfx('g5');BT.shake=22;
+            return 'サイキナヲ「まぁ、 なんとかなるやろ」\n…最後の 最後の 最後で 本気を 出した！\nみかた全員 全回復！ 敵全体に 超絶ダメージ！';}
+          BT.pt.forEach(t=>{t.ab=t.db=3;t.av=t.dv=.5*F;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,phys(me.atk,e.def,3*F)):null));sfx('heal');BT.shake=6;
+          return 'サイキナヲ「まぁ、 なんとかなるやろ」\n…本当に なんとか なった！\nみかた全員 全回復！ 攻撃・守備 +50%（3ターン）！';}
         if(k==='yuiga'){m.db=5;m.dv=4*F;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
         return null;}
 function pExtra(i){const m=BT.pt[i];if(!isAlive(m)||!(m.extra>0))return;BT.pend.push('\f');const nm=CH[m.id].short;
@@ -5611,6 +5617,30 @@ function predScr(hpA,atA){let t=0;const END=170;
       else if(t<100){skGrid(SK_JA,SKPURP,20,110,3);const hx=Math.min(150,60+(t-60)*4);skGrid(SK_JA.slice(0,10).map(r=>r.slice(13)),SKPURP,hx,70,6);if(t>70)big('ガブッ！！',150,180,'#fcfcfc','center',26);}
       else{skGrid(SK_JA,SKPURP,92,100,3);for(let x=10;x<W;x+=18){const y=200+(x%3);R(x-2,y,5,1,'#9c6cc8');R(x,y-2,1,5,'#9c6cc8');R(x,y,1,1,'#f8d8f8');}
         txtS(`HP -${fmt(hpA)}　攻撃 -${fmt(atA)}`,128,40,'#fc7460','center');if(t>120)txtS(`HP +${fmt(hpA)}　攻撃 +${fmt(atA)}`,128,60,'#f8d8f8','center');}
+      region(0,0,W,H,()=>{vA=true;});}};}
+/* 馬神サイキナヲ 固有スキル「まぁ、なんとかなるやろ」 */
+function nantokaScr(hk){let t=0;const END=230;
+  return{full:true,upd(){t++;if(t===20)sfx('ok');if(t===62)sfx('magic');if(t===112)sfx(hk?'g5':'heal');if(hk&&t===150)sfx('hit');if(t>=END||(t>60&&I.A))pop();},
+    drw(){const ph=t<60?0:t<110?1:t<190?2:3;
+      if(ph<2||(!hk&&ph>=2)){const pastel=ph>=2;R(0,0,W,H,pastel?'#a8e4fc':'#f8a860');R(0,0,W,60,pastel?'#68ccfc':'#e45c10');R(0,60,W,40,pastel?'#c8f0fc':'#fcb878');pc(200,pastel?40:96,16,pastel?'#fcfcfc':'#f8d878');
+        R(0,170,W,70,pastel?'#58d854':'#2c7c2c');for(let i=0;i<14;i++)R(i*20+((t>>3)%2),178+(i%3)*12,6,2,pastel?'#80d010':'#1c5c1c');
+        if(pastel)for(let i=0;i<16;i++){const fx=(i*41)%W,fy=180+(i*23)%50;R(fx,fy,3,3,i%2?'#f878f8':'#fcfcfc');R(fx+1,fy+1,1,1,'#f8b800');}}
+      if(ph===0){ctx.save();ctx.translate(88,92);ctx.scale(5,5);drawChar('umagami',0,0,0);ctx.restore();
+        for(let k=0;k<3;k++){const zy=80-((t*.8+k*14)%40);txtS('z',176+k*8+Math.sin((t+k*20)/8)*3,zy,'#fcfcfc','left');}
+        if(t>12)txtS('ふわぁ…',128,40,'#fcfcfc','center');if(t>36)big('まぁ、',128,200,'#fcfcfc','center',20);}
+      else if(ph===1){const b=Math.max(0,8-(t-60))*Math.sin(t)*.8;ctx.save();ctx.translate(88,92+b);ctx.scale(5,5);drawChar('umagami',0,0,(t>>3)&1);ctx.restore();
+        win(8,176,240,50);big('なんとかなるやろ',128,190+Math.round(b),'#f8d878','center',22);for(let k=0;k<6;k++){const q=t/10+k;R(128+Math.cos(q)*70,120+Math.sin(q)*50,2,2,'#fcfcfc');}}
+      else if(hk&&ph===2){const u=t-110;R(0,0,W,H,u<4?'#fcfcfc':'#140c00');
+        for(let k=0;k<24;k++){const y=(k*37)%H,len=20+(k*13)%40,x=W-((u*12+k*53)%(W+len));R(x,y,len,1,k%3?'#f8b800':'#fcfcfc');}
+        R(0,170,W,3,'#fcfcfc');for(let i=0;i<10;i++)R(W-((u*8+i*30)%W),160,2,10,'#fcfcfc');
+        const hx=-80+u*4.2;ctx.save();ctx.translate(hx,110);ctx.scale(4,4);drawHorse(0,0,'#f8b800',t,'#d82800');ctx.restore();
+        if(u>8)big('最後の 最後の 最後で',128,30,'#fcfcfc','center',14);if(u>24)big('本 気 ！！',128,56,'#f8b800','center',30);
+        if(u>40&&u<46)R(0,0,W,H,'#fcfcfc');}
+      else if(!hk&&ph===2){const u=t-110;ctx.save();ctx.translate(88,90);ctx.scale(5,5);drawChar('umagami',0,0,(t>>4)&1);ctx.restore();
+        R(170,110,10,10,'#fcfcfc');R(172,112,6,6,'#58a838');R(180,112,3,4,'#fcfcfc');for(let k=0;k<3;k++)R(173+k*2,104-((u+k*6)%10),1,4,'#fcfcfc');
+        txtS('ズズッ…（お茶を すする）',128,30,'#fcfcfc','center');if(u>30)big('…ほんとに なんとか なった',128,206,'#2c5c2c','center',14);}
+      else{R(0,0,W,H,hk?'#140c00':'#a8e4fc');ctx.save();ctx.translate(88,70);ctx.scale(5,5);drawChar('umagami',0,0,(t>>4)&1);ctx.restore();
+        win(8,166,240,60);txtS('みかた全員 全回復！',128,176,'#58f898','center');txtS(hk?'敵全体に 超絶ダメージ！':'攻撃・守備 +50%（3ターン）',128,194,hk?'#fc7460':'#f8d878','center');}
       region(0,0,W,H,()=>{vA=true;});}};}
 /* 物語用：ふたりの 覚醒（改良型 ネブカドネザル） */
 function skAwakeScr(cb){let t=0;const END=200;
