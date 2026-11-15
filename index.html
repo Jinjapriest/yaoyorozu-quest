@@ -1612,7 +1612,8 @@ const CODE_KIND=[
   {n:()=>'XR 捕食植物 タケウチジョウチャン',give:(g,a)=>{for(let i=0;i<a;i++)addChar('jouchan');applyXR();fullHeal();},u:'体'},
   {n:()=>'XR ダイナムミソノの 会員カード',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_misono');},u:'枚'},
   {n:()=>'XR なかなか 開かない がま口財布',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gamaguchi');},u:'個'},
-  {n:()=>'UR エイリア石',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_eiria');},u:'個'}];
+  {n:()=>'UR エイリア石',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_eiria');},u:'個'},
+  {n:()=>'XXR 開発者神主 タムライツク＋\n専用武器 壊れたパソコン',give:(g,a)=>{for(let i=0;i<a;i++){addChar('itsuku');addWeapon('w_brokenpc');}fullHeal();},u:'セット'}];
 function makeCode(kind,grade,amount,serial){const pl=kind*68719476736+grade*17179869184+amount*16384+serial,ck=cChk(pl),c=cEnc(xor40(pl,cMask(ck)))+cEnc(ck);return c.match(/.{4}/g).join('-');}
 function readCode(raw){const t=String(raw).toUpperCase().replace(/[^0-9A-Z]/g,'');if(t.length!==16||[...t].some(c=>!CODE_AL.includes(c)))return null;
   const ck=cDec(t.slice(8)),pl=xor40(cDec(t.slice(0,8)),cMask(ck));if(cChk(pl)!==ck)return null;
