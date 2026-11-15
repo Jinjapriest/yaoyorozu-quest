@@ -6811,13 +6811,23 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'ウルサイボルト',d:'異国の 稲妻。 ゲートでも パドックでも\nとにかく うるさいが、 走れば 世界最速。\n短距離（1400mまで）なら 手が つけられない！',w:()=>3.8,pace:1.7,sprint:1,rr:.3,ultra:1},
   {name:'キリュウヨシピデ',d:'スタートの 名手。 ゲートが 開いた 瞬間に\n先頭に 立つ ロケットスタート。\n短距離が 得意。',w:()=>2.4,pace:1.5,turbo:1,sprint:1,rr:.6},
   {name:'クロカワカヅキ',d:'障害の 中距離 職人。\n一定の リズムで 柵を 越えつづける。\n障害2880〜3300mが いちばん 得意。',w:()=>2.3,pace:1,jumper:1,jmid:1,jh:1.5,rr:.6},
-  {name:'ミャモトダイスケ',d:'ダートの 短距離で 伸びる 若き 快速馬。\n後半に ぐんぐん 加速する。\n砂の 短距離なら 大物食いも！',w:()=>2.3,pace:.2,sprint:1,dirt:1,rr:.6}];
+  {name:'ミャモトダイスケ',d:'ダートの 短距離で 伸びる 若き 快速馬。\n後半に ぐんぐん 加速する。\n砂の 短距離なら 大物食いも！',w:()=>2.3,pace:.2,sprint:1,dirt:1,rr:.6},
+  {name:'ジャスティスガトリング',d:'ウルサイボルトの 永遠の ライバル。\nボルトが 出る レースには たいてい 出てくる。\n短距離の 実力者。',w:()=>3,pace:1.5,sprint:1,rr:.4,rival:1},
+  {name:'オオタマカリン',d:'しなやかな フォームの 短距離 牝馬。\n最後まで 伸びの ある 走りが 持ち味。\n短距離が 得意。',w:()=>2.3,pace:1.1,sprint:1,rr:.6},
+  {name:'ベンジョソン',d:'筋骨 隆々の 短距離馬。 異常に 速いが\nレース後の 検査で 失格に なることが 多い…',w:()=>4.5,pace:1.9,sprint:1,dq:.55,rr:.5},
+  {name:'モハメソッドファラー',d:'長距離の 王者。 じっと 後ろで 構え、\n最後の 1周で 一気に 抜き去る。\n2400m以上で 本領 発揮。',w:()=>2.5,pace:.25,stayer:1,rr:.6},
+  {name:'ケビナシシッピ',d:'どんな 距離でも 崩れない 安定感の 持ち主。\n得意も 苦手も ない オールラウンダー。',w:()=>2.6,pace:1,rr:.6},
+  {name:'ノアホントズ',d:'マイルから 中距離（1600〜2000m）の 名手。\n先行して そのまま 押しきる。',w:()=>2.4,pace:1.3,mile:1,rr:.6},
+  {name:'チェプテゲィ',d:'砂も 芝も 関係ない 長距離の 鉄人。\n淡々と ペースを 刻み、 後続を ちぎる。\n2400m以上なら 最強クラス。',w:()=>2.6,pace:1,stayer:1,rr:.5}];
+/* ライバル：ウルサイボルトが 出ると ジャスティスガトリングも 高い 確率で 出る */
+function kRival(horses,r){const B=KRARE.findIndex(K=>K.name==='ウルサイボルト'),Gt=KRARE.findIndex(K=>K.rival);if(!horses.some(h=>h.rare===B)||horses.some(h=>h.rare===Gt)||r()>=.75)return;
+  const free=horses.map((h,i)=>i).filter(i=>horses[i].rare==null&&horses[i].mine==null);if(!free.length)return;const i=free[Math.floor(r()*free.length)],K=KRARE[Gt];horses[i]={name:K.name,jk:horses[i].jk,kg:480+Math.floor(r()*30),cd:1,w:K.w(r),rare:Gt};}
 /* 激レア馬の 主戦騎手と 障害の 得意・不得意 */
 /* 激レア騎手 ラフカディオ＝ハァン：八雲で とくに よく 乗る。 乗った 馬は 不思議な 力で 強くなる */
 const RJK={name:'ラフカディオ＝ハァン',d:'海の 向こうから 来た 激レア騎手。\n八雲の 地を 愛し、 怪談を 語りながら 馬を 導く。\n乗った 馬は 不思議な 力で 強くなる。',mul:1.7};
 function kRareJk(horses,r,p){if(r()>=p)return;const i=Math.floor(r()*8);if(horses[i].rare!=null||horses[i].mine!=null)return;horses[i].jk=RJK.name;horses[i].rjk=1;horses[i].w*=RJK.mul;}
 function kRareFix(horses,dist){const j=/^障害/.test(dist);horses.forEach(h=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;const m_=parseInt(dist.replace(/\D/g,''))||0;if(K.jumper){h.w*=j?(K.long?(m_>=3300?2.4:1.6):K.short?(m_<=2880?2.8:m_<=3300?2:1.3):K.jmid?(m_>=2880&&m_<=3300?2.5:1.5):2):(K.long?.6:.4);}
-  else if(K.sprint){h.w*=j?.4:m_<=1400?2.4:m_<=1800?1:.45;}if(K.dirt)h.w*=/^ダ/.test(dist)?1.4:.8;});}
+  else if(K.sprint){h.w*=j?.4:m_<=1400?2.4:m_<=1800?1:.45;}else if(K.stayer){h.w*=j?.5:m_>=2400?2.4:m_>=2000?1.5:.6;}else if(K.mile){h.w*=j?.5:m_>=1600&&m_<=2000?2.2:.8;}if(K.dirt)h.w*=/^ダ/.test(dist)?1.4:.8;});}
 const kRarePick=r=>{const T=KRARE.reduce((a,K)=>a+(K.rr||1),0);let x=r()*T;for(let k=0;k<KRARE.length;k++){x-=KRARE[k].rr||1;if(x<0)return k;}return 0;};
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
@@ -6831,7 +6841,7 @@ function keibaCard(vi){G.keiba=G.keiba||{};const no=keibaRaceNo()||12,r=lcg(vi*6
   {const U=G.uma;if(U&&U.entry!=null&&U.horses[U.entry]){const H=U.horses[U.entry],slot=Math.floor(r()*8);horses[slot]={name:H.name,jk:'主戦 '+(H.jk||'駒田 一騎'),kg:H.kg||480,cd:1,w:Math.pow(H.ab,2.2),mine:U.entry,dope:H.dope};}}
   {const ch=horses.find(h=>h.rare!=null&&KRARE[h.rare].charm);if(ch)horses.forEach(h=>{if(h!==ch)h.w*=KRARE[ch.rare].charm;});}
   const bb=BABA[Math.min(3,Math.floor(r()*r()*4.5))],dist=sp?(sp.dist||'芝2400m'):KDIST[Math.floor(r()*KDIST.length)];
-  kRareFix(horses,dist);kRareJk(horses,r,.015);const nz=bb[1],top3=new Array(8).fill(0),pair={};
+  kRival(horses,r);kRareFix(horses,dist);kRareJk(horses,r,.015);const nz=bb[1],top3=new Array(8).fill(0),pair={};
   for(let a=0;a<8;a++)for(let b=0;b<8;b++){if(b===a)continue;const pab=keibaProbOrd(horses,[a,b],nz),key=[a,b].sort((x,y)=>x-y).join('-');pair[key]=(pair[key]||0)+pab;
     for(let c=0;c<8;c++){if(c===a||c===b)continue;const q=keibaProbOrd(horses,[a,b,c],nz);top3[a]+=q;top3[b]+=q;top3[c]+=q;}}
   const pop=horses.map((h,i)=>i).sort((a,b)=>horses[b].w-horses[a].w);horses.forEach((h,i)=>h.pop=pop.indexOf(i)+1);
@@ -7019,7 +7029,7 @@ function chihoCard(L){const no=chihoRaceNo(L)||12,r=lcg((L.vi+1)*7919+G.day*97+n
   else if(L.chuo&&r()<.06){const k=kRarePick(r),K=KRARE[k],slot=Math.floor(r()*8);horses[slot]={name:K.name,jk:horses[slot].jk,kg:470+Math.floor(r()*40),cd:1,w:K.w(r),rare:k,saiki:K.saiki};}
   let dist;if(sp)dist=sp.dist;else if(L.dw){const T_=L.dw.reduce((a,x)=>a+x,0);let x=r()*T_,k=0;for(;k<L.dw.length-1;k++){x-=L.dw[k];if(x<0)break;}dist=L.dist[k];}else dist=L.dist[Math.floor(r()*L.dist.length)];
   if(L.chuo&&/^障害/.test(dist)&&!horses.some(h=>h.rare!=null)&&r()<.15){const J_=KRARE.map((K,i)=>K.jumper?i:-1).filter(i=>i>=0),k=J_[Math.floor(r()*J_.length)],slot=Math.floor(r()*8);horses[slot]={name:KRARE[k].name,jk:horses[slot].jk,kg:470+Math.floor(r()*30),cd:1,w:KRARE[k].w(r),rare:k};}
-  kRareFix(horses,dist);kRareJk(horses,r,L.chuo?.06:.01);const top3=new Array(8).fill(0),pair={};
+  kRival(horses,r);kRareFix(horses,dist);kRareJk(horses,r,L.chuo?.06:.01);const top3=new Array(8).fill(0),pair={};
   for(let a=0;a<8;a++)for(let b=0;b<8;b++){if(b===a)continue;const pab=keibaProbOrd(horses,[a,b],nz),key=[a,b].sort((x,y)=>x-y).join('-');pair[key]=(pair[key]||0)+pab;
     for(let c=0;c<8;c++){if(c===a||c===b)continue;const q=keibaProbOrd(horses,[a,b,c],nz);top3[a]+=q;top3[b]+=q;top3[c]+=q;}}
   const pop=horses.map((h,i)=>i).sort((a,b)=>horses[b].w-horses[a].w);horses.forEach((h,i)=>h.pop=pop.indexOf(i)+1);
