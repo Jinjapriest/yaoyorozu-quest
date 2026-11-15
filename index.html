@@ -239,14 +239,22 @@ function clockBadge(){const n=isNight(),w=dow();win(196,21,56,28);txt(clockStr()
 const KPOST=[595,625,655,685,735,765,795,825,855,890,940,980];
 const keibaDay=()=>dow()===6||dow()===0;
 const CHIHO=[
-  {id:'minamiura',vn:'南浦の村',name:'南浦',night:1,days:[6,0,1],post:[...Array(12)].map((_,k)=>880+k*33),dist:['ダ800m','ダ1300m','ダ1400m','ダ1600m','ダ1900m'],
+  {id:'minamiura',vn:'南浦の村',name:'南浦',night:1,harib:1,days:[6,0,1],post:[...Array(12)].map((_,k)=>880+k*33),dist:['ダ800m','ダ1300m','ダ1400m','ダ1600m','ダ1900m'],
    H1:['ヨサコイ','クロシオ','カツオ','ハリマヤ','ユズ','ナンゴク','ミナミウラ','シマント','ムロト','アシズリ','サンゴ','ボンタン','ドロメ','ヒロメ','タタキ','ナガオドリ','ハマカゼ','ヤシノキ'],
    H2:['オー','ボーイ','ダッシュ','スター','キング','ヒメ','ライデン','ドリーム','マーチ','パワー','クイーン','ナイト'],J1:['南浦','黒潮','浜田','汐見','港川','岬','砂浜','夜灯'],J2:['一騎','駿','疾風','翔','蓮','大地','光','凛'],
    info:['南浦競馬場は 地方競馬の ナイター開催。\n砂の ダートコースを 8頭が 走る。','土・日・月の 夕方から 夜に 12レース。\n（1R 14:40 〜 12R 20:43）','負け続けても 走りつづける 愛され馬が\nここには たまに 出走する らしい…']},
   {id:'shimono',vn:'霜野の村',name:'霜野',banei:1,days:[6,0,1],post:[...Array(12)].map((_,k)=>870+k*33),dist:['直線200m'],
    H1:['シモノ','カイタク','ダイチ','イワオ','ゲンキ','オオヨロイ','テツワン','ゴウリキ','フブキ','シラカバ','ホクト','ムサシ','キンタロウ','ユキミチ','ツチクレ','ハガネ','ゲンヤ','ヒグマ'],
    H2:['ドン','オー','タイショウ','リキ','マル','パワー','ゴー','ヒメ','キング','ホマレ','カゼ','イチバン'],J1:['霜野','開拓','白樺','雪田','原野','大鋤','氷川','土橋'],J2:['剛','力','大樹','雪丸','鉄平','岳','耕作','拓'],
-   info:['ばんえい競馬：重い ソリを 曳いて\n直線200mを 進む 力くらべ。','コースには 2つの 坂（障害）。\n第2障害の 前で 息を 入れ、 一気に 越える！','馬場の 水分が 多いほど ソリが 軽く なる。\n水分が 多い日は 波乱も 起きやすい。','土・日・月の 午後から 夜に 12レース。\n（1R 14:30 〜 12R 20:33）']}];
+   info:['ばんえい競馬：重い ソリを 曳いて\n直線200mを 進む 力くらべ。','コースには 2つの 坂（障害）。\n第2障害の 前で 息を 入れ、 一気に 越える！','馬場の 水分が 多いほど ソリが 軽く なる。\n水分が 多い日は 波乱も 起きやすい。','土・日・月の 午後から 夜に 12レース。\n（1R 14:30 〜 12R 20:33）']},
+  {id:'kawase',vn:'川瀬の里',name:'川瀬',days:[3,4,5],post:[...Array(12)].map((_,k)=>630+k*32),dist:['ダ820m','ダ1230m','ダ1400m','ダ1700m','ダ1870m'],
+   H1:['カワセ','セセラギ','アユ','ミナモ','カワラ','ドテ','ワタシブネ','ホタル','カジカ','ヤナギ','ツツミ','キヨセ','ナガレ','ミズベ','イシバシ','コイノボリ','サザナミ','ヨシキリ'],
+   H2:['オー','ボーイ','ダッシュ','スター','キング','ヒメ','ジェット','ドリーム','ブレイブ','マーチ','ロード','カワ'],J1:['川瀬','水辺','堤','柳田','石橋','岸本','瀬川','中洲'],J2:['一騎','駿','疾風','翔','蓮','大地','光','凛'],
+   info:['川瀬競馬場は 川ぞいの 小さな 地方競馬。\n砂の ダートコースを 8頭が 走る。','水・木・金の 昼に 12レース。\n（1R 10:30 〜 12R 16:22）','平日も 競馬を 楽しめる。']},
+  {id:'akatsuki',vn:'暁の村',name:'暁',days:[0,1,2],post:[...Array(12)].map((_,k)=>640+k*32),dist:['芝1000m','芝1600m','芝2400m','ダ1200m','ダ1600m','ダ2000m'],
+   H1:['アカツキ','アサヒ','ヒノデ','アケボノ','シノノメ','トウホウ','アサギリ','ハツヒ','ヨアケ','ハヤテ','コガネ','ナンブ','ユキゲ','カゲロウ','ヒガシ','オオゾラ','ハテノ','アオモリ'],
+   H2:['オー','ボーイ','スター','キング','ヒメ','ライデン','ジェット','ドリーム','マーチ','パワー','クイーン','ホシ'],J1:['暁','朝日','東雲','日出','曙','大空','果野','早瀬'],J2:['一騎','駿','疾風','翔','蓮','大地','光','凛'],
+   info:['暁競馬場は 東の はての 地方競馬。\n地方では めずらしい 芝コースも ある。','日・月・火の 昼に 12レース。\n（1R 10:40 〜 12R 16:32）']}];
 const keibaRaceNo=()=>{if(!keibaDay())return 0;const m=nowMin(),i=KPOST.findIndex(t=>t>=m);return i<0?0:i+1;};
 function keibaClosed(){const m=nowMin();
   if(!keibaDay())return[`本日（${DOWN[dow()]}曜日）は 開催日では ありません。`,'競馬は 土曜・日曜の 開催です。\n（1R 9:55 〜 12R 16:20　メインは 11R）'];
@@ -6930,7 +6938,7 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
       drw(){const pr=i=>{const q=Math.min(1.12,t/(LEN*fin[i]));if(card.horses[i].rare!=null&&KRARE[card.horses[i].rare].turbo)return q<1?Math.min(1,Math.pow(q,.8)):q;if(card.horses[i].saiki){if(t<50)return 0;const q2=Math.min(1.12,(t-50)/(LEN*fin[i]-50));return q2<1?Math.pow(q2,res.honki?4.5:1.6)*(res.honki?1:.97):q2;}return Math.max(0,q<1?q+(pace[i]-1)*.06*Math.sin(q*Math.PI):q);};
         const pos=card.horses.map((h,i)=>pr(i)*DIST),lead=Math.max(...pos),cam=Math.min(DIST-200,Math.max(0,lead-170));
         R(0,0,W,H,L&&L.night?'#0c0c34':'#68ccfc');R(0,28,W,30,'#3c3c3c');for(let k=0;k<40;k++){const x=((k*13-cam*.3)%W+W)%W;R(x,32+(k%3)*8,4,5,['#d82800','#fcfcfc','#f8b800','#0058f8'][k%4]);}
-        R(0,58,W,6,'#fcfcfc');R(0,64,W,140,L?'#a0703c':'#00a800');for(let y=70;y<200;y+=16)R(0,y,W,1,L?'#946434':'#00b800');if(L&&L.night)for(let k=0;k<6;k++){const x=((k*53-cam*.3)%W+W)%W;R(x,26,2,30,'#5c5c5c');R(x-4,24,10,4,(frame>>4)&1?'#fcfcd8':'#f8f8a0');}R(0,204,W,4,'#fcfcfc');
+        R(0,58,W,6,'#fcfcfc');const dirt=L&&!/^芝/.test(card.dist);R(0,64,W,140,dirt?'#a0703c':'#00a800');for(let y=70;y<200;y+=16)R(0,y,W,1,dirt?'#946434':'#00b800');if(L&&L.night)for(let k=0;k<6;k++){const x=((k*53-cam*.3)%W+W)%W;R(x,26,2,30,'#5c5c5c');R(x-4,24,10,4,(frame>>4)&1?'#fcfcd8':'#f8f8a0');}R(0,204,W,4,'#fcfcfc');
         for(let k=0;k<30;k++){const x=k*60-(cam%60);R(x,60,2,8,'#fcfcfc');R(x,200,2,8,'#fcfcfc');}
         {const gx=DIST+20-cam;if(gx<W+10){R(gx,56,3,152,'#d82800');R(gx-4,48,11,10,'#fcfcfc');txtS('G',gx+1,50,'#d82800','center');}}
         card.horses.forEach((h,i)=>{const x=pos[i]-cam+20,y=70+i*16;if(x>-20&&x<W+10){if(h.rare!=null){for(let k=0;k<3;k++)R(Math.round(x)-4-((t*2+k*7)%14),y+2+k*3,3,1,(t>>2)&1?'#f8b800':'#fcfcfc');}drawHorse(x,y,KCOL[i],t+i*3,KCOL[i]==='#fcfcfc'?'#bcbcbc':KCOL[i]);}txtS(String(i+1),Math.max(2,Math.min(W-8,x-6)),y+1,KCOL[i]==='#000000'?'#7c7c7c':KCOL[i]);});
@@ -6977,15 +6985,15 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
 /* ===================== 地方競馬（小さな 町の 近く） ===================== */
 /* 南浦競馬場：南国の ナイター競馬（高知系）／ばんえい霜野競馬場：重い ソリを 曳く ばんえい競馬 */
 function chihoRaceNo(L){if(!L.days.includes(dow()))return 0;const m=nowMin(),i=L.post.findIndex(t=>t>=m);return i<0?0:i+1;}
-function chihoClosed(L){const m=nowMin(),info=`（土・日・月 開催　1R ${hm(L.post[0])} 〜 12R ${hm(L.post[11])}）`;
-  if(!L.days.includes(dow()))return[`本日（${DOWN[dow()]}曜日）は 開催日では ありません。`,`${L.banei?'ばんえい':''}${L.name}競馬場は 土曜・日曜・月曜の 開催です。\n${info}`];
+function chihoClosed(L){const m=nowMin(),dn=L.days.map(d=>DOWN[d]).join('・'),info=`（${dn} 開催　1R ${hm(L.post[0])} 〜 12R ${hm(L.post[11])}）`;
+  if(!L.days.includes(dow()))return[`本日（${DOWN[dow()]}曜日）は 開催日では ありません。`,`${L.banei?'ばんえい':''}${L.name}競馬場は ${L.days.map(d=>DOWN[d]+'曜').join('・')}の 開催です。\n${info}`];
   if(m<L.post[0]-60)return[`まだ 開門前です。（開門 ${hm(L.post[0]-60)}）`,info];
   if(!chihoRaceNo(L))return['本日の 全レースは 終了しました。','またの ご来場を お待ちしております。'];return null;}
 function chihoCard(L){const no=chihoRaceNo(L)||12,r=lcg((L.vi+1)*7919+G.day*97+no*29),used=new Set();
   const horses=[0,1,2,3,4,5,6,7].map(i=>{let n;do{n=L.H1[Math.floor(r()*L.H1.length)]+L.H2[Math.floor(r()*L.H2.length)];}while(used.has(n));used.add(n);
     const sp=.55+r()*r()*1.3,cd=.85+r()*.3;let j;do{j=L.J1[Math.floor(r()*L.J1.length)]+' '+L.J2[Math.floor(r()*L.J2.length)];}while(used.has(j));used.add(j);
     return{name:n,jk:j,kg:L.banei?900+Math.floor(r()*250):420+Math.floor(r()*80),cd:Math.round(cd*100)/100,w:Math.pow(sp*cd,2.2)};});
-  if(!L.banei&&r()<.06){const slot=Math.floor(r()*8),K=KRARE[0];horses[slot]={name:K.name,jk:horses[slot].jk,kg:430+Math.floor(r()*30),cd:1,w:K.w(r),rare:0};}
+  if(L.harib&&r()<.06){const slot=Math.floor(r()*8),K=KRARE[0];horses[slot]={name:K.name,jk:horses[slot].jk,kg:430+Math.floor(r()*30),cd:1,w:K.w(r),rare:0};}
   let baba,nz;if(L.banei){const wm=Math.round((.5+r()*r()*8)*10)/10;baba=`水分${wm}%`;nz=.14+wm*.035;}else{const bb=BABA[Math.min(3,Math.floor(r()*r()*4.5))];baba=bb[0];nz=bb[1]+.03;}
   const dist=L.dist[Math.floor(r()*L.dist.length)],top3=new Array(8).fill(0),pair={};
   for(let a=0;a<8;a++)for(let b=0;b<8;b++){if(b===a)continue;const pab=keibaProbOrd(horses,[a,b],nz),key=[a,b].sort((x,y)=>x-y).join('-');pair[key]=(pair[key]||0)+pab;
@@ -7412,16 +7420,19 @@ function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push
   for(let k=0;k<3;k++){C[3][6+k]={t:'kboard',k:k+1};}C[4][5]={t:'kvote',k:0};
   for(const y of [7,9])for(let x=4;x<=12;x++)if(x!==8)C[y][x]={t:'kseat'};
   C[h-1][8]={t:'exit'};
-  const r=lcg(vi*577+G.day*31),npcs=[{x:3,y:5,col:'#503000',hair:'#3c3c3c',line:'係員「こちらは 馬券の 窓口。\nコクラ競馬場の レースが 買えますよ」'},{x:13,y:5,col:'#0058f8',hair:'#000000',line:'係員「こちらは 舟券の 窓口。\n各地の ボートレース場の レースが 買えます」'},
+  const r=lcg(vi*577+G.day*31),npcs=[{x:3,y:5,col:'#503000',hair:'#3c3c3c',line:'係員「こちらは 馬券の 窓口。\n中央と 地方の 競馬場の レースが 買えますよ」'},{x:13,y:5,col:'#0058f8',hair:'#000000',line:'係員「こちらは 舟券の 窓口。\n各地の ボートレース場の レースが 買えます」'},
     {x:6,y:6,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「モニターの 前が いちばん 落ちつくわい」'},{x:11,y:10,col:'#00a800',hair:'#7c4c10',line:'客「1号艇から 流すのが 基本たい」'},{x:5,y:10,col:'#d82800',hair:'#000000',yoso:1,line:''}];
   if(r()<.12)npcs.push({x:14,y:9,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
   return{jogai:true,title:`場外発売所（${VIL[vi].name.replace(/^.* /,'')}）`,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
 function enterJogai(){const m=nowMin();if(m<9*60||m>=21*60){dialog(['場外発売所は 閉まっている。','「営業時間 9:00〜21:00」']);return;}jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
 function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
+/* 場外で 買える 競馬場：中央（コクラ・マホロバ）＋ 地方 */
+function jogaiTracks(){const cst=i=>()=>keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし';
+  return[...[KOKURA(),VIL.findIndex(v=>v.capital)].map(i=>({vi:i,nm:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',st:cst(i)})),
+    ...CHIHO.filter(L=>L.x!=null).map(L=>({vi:L.vi,L,nm:(L.banei?'ばんえい':'')+L.name+'競馬場（地方）',st:()=>{const n=chihoRaceNo(L);return !n?'発売なし':chihoClosed(L)?'発売前':`${n}R ${hm(L.post[n-1])}`;}}))];}
 function jogaiBump(c){
-  if(c.t==='kwin'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('どの 競馬場の 馬券を 買いますか？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし'})),k=>keibaFac(L[k]));return true;}
-  if(c.t==='kvote'){const L=[KOKURA(),VIL.findIndex(v=>v.capital)];listPick('マークカード：どの 競馬場？',L.map(i=>({t:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',r:keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし'})),k=>markCard(L[k],bs=>keibaFac(L[k],bs)));return true;}
+  if(c.t==='kwin'||c.t==='kvote'){const L=jogaiTracks(),mk=c.t==='kvote';listPick(mk?'マークカード：どの 競馬場？':'どの 競馬場の 馬券を 買いますか？',L.map(x=>({t:x.nm,r:x.st(),col:x.L?'#7ee07e':null})),k=>{const x=L[k];if(mk)markCard(x.vi,bs=>keibaFac(x.vi,bs,x.L),x.L?Object.assign({},KEIBA_CF,{closed:()=>chihoClosed(x.L),card:()=>chihoCard(x.L)}):undefined);else keibaFac(x.vi,null,x.L);});return true;}
   if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>(VIL[i].port||VIL[i].kyotei)&&!VIL[i].depop);
     listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:boatRaceNo(i)&&nowMin()>=BPOST(i)[0]-60?`${boatRaceNo(i)}R ${hm(BPOST(i)[boatRaceNo(i)-1])}（${BTYPEN[BTYPE(i)]}）`:'発売なし'})),k=>raceFac(P[k]));return true;}
   if(c.t==='tvmon'){dialog('モニターに 各地の レースが 映っている。\n競馬と ボートレースが 交互に 流れる。');return true;}
