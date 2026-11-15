@@ -7160,7 +7160,9 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'ムロビシコウジ',d:'ばんえい競馬の 鉄人。 ハンマーのように\n鉄そりを 振り回す 怪力で 第2障害も ひと息に 越える。\nどんな 馬場でも 崩れない。（ばんえい 専用）',w:()=>3.6,pace:1,banei:1,rr:.5,ultra:1},
   {name:'ムロビシシゲノブ',d:'ムロビシコウジの 父にして 師匠。\n息子が 出る レースには よく 一緒に 出てくる。\n水分の 少ない 重い 馬場ほど 粘り強い。（ばんえい 専用）',w:()=>2.9,pace:1,banei:1,bdry:1,rr:.5,rival:'ムロビシコウジ'},
   {name:'ライアンブルドーザー',d:'海の 向こうから 来た 重戦車。\n体ごと そりを 押し出す 圧倒的な パワーで\n障害を ねじふせる。 乾いた 重い 馬場で 本領 発揮。（ばんえい 専用）',w:()=>3.4,pace:1,banei:1,bdry:1,rr:.5,ultra:1},
-  {name:'ミナミグチハルカ',d:'明るい 笑顔の 人気馬。 序盤は 控えめだが\n「最後の 一投」で 大逆転する ことが ある。\n水分 多めの 軽い 馬場が 得意。（ばんえい 専用）',w:()=>2.8,pace:1,banei:1,bwet:1,jav:1,rr:.5}];
+  {name:'ミナミグチハルカ',d:'明るい 笑顔の 人気馬。 序盤は 控えめだが\n「最後の 一投」で 大逆転する ことが ある。\n水分 多めの 軽い 馬場が 得意。（ばんえい 専用）',w:()=>2.8,pace:1,banei:1,bwet:1,jav:1,rr:.5},
+  {name:'ショーエイ',d:'たくましい 体の 涙もろい 熱血馬。\nレース中に 感極まって 泣き出すと\n涙の 力で 信じられない 底力を 出す。（ばんえい 専用）',w:()=>2.9,pace:1,banei:1,tear:1,rr:.5},
+  {name:'デーンゲンチ',d:'いつでも 元気 いっぱいの 快活な 馬。\nミナミグチハルカと 同じく「最後の 一投」の 使い手。\n水分 多めの 軽い 馬場が 得意。（ばんえい 専用）',w:()=>2.9,pace:1,banei:1,bwet:1,jav:1,rr:.5}];
 /* ライバル：ウルサイボルトが 出ると ジャスティスガトリングも 高い 確率で 出る */
 function kRival(horses,r){KRARE.forEach((K,Gt)=>{if(!K.rival)return;const B=KRARE.findIndex(X=>X.name===K.rival);if(!horses.some(h=>h.rare===B)||horses.some(h=>h.rare===Gt)||r()>=.75)return;
   const free=horses.map((h,i)=>i).filter(i=>horses[i].rare==null&&horses[i].mine==null);if(!free.length)return;const i=free[Math.floor(r()*free.length)];horses[i]={name:K.name,jk:horses[i].jk,kg:K.banei?1000+Math.floor(r()*80):480+Math.floor(r()*30),cd:1,w:K.w(r),rare:Gt};});}
@@ -7228,7 +7230,7 @@ function keibaSpecial(vi,no){const K=G.kinen;if(K&&K.vi===vi)return{name:K.name,
   if(VIL[vi].capital){const yr=Math.floor(G.day/360);if(main&&G.day%360>=350&&!((G.arima||{})[yr]))return{name:'アリウマ記念',grade:1,arima:yr,dist:'芝2500m'};if(main&&wk%2===1)return{name:'イツク杯',grade:1,dist:'芝2000m'};return null;}
   return main&&wk%2===0?{name:'タムニィ杯',grade:1,dist:'芝2400m'}:null;}
 const kW=(h,noise)=>Math.pow(h.w*(h.mul||1),1/(1+(h.rare!=null&&KRARE[h.rare].turbo?noise*.25:noise)*2));
-function keibaResult(hs,noise,rr=rnd){const sk=hs.find(h=>h.saiki);let honki=null;if(sk){honki=rr()<SAIKI_P;sk.mul=honki?3:.3;}const wh=hs.find(h=>h.whim);let yaru=null;if(wh){const W=wh.whim===1?{p:.5,hi:2.4,lo:.3}:wh.whim;yaru=rr()<W.p;wh.mul=yaru?W.hi:W.lo;}const jv=hs.find(h=>h.rare!=null&&KRARE[h.rare].jav);let jav=null;if(jv){jav=rr()<.4;jv.mul=jav?2.6:.85;}const out=keibaResult0(hs,noise,rr);if(sk)sk.mul=undefined;if(wh)wh.mul=undefined;if(jv)jv.mul=undefined;out.honki=honki;out.yaru=yaru;out.jav=jav;return out;}
+function keibaResult(hs,noise,rr=rnd){const sk=hs.find(h=>h.saiki);let honki=null;if(sk){honki=rr()<SAIKI_P;sk.mul=honki?3:.3;}const wh=hs.find(h=>h.whim);let yaru=null;if(wh){const W=wh.whim===1?{p:.5,hi:2.4,lo:.3}:wh.whim;yaru=rr()<W.p;wh.mul=yaru?W.hi:W.lo;}const jvs=hs.filter(h=>h.rare!=null&&(KRARE[h.rare].jav||KRARE[h.rare].tear)),jav={};jvs.forEach(h=>{const K=KRARE[h.rare],p=K.tear?.3:.4;jav[h.name]=rr()<p;h.mul=jav[h.name]?(K.tear?2.4:2.6):.85;});const jv=jvs.length?jvs:null;const out=keibaResult0(hs,noise,rr);if(sk)sk.mul=undefined;if(wh)wh.mul=undefined;if(jv)jv.forEach(h=>{h.mul=undefined;});out.honki=honki;out.yaru=yaru;out.jav=jav;return out;}
 function keibaResult0(hs,noise,rr){const left=hs.map((h,i)=>i),out=[];while(left.length){const tot=left.reduce((a,i)=>a+kW(hs[i],noise),0);let x=rr()*tot,k=0;for(;k<left.length-1;k++){x-=kW(hs[left[k]],noise);if(x<0)break;}out.push(left.splice(k,1)[0]);}return out;}
 function keibaProbOrd(hs,ord,noise){const sk=hs.find(h=>h.saiki);if(!sk||sk.mul)return keibaProbOrd0(hs,ord,noise);/* サイキナヲ：本気（30%）と 気まぐれ の 混合 */sk.mul=3;const a=keibaProbOrd0(hs,ord,noise);sk.mul=.3;const b=keibaProbOrd0(hs,ord,noise);sk.mul=undefined;return SAIKI_P*a+(1-SAIKI_P)*b;}
 function keibaProbOrd0(hs,ord,noise){/* 単勝・3連単は 正確な 確率 */let tot=hs.reduce((a,h)=>a+kW(h,noise),0),p=1;for(const i of ord){p*=kW(hs[i],noise)/tot;tot-=kW(hs[i],noise);}return p;}
@@ -7382,7 +7384,9 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
     const pre=RO.length?[...RO.filter(o=>o.k!=='FS').map(o=>relayIncTxt(o,card0.horses[o.i])),...(RO.some(o=>o.k!=='DNF')?['失格・棄権の チームは 着順の 対象外。\n（その チームの 馬券は ハズレ）']:['棄権の チームの 馬券は ハズレ']),]:dq!=null?[`【審議】 ${dq+1}番 ${card0.horses[dq].name}は\nレース後の 検査で 失格と なった！`,'着順が 繰り上がります。']:[];
     const whI=card0.horses.findIndex(x=>x.whim),whK=whI<0?null:(card0.horses[whI].whim.k||'silver'),whL=whI<0?[]:whK==='terada'?(res0.yaru?[]:['神社田夏樹が ゴール 手前の 交差点で\nコースを 間違えた！！','場内「あーっと！ そっちじゃない！！」\n（のちに「神社田交差点」と 呼ばれる）']):[res0.yaru?'シルバーシップ「…今日は 気分が いい」\nやる気 満々で 大まくり！':'シルバーシップは 今日は やる気が なかった…\n（ゲートで 寝ていた）'];const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
     const hr=h.rare!=null?[h.rare===0?'★ハリボテエレジーが 勝った！！\n場内が どよめきに 包まれる！':`★激レア馬 ${h.name}の 勝利！`]:[];
-    {const ji=card0.horses.findIndex(x=>x.rare!=null&&KRARE[x.rare].jav);if(ji>=0&&res0.jav)hr.push(res.indexOf(ji)===0?'ミナミグチハルカの「最後の 一投」！！\n第2障害から 一気に 大逆転！':'ミナミグチハルカが「最後の 一投」で 猛追！\n…あと 一歩 届かなかった');}
+    card0.horses.forEach((x,ji)=>{if(x.rare==null||!res0.jav||!res0.jav[x.name])return;const K=KRARE[x.rare],win1=res.indexOf(ji)===0;
+      if(K.tear)hr.push(win1?`${x.name}が 第2障害で 号泣！！\n涙の 底力で 大逆転 勝利！ 場内も もらい泣き…`:`${x.name}が 感極まって 泣きながら 猛追！\n…あと 一歩 届かなかった（まだ 泣いている）`);
+      else hr.push(win1?`${x.name}の「最後の 一投」！！\n第2障害から 一気に 大逆転！`:`${x.name}が「最後の 一投」で 猛追！\n…あと 一歩 届かなかった`);});
     if(card0.relay&&h.dia)hr.push('★★ダイヤモンドチーム 優勝！！\n激レア馬だけの 夢の リレーが 頂点に！');
     if(card0.relay&&h.rm!=null)hr.push(`★激レア馬 ${KRARE[h.rm].name}が\n第${h.rl+1}走で 大活躍！ ${h.name} 優勝！`);
     if(h.rare!=null&&KRARE[h.rare].vault&&/^障害/.test(card0.dist)){G.mondo=(G.mondo||0)+1;hr.push(`アルフォートデュプランティスが\n障害 世界記録を 更新！（${G.mondo}回目・+1cm）`);}
