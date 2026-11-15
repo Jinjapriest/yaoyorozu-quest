@@ -6840,7 +6840,7 @@ function taDaily(){const A=G.ta;if(!A)return[];const msgs=[],F=A.fin;
   /* パチンコ店 */
   for(const H of taHs()){taSetFix(H);const n=taHallN(H.vi),set=H.set||Array(n).fill(1),avg=set.reduce((a,b)=>a+b,0)/n,pay=set.reduce((a,s)=>a+TA_PAY[s-1],0)/n;
     H.rep=clamp(H.rep+(avg-2.6)*.04+(H.ev===G.day?.08:0),.15,2.5);
-    const cust=Math.round((isKaso(H.vi)?120:600)*Math.pow(H.rep,1.5)*(H.ev===G.day?1.6:1)*(hallDay(H.vi)?1.3:1)*(.85+rnd()*.3)),pl=Math.round(cust*300000*(1-pay));
+    const cust=Math.round((isKaso(H.vi)?120:VIL[H.vi].size>=6?2400:VIL[H.vi].size>=5?1600:VIL[H.vi].size>=4?1000:600)*Math.pow(H.rep,1.5)*(H.ev===G.day?1.6:1)*(hallDay(H.vi)?1.3:1)*(.85+rnd()*.3)),pl=Math.round(cust*300000*(1-pay));
     A.cash+=pl;H.last={cust,pl};}
   if(G.day%7===0)msgs.push(`TAインダストリアル 週報\n資金 ${fmt(A.cash)}イェソ　貸付残高 ${fmt(F.out)}\n${(()=>{const L=taHs();if(!L.length)return'TAホール：未出店';const c=L.reduce((a,h)=>a+(h.last?h.last.cust:0),0),pl=L.reduce((a,h)=>a+(h.last?h.last.pl:0),0);return`TAホール ${L.length}店 昨日 ${c}人・収支 ${pl>=0?'+':''}${fmt(pl)}`;})()}`);
   return msgs;}
@@ -6856,18 +6856,20 @@ function taFin(){const F=G.ta.fin,L=F.last;
     listPick('金利を えらぶ',TA_RN.map((n,i)=>({t:n,col:i===F.rate?'#7ee07e':i===2?'#fc7460':null})),i=>{F.rate=i;save();sfx('ok');
       dialog(i===2?['…帝愛式の 金利に した。','もうけは 大きいが 貸し倒れも 多く\n金融庁に 見つかると 重い 罰が ある…']:[`金利を ${TA_RN[i]}に した。`],taFin);},
       i=>['利息は 少ないが 客が 多く 貸し倒れも 少ない。\n安全に 長く 稼げる。','利息は 倍。 客は 少し 減り\n貸し倒れも 増える。','利息は 1日 3.4%の 超高利。\n客は 半分以下、貸し倒れ 多数。\n毎日 5%で 立入検査（罰金30%・営業停止）'][i]);},150);}
-const TA_OPEN=vi=>isKaso(vi)?1e8:5e8;
+const taBuyOK=vi=>{const v=VIL[vi];return !!v&&!v.tokoyo&&!v.depop&&v.size>=4&&hallKind(vi)==='pachi';};
+const TA_OPEN=vi=>{const z=VIL[vi].size;return z>=6?2e10:z>=5?8e9:z>=4?3e9:isKaso(vi)?1e8:5e8;};
 function taHall(){const A=G.ta,HL=taHs();
   const items=[...HL.map(h=>({t:taHallName(h),r:h.last?`${h.last.pl>=0?'+':''}${fmt(h.last.pl)}`:'1日目',col:h.last&&h.last.pl<0?'#fc7460':null})),{t:'＋ 新しく 出店する',col:'#7ee07e'},{t:'もどる',col:'#7c7c7c'}];
   listPick(`TAホール（${HL.length}店）　資金 ${fmt(A.cash)}イェソ`,items,i=>{if(i<HL.length){taHallOne(HL[i]);return;}if(i===HL.length){taHallOpen();return;}taScr();},
-    i=>{const h=HL[i];if(h){const n=taHallN(h.vi),avg=(h.set.reduce((a,b)=>a+b,0)/n).toFixed(1);return `${VIL[h.vi].name}　${n}台\n平均設定 ${avg}　評判 ${h.rep.toFixed(2)}${h.ev>G.day?'　明日 イベント':''}\n${h.last?`昨日 ${h.last.cust}人`:'（営業 1日目）'}`;}return i===HL.length?(HL.length?'2店目からは 出店費が かかる。\n（普通の 店 5億・過疎の 店 1億イェソ）':'1店目は 無料で 引き継げる。'):'';});}
-function taHallOpen(){const A=G.ta,HL=taHs();const L=VIL.map((v,i)=>i).filter(i=>kpachiOK(i)&&!taHallOf(i)).sort((a,b)=>(VIL[b].size||0)-(VIL[a].size||0));
+    i=>{const h=HL[i];if(h){const n=taHallN(h.vi),avg=(h.set.reduce((a,b)=>a+b,0)/n).toFixed(1);return `${VIL[h.vi].name}　${n}台\n平均設定 ${avg}　評判 ${h.rep.toFixed(2)}${h.ev>G.day?'　明日 イベント':''}\n${h.last?`昨日 ${h.last.cust}人`:'（営業 1日目）'}`;}return i===HL.length?`${HL.length?'さびれた 店は 2店目から 1億イェソ。':'さびれた 店の 1店目は 無料。'}\n都会以上の 大型店は 買収できる。\n（都会 30億・大都会 80億・超都会 200億）`:'';});}
+function taHallOpen(){const A=G.ta,HL=taHs();const L=VIL.map((v,i)=>i).filter(i=>(kpachiOK(i)||taBuyOK(i))&&!taHallOf(i)).sort((a,b)=>(VIL[b].size||0)-(VIL[a].size||0));
+  const cost0=vi=>taBuyOK(vi)?TA_OPEN(vi):HL.length?TA_OPEN(vi):0;
   if(!L.length){dialog('出店できる 町が もう ない。\n（パチンコ店の ある 町は すべて TAホールだ）',taHall);return;}
-  listPick('TAホールを 出店する 町（パチンコ店の ある 町）',L.map(i=>({t:VIL[i].name,r:`${isKaso(i)?'8台':'24台'}${HL.length?'　'+fmt(TA_OPEN(i)):''}`})),k=>{const vi=L[k],cost=HL.length?TA_OPEN(vi):0;
+  listPick('出店・買収する 町（パチンコ店の ある 町）',L.map(i=>({t:(taBuyOK(i)?'【買収】':'')+VIL[i].name,r:`${isKaso(i)?'8台':'24台'}${cost0(i)?'　'+fmt(cost0(i)):'　無料'}`,col:taBuyOK(i)?'#f8b800':null})),k=>{const vi=L[k],cost=cost0(vi),buy=taBuyOK(vi);
     if(cost>A.cash){toast('TAの 資金が たりない');taHallOpen();return;}
-    choice(`${VIL[vi].name}の パチンコ店を 引き継ぎますか？${cost?`\n（出店費 ${fmt(cost)}イェソ）`:''}`,['引き継ぐ','やめる'],r=>{if(r!==0){taHallOpen();return;}
+    choice(buy?`${VIL[vi].name}の 大型店「パーラー 八百万」を\n買収しますか？\n（買収額 ${fmt(cost)}イェソ）`:`${VIL[vi].name}の パチンコ店を 引き継ぎますか？${cost?`\n（出店費 ${fmt(cost)}イェソ）`:''}`,[buy?'買収する':'引き継ぐ','やめる'],r=>{if(r!==0){taHallOpen();return;}
       A.cash-=cost;const H={vi,set:Array(taHallN(vi)).fill(3),rep:1,ev:0,last:null};HL.push(H);G.pachi.mkey=null;save();sfx('g5');
-      dialog([`${VIL[vi].name}の パチンコ店を\n「TAホール」として 引き継いだ！（${HL.length}店目）`,...(HL.length===1?['台の 設定は 1〜6を 自由に 決められる。\n高設定は 客が 喜び 評判が 上がるが\n店の もうけは 減る。','（自分の 店で 遊ぶと 台の 設定が 見える）']:[])],()=>taHallOne(H));},150);});}
+      dialog([...(buy?['札束の 入った アタッシュケースを 机に 置いた。','前オーナー「…この 店を 手放す 日が 来るとは」','買収 成立！']:[]),`${VIL[vi].name}の パチンコ店を\n「TAホール」として ${buy?'手に入れた':'引き継いだ'}！（${HL.length}店目）`,...(HL.length===1?['台の 設定は 1〜6を 自由に 決められる。\n高設定は 客が 喜び 評判が 上がるが\n店の もうけは 減る。','（自分の 店で 遊ぶと 台の 設定が 見える）']:[])],()=>taHallOne(H));},150);});}
 function taHallOne(H){const A=G.ta;taSetFix(H);
   const n=taHallN(H.vi),avg=(H.set.reduce((a,b)=>a+b,0)/n).toFixed(1),Ls=H.last,nm=taHallName(H);
   choice(`${nm}（${VIL[H.vi].name.replace(/^.* /,'')}）\n平均設定 ${avg}　評判 ${H.rep.toFixed(2)}${H.ev>G.day?'　明日 イベント':''}\n${Ls?`昨日 ${Ls.cust}人・収支 ${Ls.pl>=0?'+':''}${fmt(Ls.pl)}イェソ`:'（営業 1日目）'}`,
