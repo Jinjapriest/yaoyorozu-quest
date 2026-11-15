@@ -459,7 +459,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'},{n:'XXR',c:'#f8d878',lab:'開発者'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'リュック':{a:1.7,m:1.1},'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami'];
 const BASE_SKILLS={
@@ -547,6 +547,7 @@ const BASE_SKILLS={
   ws_raijodo:{name:'鵺射ち',mp:16,target:'enemy',kind:'phys',power:3.4,verb:'放った'},
   ws_nyoi:{name:'如意宝珠',mp:16,target:'enemies',kind:'mag',power:2.6,verb:'かかげた'},
   ws_misono:{name:'貯玉 再プレイ',mp:18,target:'enemy',kind:'phys',power:1.1,hits:4,verb:'はじいた'},
+  ws_ryuck:{name:'溢れ出るイェソ',mp:28,target:'enemies',kind:'yeso',power:3.4,verb:'ひっくり返した'},
   ws_gamaguchi:{name:'口金 パッチン',mp:16,target:'enemy',kind:'drain',power:2.4,verb:'はさみこんだ'},
   ws_tgphone:{name:'内部告発',mp:20,target:'enemies',kind:'debuff',amount:.45,turns:4,verb:'送信した'},
   ws_futonorito:{name:'太祝詞事',mp:18,target:'allies',kind:'heal',power:2.2,revive:true,verb:'奏上した'},
@@ -628,7 +629,7 @@ const BASE_PACK={
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
-    {id:'umagami',name:'馬神 サイキナヲ',short:'サイキナヲ',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:170,mp:100,atk:58,mag:34,def:30,spd:40,skills:['saiki_makuri','saiki_kimagure','saiki_kago'],look:{head:'umagami',hair:'#7c4c10',body:'#f8b800',accent:'#fcfcfc',legs:'#5c3000',held:'神宝'}},
+    {id:'umagami',name:'馬神 サイキナヲ',short:'サイキナヲ',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:170,mp:100,atk:58,mag:34,def:30,spd:40,skills:['saiki_makuri','saiki_kimagure','saiki_kago'],look:{head:'umagami',hair:'#7c4c10',body:'#f8b800',accent:'#fcfcfc',legs:'#5c3000',held:'リュック'}},
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
@@ -663,7 +664,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_eiria','エイリア石','UR','神器',80],['w_koban','猫の小判','UR','小判',70],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_ryuck','無駄に 重い リュックサック','XR','リュック',230],['w_eiria','エイリア石','UR','神器',80],['w_koban','猫の小判','UR','小判',70],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -792,10 +793,10 @@ function rebuild(){
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc','w_koban'];
+const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc','w_koban','w_ryuck'];
 const hasSkW=(cid,w)=>{const c=G&&G.chars[cid];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes(w);};
 const hasTgPhone=id=>{const c=G&&G.chars[id];return !!c&&id==='tagaba'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_tgphone');};
-const WSK={w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
+const WSK={w_ryuck:'ws_ryuck',w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
 const wSkills=id=>{const c=G&&G.chars[id];if(!c)return[];const L=[c.wpn,typeof twoSlot==='function'&&twoSlot(id)?c.wpn2:null].filter(Boolean).map(w=>WSK[baseW(w)]).filter(k=>k&&SK[k]);return[...new Set(L)];};
 const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_umegae');};
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
@@ -1158,13 +1159,13 @@ const SPEAR_NG='ロンギヌス・カシウスと ガイウスの槍は\n同じ 
 const hasGaius=id=>{const c=G.chars[id];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_gaius');};
 /* 武器の 効果説明 */
 function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=d.type;
-  if(d.rar===6&&b!=='w_umegae'&&b!=='w_tgphone'&&b!=='w_misono'&&b!=='w_gamaguchi'&&b!=='w_kinsho')L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
+  if(d.rar===6&&b!=='w_umegae'&&b!=='w_tgphone'&&b!=='w_misono'&&b!=='w_gamaguchi'&&b!=='w_kinsho'&&b!=='w_ryuck')L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
   if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
-  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');else if(t==='書')L.push('導きの師 吉田松陰 専用（Lv制限なし）');else if(t==='パソコン')L.push('開発者神主 タムライツク 専用（Lv制限なし）');
+  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');else if(t==='書')L.push('導きの師 吉田松陰 専用（Lv制限なし）');else if(t==='パソコン')L.push('開発者神主 タムライツク 専用（Lv制限なし）');else if(t==='リュック')L.push('馬神 サイキナヲ 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
   if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
   if(b==='w_kinbat')L.push('装備すると：','\t攻撃する たびに 金メッキが 剥がれ','\t攻撃力が 10%ずつ 下がる（戦闘中・最低 30%）','\t専用技「剥がれる」（強打。 攻撃力が 20% 下がる）');
-  if(b==='w_koban')L.push('だれでも 装備できる','パーティの だれかが 装備すると：','\t戦闘で 手に入る イェソが 5倍');if(b==='w_brokenpc')L.push('スキルは ない。 そのかわり…','\t攻撃・魔力が 異常に 高い','\tタムライツクが 装備すると 全ステータス 3倍');if(b==='w_kinsho')L.push('吉田松陰が 装備すると：','\t維新Vanguardの MP回復 30%→45%','\t専用技「籠中の 記」（味方全体 回復＋攻撃・守備 +70%）');
+  if(b==='w_koban')L.push('だれでも 装備できる','パーティの だれかが 装備すると：','\t戦闘で 手に入る イェソが 5倍');if(b==='w_brokenpc')L.push('スキルは ない。 そのかわり…','\t攻撃・魔力が 異常に 高い','\tタムライツクが 装備すると 全ステータス 3倍');if(b==='w_ryuck')L.push('中身は ほとんど イェソ。 無駄に 重い。','\t専用技「溢れ出るイェソ」','\t（敵全体に 攻撃＋ あふれた イェソを 拾える）');if(b==='w_kinsho')L.push('吉田松陰が 装備すると：','\t維新Vanguardの MP回復 30%→45%','\t専用技「籠中の 記」（味方全体 回復＋攻撃・守備 +70%）');
   if(b==='w_misono')L.push('トモヤヨシダが 装備すると：','\t覚醒ハイパーの 継続率 81%→84%','\t保留が たまる 確率 5%→8%','\t専用技「貯玉 再プレイ」（4連撃）');
   if(b==='w_gamaguchi')L.push('ジョウチャンが 装備すると：','\tプレデタープラントで 吸い取る 量 1.5倍','\t（いちど くわえたら なかなか 離さない）','\t専用技「口金 パッチン」（吸収攻撃）');
   if(b==='w_tgphone')L.push('タガバソウが 装備すると：','\tゴッドダイスで ヒフミか 目が 出たら','\t地下の 仲間に 電話して 1回 振り直す');
@@ -1173,9 +1174,9 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
   if(b==='w_gaius')L.push('装備すると 全ステータス +200%','固有スキル「neonGenesis」（1戦に1回）：','\tHP・MP 1.5倍で 全回復＋敵全体に 超絶ダメージ','\t＋アディショナルインパクト','※ロンギヌス・カシウスとは 同じ編成に 入れられない');
   if(!L.length)L.push('特殊な 効果は ない');return L;}
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
-const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
+const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||baseW(wid)==='w_ryuck'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||t==='小判'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||t==='小判'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';if(t==='リュック')return cid==='umagami';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -1299,6 +1300,7 @@ function drawHeld(t,P,acc){
   switch(t){
     case 'スマホ':P(13,7,3,5,'#1c1c1c');P(14,8,1,3,'#3cbcfc');break;
     case '会員カード':P(12,8,4,3,'#d82800');P(12,9,4,1,'#f8b800');break;
+    case 'リュック':P(12,6,5,7,'#2c5c2c');P(13,7,3,2,'#3c7c3c');P(12,10,5,1,'#f8b800');P(14,11,1,1,'#f8d878');break;
     case 'がま口':P(12,8,4,4,'#a05000');P(12,7,4,1,'#f8b800');break;
     case '書':P(12,7,4,5,'#5c3c24');P(13,8,3,3,'#e8dcc0');P(12,7,1,5,'#2c1c10');break;
     case '小判':P(12,7,4,5,'#f8b800');P(13,8,2,3,'#fce0a8');P(12,7,4,1,'#fce0a8');break;
@@ -1326,6 +1328,7 @@ function drawWIcon(id,x,y,sc=1){
     case '大幣':P(7,1,2,15,'#c89060');P(5,2,6,1,col);for(let k=0;k<4;k++){P(3+(k&1),4+k*2,3,2,'#fcfcfc');P(10-(k&1),4+k*2,3,2,'#fcfcfc');}break;
     case '扇':for(let r=0;r<8;r++){const w=Math.round(Math.sqrt(64-r*r));P(8-w,9-r,w*2,1,r%2?col:'#fcfcfc');}P(7,9,2,6,'#7c4c10');break;
     case '弓':for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#a05000');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#bcbcbc');P(12,7,2,3,col);break;
+    case 'リュック':P(3,3,10,12,'#2c5c2c');P(4,4,8,4,'#3c7c3c');P(3,8,10,1,'#1c3c1c');P(5,10,6,3,'#3c7c3c');P(7,11,2,1,'#f8b800');P(5,1,6,2,'#1c3c1c');P(6,2,4,1,'#2c5c2c');P(11,12,2,2,'#f8b800');P(13,13,1,1,'#f8d878');P(2,14,1,1,'#f8b800');P(13,3,1,2,col);break;
     case '会員カード':P(2,4,12,8,'#d82800');P(2,4,12,2,'#f8b800');P(3,7,6,1,'#fcfcfc');P(3,9,4,1,'#fcfcfc');P(10,8,3,3,'#f8b800');P(13,3,1,2,col);break;
     case '小判':[[6,4],[4,8],[3,10],[3,10],[3,10],[3,10],[3,10],[3,10],[3,10],[3,10],[4,8],[6,4]].forEach(([x0,w],r)=>{P(x0,2+r,w,1,'#a87c00');if(r>0&&r<11)P(x0+1,2+r,Math.max(0,w-2),1,'#f8b800');});P(6,4,4,1,'#fce0a8');P(5,6,6,1,'#a87c00');P(5,10,6,1,'#a87c00');P(7,7,2,2,'#7c5c00');P(4,3,1,2,'#fcfcfc');P(13,12,2,2,col);break;
     case 'パソコン':P(2,2,12,8,'#3c3c3c');P(3,3,10,6,'#14142c');P(4,4,3,2,'#3cbcfc');P(8,3,1,2,'#fcfcfc');P(9,5,1,2,'#fcfcfc');P(8,7,1,2,'#fcfcfc');P(10,4,1,1,'#fcfcfc');P(0,10,16,3,'#7c7c7c');P(1,10,14,1,'#bcbcbc');P(3,11,10,1,'#5c5c5c');P(12,12,2,2,col);P(13,1,1,1,'#f8f800');P(14,0,1,1,'#f8f800');break;
@@ -2243,6 +2246,8 @@ function pAct(i){
         if(sk.tg==='enemies')P_(()=>{if(!ok.v)return null;NOW(aliveEn().map(e=>()=>e.alive?dmgEnemy(e,one(e)):null));return null;});
         else for(let h=0;h<sk.hits;h++)P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);return e?dmgEnemy(e,one(e)):null;});
         P_(()=>ok.v?kinPeel(m,cmd.k==='ws_kinbat'):null);break;}
+      case 'yeso':{let tot=0;P_(()=>{if(!ok.v)return null;sfx('coin');NOW(aliveEn().map(e=>()=>{if(!e.alive)return null;const v=phys(st().atk,e.def,sk.p*rm);tot+=v;return dmgEnemy(e,v);}));return 'リュックサックから イェソが あふれ出し\n敵全体に 降り注いだ！';});
+        P_(()=>{if(!ok.v)return null;const g=Math.max(1e6,Math.round(tot*100));G.coins+=g;sfx('coin');return `あふれた イェソ ${fmt(g)}を 拾い集めた！`;});break;}
       case 'gamble':P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);if(!e)return null;const pw=[0,.5,1,2,3,5][Math.floor(rnd()*6)];
         if(!pw)return 'しかし ハズレ！ 何も おこらなかった。';const v=phys(st().atk,e.def,pw*rm);if(pw>=3)NOW([dmgEnemy(e,v)]);return pw>=3?`大当たり！ ${pw}倍！`:dmgEnemy(e,v);});break;
       case 'drain':P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);if(!e)return null;const v=phys(st().atk,e.def,sk.p);const s=dmgEnemy(e,v);
@@ -4161,7 +4166,7 @@ const g4=(b,o)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)
 const LB3=[{t:'経験値祝詞×1000\n極上鉱石×1000\n金景品（大）×100',s:'祝詞・極上\n×1000\n大景品100',give:()=>{g4(1000,1000);G.items.tok[0]+=100;}},
   ...[2,3,4,5,6].map(()=>({t:'経験値祝詞×1000\n極上鉱石×1000',s:'祝詞・極上\n×1000',give:()=>g4(1000,1000)})),
   {t:'経験値祝詞×2000\n極上鉱石×2000\nガチャチケット×1000',s:'祝詞・極上\n×2000\n券×1000',give:()=>{g4(2000,2000);G.items.tk+=1000;}}];
-const LBH_EX=['w_gaius','w_umegae','w_misono','w_gamaguchi','w_tgphone','w_kinsho','w_brokenpc','w_koban'];
+const LBH_EX=['w_gaius','w_umegae','w_misono','w_gamaguchi','w_tgphone','w_kinsho','w_brokenpc','w_koban','w_ryuck'];
 const LBH=[{t:'好きな URキャラ\n好きな UR・XR武器',s:'URキャラ\nUR・XR\n武器',give:()=>{G.lbPick=(G.lbPick||[]).concat(['urc','urw']);}},
   {t:'1,000億イェソ',s:'1,000億\nイェソ',give:()=>{noCount(()=>{G.coins+=1e11;});}},
   {t:'経験値祝詞×5000',s:'経験値\n祝詞\n×5000',give:()=>{G.items.b[4]=(G.items.b[4]||0)+5000;}}];
@@ -5071,7 +5076,7 @@ function umagamiManifest(cb){const LEN=240,MAIN=96;const fired={};
   const bg={full:true,upd(){},drw(){draw(0,true);}};push(bg);
   cutscene(LEN,t=>{if(t===30&&!fired.a){fired.a=1;sfx('magic');}if(t===MAIN&&!fired.m){fired.m=1;sfx('g5');}draw(t,false);},
     [[1,'…勝利の 余韻に 包まれる 場内。'],[30,'すると 天が 割れ、\nまばゆい 光が ターフに 差し込んだ！'],[MAIN,'光の 中から 何かが\nゆっくりと 降りてくる…！'],[MAIN+72,'天から 馬神 サイキナヲが 降臨した！！']],
-    ()=>dialog(['馬神サイキナヲ「…最後の 最後の 最後まで\n我を 信じた 者よ」','「その 信心に 免じ、\n汝の 旅路に 力を 貸そう」','【XR】馬神 サイキナヲが 仲間に なった！（基礎Lv100）','（スキル：最後の最後の大まくり・きまぐれ本気・馬神の加護）'],()=>{if(stack[stack.length-1]===bg)pop();cb&&cb();}));}
+    ()=>dialog(['馬神サイキナヲ「…最後の 最後の 最後まで\n我を 信じた 者よ」','「その 信心に 免じ、\n汝の 旅路に 力を 貸そう」','【XR】馬神 サイキナヲが 仲間に なった！（基礎Lv100）','（スキル：最後の最後の大まくり・きまぐれ本気・馬神の加護）','サイキナヲ「…これも 持っていけ。 無駄に 重いが」','専用武器「無駄に 重い リュックサック」を 手に入れた！\n（スキル：溢れ出るイェソ）'],()=>{if(stack[stack.length-1]===bg)pop();cb&&cb();}));}
 /* 宝箱（防府天満宮の 本殿の 裏手） */
 function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は からっぽだ。');return;}
   if(c.id==='kinsho'){G.tbox.kinsho=1;addWeapon('w_kinsho');save();sfx('g5');dialog(['松陰神社の 奥に まわると…','松下村塾の 方から 声が する。','松陰「…この 書は 長らく 禁書と されてきた。\n　されど 学ぶに 禁じる ものなど ない」','宝箱の 中に 古い 日記が 入っていた。','専用武器「禁書 鸚鵡籠中記」を 手に入れた！','（吉田松陰が 装備すると\n　維新Vanguardが 強くなり 専用技「籠中の 記」を 使える）']);return;}
@@ -6152,13 +6157,14 @@ function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
   dialog(F.n);}
 function ajTalk(id){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),n=ajName(id),L=[];
   if(id==='tomoya')L.push(has('slot')?'7を 揃えるのは 得意だぜ！\n覚醒ハイパー 見せてやろうか？':'スロット台は ないのか？\n…いや 別に 打ちたい わけじゃ ないけどな。');
+  if(id==='tomoya')L.push(['いいご身分ですね'],['日本語も 読めない…\nまずいなぁ','（カチャ… 銃を 構える 音）']);
   if(id==='jouchan')L.push('このがま口… やっぱり 開かない。','アジトの 植物… 食べないから 安心しろ。');
   if(has('bed'))L.push('ベッド ふかふかだった！');else L.push('ベッドが あったら 泊まれるのになあ。');
   if(has('ih'))L.push('IHコンロで 何か 作ってよ。');
   if(has('pcd')||has('pcn'))L.push('あとで PC 貸してね。');else L.push('ゲーミングPC ほしいなあ。');
   if(has('slot'))L.push('スロット 打っても いい？');
   L.push('ここ 落ち着くね。','次は アイヂ だっけ？\n準備 しなきゃね。','アジト いいね。 また 来るよ。');
-  dialog(`${n}「${L[Math.floor(rnd()*L.length)]}」`);}
+  const pk=L[Math.floor(rnd()*L.length)];dialog(Array.isArray(pk)?[`${n}「${pk[0]}」`,...pk.slice(1).map(x=>x[0]==='（'?x:`${n}「${x}」`)]:`${n}「${pk}」`);}
 function ajSlotScr(){const A=ajS(),S=['7','BAR','ベル','チェ','リプ','ベル','リプ','BAR','チェ','ベル'],C={'7':'#d82800','BAR':'#fcfcfc','ベル':'#f8d878','チェ':'#f878f8','リプ':'#68ccfc'};
   const pos=[0,3,6],spin=[false,false,false];let bigW=false,ph='idle',msg='A：レバー　B：やめる',fan=0,t=0,games=0;
   push({full:true,upd(){t++;if(fan>0)fan--;for(let i=0;i<3;i++)if(spin[i])pos[i]=(pos[i]+.45)%S.length;
@@ -7132,7 +7138,7 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
     const pre=dq!=null?[`【審議】 ${dq+1}番 ${card0.horses[dq].name}は\nレース後の 検査で 失格と なった！`,'着順が 繰り上がります。']:[];
     const whI=card0.horses.findIndex(x=>x.whim),whK=whI<0?null:(card0.horses[whI].whim.k||'silver'),whL=whI<0?[]:whK==='terada'?(res0.yaru?[]:['神社田夏樹が ゴール 手前の 交差点で\nコースを 間違えた！！','場内「あーっと！ そっちじゃない！！」\n（のちに「神社田交差点」と 呼ばれる）']):[res0.yaru?'シルバーシップ「…今日は 気分が いい」\nやる気 満々で 大まくり！':'シルバーシップは 今日は やる気が なかった…\n（ゲートで 寝ていた）'];const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
     const hr=h.rare!=null?[h.rare===0?'★ハリボテエレジーが 勝った！！\n場内が どよめきに 包まれる！':`★激レア馬 ${h.name}の 勝利！`]:[];
-    const umaCb=umaG?()=>{const nw=!G.chars.umagami;addChar('umagami');if(nw)G.chars.umagami.dup=Math.max(G.chars.umagami.dup,XR_LV-1);{const s2=cstat('umagami');G.chars.umagami.hp=s2.hp;G.chars.umagami.mp=s2.mp;}save();if(nw)umagamiManifest(()=>{});else{sfx('lv');dialog(['天から 一筋の 光が 差し込んだ…','馬神 サイキナヲの 力が 高まった！（基礎Lv＋1）']);}}:undefined;
+    const umaCb=umaG?()=>{const nw=!G.chars.umagami,nr=!G.weapons||!Object.keys(G.weapons).some(k=>baseW(k)==='w_ryuck');if(nr)addWeapon('w_ryuck');addChar('umagami');if(nw)G.chars.umagami.dup=Math.max(G.chars.umagami.dup,XR_LV-1);{const s2=cstat('umagami');G.chars.umagami.hp=s2.hp;G.chars.umagami.mp=s2.mp;}save();if(nw)umagamiManifest(()=>{});else{sfx('lv');dialog(['天から 一筋の 光が 差し込んだ…','馬神 サイキナヲの 力が 高まった！（基礎Lv＋1）',...(nr?['ドスン！ 空から リュックサックが 落ちてきた。','専用武器「無駄に 重い リュックサック」を 手に入れた！']:[])]);}}:undefined;
     if(pay){sfx('win');dialog([...pre,head,...skL,...whL,...hr,...mineL,...lines.slice(0,3),`払い戻し 合計 ${fmt(pay)}イェソ！`,...unlock],umaCb);}else{sfx(mineL.length?'win':'cancel');dialog([...pre,head,...skL,...whL,...hr,...mineL,...(hadB?['馬券は ハズレた…']:mineL.length?[]:['レースを 見届けた。'])]);}
     kRareNote();};
   push({full:true,canBack:true,
