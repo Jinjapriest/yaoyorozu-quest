@@ -7193,7 +7193,10 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'ショーエイ',d:'たくましい 体の 涙もろい 熱血馬。\nレース中に 感極まって 泣き出すと\n涙の 力で 信じられない 底力を 出す。（ばんえい 専用）',w:()=>2.9,pace:1,banei:1,tear:1,rr:.5},
   {name:'デーンゲンチ',d:'いつでも 元気 いっぱいの 快活な 馬。\nミナミグチハルカと 同じく「最後の 一投」の 使い手。\n水分 多めの 軽い 馬場が 得意。（ばんえい 専用）',w:()=>2.9,pace:1,banei:1,bwet:1,jav:1,rr:.5},
   {name:'ニーラジチョップラ',d:'南の 大国から 来た 国民的 英雄。\n大観衆の 声援を 背に 一気に 引き切る。\nどんな 馬場でも 安定して「最後の 一投」を 決める。（ばんえい 専用）',w:()=>3.1,pace:1,banei:1,jav:1,jp:.5,rr:.4},
-  {name:'ヤングゼレズニー',d:'「最後の 一投」の 生ける 伝説。\n若々しい 名前とは うらはらに 大ベテラン。\n一投が 決まれば だれも 追いつけない 世界記録級。（ばんえい 専用）',w:()=>3.3,pace:1,banei:1,jav:1,jp:.6,jm:3.4,rr:.25,ultra:1}];
+  {name:'ヤングゼレズニー',d:'「最後の 一投」の 生ける 伝説。\n若々しい 名前とは うらはらに 大ベテラン。\n一投が 決まれば だれも 追いつけない 世界記録級。（ばんえい 専用）',w:()=>3.3,pace:1,banei:1,jav:1,jp:.6,jm:3.4,rr:.25,ultra:1},
+  {name:'ヤツコブインゲブリクセン',d:'北の 国から 来た 中距離の 絶対王者。\n最初から 前で 引っぱり、 最後の 1周で\n誰も ついて こられない ロングスパート。（1600〜2400m）',w:()=>3.4,pace:1.3,mid2:1,rr:.4,ultra:1},
+  {name:'ナガシマゲンキジョセフ',d:'明るく 元気な 400の 職人。\n1400〜1800mで 力を 出し切る 粘り強さ。\nリレーでは チームの ために さらに 燃える。',w:()=>3,pace:.8,mile4:1,relayB:1.4,rr:.5},
+  {name:'ガウトアウト',d:'南の 大陸の 10代の 新星。\n短距離で ぐんぐん 伸びる 快足馬。\n日が たつほど 成長して 強くなる。（〜1400m）',w:()=>2.6,pace:1.4,sprint:1,grow:1,rr:.5}];
 /* ライバル：ウルサイボルトが 出ると ジャスティスガトリングも 高い 確率で 出る */
 function kRival(horses,r){KRARE.forEach((K,Gt)=>{if(!K.rival)return;const B=KRARE.findIndex(X=>X.name===K.rival);if(!horses.some(h=>h.rare===B)||horses.some(h=>h.rare===Gt)||r()>=.75)return;
   const free=horses.map((h,i)=>i).filter(i=>horses[i].rare==null&&horses[i].mine==null);if(!free.length)return;const i=free[Math.floor(r()*free.length)];horses[i]={name:K.name,jk:horses[i].jk,kg:K.banei?1000+Math.floor(r()*80):480+Math.floor(r()*30),cd:1,w:K.w(r),rare:Gt};});}
@@ -7207,13 +7210,16 @@ const RJKS=[
   {name:'神社田夏樹',d:'神主の 学校で 学んだ 実力派 騎手。\n馬を ぐいぐい 引っぱるが、 ゴール 手前の\n交差点で コースを 間違えることが ある…（25%）',mul:()=>1.9,whim:{p:.75,hi:1,lo:.25,k:'terada'},wt:()=>1},
   {name:'ちょるるん',d:'マホロバ生まれの 人気者 騎手。\nとにかく かわいいので 馬も はりきる。\nマホロバ競馬場に よく 現れる。',mul:()=>1.3,wt:c=>c.cap?6:1},
   {name:'シルバーシップ',d:'気分屋の 白い 騎手。\nやる気が あれば 大まくりで 圧勝、\nやる気が なければ ゲートから 動かない…',mul:()=>1,whim:{p:.5,hi:2.4,lo:.3,k:'silver'},wt:()=>1},
-  {name:'ジェフベゾス',d:'宇宙帰りの 大富豪 騎手。\n乗った 馬が 1着に なると\n的中した 払い戻しが 1.5倍に なる！',mul:()=>1.4,bezos:1,wt:()=>1}];
+  {name:'ジェフベゾス',d:'宇宙帰りの 大富豪 騎手。\n乗った 馬が 1着に なると\n的中した 払い戻しが 1.5倍に なる！',mul:()=>1.4,bezos:1,wt:()=>1},
+  {name:'アイロンマスク',d:'宇宙ロケットの 会社を いくつも 持つ 騎手。\nロケットのような 加速で 馬を 引っぱるが、\nレース中に スマホで 投稿を 始める ことが ある（20%）',mul:()=>1.9,whim:{p:.8,hi:1,lo:.35,k:'iron'},wt:()=>1},
+  {name:'ティムクッキング',d:'りんごの マークの 会社の 物静かな 騎手。\n馬を ていねいに 仕上げる。 乗った 馬が 1着だと\n特製 アップルパイを ふるまって くれる（パーティ 全回復）',mul:()=>1.5,tim:1,wt:()=>1},
+  {name:'山形亮太',d:'スタートの 名人。 ゲートが 開いた 瞬間に\n誰よりも 早く 飛び出す 短距離の 職人。\n1400m以下で 本領 発揮。',mul:c=>c.m<=1400?2.1:1.2,wt:()=>1}];
 const RJK=RJKS[0],rjkOf=h=>h&&h.rjk?RJKS[h.rjk-1]:null;
 function kRareJk(horses,r,p,c){if(r()>=p)return;const i=Math.floor(r()*8);if(horses[i].rare!=null||horses[i].mine!=null)return;
   const ws=RJKS.map(J=>J.wt(c)),T_=ws.reduce((a,x)=>a+x,0);let x=r()*T_,k=0;for(;k<ws.length-1;k++){x-=ws[k];if(x<0)break;}
   const J=RJKS[k];horses[i].jk=J.name;horses[i].rjk=k+1;horses[i].w*=J.mul(c);if(J.whim)horses[i].whim=J.whim;}
 function kRareFix(horses,dist,nzv){const j=/^障害/.test(dist);horses.forEach((h,hi)=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;const m_=parseInt(dist.replace(/\D/g,''))||0;if(K.jumper){h.w*=j?(K.long?(m_>=3300?2.4:1.6):K.short?(m_<=2880?2.8:m_<=3300?2:1.3):K.jmid?(m_>=2880&&m_<=3300?2.5:1.5):2):(K.long?.6:.4);}
-  else if(K.sprint){h.w*=j?.4:m_<=1400?2.4:m_<=1800?1:.45;}else if(K.stayer){h.w*=j?.5:m_>=2400?2.4:m_>=2000?1.5:.6;}else if(K.dino){if(j)h.w*=.3;}else if(K.elder){h.w*=j?.4:m_>=2000?1.8:.8;if((nzv||0)>=.3)h.w*=1.3;}else if(K.allr){h.w*=j?1.8:m_<=1400?2.2:m_<=1800?1.6:m_<2400?1:.4;}else if(K.q4){h.w*=j?.5:m_>=1400&&m_<=1800?2.4:m_<1400?.9:.6;if(hi===7)h.w*=1.3;}else if(K.mile){h.w*=j?.5:m_>=1600&&m_<=2000?2.2:.8;}else if(K.hurd){h.w*=j?(m_<=3000?2.6:1.6):m_>=1400&&m_<=1800?2:m_<1400?1:.5;}else if(K.vault){h.w*=j?3:1;}else if(K.banei){if(K.bdry)h.w*=(nzv||0)<.25?1.5:1;if(K.bwet)h.w*=(nzv||0)>=.3?1.5:1;}else if(K.sprint2){h.w*=j?.4:m_>=1200&&m_<=1600?2.6:m_<1200?1.6:m_<=1800?1.1:.45;}if(K.dirt)h.w*=/^ダ/.test(dist)?1.4:.8;});}
+  else if(K.sprint){h.w*=j?.4:m_<=1400?2.4:m_<=1800?1:.45;}else if(K.stayer){h.w*=j?.5:m_>=2400?2.4:m_>=2000?1.5:.6;}else if(K.dino){if(j)h.w*=.3;}else if(K.elder){h.w*=j?.4:m_>=2000?1.8:.8;if((nzv||0)>=.3)h.w*=1.3;}else if(K.allr){h.w*=j?1.8:m_<=1400?2.2:m_<=1800?1.6:m_<2400?1:.4;}else if(K.q4){h.w*=j?.5:m_>=1400&&m_<=1800?2.4:m_<1400?.9:.6;if(hi===7)h.w*=1.3;}else if(K.mile){h.w*=j?.5:m_>=1600&&m_<=2000?2.2:.8;}else if(K.hurd){h.w*=j?(m_<=3000?2.6:1.6):m_>=1400&&m_<=1800?2:m_<1400?1:.5;}else if(K.vault){h.w*=j?3:1;}else if(K.banei){if(K.bdry)h.w*=(nzv||0)<.25?1.5:1;if(K.bwet)h.w*=(nzv||0)>=.3?1.5:1;}else if(K.mid2){h.w*=j?.5:m_>=1600&&m_<=2400?2.4:m_<1600?.8:.9;}else if(K.mile4){h.w*=j?.5:m_>=1400&&m_<=1800?2.2:m_<1400?1:.6;}else if(K.sprint2){h.w*=j?.4:m_>=1200&&m_<=1600?2.6:m_<1200?1.6:m_<=1800?1.1:.45;}if(K.dirt)h.w*=/^ダ/.test(dist)?1.4:.8;if(K.grow)h.w*=1+Math.min(.8,(G.day||0)/1200);});}
 const kRarePick=r=>{const T=KRARE.reduce((a,K)=>a+(K.banei?0:K.rr||1),0);let x=r()*T;for(let k=0;k<KRARE.length;k++){if(KRARE[k].banei)continue;x-=KRARE[k].rr||1;if(x<0)return k;}return 0;};
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
@@ -7226,7 +7232,7 @@ function relayTeams(r,old,H1,H2){const TN=shufR(['明木','萩往還','天花','
   const pool=KRARE.map((K,i)=>i).filter(i=>{const K=KRARE[i];return i>0&&!K.banei&&!K.saiki&&!K.dq&&!K.charm&&!K.dino&&!K.elder&&!(K.jumper&&!K.hurd)&&!K.vault;});
   const nR=(r()<.55?1:0)+(r()<.2?1:0),ts=shufR([0,1,2,3,4,5,6,7],r);
   for(let q=0;q<nR;q++){const k=pool[Math.floor(r()*pool.length)],t=T[ts[q]];if(T.some(x=>x.rm===k))continue;const d={rare:k,w:1};kRareFix([d],'芝1600m',0);const K=KRARE[k];
-    t.rl=r()<.5?3:Math.floor(r()*3);t.rm=k;t.mem[t.rl]=K.name;t.w*=(1.1+.5*Math.min(2.6,d.w))*(K.ultra?1.3:1);}
+    t.rl=r()<.5?3:Math.floor(r()*3);t.rm=k;t.mem[t.rl]=K.name;t.w*=(1.1+.5*Math.min(2.6,d.w))*(K.ultra?1.3:1)*(K.relayB||1);}
   if(r()<.04){/* まれに ダイヤモンドチーム（全員 激レア馬） */const slot=ts[7],ks=shufR(pool.slice(),r).slice(0,4),avg=T.reduce((a,x)=>a+x.w,0)/8;
     T[slot]={name:'ダイヤモンドチーム',jk:T[slot].jk,kg:480,cd:1,w:avg*3.2,mem:ks.map(k=>KRARE[k].name),relay:1,dia:1,dm:ks};}
   return T;}
@@ -7403,7 +7409,7 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
         region(0,0,W,H,()=>{vA=true;});}});};
     if(fsI){sfx('ng');dialog(['号砲！ ……パン！パン！','ピストルが 2回 鳴った！ フライングだ！',relayIncTxt(fsI,card.horses[fsI.i]),'（残りの チームで レースを やり直す）'],go);}else go();};
   const finish=(res0)=>{let pay=0;const lines=[],dq=res0.dq,RO=res0.rout||[],bad=RO.map(o=>o.i);let res=dq!=null?[...res0.filter(i=>i!==dq),dq]:res0;if(bad.length)res=[...res.filter(i=>!bad.includes(i)),...bad];
-    const bz=(rjkOf(card.horses[res[0]])||{}).bezos;for(const b of bets){if(keibaHit(b.t,b.sel,res)){const p=Math.floor(b.amt*b.od*(bz?1.5:1));pay+=p;lines.push(`的中！ ${b.t} ${b.sel.map(i=>i+1).join(kjoin(b.t))}　${fmt(p)}イェソ`);}}if(bz&&pay)lines.unshift('ジェフベゾスの 馬が 1着！\n払い戻しが 1.5倍に なった！');
+    const bz=(rjkOf(card.horses[res[0]])||{}).bezos;for(const b of bets){if(keibaHit(b.t,b.sel,res)){const p=Math.floor(b.amt*b.od*(bz?1.5:1));pay+=p;lines.push(`的中！ ${b.t} ${b.sel.map(i=>i+1).join(kjoin(b.t))}　${fmt(p)}イェソ`);}}if(bz&&pay)lines.unshift('ジェフベゾスの 馬が 1着！\n払い戻しが 1.5倍に なった！');if((rjkOf(card.horses[res[0]])||{}).tim){G.party.forEach(id=>{const c=G.chars[id];if(!c)return;const s2=cstat(id);c.hp=s2.hp;c.mp=s2.mp;});lines.unshift('ティムクッキングの 馬が 1着！\n特製 アップルパイを ふるまって くれた！\n（パーティ 全員の HP・MPが 全回復）');}
     const umaG=!!(card.g1&&pay>0&&card.horses[res[0]]&&KRARE[card.horses[res[0]].rare]&&KRARE[card.horses[res[0]].rare].saiki),card0=card,g1=card.g1,gmul=card.sp?[1,30,10,5][card.sp.grade]:1,gnm=card.gname,hadB=bets.length,hit3=bets.some(b=>b.t==='3連単'&&keibaHit(b.t,b.sel,res)),mineL=[];
     {const U=G.uma;card.horses.forEach((x,i)=>{if(x.mine==null||!U||!U.horses[x.mine])return;const H=U.horses[x.mine],rk=res.indexOf(i);H.runs=(H.runs||0)+1;
       const PZ=[1e7,4e6,2.5e6];if(rk<3){const pz=Math.round(PZ[rk]*gmul*polMul('uma'));noCount(()=>{G.coins+=pz;});if(rk===0){H.win=(H.win||0)+1;if(g1)H.g1=(H.g1||0)+1;}mineL.push(`◎あなたの ${H.name}は ${rk+1}着！\n賞金 ${fmt(pz)}イェソを 獲得！`+(rk===0&&card.sp?`\n${gnm} 制覇！！`:''));}
@@ -7413,7 +7419,7 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
     G.coins+=pay;G.mn=Math.max(nowMin(),POST[card.no-1]+3);bets.length=0;const h=card.horses[res[0]];if(RNO())card=CARD();save();playBGM('village');
     const head=(gnm?`【${gnm}】\n`:'')+`着順：${res.slice(0,3).map(i=>i+1).join('-')}\n1着 ${res[0]+1}番 ${h.name}（${h.pop}番人気）`+(card0.relay?`\n${h.mem.join('→')}`:gnm?'':`\n騎手 ${h.jk}`);
     const pre=RO.length?[...RO.filter(o=>o.k!=='FS').map(o=>relayIncTxt(o,card0.horses[o.i])),...(RO.some(o=>o.k!=='DNF')?['失格・棄権の チームは 着順の 対象外。\n（その チームの 馬券は ハズレ）']:['棄権の チームの 馬券は ハズレ']),]:dq!=null?[`【審議】 ${dq+1}番 ${card0.horses[dq].name}は\nレース後の 検査で 失格と なった！`,'着順が 繰り上がります。']:[];
-    const whI=card0.horses.findIndex(x=>x.whim),whK=whI<0?null:(card0.horses[whI].whim.k||'silver'),whL=whI<0?[]:whK==='terada'?(res0.yaru?[]:['神社田夏樹が ゴール 手前の 交差点で\nコースを 間違えた！！','場内「あーっと！ そっちじゃない！！」\n（のちに「神社田交差点」と 呼ばれる）']):[res0.yaru?'シルバーシップ「…今日は 気分が いい」\nやる気 満々で 大まくり！':'シルバーシップは 今日は やる気が なかった…\n（ゲートで 寝ていた）'];const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
+    const whI=card0.horses.findIndex(x=>x.whim),whK=whI<0?null:(card0.horses[whI].whim.k||'silver'),whL=whI<0?[]:whK==='terada'?(res0.yaru?[]:['神社田夏樹が ゴール 手前の 交差点で\nコースを 間違えた！！','場内「あーっと！ そっちじゃない！！」\n（のちに「神社田交差点」と 呼ばれる）']):whK==='iron'?(res0.yaru?[]:['アイロンマスクが レース中に\nスマホで 投稿を 始めた！','馬「…………」 （ペースが 落ちた）']):[res0.yaru?'シルバーシップ「…今日は 気分が いい」\nやる気 満々で 大まくり！':'シルバーシップは 今日は やる気が なかった…\n（ゲートで 寝ていた）'];const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
     const hr=h.rare!=null?[h.rare===0?'★ハリボテエレジーが 勝った！！\n場内が どよめきに 包まれる！':`★激レア馬 ${h.name}の 勝利！`]:[];
     card0.horses.forEach((x,ji)=>{if(x.rare==null||!res0.jav||!res0.jav[x.name])return;const K=KRARE[x.rare],win1=res.indexOf(ji)===0;
       if(K.tear)hr.push(win1?`${x.name}が 第2障害で 号泣！！\n涙の 底力で 大逆転 勝利！ 場内も もらい泣き…`:`${x.name}が 感極まって 泣きながら 猛追！\n…あと 一歩 届かなかった（まだ 泣いている）`);
