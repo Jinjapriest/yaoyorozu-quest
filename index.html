@@ -6807,12 +6807,17 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'サイキナヲ',d:'現代の 気まぐれ 名馬。 スタートは すごく 遅いが\n最後の 最後の 最後で 本気を 出す（かも しれない）',w:r=>1.6+r()*.8,pace:1,saiki:1},
   {name:'ジェニファーピームラタ',d:'異国から やってきた 超良血の 貴公子（牡馬）。\n特殊能力「ターボスプリント」\n序盤・中盤・終盤 隙が ない！',w:()=>3.6,pace:1.6,turbo:1,rr:.15,ultra:1},
   {name:'チョウヤクハードラー',d:'障害レースの 申し子。 主戦は 泉谷 駿助。\n竹柵を 低く 鋭く 飛びこえる。\n短い 障害ほど 強い。 平地では いまひとつ…',w:()=>2.4,pace:1.2,jk:'泉谷 駿助',jumper:1,short:1,jh:1.8,rr:.6},
-  {name:'ミウラリュウジ',d:'長い 障害レースの 鉄人。\n水濠も 竹柵も リズムよく 越え、\n最後の 1周で 一気に 抜け出す！（長い 障害ほど 強い）',w:()=>2.3,pace:.3,jumper:1,long:1,jh:1.3,rr:.6}];
+  {name:'ミウラリュウジ',d:'長い 障害レースの 鉄人。\n水濠も 竹柵も リズムよく 越え、\n最後の 1周で 一気に 抜け出す！（長い 障害ほど 強い）',w:()=>2.3,pace:.3,jumper:1,long:1,jh:1.3,rr:.6},
+  {name:'ウルサイボルト',d:'異国の 稲妻。 ゲートでも パドックでも\nとにかく うるさいが、 走れば 世界最速。\n短距離（1400mまで）なら 手が つけられない！',w:()=>3.8,pace:1.7,sprint:1,rr:.3,ultra:1},
+  {name:'キリュウヨシピデ',d:'スタートの 名手。 ゲートが 開いた 瞬間に\n先頭に 立つ ロケットスタート。\n短距離が 得意。',w:()=>2.4,pace:1.5,turbo:1,sprint:1,rr:.6},
+  {name:'クロカワカヅキ',d:'障害の 中距離 職人。\n一定の リズムで 柵を 越えつづける。\n障害2880〜3300mが いちばん 得意。',w:()=>2.3,pace:1,jumper:1,jmid:1,jh:1.5,rr:.6},
+  {name:'ミャモトダイスケ',d:'ダートの 短距離で 伸びる 若き 快速馬。\n後半に ぐんぐん 加速する。\n砂の 短距離なら 大物食いも！',w:()=>2.3,pace:.2,sprint:1,dirt:1,rr:.6}];
 /* 激レア馬の 主戦騎手と 障害の 得意・不得意 */
 /* 激レア騎手 ラフカディオ＝ハァン：八雲で とくに よく 乗る。 乗った 馬は 不思議な 力で 強くなる */
 const RJK={name:'ラフカディオ＝ハァン',d:'海の 向こうから 来た 激レア騎手。\n八雲の 地を 愛し、 怪談を 語りながら 馬を 導く。\n乗った 馬は 不思議な 力で 強くなる。',mul:1.7};
 function kRareJk(horses,r,p){if(r()>=p)return;const i=Math.floor(r()*8);if(horses[i].rare!=null||horses[i].mine!=null)return;horses[i].jk=RJK.name;horses[i].rjk=1;horses[i].w*=RJK.mul;}
-function kRareFix(horses,dist){const j=/^障害/.test(dist);horses.forEach(h=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;if(K.jumper){const m_=parseInt(dist.replace(/\D/g,''))||0;h.w*=j?(K.long?(m_>=3300?2.4:1.6):K.short?(m_<=2880?2.8:m_<=3300?2:1.3):2):(K.long?.6:.4);}});}
+function kRareFix(horses,dist){const j=/^障害/.test(dist);horses.forEach(h=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;const m_=parseInt(dist.replace(/\D/g,''))||0;if(K.jumper){h.w*=j?(K.long?(m_>=3300?2.4:1.6):K.short?(m_<=2880?2.8:m_<=3300?2:1.3):K.jmid?(m_>=2880&&m_<=3300?2.5:1.5):2):(K.long?.6:.4);}
+  else if(K.sprint){h.w*=j?.4:m_<=1400?2.4:m_<=1800?1:.45;}if(K.dirt)h.w*=/^ダ/.test(dist)?1.4:.8;});}
 const kRarePick=r=>{const T=KRARE.reduce((a,K)=>a+(K.rr||1),0);let x=r()*T;for(let k=0;k<KRARE.length;k++){x-=KRARE[k].rr||1;if(x<0)return k;}return 0;};
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
