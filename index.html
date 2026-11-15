@@ -438,7 +438,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'},{n:'XXR',c:'#f8d878',lab:'開発者'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'パソコン':{a:1.6,m:1.6},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid'];
 const BASE_SKILLS={
@@ -638,7 +638,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',260],['w_eiria','エイリア石','UR','神器',80],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_eiria','エイリア石','UR','神器',80],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -1074,7 +1074,7 @@ function cstat(id,m){
   let atk=(d.atk*lm*dm+w.atk)*bl,mag=(d.mag*lm*dm+w.mag)*bl,def=d.def*lm*dm*bl,spd=d.spd*(1+(c.lv-1)*.012)*dm;
   const xm=isXR(id)?XR_MUL:1;if(xm>1){atk*=xm;mag*=xm;def*=xm;spd*=xm;}
   if(spearPair(id)){atk*=PAIR_MUL;mag*=PAIR_MUL;def*=PAIR_MUL;spd*=PAIR_MUL;}
-  const gm=hasGaius(id)?GAIUS_MUL:1;if(gm>1){atk*=gm;mag*=gm;def*=gm;spd*=gm;}
+  const gm=(hasGaius(id)?GAIUS_MUL:1)*(id==='itsuku'&&hasSkW(id,'w_brokenpc')?3:1);if(gm>1){atk*=gm;mag*=gm;def*=gm;spd*=gm;}
   if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;if(m.mgMul)mag*=m.mgMul;if(m.atMul)atk*=m.atMul;if(m.mgAdd)mag+=m.mgAdd;if(m.atAdd)atk+=m.atAdd;}
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
@@ -1131,7 +1131,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
   if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
   if(b==='w_kinbat')L.push('装備すると：','\t攻撃する たびに 金メッキが 剥がれ','\t攻撃力が 10%ずつ 下がる（戦闘中・最低 30%）','\t専用技「剥がれる」（強打。 攻撃力が 20% 下がる）');
-  if(b==='w_kinsho')L.push('吉田松陰が 装備すると：','\t維新Vanguardの MP回復 30%→45%','\t専用技「籠中の 記」（味方全体 回復＋攻撃・守備 +70%）');
+  if(b==='w_brokenpc')L.push('スキルは ない。 そのかわり…','\t攻撃・魔力が 異常に 高い','\tタムライツクが 装備すると 全ステータス 3倍');if(b==='w_kinsho')L.push('吉田松陰が 装備すると：','\t維新Vanguardの MP回復 30%→45%','\t専用技「籠中の 記」（味方全体 回復＋攻撃・守備 +70%）');
   if(b==='w_misono')L.push('トモヤヨシダが 装備すると：','\t覚醒ハイパーの 継続率 81%→84%','\t保留が たまる 確率 5%→8%','\t専用技「貯玉 再プレイ」（4連撃）');
   if(b==='w_gamaguchi')L.push('ジョウチャンが 装備すると：','\tプレデタープラントで 吸い取る 量 1.5倍','\t（いちど くわえたら なかなか 離さない）','\t専用技「口金 パッチン」（吸収攻撃）');
   if(b==='w_tgphone')L.push('タガバソウが 装備すると：','\tゴッドダイスで ヒフミか 目が 出たら','\t地下の 仲間に 電話して 1回 振り直す');
