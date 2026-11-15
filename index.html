@@ -438,7 +438,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid'];
 const BASE_SKILLS={
@@ -1125,7 +1125,7 @@ const hasGaius=id=>{const c=G.chars[id];return !!c&&[baseW(c.wpn),baseW(c.wpn2)]
 function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=d.type;
   if(d.rar===6&&b!=='w_umegae'&&b!=='w_tgphone'&&b!=='w_misono'&&b!=='w_gamaguchi'&&b!=='w_kinsho')L.push(`XR武器：キャラLv${XRW_LV+1}以上で 装備できる`);
   if(t==='祝詞')L.push('神主 専用');else if(GOD_BOOST[wid])L.push(`だれでも 装備できる（神が 持つと 攻撃・魔力 ${GOD_BOOST[wid]}倍）`);
-  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');
+  else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');else if(t==='書')L.push('導きの師 吉田松陰 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
   if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
   if(b==='w_kinbat')L.push('装備すると：','\t攻撃する たびに 金メッキが 剥がれ','\t攻撃力が 10%ずつ 下がる（戦闘中・最低 30%）','\t専用技「剥がれる」（強打。 攻撃力が 20% 下がる）');
@@ -1140,7 +1140,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -1264,6 +1264,7 @@ function drawHeld(t,P,acc){
     case 'スマホ':P(13,7,3,5,'#1c1c1c');P(14,8,1,3,'#3cbcfc');break;
     case '会員カード':P(12,8,4,3,'#d82800');P(12,9,4,1,'#f8b800');break;
     case 'がま口':P(12,8,4,4,'#a05000');P(12,7,4,1,'#f8b800');break;
+    case '書':P(12,7,4,5,'#5c3c24');P(13,8,3,3,'#e8dcc0');P(12,7,1,5,'#2c1c10');break;
     case '片手剣':P(14,4,1,7,'#d8d8d8');P(13,10,3,1,'#f8b800');break;
     case '両手剣':P(13,0,2,11,'#d8d8d8');P(12,10,4,1,'#f8b800');P(13,11,2,2,'#7c4c10');break;
     case '刀':P(14,2,1,9,'#fcfcfc');P(13,10,3,1,'#000');break;
@@ -1288,6 +1289,7 @@ function drawWIcon(id,x,y,sc=1){
     case '扇':for(let r=0;r<8;r++){const w=Math.round(Math.sqrt(64-r*r));P(8-w,9-r,w*2,1,r%2?col:'#fcfcfc');}P(7,9,2,6,'#7c4c10');break;
     case '弓':for(let k=0;k<12;k++){const o=Math.round(Math.sin(k/11*Math.PI)*4);P(5+o,2+k,2,1,'#a05000');}P(5,2,1,12,'#fcfcfc');P(3,8,10,1,'#bcbcbc');P(12,7,2,3,col);break;
     case '会員カード':P(2,4,12,8,'#d82800');P(2,4,12,2,'#f8b800');P(3,7,6,1,'#fcfcfc');P(3,9,4,1,'#fcfcfc');P(10,8,3,3,'#f8b800');P(13,3,1,2,col);break;
+    case '書':P(3,3,10,11,'#5c3c24');P(4,4,8,9,'#e8dcc0');P(3,3,1,11,'#2c1c10');P(5,6,6,1,'#7c7c7c');P(5,8,6,1,'#7c7c7c');P(5,10,4,1,'#7c7c7c');P(7,4,2,2,'#d82800');break;
     case 'がま口':P(3,6,10,8,'#a05000');P(4,7,8,6,'#c87c3c');P(3,5,10,2,'#f8b800');P(5,3,2,3,'#f8b800');P(9,3,2,3,'#f8b800');P(6,2,1,1,'#fce0a8');P(10,2,1,1,'#fce0a8');P(13,3,1,2,col);break;
     case 'スマホ':P(5,1,7,14,'#1c1c1c');P(6,2,5,10,'#3cbcfc');P(6,2,5,2,'#a4e4fc');P(7,13,3,1,'#5c5c5c');P(7,5,3,1,'#fcfcfc');P(7,7,2,1,'#fcfcfc');P(12,3,1,2,col);break;
     case '笏':for(let k=0;k<12;k++)P(4+Math.round(k*.35),3+k,3,1,'#c89060');P(4,3,3,1,'#e8c08a');P(5,14,2,1,'#7c4c10');for(let k=0;k<6;k++)P(8+k,6-Math.round(k*.6),1,1,'#503000');for(const [a,b2] of [[9,4],[12,2],[13,5],[10,7]]){P(a,b2,2,2,'#f878f8');P(a,b2,1,1,'#fcfcfc');}P(14,1,1,1,col);break;
