@@ -6804,10 +6804,10 @@ const KRARE=[{name:'ハリボテエレジー',d:'負け続けても 走り続け
   {name:'ドーピングバンザイ',d:'ありえない 速さで 走るが\nレース後の 検査で 失格に なることも…',w:()=>6,pace:1.9,dq:.4},
   {name:'サイキナヲ',d:'現代の 気まぐれ 名馬。 スタートは すごく 遅いが\n最後の 最後の 最後で 本気を 出す（かも しれない）',w:r=>1.6+r()*.8,pace:1,saiki:1},
   {name:'ジェニファーピームラタ',d:'異国から やってきた 超良血の 貴公子（牡馬）。\n特殊能力「ターボスプリント」\n序盤・中盤・終盤 隙が ない！',w:()=>3.6,pace:1.6,turbo:1,rr:.15,ultra:1},
-  {name:'チョウヤクハードラー',d:'障害レースの 申し子。 主戦は 泉谷 駿助。\n竹柵を 低く 鋭く 飛びこえる。\n障害なら 敵なし、 平地では いまひとつ…',w:()=>2.4,pace:1.2,jk:'泉谷 駿助',jumper:1,jh:1.8,rr:.6},
+  {name:'チョウヤクハードラー',d:'障害レースの 申し子。 主戦は 泉谷 駿助。\n竹柵を 低く 鋭く 飛びこえる。\n短い 障害ほど 強い。 平地では いまひとつ…',w:()=>2.4,pace:1.2,jk:'泉谷 駿助',jumper:1,short:1,jh:1.8,rr:.6},
   {name:'ミウラリュウジ',d:'長い 障害レースの 鉄人。\n水濠も 竹柵も リズムよく 越え、\n最後の 1周で 一気に 抜け出す！（長い 障害ほど 強い）',w:()=>2.3,pace:.3,jumper:1,long:1,jh:1.3,rr:.6}];
 /* 激レア馬の 主戦騎手と 障害の 得意・不得意 */
-function kRareFix(horses,dist){const j=/^障害/.test(dist);horses.forEach(h=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;if(K.jumper)h.w*=j?(K.long?(parseInt(dist.replace(/\D/g,''))>=3300?2.4:1.6):2):(K.long?.6:.4);});}
+function kRareFix(horses,dist){const j=/^障害/.test(dist);horses.forEach(h=>{if(h.rare==null)return;const K=KRARE[h.rare];if(K.jk)h.jk=K.jk;if(K.jumper){const m_=parseInt(dist.replace(/\D/g,''))||0;h.w*=j?(K.long?(m_>=3300?2.4:1.6):K.short?(m_<=2880?2.8:m_<=3300?2:1.3):2):(K.long?.6:.4);}});}
 const kRarePick=r=>{const T=KRARE.reduce((a,K)=>a+(K.rr||1),0);let x=r()*T;for(let k=0;k<KRARE.length;k++){x-=KRARE[k].rr||1;if(x<0)return k;}return 0;};
 const SAIKI_P=.3;
 const BABA=[['良',.15],['稍重',.22],['重',.3],['不良',.4]],KDIST=['芝1200m','芝1800m','芝2000m','ダ1700m','芝2600m'];
