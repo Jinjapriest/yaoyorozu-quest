@@ -1697,9 +1697,9 @@ function charListScr(){
   push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}if(r!=null)charDetail(ids()[r],refresh);},drw(a){R(0,0,W,H,'#000');menuDraw(m,a);}});
 }
 function charDetail(id,after){
-  const m=mkMenu(['経験値書を使う','武器をそうびする','もどる'],{x:4,y:172,w:124});
-  push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===2){pop();after&&after();return;}
-      if(r===0)bookMenu(id,'char');if(r===1)equipMenu(id);},
+  const m=mkMenu(['経験値書を使う','武器をそうびする','スキルを見る','もどる'],{x:4,y:172,w:124});
+  push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'||r===3){pop();after&&after();return;}
+      if(r===0)bookMenu(id,'char');if(r===1)equipMenu(id);if(r===2)skillView(id);},
     drw(a){
       R(0,0,W,H,'#000');win(0,4,256,166);const d=CH[id],c=G.chars[id],s=cstat(id);
       R(10,14,52,56,isXR(id)?`hsl(${(frame*3)%360},60%,30%)`:'#24188c');drawChar(id,12,20,(frame>>4)&1,3);
@@ -1712,10 +1712,21 @@ function charDetail(id,after){
       L.forEach((l,k)=>txt(l,12+(k%2)*120,76+Math.floor(k/2)*12,'#fcfcfc','left',116));
       txt('武器：'+(wNames(id)||'なし')+(spearPair(id)?'（双槍 全ステ+175%）':twoSlot(id)?'（2つまで）':''),12,114,spearPair(id)?rcol(6):'#fcfcfc','left',236);
       txt('装備：'+(d.wt==='any'?'すべて':d.wt.join('・'))+'（神器はだれでも'+(isGod(id)?'・神宝も':'')+(id==='buddha'?'・仏具も':id==='yarimasu'?'・飲料も':id==='beatkun'?'・マイクも':id==='snipekun'?'・狙撃銃も':'')+'）',12,126,'#bcbcbc','left',236);
-      txt(id==='itsuku'?`スキル：全キャラの 固有スキル（${skillsOf(id).length}種）`:'スキル：'+skillsOf(id).map(k=>SK[k].name).join('・'),12,140,id==='itsuku'?rcol(7):isXR(id)?'#f8d878':'#fcfcfc','left',236);
+      txt(id==='itsuku'?`スキル：管理者権限（全キャラの 固有スキル ${skillsOf(id).length}種）`:'スキル：'+skillsOf(id).map(k=>SK[k].name).join('・'),12,140,id==='itsuku'?rcol(7):isXR(id)?'#f8d878':'#fcfcfc','left',236);
       if(d.src!=='基本')txt('追加データ：'+d.src,12,153,'#7c7c7c','left',236);
       menuDraw(m,a);
     }});
+}
+/* キャラの スキルと 効果を 見る */
+function skillView(id){
+  const ks=skillsOf(id);if(!ks.length){toast('スキルは ありません');return;}
+  const m=mkMenu(ks.map(k=>({t:SK[k].name,r:fmt(skCost(id,k))+'MP',col:SK[k].k==='xr'||k==='sakatari'||k==='goddice'?'#f8d878':/^ws_/.test(k)?'#68ccfc':null})),{x:4,y:8,w:248,rows:Math.min(7,ks.length),title:id==='itsuku'?`管理者権限（${ks.length}種）`:`${CH[id].short}の スキル（${ks.length}種）`});
+  push({full:true,canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();return;}},
+    drw(a){R(0,0,W,H,'#000');menuDraw(m,a);const k=ks[m.sel];if(!k)return;
+      const ls=(skDesc(k,id)||'（説明なし）').split('\n'),hh=Math.min(110,ls.length*12+34),y0=236-hh;win(0,y0,256,hh);
+      txt(`${SK[k].name}　MP ${fmt(skCost(id,k))}`,10,y0+7,SK[k].k==='xr'?'#f8d878':'#f8b800','left',236);
+      ls.slice(0,Math.floor((hh-34)/12)).forEach((l,j)=>txt(l,10,y0+20+j*12,'#fcfcfc','left',236));
+      txt(/^ws_/.test(k)?'（装備中の 武器の スキル）':SK[k].k==='xr'?'（XRの スキル）':'',10,y0+hh-13,'#7c7c7c','left',236);}});
 }
 function bookMenu(id,kind){
   const inv=kind==='char'?G.items.b:G.items.o,nm=kind==='char'?'経験値書':'鍛錬鉱',obj=()=>kind==='char'?G.chars[id]:G.weapons[id];
@@ -2030,7 +2041,7 @@ function trialTalk(npc){const g=npc.trial==='guji',T_=G.trial||{w:0,l:0};
 function trialWin(pages){const T_=G.trial=G.trial||{w:0,l:0,m:1};T_.w++;T_.m=(T_.m||1)*1.06;G.items.b[4]=(G.items.b[4]||0)+10;G.items.o[4]=(G.items.o[4]||0)+10;
   const ur=rnd()<.2;if(ur)G.items.urtk=(G.items.urtk||0)+1;
   if(BT.sp.dev){T_.dev=(T_.dev||0)+1;const lucky=rnd()<1/65536;pages.push('開発者神主 タムライツク「…まさか 開発者が 負けるとは。\nおみごとです」');
-    if(lucky){const nw=addChar('itsuku');addWeapon('w_brokenpc');fullHeal();sfx('g5');pages.push('タムライツク「…この ゲーム、 まだ バグだらけで。\nよければ 一緒に 直して いきましょう」',nw?'XXR 開発者神主 タムライツクが 仲間に なった！':`開発者神主 タムライツクの 基礎Lvが あがった！（基礎Lv ${G.chars.itsuku.dup+1}）`,'専用武器「壊れたパソコン」を 手に入れた！','（タムライツクは 全キャラの 固有スキルを 使える）');}
+    if(lucky){const nw=addChar('itsuku');addWeapon('w_brokenpc');fullHeal();sfx('g5');pages.push('タムライツク「…この ゲーム、 まだ バグだらけで。\nよければ 一緒に 直して いきましょう」',nw?'XXR 開発者神主 タムライツクが 仲間に なった！':`開発者神主 タムライツクの 基礎Lvが あがった！（基礎Lv ${G.chars.itsuku.dup+1}）`,'専用武器「壊れたパソコン」を 手に入れた！','（タムライツクは 管理者権限で\n全キャラの 固有スキルを 使える）');}
     else pages.push('タムライツク「では、 開発に 戻ります。\n…あ、 バグ 見つけたら 教えてくださいね」','開発者は デバッグ画面の 中へ 消えていった…');}
   pages.push(BT.sp.by==='guji'?'宮司 タムラダイジ「見事じゃ…！\nそなたこそ まことの 勇者よ」':'禰宜 タムライツク「すごい…！\nあなたなら この 先も きっと 大丈夫です」',`明木の 試練を 乗りこえた！（${T_.w}勝目）\n経験値祝詞・極上鉱石 ×10${ur?'\nUR確定チケット ×1':''}`,'（次の 試練は 少し 手強くなる）');}
 function trialLose(){const T_=G.trial=G.trial||{w:0,l:0,m:1};T_.l++;T_.m=(T_.m||1)*.96;const by=BT.sp.by;
