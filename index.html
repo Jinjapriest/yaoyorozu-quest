@@ -1611,15 +1611,29 @@ function openShop(vi){
 /* ===================== メニュー ===================== */
 function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right',G.coins>=1e9?92:62);
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
+/* メニュー：スマホ風（アプリの アイコンを 選ぶ） */
+const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c']};
 function openMenu(){
   const NM=['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
   if(ajOK()){NM.splice(8,0,'アジト');FN.splice(8,0,ajMenu);}
-  const m=mkMenu(NM,{x:8,y:20,w:96});m.rows=12;
-  push({canBack:true,upd(){const r=menuUpd(m);if(r==='cancel'){pop();save();return;}if(r==null)return;
-      FN[r]();},
-    drw(a){menuDraw(m,a);coinWin(140,20);win(140,58,108,62);txt(`${G.day}日目`,148,65,'#fcfcfc');txt(`研修歴${G.career}`,240,65,'#bcbcbc','right');
-      txt(G.job?`仕事：${G.job.prog}/${G.job.need}`:'仕事：なし',148,78,'#bcbcbc','left',92);txt(G.meal&&G.meal.left>0?`食事：${G.meal.n}`:'食事：なし',148,91,'#bcbcbc','left',92);txt(`チケット ${G.items.tk}枚`,148,104,'#f8b800','left',92);if(titleOf()){win(140,122,108,20);txt('称号 '+titleOf(),148,128,'#f8d878','left',92);}
-      {const y=titleOf()?144:122,lv=plv();win(140,y,108,30);txt(`プレイヤーLv ${lv}`,148,y+6,'#68ccfc','left',92);const r=lv>=PLV_MAX?1:Math.min(1,(G.pexp||0)/pneed(lv));R(148,y+19,92,4,'#3c3c3c');R(148,y+19,Math.round(92*r),4,'#68ccfc');}}});
+  const PX=53,PY=2,PW=150,PH=236,SX=PX+6,SY=PY+12,SW=PW-12,SH=PH-24,GY=SY+70,CW=SW/4,RH=35;let sel=0,click=null,t=0;
+  const icon=(i,x,y,on)=>{const [g,c]=PH_APP[NM[i]]||['？','#5c5c5c'];const up=on?-2:0;R(x+1,y+up,20,22,c);R(x,y+1+up,22,20,c);R(x+1,y+1+up,20,3,'rgba(255,255,255,.25)');big(g,x+11,y+4+up,'#fcfcfc','center',12);
+    if(on){ctx.strokeStyle='#fcfcfc';ctx.lineWidth=1;ctx.strokeRect(x-2.5,y-3.5+up,27,27);}};
+  push({canBack:true,upd(){t++;const n=NM.length;if(click!=null){sel=click;click=null;sfx('ok');FN[sel]();return;}
+      let s=sel;if(I.pu)s-=4;if(I.pd)s+=4;if(I.pl)s--;if(I.pr)s++;if(s!==sel&&s>=0&&s<n){sel=s;sfx('cur');}
+      if(I.A){sfx('ok');FN[sel]();return;}if(I.B){sfx('cancel');pop();save();return;}},
+    drw(){ctx.globalAlpha=.6;R(0,0,W,H,'#000');ctx.globalAlpha=1;
+      R(PX,PY+4,PW,PH-8,'#181820');R(PX+4,PY,PW-8,PH,'#181820');R(PX+1,PY+1,PW-2,PH-2,'#26262e');R(PX+2,PY+2,PW-4,PH-4,'#181820');
+      const g=ctx.createLinearGradient(0,SY,0,SY+SH);g.addColorStop(0,'#24186c');g.addColorStop(.55,'#8c3c8c');g.addColorStop(1,'#f89050');ctx.fillStyle=g;ctx.fillRect(SX,SY,SW,SH);
+      /* 壁紙の 鳥居 */ctx.globalAlpha=.18;R(SX+SW/2-34,SY+SH-60,68,5,'#000');R(SX+SW/2-28,SY+SH-50,56,3,'#000');R(SX+SW/2-24,SY+SH-55,5,55,'#000');R(SX+SW/2+19,SY+SH-55,5,55,'#000');ctx.globalAlpha=1;
+      R(PX+PW/2-16,PY+5,32,4,'#000');pc(PX+PW/2+10,PY+7,1,'#26263c');
+      const now=nowMin();txt(hm(now),SX+5,SY+2,'#fcfcfc');for(let k=0;k<4;k++)R(SX+SW-40+k*4,SY+8-k*2,3,2+k*2,'#fcfcfc');txt('5G',SX+SW-24,SY+2,'#fcfcfc');R(SX+SW-12,SY+3,9,6,'#fcfcfc');R(SX+SW-11,SY+4,7,4,'#58f898');R(SX+SW-3,SY+5,1,2,'#fcfcfc');
+      /* ウィジェット */const wy=SY+14;ctx.globalAlpha=.35;R(SX+5,wy,SW-10,52,'#000');ctx.globalAlpha=1;
+      txt('財布',SX+9,wy+4,'#bcbcbc');txt(`${fmt(G.coins)}イェソ`,SX+SW-9,wy+4,'#f8d878','right',SW-44);txt(`${G.day}日目（${DOWN[dow()]}）`,SX+9,wy+16,'#fcfcfc','left',70);txt(`チケット ${G.items.tk}枚`,SX+SW-9,wy+16,'#f8b800','right',60);
+      const lv=plv(),rr=lv>=PLV_MAX?1:Math.min(1,(G.pexp||0)/pneed(lv));txt(`Lv ${lv}`+(titleOf()?`　${titleOf()}`:''),SX+9,wy+28,'#68ccfc','left',SW-20);R(SX+9,wy+39,SW-18,3,'#3c3c4c');R(SX+9,wy+39,Math.round((SW-18)*rr),3,'#68ccfc');
+      txt(G.job?`仕事 ${G.job.prog}/${G.job.need}`:'仕事なし',SX+9,wy+43,'#bcbcbc','left',60);txt(G.meal&&G.meal.left>0?`食事 ${G.meal.n}`:'食事なし',SX+SW-9,wy+43,'#bcbcbc','right',62);
+      NM.forEach((nm,i)=>{const c=i%4,r=Math.floor(i/4),x=Math.round(SX+c*CW+(CW-22)/2),y=GY+r*RH;icon(i,x,y,i===sel);txt(nm,x+11,y+24,i===sel?'#fcfcfc':'#e0e0e8','center',CW-2);region(x-4,y-3,30,34,()=>{click=i;});});
+      R(SX+SW/2-20,SY+SH-6,40,2,'#fcfcfc');region(0,0,PX,H,()=>{vB=true;});region(PX+PW,0,W-PX-PW,H,()=>{vB=true;});}});
 }
 /* ===================== プレゼントコード ===================== */
 const CODE_AL='23456789ABCDEFGHJKLMNPQRSTUVWXYZ',CODE_KEY='yaoyorozu/akiragi/present/2026',P40=1099511627776,P32=4294967296;
