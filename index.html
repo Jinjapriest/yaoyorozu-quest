@@ -552,6 +552,7 @@ const BASE_SKILLS={
   ranryo:{name:'蘭陵王',mp:60,target:'enemies',kind:'xr',verb:'舞った'},
   ishin_vg:{name:'維新Vanguard',mp:20,target:'allies',kind:'mpgive',verb:'説いた'},
   oyagokoro:{name:'おやごころ',mp:16,target:'allies',kind:'song',power:1,amount:.5,turns:4,verb:'示した'},
+  ws_kinbat:{name:'剥がれる',mp:12,target:'enemy',kind:'phys',power:2.4,verb:'フルスイングした'},
   ws_kinsho:{name:'籠中の 記',mp:24,target:'allies',kind:'song',power:1.5,amount:.7,turns:4,verb:'読み上げた'},
   ws_shichisei:{name:'七星剣',mp:30,target:'enemy',kind:'shichisei',power:1.1,hits:7,verb:'ふるった'},
   ws_eiria:{name:'魔力 分配',mp:15,target:'allies',kind:'eiria',verb:'かかげた'},
@@ -768,7 +769,7 @@ rebuild();
 const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho'];
 const hasSkW=(cid,w)=>{const c=G&&G.chars[cid];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes(w);};
 const hasTgPhone=id=>{const c=G&&G.chars[id];return !!c&&id==='tagaba'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_tgphone');};
-const WSK={w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
+const WSK={w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
 const wSkills=id=>{const c=G&&G.chars[id];if(!c)return[];const L=[c.wpn,typeof twoSlot==='function'&&twoSlot(id)?c.wpn2:null].filter(Boolean).map(w=>WSK[baseW(w)]).filter(k=>k&&SK[k]);return[...new Set(L)];};
 const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_umegae');};
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
@@ -1073,7 +1074,7 @@ function cstat(id,m){
   const xm=isXR(id)?XR_MUL:1;if(xm>1){atk*=xm;mag*=xm;def*=xm;spd*=xm;}
   if(spearPair(id)){atk*=PAIR_MUL;mag*=PAIR_MUL;def*=PAIR_MUL;spd*=PAIR_MUL;}
   const gm=hasGaius(id)?GAIUS_MUL:1;if(gm>1){atk*=gm;mag*=gm;def*=gm;spd*=gm;}
-  if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;if(m.mgMul)mag*=m.mgMul;if(m.mgAdd)mag+=m.mgAdd;if(m.atAdd)atk+=m.atAdd;}
+  if(m){if(m.ab>0)atk*=1+m.av;if(m.db>0)def*=1+m.dv;if(m.mgMul)mag*=m.mgMul;if(m.atMul)atk*=m.atMul;if(m.mgAdd)mag+=m.mgAdd;if(m.atAdd)atk+=m.atAdd;}
   const ml=G.meal&&G.meal.left>0?G.meal:null,ma=ml?ml.all:0;if(ml){atk*=1+ml.atk+ma;mag*=1+ma;def*=1+ma;}
   const shk=shocked()?(G.shockHard?1/100:1/3):1;atk*=shk;if(shocked()&&G.shockHard){mag*=shk;def*=shk;}
   const aj=(G.kaiho?[1,1.1,1.3][G.kaiho.rank]:1)*(G.ukaiho?[1,1.1,1.3][G.ukaiho.rank]:1)*(G.party.includes(id)?partyBonus():1)*(typeof honoBuf==='function'&&G.hono?honoBuf():1);atk*=aj;mag*=aj;def*=aj;
@@ -1127,6 +1128,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
   else if(t==='神宝')L.push('神 専用');else if(t==='仏具')L.push('仏陀 専用');else if(t==='飲料')L.push('先輩 専用');else if(t==='マイク')L.push('ビート兄 専用');else if(t==='狙撃銃')L.push('狙撃弟 専用');else if(t==='笏')L.push('天神 菅原道真公 専用（Lv制限なし）');else if(t==='スマホ')L.push('救世主 タガバソウ 専用（Lv制限なし）');else if(t==='会員カード')L.push('可能性の獣 トモヤヨシダ 専用（Lv制限なし）');else if(t==='がま口')L.push('捕食植物 タケウチジョウチャン 専用（Lv制限なし）');
   if(t==='聖槍')L.push('聖槍：持つと 武器を 2つまで 装備できる');
   if(WSK[b]&&SK[WSK[b]])L.push(`専用スキル「${SK[WSK[b]].name}」（装備すると 使える）`,...skDesc(WSK[b]).split('\n').map(x=>'\t'+x));
+  if(b==='w_kinbat')L.push('装備すると：','\t攻撃する たびに 金メッキが 剥がれ','\t攻撃力が 10%ずつ 下がる（戦闘中・最低 30%）','\t専用技「剥がれる」（強打。 攻撃力が 20% 下がる）');
   if(b==='w_kinsho')L.push('吉田松陰が 装備すると：','\t維新Vanguardの MP回復 30%→45%','\t専用技「籠中の 記」（味方全体 回復＋攻撃・守備 +70%）');
   if(b==='w_misono')L.push('トモヤヨシダが 装備すると：','\t覚醒ハイパーの 継続率 81%→84%','\t保留が たまる 確率 5%→8%','\t専用技「貯玉 再プレイ」（4連撃）');
   if(b==='w_gamaguchi')L.push('ジョウチャンが 装備すると：','\tプレデタープラントで 吸い取る 量 1.5倍','\t（いちど くわえたら なかなか 離さない）','\t専用技「口金 パッチン」（吸収攻撃）');
@@ -2136,7 +2138,7 @@ function pAct(i){
   const d=CH[m.id],c=G.chars[m.id],nm=d.short;BT.pend.push('\f');
   if(m.stun>0){m.stun--;if(m.stunWhy){P_(`${nm}は ${m.stunWhy}`);if(m.stun<=0)m.stunWhy=null;return;}P_(m.stun>0?`${nm}は 活動休止中…（あと${m.stun}ターン）`:`${nm}は 活動休止中…\n次のターンから 活動再開！`);return;}
   if(cmd.type==='atk'){P_(`${nm}の こうげき！`);P_(()=>{const e=liveEn(cmd.t);if(!e)return null;const st=cstat(m.id,m);let v=phys(st.atk,e.def,1);
-      if(rnd()<.06){v=Math.round(v*1.8);sfx('crit');NOW([dmgEnemy(e,v)]);return 'かいしんの いちげき！';}return dmgEnemy(e,v);});return;}
+      if(rnd()<.06){v=Math.round(v*1.8);sfx('crit');NOW([dmgEnemy(e,v)]);return 'かいしんの いちげき！';}return dmgEnemy(e,v);});P_(()=>kinPeel(m));return;}
   if(cmd.type==='guard'){P_(`${nm}は みを まもっている。`);return;}
   if(cmd.type==='herb'){P_(`${nm}は やくそうを つかった！`);P_(()=>{const t=BT.pt[cmd.t];if(G.items.herb<=0)return 'しかし やくそうが ない！';G.items.herb--;
       if(!isAlive(t))return 'しかし なにも おこらなかった。';const v=healM(t,Math.round(cstat(t.id,t).hp*.4));sfx('heal');return `${CH[t.id].short}の HPが ${fmt(v)} 回復した！`;});return;}
@@ -2163,7 +2165,7 @@ function pAct(i){
         const one=e=>sk.k==='phys'?phys(st().atk,e.def,sk.p*(sk.k==='phys'?1:rm)):magd(st().mag,e.def,sk.p*rm*km);
         if(sk.tg==='enemies')P_(()=>{if(!ok.v)return null;NOW(aliveEn().map(e=>()=>e.alive?dmgEnemy(e,one(e)):null));return null;});
         else for(let h=0;h<sk.hits;h++)P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);return e?dmgEnemy(e,one(e)):null;});
-        break;}
+        P_(()=>ok.v?kinPeel(m,cmd.k==='ws_kinbat'):null);break;}
       case 'gamble':P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);if(!e)return null;const pw=[0,.5,1,2,3,5][Math.floor(rnd()*6)];
         if(!pw)return 'しかし ハズレ！ 何も おこらなかった。';const v=phys(st().atk,e.def,pw*rm);if(pw>=3)NOW([dmgEnemy(e,v)]);return pw>=3?`大当たり！ ${pw}倍！`:dmgEnemy(e,v);});break;
       case 'drain':P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);if(!e)return null;const v=phys(st().atk,e.def,sk.p);const s=dmgEnemy(e,v);
@@ -2196,6 +2198,7 @@ function pAct(i){
     }
   }
 }
+function kinPeel(m,big){if(!BT||!hasSkW(m.id,'w_kinbat'))return null;const was=m.atMul||1;if(was<=.3)return null;m.atMul=Math.max(.3,was*(big?.8:.9));const pc=Math.round((1-m.atMul)*100);return big?`バットの 金メッキが ベリッと 剥がれた！\n${CH[m.id].short}の 攻撃力が ${pc}% ダウン…`:`金メッキが 少し 剥がれた…\n（${CH[m.id].short}の 攻撃力 -${pc}%）`;}
 function predEatAlly(m,i){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return '（捕食植物は 味方の 方を 見たが… 誰も いなかった）';
   const a=al[ri(0,al.length-1)],an=CH[a.id].short,ac=G.chars[a.id],cut=Math.max(1,Math.round(cstat(a.id,a).hp*.25));ac.hp=Math.max(1,ac.hp-cut);BT.shake=12;
   const ng=['predplant','kakuhyper','krmz_kikoku','gogo'];let pool=[...new Set(skillsOf(a.id).concat(XRSK[a.id]?[XRSK[a.id]]:[]))].filter(k=>SK[k]&&!ng.includes(k)&&SK[k].k!=='krmz2');
