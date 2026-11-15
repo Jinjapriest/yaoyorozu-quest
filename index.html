@@ -461,7 +461,7 @@ const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
 const WT={'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
-const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid'];
+const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami'];
 const BASE_SKILLS={
   hayabusa:{name:'はやぶさ斬り',mp:3,target:'enemy',kind:'phys',power:.75,hits:2,verb:'はなった'},
   kabuto:{name:'かぶと割り',mp:5,target:'enemy',kind:'phys',power:2.1,verb:'はなった'},
@@ -521,6 +521,9 @@ const BASE_SKILLS={
   hs_bottle:{name:'ドンペリ ゴールド',mp:10,target:'allies',kind:'heal',power:1.8,verb:'おろした'},
   hs_after:{name:'アフターの お誘い',mp:9,target:'enemies',kind:'debuff',amount:.4,turns:3,verb:'しかけた'},
   hs_no1:{name:'No.1の 風格',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'見せつけた'},
+  saiki_makuri:{name:'最後の最後の大まくり',mp:36,target:'enemies',kind:'phys',power:4.4,verb:'仕掛けた'},
+  saiki_kimagure:{name:'きまぐれ本気',mp:6,target:'enemy',kind:'gamble',verb:'出した（かも しれない）'},
+  saiki_kago:{name:'馬神の加護',mp:22,target:'allies',kind:'song',power:1.5,amount:.9,turns:4,verb:'授けた'},
   dazaifu:{name:'ダザイフバースト',mp:40,target:'enemies',kind:'mag',power:4.6,verb:'放った'},
   kitano:{name:'キタノサンダー',mp:18,target:'enemies',kind:'mag',power:2.9,verb:'落とした'},
   umekaze:{name:'梅風',mp:20,target:'allies',kind:'song',power:1.4,amount:.8,turns:4,verb:'吹かせた'},
@@ -625,6 +628,7 @@ const BASE_PACK={
     {id:'amaterasu',name:'天照大御神',short:'天照',rarity:'UR',weight:2,weapon:'any',hp:125,mp:70,atk:28,mag:40,def:26,spd:20,skills:['hikari','tenkei','nichirin'],look:{head:'sun',hair:'#000000',body:'#fcfcfc',accent:'#f8b800',legs:'#d82800',held:'神器'}},
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
+    {id:'umagami',name:'馬神 サイキナヲ',short:'サイキナヲ',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:170,mp:100,atk:58,mag:34,def:30,spd:40,skills:['saiki_makuri','saiki_kimagure','saiki_kago'],look:{head:'umagami',hair:'#7c4c10',body:'#f8b800',accent:'#fcfcfc',legs:'#5c3000',held:'神宝'}},
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
@@ -1129,7 +1133,7 @@ const XR_ALWAYS=['michizane'];/* 道真公は 他のXRと 並んでも 常に XR
 const xrLead=()=>G&&G.party?G.party.find(id=>xrReady(id)&&!XR_ALWAYS.includes(id)):null;
 const isXR=id=>xrReady(id)&&(XR_ALWAYS.includes(id)||!G.party||!G.party.includes(id)||xrLead()===id);
 const crar=id=>isXR(id)?6:CH[id].rar===7?7:Math.min(5,CH[id].rar);
-function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane'||id==='tagaba')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
+function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane'||id==='umagami'||id==='tagaba')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
   if(isXR(id)){if(id==='takao'){d.name='フルクマの守護者 タカヲマニワ';d.short='守護者タカヲ';}else{d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}}else{d.name=d._base.name;d.short=d._base.short;}}}
 function addWeapon(id){const w=G.weapons[id];if(w){w.dup=Math.min(999,w.dup+1);return false;}G.weapons[id]={lv:1,exp:0,dup:0};return true;}
 const GOD_IDS=['kami','amaterasu','susanoo','tsukuyomi','okuninushi'];
@@ -1270,6 +1274,7 @@ function drawChar(id,x,y,f=0,sc=1){
     case 'witch':P(3,3,10,1,L.hat);P(5,1,6,2,L.hat);P(6,-1,4,2,L.hat);P(8,-3,2,2,L.hat);P(5,2,6,1,L.acc);break;
     case 'hood':P(4,2,8,2,L.hood);P(4,4,1,5,L.hood);P(11,4,1,5,L.hood);P(7,2,2,1,L.acc);break;
     case 'eboshi':P(5,2,6,2,'#000');P(6,-1,4,3,'#000');P(8,-3,3,2,'#000');P(5,4,1,2,'#000');P(10,4,1,2,'#000');break;
+    case 'umagami':P(3,-3,10,1,'#f8d878');P(2,-2,1,2,'#f8d878');P(13,-2,1,2,'#f8d878');P(4,0,2,2,L.hair);P(10,0,2,2,L.hair);P(5,-1,1,1,L.hair);P(10,-1,1,1,L.hair);P(5,2,6,2,L.hair);P(4,3,1,7,L.hair);P(11,3,1,9,L.hair);P(12,5,1,6,L.hair);P(7,2,2,3,'#fcfcfc');break;
     case 'crown':P(4,2,8,2,L.hair);P(3,3,1,8,L.hair);P(12,3,1,8,L.hair);P(4,-2,8,1,'#f8d878');P(3,-1,1,2,'#f8d878');P(12,-1,1,2,'#f8d878');P(7,1,2,1,L.acc);break;
     case 'bard':P(3,2,10,2,L.hat);P(5,0,6,2,L.hat);P(11,-3,2,4,'#fc7460');P(12,-4,1,2,'#f8b800');P(4,4,1,3,'#f8b800');P(11,4,1,3,'#f8b800');P(5,5,6,1,'#000');P(5,4,2,1,'#000');P(9,4,2,1,'#000');P(6,4,1,1,'#3cbcfc');P(10,4,1,1,'#3cbcfc');P(7,7,2,1,'#fcfcfc');break;
     case 'band':P(5,2,6,2,L.hair);P(4,3,1,4,L.hair);P(11,3,1,4,L.hair);P(5,3,6,1,L.acc);P(12,3,2,1,L.acc);P(13,4,1,2,L.acc);break;
@@ -1866,7 +1871,7 @@ function rollRar(min){
   return k;
 }
 /* ガチャに 出ない キャラ（宝箱などで 入手） */
-const NOGACHA_C=['michizane','itsuku'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
+const NOGACHA_C=['michizane','itsuku','umagami'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
 function poolFor(b,rar){
   const all=(b.type==='weapon'?wpList():chList().filter(p=>!noGachaC(p.id))).filter(p=>p.rar===rar);
   return all;
@@ -5051,6 +5056,22 @@ function michiManifest(cb){const LEN=230,STR=[[24,70],[46,188],[66,40],[84,210]]
   cutscene(LEN,t=>{for(const [ts] of STR)if(t===ts&&!fired[ts]){fired[ts]=1;thunderSfx(0);}if(t===MAIN&&!fired.m){fired.m=1;thunderSfx(1);sfx('g5');}draw(t,false);},
     [[1,'…空が 急に かき曇った。'],[24,'ゴロゴロ… ピシャーン！'],[MAIN,'宝箱めがけて\n雷光が 落ちた！！'],[MAIN+44,'雷光の 中から\n天神 菅原道真公が 顕現した！']],
     ()=>dialog(['菅原道真公「この地、 未だ 帝土を 離れず、\n願わくば 居を このところに しめむ」','【XR】天神 菅原道真公が 仲間に なった！','（スキル：ダザイフバースト・キタノサンダー・梅風）'],()=>{if(stack[stack.length-1]===bg)pop();cb&&cb();}));}
+/* 馬神 サイキナヲ 降臨（G1で サイキナヲが 1着 ＆ 馬券的中） */
+function umagamiManifest(cb){const LEN=240,MAIN=96;const fired={};
+  const draw=(t,final)=>{if(final)t=LEN+(frame%60);
+    R(-8,-8,W+16,H+16,'#0c1c3c');for(let i=0;i<46;i++)R((i*53)%W,(i*29)%120,1,1,(i+(t>>3))%5?'#3c4c7c':'#fcfcfc');
+    R(-8,168,W+16,80,'#1c4c1c');for(let i=0;i<8;i++)R(i*34,178,26,2,'#2c6c2c');R(0,166,W,2,'#fcfcfc');for(let i=0;i<16;i++)R(i*16,160,2,6,'#fcfcfc');
+    if(t>=30){const op=Math.min(1,(t-30)/40),w=Math.round(16+op*44);ctx.globalAlpha=.25+op*.35;R(128-w/2,0,w,170,'#f8f8a0');ctx.globalAlpha=.5*op;R(128-w/4,0,w/2,170,'#fcfcfc');ctx.globalAlpha=1;
+      for(let k=0;k<5;k++){const cx=128+(k-2)*40+Math.sin(t/20+k)*4;R(cx-18,8+(k%2)*4,36,6,'#fcfcfc');R(cx-12,4+(k%2)*4,24,4,'#fcfcfc');}}
+    if(t>=MAIN&&t<MAIN+5)R(-8,-8,W+16,H+16,'#fcfcfc');
+    if(t>=MAIN){const k=Math.min(1,(t-MAIN)/70),y=Math.round(-40+k*(122-(-40)));ctx.globalAlpha=.6;pc(128,y+24,30+Math.sin(t/7)*3,'#f8d878');ctx.globalAlpha=1;
+      ctx.save();ctx.translate(128-24,y);ctx.scale(3,3);drawChar('umagami',0,0,(t>>4)&1);ctx.restore();
+      if(k<1)for(let i=0;i<6;i++)R(118+i*4,y-8-((t*3+i*9)%30),1,6,'#fcfcfc');}
+    if(t>=MAIN+70)for(let i=0;i<22;i++){const px=((i*37+t*.7)%W),py=((i*61+t*(.6+i%3*.2))%H);R(px,py,2,2,i%2?'#f8b800':'#fcfcfc');}};
+  const bg={full:true,upd(){},drw(){draw(0,true);}};push(bg);
+  cutscene(LEN,t=>{if(t===30&&!fired.a){fired.a=1;sfx('magic');}if(t===MAIN&&!fired.m){fired.m=1;sfx('g5');}draw(t,false);},
+    [[1,'…勝利の 余韻に 包まれる 場内。'],[30,'すると 天が 割れ、\nまばゆい 光が ターフに 差し込んだ！'],[MAIN,'光の 中から 何かが\nゆっくりと 降りてくる…！'],[MAIN+72,'天から 馬神 サイキナヲが 降臨した！！']],
+    ()=>dialog(['馬神サイキナヲ「…最後の 最後の 最後まで\n我を 信じた 者よ」','「その 信心に 免じ、\n汝の 旅路に 力を 貸そう」','【XR】馬神 サイキナヲが 仲間に なった！（基礎Lv100）','（スキル：最後の最後の大まくり・きまぐれ本気・馬神の加護）'],()=>{if(stack[stack.length-1]===bg)pop();cb&&cb();}));}
 /* 宝箱（防府天満宮の 本殿の 裏手） */
 function tboxOpen(c){G.tbox=G.tbox||{};if(G.tbox[c.id]){dialog('宝箱は からっぽだ。');return;}
   if(c.id==='kinsho'){G.tbox.kinsho=1;addWeapon('w_kinsho');save();sfx('g5');dialog(['松陰神社の 奥に まわると…','松下村塾の 方から 声が する。','松陰「…この 書は 長らく 禁書と されてきた。\n　されど 学ぶに 禁じる ものなど ない」','宝箱の 中に 古い 日記が 入っていた。','専用武器「禁書 鸚鵡籠中記」を 手に入れた！','（吉田松陰が 装備すると\n　維新Vanguardが 強くなり 専用技「籠中の 記」を 使える）']);return;}
@@ -7100,7 +7121,7 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
         region(0,0,W,H,()=>{vA=true;});}});};
   const finish=(res0)=>{let pay=0;const lines=[],dq=res0.dq,res=dq!=null?[...res0.filter(i=>i!==dq),dq]:res0;
     const bz=(rjkOf(card.horses[res[0]])||{}).bezos;for(const b of bets){if(keibaHit(b.t,b.sel,res)){const p=Math.floor(b.amt*b.od*(bz?1.5:1));pay+=p;lines.push(`的中！ ${b.t} ${b.sel.map(i=>i+1).join(kjoin(b.t))}　${fmt(p)}イェソ`);}}if(bz&&pay)lines.unshift('ジェフベゾスの 馬が 1着！\n払い戻しが 1.5倍に なった！');
-    const card0=card,g1=card.g1,gmul=card.sp?[1,30,10,5][card.sp.grade]:1,gnm=card.gname,hadB=bets.length,hit3=bets.some(b=>b.t==='3連単'&&keibaHit(b.t,b.sel,res)),mineL=[];
+    const umaG=!!(card.g1&&pay>0&&card.horses[res[0]]&&KRARE[card.horses[res[0]].rare]&&KRARE[card.horses[res[0]].rare].saiki),card0=card,g1=card.g1,gmul=card.sp?[1,30,10,5][card.sp.grade]:1,gnm=card.gname,hadB=bets.length,hit3=bets.some(b=>b.t==='3連単'&&keibaHit(b.t,b.sel,res)),mineL=[];
     {const U=G.uma;card.horses.forEach((x,i)=>{if(x.mine==null||!U||!U.horses[x.mine])return;const H=U.horses[x.mine],rk=res.indexOf(i);H.runs=(H.runs||0)+1;
       const PZ=[1e7,4e6,2.5e6];if(rk<3){const pz=Math.round(PZ[rk]*gmul*polMul('uma'));noCount(()=>{G.coins+=pz;});if(rk===0){H.win=(H.win||0)+1;if(g1)H.g1=(H.g1||0)+1;}mineL.push(`◎あなたの ${H.name}は ${rk+1}着！\n賞金 ${fmt(pz)}イェソを 獲得！`+(rk===0&&card.sp?`\n${gnm} 制覇！！`:''));}
       else mineL.push(`◎あなたの ${H.name}は ${rk+1}着だった…`);});}
@@ -7111,7 +7132,8 @@ function keibaFac(vi0,pre,L){const vi=vi0!=null?vi0:curVil,v=VIL[vi],bets=[...(p
     const pre=dq!=null?[`【審議】 ${dq+1}番 ${card0.horses[dq].name}は\nレース後の 検査で 失格と なった！`,'着順が 繰り上がります。']:[];
     const whI=card0.horses.findIndex(x=>x.whim),whK=whI<0?null:(card0.horses[whI].whim.k||'silver'),whL=whI<0?[]:whK==='terada'?(res0.yaru?[]:['神社田夏樹が ゴール 手前の 交差点で\nコースを 間違えた！！','場内「あーっと！ そっちじゃない！！」\n（のちに「神社田交差点」と 呼ばれる）']):[res0.yaru?'シルバーシップ「…今日は 気分が いい」\nやる気 満々で 大まくり！':'シルバーシップは 今日は やる気が なかった…\n（ゲートで 寝ていた）'];const sk=card0.horses.findIndex(x=>x.saiki),skL=sk<0?[]:res0.honki?[res.indexOf(sk)<3?'サイキナヲが 最後の 最後の 最後で\n本気を 出した！！ 場内 騒然！':'サイキナヲは 最後に 本気を 出したが\nわずかに 届かなかった…']:['サイキナヲは 今日は やる気が なかった…\n（ゲートで あくびを していた）'];
     const hr=h.rare!=null?[h.rare===0?'★ハリボテエレジーが 勝った！！\n場内が どよめきに 包まれる！':`★激レア馬 ${h.name}の 勝利！`]:[];
-    if(pay){sfx('win');dialog([...pre,head,...skL,...whL,...hr,...mineL,...lines.slice(0,3),`払い戻し 合計 ${fmt(pay)}イェソ！`,...unlock]);}else{sfx(mineL.length?'win':'cancel');dialog([...pre,head,...skL,...whL,...hr,...mineL,...(hadB?['馬券は ハズレた…']:mineL.length?[]:['レースを 見届けた。'])]);}
+    const umaCb=umaG?()=>{const nw=!G.chars.umagami;addChar('umagami');if(nw)G.chars.umagami.dup=Math.max(G.chars.umagami.dup,XR_LV-1);{const s2=cstat('umagami');G.chars.umagami.hp=s2.hp;G.chars.umagami.mp=s2.mp;}save();if(nw)umagamiManifest(()=>{});else{sfx('lv');dialog(['天から 一筋の 光が 差し込んだ…','馬神 サイキナヲの 力が 高まった！（基礎Lv＋1）']);}}:undefined;
+    if(pay){sfx('win');dialog([...pre,head,...skL,...whL,...hr,...mineL,...lines.slice(0,3),`払い戻し 合計 ${fmt(pay)}イェソ！`,...unlock],umaCb);}else{sfx(mineL.length?'win':'cancel');dialog([...pre,head,...skL,...whL,...hr,...mineL,...(hadB?['馬券は ハズレた…']:mineL.length?[]:['レースを 見届けた。'])]);}
     kRareNote();};
   push({full:true,canBack:true,
     upd(){m.items=items();const r=menuUpd(m);if(r==null)return;
