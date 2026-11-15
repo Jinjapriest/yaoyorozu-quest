@@ -545,6 +545,13 @@ const BASE_SKILLS={
   gogo:{name:'ごーごーちゃんす！',mp:12,target:'enemies',kind:'gogo',verb:'さけんだ'},
   zg_drink:{name:'栄養ドリンク 一気',mp:3,target:'allies',kind:'heal',power:.8,verb:'あおった'},
   zg_punch:{name:'寝不足 パンチ',mp:2,target:'enemy',kind:'phys',power:1.4,verb:'くりだした'},
+  ikki_sakura:{name:'一気コール・さくらんぼ',mp:10,target:'allies',kind:'buff',stat:'atk',amount:.5,turns:3,verb:'コールした'},
+  ikki_taiyo:{name:'一気コール・イケナイ太陽',mp:14,target:'enemies',kind:'phys',power:1.3,verb:'あおった'},
+  shoranjo:{name:'小乱声',mp:18,target:'enemies',kind:'mag',power:2.2,verb:'奏でた'},
+  chogeishi:{name:'長慶子',mp:22,target:'allies',kind:'heal',power:2.0,verb:'奏でた'},
+  ranryo:{name:'蘭陵王',mp:60,target:'enemies',kind:'xr',verb:'舞った'},
+  ishin_vg:{name:'維新Vanguard',mp:20,target:'allies',kind:'mpgive',verb:'説いた'},
+  oyagokoro:{name:'おやごころ',mp:16,target:'allies',kind:'song',power:1,amount:.5,turns:4,verb:'示した'},
   ws_shichisei:{name:'七星剣',mp:30,target:'enemy',kind:'shichisei',power:1.1,hits:7,verb:'ふるった'},
   ws_eiria:{name:'魔力 分配',mp:15,target:'allies',kind:'eiria',verb:'かかげた'},
   tm_kessho:{name:'結晶斬り',mp:14,target:'enemy',kind:'phys',power:3.0,verb:'斬りつけた'},
@@ -596,6 +603,8 @@ const BASE_PACK={
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
+    {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'UR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
+    {id:'shoin',name:'導きの師 吉田松陰',short:'松陰',rarity:'UR',weapon:'any',hp:170,mp:170,atk:14,mag:30,def:28,spd:14,skills:['ishin_vg','oyagokoro'],look:{head:'samurai',hair:'#202020',body:'#3c3c5c',accent:'#f8f0d8',legs:'#2c2c3c',held:'扇'}},
     {id:'pierrot',name:'ピエロ',short:'ピエロ',rarity:'SR',weapon:['メイス'],hp:64,mp:22,atk:16,mag:10,def:9,spd:13,skills:['gogo'],look:{head:'hood',hood:'#f8b800',body:'#d82800',accent:'#fcfcfc',legs:'#3cbcfc',held:'メイス'}},
     {id:'zangyo',name:'残業明けの サラリーマン',short:'サラリーマン',rarity:'N',weapon:['メイス'],hp:40,mp:8,atk:9,mag:3,def:6,spd:5,skills:['zg_drink','zg_punch'],look:{head:'hair',hair:'#282828',body:'#24306c',accent:'#d82800',legs:'#3c3c3c',held:'メイス'}},
     {id:'tomoya',name:'可能性の獣 トモヤヨシダ',short:'トモヤヨシダ',rarity:'XR',weight:1,weapon:'any',hp:175,mp:100,atk:52,mag:30,def:32,spd:26,skills:['tm_kessho','tm_totsugeki'],look:{head:'hair',hair:'#282828',body:'#4a6a24',accent:'#d82800',legs:'#24306c',held:'両手剣'}},
@@ -1058,7 +1067,7 @@ function blessMul(){return G.bless&&G.bless.left>0?1+G.bless.pct/100:1;}
 function wstat(id){const d=WPD[id],w=G.weapons[id];if(!d||!w)return{atk:0,mag:0};const p=(d.pow??WPOW[d.rar])*(1+(w.lv-1)*.06)*(1+w.dup*.1),t=WT[d.type];return{atk:Math.round(p*t.a),mag:Math.round(p*t.m)};}
 function partyBonus(){const mk=G.party.filter(id=>CH[id]&&CH[id].special==='miko');if(!mk.length||!G.party.some(id=>isKannushi(id)))return 1;return 1+Math.max(...mk.map(id=>.1+.04*CH[id].rar));}
 function cstat(id,m){
-  const d=CH[id],c=G.chars[id],lm=1+(c.lv-1)*.08,dm=1+c.dup*.1,bl=blessMul(),gb=(w,o)=>{const k=GOD_BOOST[w]&&isGod(id)?GOD_BOOST[w]:1;return{atk:o.atk*k,mag:o.mag*k};},w0=c.wpn&&WPD[c.wpn]?gb(c.wpn,wstat(c.wpn)):{atk:0,mag:0},w1=twoSlot(id)&&c.wpn2&&WPD[c.wpn2]?gb(c.wpn2,wstat(c.wpn2)):{atk:0,mag:0},w={atk:w0.atk+w1.atk,mag:w0.mag+w1.mag};
+  const d=CH[id],c=G.chars[id],lm=1+(c.lv-1)*.08,dm=1+c.dup*.1,bl=blessMul(),gb=(w,o)=>{const k=GOD_BOOST[w]&&isGod(id)?GOD_BOOST[w]:1;return{atk:o.atk*k,mag:o.mag*k};},w0=c.wpn&&WPD[c.wpn]?gb(c.wpn,wstat(c.wpn)):{atk:0,mag:0},w1=twoSlot(id)&&c.wpn2&&WPD[c.wpn2]?gb(c.wpn2,wstat(c.wpn2)):{atk:0,mag:0},WM=id==='takao'?1.2:1,w={atk:(w0.atk+w1.atk)*WM,mag:(w0.mag+w1.mag)*WM};
   let atk=(d.atk*lm*dm+w.atk)*bl,mag=(d.mag*lm*dm+w.mag)*bl,def=d.def*lm*dm*bl,spd=d.spd*(1+(c.lv-1)*.012)*dm;
   const xm=isXR(id)?XR_MUL:1;if(xm>1){atk*=xm;mag*=xm;def*=xm;spd*=xm;}
   if(spearPair(id)){atk*=PAIR_MUL;mag*=PAIR_MUL;def*=PAIR_MUL;spd*=PAIR_MUL;}
@@ -1074,21 +1083,21 @@ function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
-const XRSK={tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
+const XRSK={takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*1.5)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
-const skillsOf=id=>{const d=CH[id];let b=(d.sk||[]).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
+const skillsOf=id=>{const d=CH[id];let b=(id==='takao'&&isXR(id)?['shoranjo','chogeishi']:(d.sk||[])).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
 /* 味方が 負けそうか：半数以上が 戦闘不能、 または HP合計が 30%以下 */
 function gdPinch(){if(typeof BT==='undefined'||!BT||!BT.pt)return false;const n=BT.pt.length,dead=BT.pt.filter(t=>!isAlive(t)).length;let hp=0,mx=0;BT.pt.forEach(t=>{hp+=Math.max(0,G.chars[t.id].hp);mx+=cstat(t.id,t).hp;});return (n>1&&dead>=Math.ceil(n/2))||hp/Math.max(1,mx)<=.3;}
-let xrNews=[];const XR_MUL=2.4,XR_LV=100,xrCand=id=>!!CH[id]&&(id==='buddha'||isGod(id));
+let xrNews=[];const XR_MUL=2.4,XR_LV=100,XR_LVS={takao:40},xrCand=id=>!!CH[id]&&(id==='buddha'||id==='takao'||isGod(id));
 const xrNative=id=>!!(CH[id]&&CH[id].rar===6);/* 生まれつきXR（伊邪那岐・伊邪那美） */
-const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=XR_LV));
+const xrReady=id=>!!(G&&G.chars&&G.chars[id])&&(xrNative(id)||(xrCand(id)&&G.chars[id].dup+1>=(XR_LVS[id]||XR_LV)));
 /* XRは 編成に 1体だけ。パーティ内で 先頭の 1体のみ XR、2体目以降は UR扱い（基礎Lvは そのまま） */
 const XR_ALWAYS=['michizane'];/* 道真公は 他のXRと 並んでも 常に XR */
 const xrLead=()=>G&&G.party?G.party.find(id=>xrReady(id)&&!XR_ALWAYS.includes(id)):null;
 const isXR=id=>xrReady(id)&&(XR_ALWAYS.includes(id)||!G.party||!G.party.includes(id)||xrLead()===id);
 const crar=id=>isXR(id)?6:Math.min(5,CH[id].rar);
 function applyXR(){for(const id in CH){if((!xrCand(id)&&!xrNative(id))||id==='momo'||id==='michizane'||id==='tagaba')continue;const d=CH[id];if(!d._base)d._base={name:d.name,short:d.short};
-  if(isXR(id)){d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}else{d.name=d._base.name;d.short=d._base.short;}}}
+  if(isXR(id)){if(id==='takao'){d.name='フルクマの守護者 タカヲマニワ';d.short='守護者タカヲ';}else{d.name='全てを超越せし'+d._base.name;d.short='超越'+d._base.short;}}else{d.name=d._base.name;d.short=d._base.short;}}}
 function addWeapon(id){const w=G.weapons[id];if(w){w.dup=Math.min(999,w.dup+1);return false;}G.weapons[id]={lv:1,exp:0,dup:0};return true;}
 const GOD_IDS=['kami','amaterasu','susanoo','tsukuyomi','okuninushi'];
 const isGod=id=>GOD_IDS.includes(id)||!!(CH[id]&&CH[id].special==='god');
@@ -1490,6 +1499,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     for(let ty=ty0;ty<=ty0+15;ty++)for(let tx=tx0;tx<=tx0+16;tx++)drawTile(tileAt(tx,ty),tx*16-camX,ty*16-camY);
     for(const q of G.rifts){const sx=q.x*16-camX,sy=q.y*16-camY;if(sx<-16||sy<-16||sx>W||sy>H)continue;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,4,'#6800a8');
       for(let k=0;k<6;k++){const an=k/6*Math.PI*2+frame*.1;R(Math.round(sx+8+Math.cos(an)*5),Math.round(sy+8+Math.sin(an)*5),2,2,k%2?'#d82800':'#f878f8');}}
+    {const n=namidaPos(),sx=n.x*16-camX,sy=n.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawNamida(sx,sy);}
     if(G.ajito&&G.ajito.x!=null&&ajOK()){const sx=G.ajito.x*16-camX,sy=G.ajito.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAjHouse(sx,sy);}
     drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();fkHeatBadge();
     const vi=nearestVil(G.pos.x,G.pos.y),v=VIL[vi],t=v.tier;
@@ -1504,6 +1514,7 @@ function startField(){setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
 function onStep(pv){timeAdd(5);fkHeatStep();
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
+  {const n=namidaPos();if(n.x===x&&n.y===y){namidaEv();return;}}
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
   if(t===T.KQSPOT){kqFac('kqcable');return;}
@@ -2142,6 +2153,7 @@ function pAct(i){
         P_(()=>ok.v?'七支刀の 七つの 刃が 星のように 輝いた！':null);
         for(let h=0;h<7;h++)P_(()=>{if(!ok.v)return null;const e=liveEn(cmd.t);if(!e)return null;const t=roll();if(t[0]==='超絶')BT.shake=10;const r=dmgEnemy(e,phys(st().atk,e.def,t[1]));return `${['一','二','三','四','五','六','七'][h]}の星【${t[0]}】 ${r||''}`;});
         P_(()=>{if(!ok.v)return null;if(rnd()<.3){m.stun=Math.max(m.stun||0,1);m.stunWhy='七星剣の 反動で 動けない…';return `${CH[m.id].short}は 七星剣の 反動で\n次の ターン 動けない！`;}return null;});break;}
+      case 'mpgive':P_(()=>{if(!ok.v)return null;const mx=st().mp,al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return 'しかし 伝える 相手が いない！';sfx('heal');NOW(al.map(t=>()=>{const tc=G.chars[t.id],tm=cstat(t.id,t).mp,v=Math.min(tm-tc.mp,Math.round(mx*.3*rm));tc.mp+=v;return `${CH[t.id].short}の MPが ${fmt(v)} 回復した！`;}));return '「諸君、 狂いたまえ」\n松陰の 志が みかたに 伝わっていく！';});break;
       case 'gogo':{const sum=[['キツネ',1.3,0],['サイ',2.0,0],['ゾウ',1.1,1]];P_(()=>ok.v?'「ごーごーちゃんす！！」\nピエロの 帽子から 動物たちが 飛び出した！':null);
         sum.forEach(([nm,pw,all])=>{P_(()=>{if(!ok.v||!BT.en.some(e=>e.alive))return null;const tg=all?BT.en.filter(e=>e.alive):[liveEn(-1)||BT.en.find(e=>e.alive)];NOW(tg.filter(Boolean).map(e=>()=>e.alive?dmgEnemy(e,phys(st().atk,e.def,pw)):null));return all?`${nm}が 地響きを 立てて 突進！`:`${nm}が 飛びかかった！`;});});break;}
       case 'phys':case 'mag':{
@@ -2215,6 +2227,7 @@ function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st(),F=BT
           NOW([()=>`${e.label}に 捕食植物が 食らいついた！\n`+dmgEnemy(e,hpA),()=>`${e.label}の 攻撃力を ${fmt(atA)} 吸収した！`,()=>{if(!isAlive(m))return null;const v=healM(m,hpA);return `${CH[m.id].short}の HPが ${fmt(v)} 回復した！`;},()=>{m.ab=Math.max(m.ab||0,5);m.av=Math.min(4,(m.av||0)+atA/base*F);return `${CH[m.id].short}の 攻撃力が ${fmt(atA)} あがった！`;},()=>predEatAlly(m,i)]);
           sfx('magic');BT.shake=12;return '「喰らい尽くせ……！」\n大地を 割って 紫の 捕食植物が 現れた！';}
         if(k==='teiaiou'){BT.pt.forEach(t=>FH(t));live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.5));e.mag=Math.round(e.mag*DB(.5));e.def=Math.round(e.def*DB(.7));}e.deb=4;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))):null));sfx('heal');BT.shake=14;return '4・5・6！ 大逆転の シゴロ返し！\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n敵の 攻撃・魔力 半減（4ターン）＋最大HPの 30% 削る！';}
+        if(k==='ranryo'){const L=live();NOW(L.map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.3))+phys(me.atk,e.def,3)):null));BT.pt.forEach(t=>{t.ab=Math.max(t.ab||0,4);t.av=Math.max(t.av||0,.8*F);});L.forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.6));e.mag=Math.round(e.mag*DB(.6));}e.deb=Math.max(e.deb||0,4);});sfx('magic');BT.shake=18;return '恐ろしい 仮面を つけた 陵王が 舞う…！\n敵全体に 大ダメージ！\nみかたの 攻撃力 +80%・敵の 攻撃・魔力 -40%（4ターン）';}
         if(k==='yuiga'){m.db=5;m.dv=4*F;BT.taunt={i,t:5};BT.shake=12;NOW(live().map(e=>()=>e.alive?dmgEnemy(e,magd(me.mag,e.def,6)):null));return '天上天下 唯我独尊！\n仏陀の 守備力が 超絶アップ！\n敵は 仏陀しか 攻撃できない！';}
         return null;}
 function pExtra(i){const m=BT.pt[i];if(!isAlive(m)||!(m.extra>0))return;BT.pend.push('\f');const nm=CH[m.id].short;
@@ -2266,7 +2279,7 @@ function autoCmd(i){
   {const db=mySk.find(k=>can(k)&&SK[k].k==='debuff');if(db&&BT.en.some(e=>e.alive&&!(e.deb>0))&&rnd()<.5)return{type:'skill',k:db};}
   const bf=mySk.find(k=>can(k)&&(SK[k].k==='buff'||SK[k].k==='song'));if(bf&&BT.pt.some(t=>isAlive(t)&&(SK[bf].st==='d'?t.db:t.ab)<=0)&&rnd()<.7)return{type:'skill',k:bf};
   const en=BT.en.map((e,j)=>j).filter(j=>BT.en[j].alive),weak=en.sort((a,b)=>BT.en[a].hp-BT.en[b].hp)[0];
-  if(can('gogo')&&BT.en.some(e=>e.alive)&&rnd()<.6)return{type:'skill',k:'gogo'};if(can('krmz_power')&&!m.atAdd)return{type:'skill',k:'krmz_power'};if(can('ws_eiria')&&!m.mgMul&&BT.pt.filter(isAlive).length>1&&rnd()<.5)return{type:'skill',k:'ws_eiria'};
+  if(can('gogo')&&BT.en.some(e=>e.alive)&&rnd()<.6)return{type:'skill',k:'gogo'};if(can('krmz_power')&&!m.atAdd)return{type:'skill',k:'krmz_power'};if(can('ishin_vg')&&BT.pt.some(t=>t!==m&&isAlive(t)&&G.chars[t.id].mp<cstat(t.id,t).mp*.4)&&rnd()<.6)return{type:'skill',k:'ishin_vg'};if(can('ws_eiria')&&!m.mgMul&&BT.pt.filter(isAlive).length>1&&rnd()<.5)return{type:'skill',k:'ws_eiria'};
   const best=f=>mySk.filter(f).sort((a,b)=>(SK[b].p||1)*(SK[b].hits||1)-(SK[a].p||1)*(SK[a].hits||1))[0];/* いちばん 強い 技を えらぶ（武器の 専用スキルも） */
   const aoe=best(k=>can(k)&&(SK[k].k==='phys'||SK[k].k==='mag')&&SK[k].tg==='enemies');
   if(aoe&&en.length>=2&&c.mp>=SK[aoe].mp*2)return{type:'skill',k:aoe};
@@ -2291,7 +2304,7 @@ function execTurn(){BT.turns=(BT.turns||0)+1;
   BT.en.forEach((e,i)=>{if(e.alive)for(let k=0;k<(e.boss?2:1);k++)acts.push({e:i,s:e.spd*(.75+rnd()*.5)});});
   acts.sort((a,b)=>b.s-a.s);BT.q=acts;
 }
-const XR_DESC={moekyun:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方の 攻撃・守備 +80%（4ターン）\n＋敵全体が 見とれて 3ターン 動けない',ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n＋敵全体の HPを 最大HPの 25% 削る',
+const XR_DESC={ranryo:'恐ろしい 仮面を つけて 陵王の 舞を 舞う。\n敵全体に 最大HPの 30%＋強攻撃\nみかたの 攻撃力 +80%・敵の 攻撃・魔力 -40%（4ターン）',moekyun:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方の 攻撃・守備 +80%（4ターン）\n＋敵全体が 見とれて 3ターン 動けない',ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n＋敵全体の HPを 最大HPの 25% 削る',
   unabarising:'敵全体を 5ターン 行動不能にし\n自分は 5ターン 毎ターン 追加攻撃する',
   nightparry:'味方全体の 攻撃・守備 +120%（5ターン）\n＋敵全体の 攻撃・魔力・守備 -50%（5ターン）',
   kunizukuri:'味方全体に 最大HPの 60%の シールド\n＋5ターン 毎ターン HPが 35% 回復',
@@ -2309,6 +2322,7 @@ function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',en
     case 'krmz1':return '魔力の 3割を 燃やし\nその 半分を 自分の 攻撃力に 上乗せする\n（戦闘中 ずっと／重ねがけ できる）';
     case 'krmz2':return '自分の HPが 0に なる かわりに\n自分の 魔力の 半分を\n味方全員に 分けて 底上げする';
     case 'shichisei':return '七支刀の 固有スキル\n敵1体に 7回 攻撃。 1回ごとの 威力は\n小・中・大・特大・超絶から ランダム\n使うと 30%で 次の ターン 動けない';
+    case 'mpgive':return '自分の 最大MPの 30%ずつ\n味方全員（自分以外）の MPを 回復する';
     case 'eiria':return 'エイリア石の 固有スキル\n自分の 魔力の 半分を\n味方全員に 分け与える（戦闘中 ずっと）';
     case 'gogo':return 'キツネ・サイ・ゾウを 召喚して 攻撃\nキツネ：敵1体（威力 ×1.3）\nサイ：敵1体（威力 ×2.0）\nゾウ：敵全体（威力 ×1.1）';
     case 'gd':return 'タガバソウの 固有スキル（1戦に 1回）\n味方が 負けそうな ときだけ 使える\n（半数以上が 戦闘不能 か HP合計 30%以下）\n神の 賽の 出目で 大逆転…！';
@@ -2850,7 +2864,7 @@ const townScr={full:true,mv:null,bt:0,
     if(!this.mv&&dayQShow())return;
     /* 出入りの 直後は 方向キーを 一度 離すまで 動かない（出入りの ループ防止） */
     if(this.lock&&!this.mv){if(I.u||I.d||I.l||I.r||fieldPtr)return;this.lock=0;}
-    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(!TW.ship)timeAdd(1);if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.kanShop)exitKanShop();else if(TW.jogai||TW.diet||TW.kanIn)exitJogai();else leaveTown();}}return;}
+    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){TW.px=this.mv.x1;TW.py=this.mv.y1;this.mv=null;if(!TW.ship)timeAdd(1);if(TW.kanIn&&takaoEnc())return;if(TW.C[TW.py][TW.px].t==='exit'){if(TW.ship)exitShip();else if(TW.kanShop)exitKanShop();else if(TW.jogai||TW.diet||TW.kanIn)exitJogai();else leaveTown();}}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0,fresh=I.pu||I.pd||I.pl||I.pr||ptrFresh;ptrFresh=false;
     if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
@@ -5718,6 +5732,24 @@ function skWin(sp,back,pages){const S=skS(),q=skQ(),w=sp.wave||1,NW=GSTG[sp.st].
       titleCard('人類保管計画編　完',()=>push(skEndingScr(()=>{sfx('g5');returnField();dialog(['── ぶっ飛びサキタマ編　完 ──','【クリア報酬】','XR「可能性の獣 トモヤヨシダ」と\nXR「捕食植物 タケウチジョウチャン」が\nガチャに 登場する ように なった！','トモヤヨシダから「ダイナムミソノの 会員カード」、\nジョウチャンから「なかなか 開かない がま口財布」を\n託された！（ふたりの 専用武器）','ワクさんが「渡したい ものが ある」と\n言っていた。（マツゥヤマへ 行ってみよう）',rw]);}))))));});return;}
   back([]);}
 
+/* ===================== タカヲマニワ（マホロバ 歓楽街の 夜）・吉田松陰（涙松の 宝箱） ===================== */
+function takaoEnc(){if(!TW||!TW.kanIn||!isNight()||!VIL[TW.vi]||!VIL[TW.vi].capital||G.tkDay===G.day)return false;if(rnd()>=.08)return false;G.tkDay=G.day;
+  const had=!!G.chars.takao;
+  scene('fknight',['ネオンの 下で 誰かが 千鳥足で 歩いてくる…','？？？「おぉ〜い！ そこの きみたち〜！\nいっしょに 飲もうや〜！」',had?'タカヲ「…あれぇ？ また 会ったなぁ〜！\nもう一軒 いこう！ もう一軒！」':'泥酔した 男「おれぁ タカヲ！ タカヲマニワ！\n…古熊の 方から 来たんだぁ〜」','タカヲ「さくらんぼ〜♪ イケナイ たいよう〜♪\n…一気！ 一気！」','……朝まで 付き合わされた。'],()=>{addChar('takao');save();sfx('g5');
+    dialog(had?['タカヲマニワの 基礎Lvが あがった！',`（基礎Lv ${G.chars.takao.dup+1}${G.chars.takao.dup+1>=40?'':' ／ 40で XRに 覚醒'}）`]:['タカヲマニワが 仲間に なった！','（専用武器は ないが、 装備した 武器の 力が 1.2倍）','（基礎Lv 40で「フルクマの守護者」に 覚醒する…らしい）']);});return true;}
+let NMD=null;
+function namidaPos(){if(NMD)return NMD;let best=null,bd=1e9;for(let y=15;y<=21;y++)for(let x=133;x<=138;x++){const t=tileAt(x,y);if(t!==T.ROAD&&t!==T.GRASS)continue;if(VIL.some(v=>v.x===x&&v.y===y))continue;const d=Math.hypot(x-135.5,y-17.5)+(t===T.ROAD?0:.6);if(d<bd){bd=d;best={x,y};}}NMD=best||{x:135,y:17};return NMD;}
+function drawNamida(sx,sy){R(sx+7,sy+9,2,7,'#5c3410');R(sx+2,sy+6,12,3,'#1c5c1c');R(sx+4,sy+3,8,3,'#2c7c2c');R(sx+6,sy+1,4,2,'#3c9c3c');R(sx+12,sy+12,1,2,'#68ccfc');
+  if(!G.namida){R(sx+1,sy+11,7,5,'#a05c18');R(sx+1,sy+11,7,1,'#f8b800');R(sx+4,sy+13,1,1,'#f8d878');}}
+const NMD_ANS=['かえらじとおもいさだめしたびなればひとりぬるるなみだまつかな','かへらじとおもひさだめしたびなればひとしほぬるるなみだまつかな','かえらじとおもいさだめしたびなればひとしおぬるるなみだまつかな','帰らじと思ひ定めし旅なればひとしほぬるる涙松かな','帰らじと思い定めし旅なればひとりぬるる涙松かな'];
+const nmdNorm=t=>String(t||'').replace(/[\s、。,.・　「」]/g,'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+function namidaEv(){if(G.namida){dialog(['涙松の 跡だ。','萩の 町が 遠くに 見える…','（宝箱は もう 空っぽだ）']);return;}
+  dialog(['── 涙松の 跡 ──','萩を 出る 旅人が 最後に 城下を 振り返り\n涙を 流したと いう 場所だ。','松の 根元に 古い 宝箱が ある。\n蓋には 和歌を 刻む 枠が ある…'],()=>
+    choice('和歌を 刻みますか？',['刻む','やめる'],r=>{if(r!==0)return;
+      askText('涙松の 宝箱（和歌を ひらがなで）',[{label:'和歌',max:60,placeholder:'かえらじと…'}],v=>{if(!v)return;const a=nmdNorm(v[0]);
+        if(NMD_ANS.map(nmdNorm).includes(a)){G.namida=1;addChar('shoin');save();sfx('g5');
+          dialog(['……カチリ。 宝箱が 開いた！','中から 一冊の 書物と…\n穏やかな まなざしの 人物が 現れた。','「かへらじと 思ひさだめし 旅なれば…\n　よくぞ この 歌を 覚えていて くれた」','導きの師 吉田松陰が 仲間に なった！','松陰「至誠にして 動かざる者は\n　未だ これ有らざるなり。 共に 参ろう」']);}
+        else{sfx('bump');dialog(['……何も 起こらない。','（萩を 去る 者の 歌…\n　この 地で 詠まれた 歌の ようだ）']);}});},88));}
 /* ===================== アジト（サキタマ編 クリア報酬） ===================== */
 const AJ_F={bed:{n:'ベッド',p:3000,h:2,d:'寝ると 仲間全員の HP・MPが 全回復'},shelf:{n:'本棚',p:2000,d:'いろいろな 本が 読める'},
   ih:{n:'IHコンロ',p:8000,d:'自炊すると 攻撃 +10%（3戦）'},pcd:{pc:1,n:'ゲーミングPC（デスクトップ）',p:50000,d:'静かで よく冷える タワー型'},
@@ -6265,6 +6297,7 @@ function fkSceneBg(k){if(!k.startsWith('fk'))return false;
   const sky=(a,b)=>{R(0,0,W,H,a);R(0,0,W,70,b);};
   if(k==='fkwinter'){sky('#9cc8e8','#c8e0f8');for(let i=0;i<60;i++)R((i*53+(frame>>1)*(1+i%3))%W,(i*37+frame*(1+i%2))%H,2,2,'#fcfcfc');R(0,150,W,90,'#e8f0f8');
     for(let x=14;x<W;x+=18){R(x,132,2,22,'#fcfcfc');R(x-1,122,4,12,'#2c9c3c');}return true;}
+  if(k==='fknight'){R(0,0,W,H,'#0c0820');for(let i=0;i<24;i++)R((i*53)%W,(i*29)%70,1,1,'#fcfcfc');for(let x=0;x<W;x+=36){const h=70+((x*13)%60);R(x+2,170-h,32,h,'#1c1838');for(let y=176-h;y<164;y+=9)R(x+6+((y>>3)%2)*10,y,6,4,['#f878f8','#68ccfc','#f8d878'][(x+y)%3]);}R(0,170,W,70,'#202030');for(let i=0;i<8;i++)R(i*34,190,20,2,(frame>>3)%2?'#f878f8':'#68ccfc');return true;}
   if(k==='fkparty'){sky('#0c0820','#1c1040');for(let i=0;i<20;i++)R((i*53)%W,(i*29)%80,1,1,'#fcfcfc');R(0,150,W,90,'#3c2a14');R(70,140,116,40,'#3c3c3c');R(74,136,108,6,'#7c7c7c');
     for(let i=0;i<6;i++){const x=80+i*16;R(x,126,2,14,'#c8a060');R(x-2,122,6,4,'#fcfcfc');R(x-2,128,6,4,'#7c3c10');}for(let i=0;i<8;i++)R(84+i*12,144,6,3,(frame>>2)%3===i%3?'#f8b800':'#f83800');return true;}
   sky('#f89838','#fc7460');pc(214,40,18,'#f8d878');pc(214,40,12,'#fcfcb0');for(let i=0;i<8;i++)R(((i*61+(frame>>1))%W),80+i*9,30,1,'#fcd8a8');
