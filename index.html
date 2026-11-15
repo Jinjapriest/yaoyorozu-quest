@@ -7193,14 +7193,14 @@ function relayTeams(r,old,H1,H2){const TN=shufR(['明木','萩往還','天花','
   if(r()<.04){/* まれに ダイヤモンドチーム（全員 激レア馬） */const slot=ts[7],ks=shufR(pool.slice(),r).slice(0,4),avg=T.reduce((a,x)=>a+x.w,0)/8;
     T[slot]={name:'ダイヤモンドチーム',jk:T[slot].jk,kg:480,cd:1,w:avg*3.2,mem:ks.map(k=>KRARE[k].name),relay:1,dia:1,dm:ks};}
   return T;}
-/* リレーの アクシデント：フライング（DQ TR16.8）・バトンパス違反（DQ TR24.19）・レーン侵害（DQ TR17.3.1）・途中棄権（DNF） */
+/* リレーの アクシデント：フライング（DQ TR16.8）・バトンパス違反（DQ TR24.19）・レーン侵害（DQ T1〜T4＝何走目か）・途中棄権（DNF） */
 function relayIncidents(hs){const out=[],used=new Set(),pick=()=>{const c=hs.map((h,i)=>i).filter(i=>!used.has(i));const i=c[Math.floor(rnd()*c.length)];used.add(i);return i;};
   if(rnd()<.05)out.push({i:pick(),k:'FS',leg:0});
   if(rnd()<.05)out.push({i:pick(),k:'DNF',leg:Math.floor(rnd()*4)});
   if(rnd()<.06)out.push({i:pick(),k:'TR24.19',leg:1+Math.floor(rnd()*3)});
-  if(rnd()<.03)out.push({i:pick(),k:'TR17.3.1',leg:Math.floor(rnd()*4)});
+  if(rnd()<.05)out.push({i:pick(),k:'LANE',leg:Math.floor(rnd()*4)});
   return out;}
-const relayIncTxt=(o,h)=>o.k==='FS'?`${o.i+1}番 ${h.name}：フライング → 失格（DQ TR16.8）`:o.k==='DNF'?`${o.i+1}番 ${h.name}：第${o.leg+1}走の ${h.mem[o.leg]}が\n${['バトンを 落とした','脚を 痛めて 止まった','バトンを 落とした','コースの 外へ 逃げた'][o.leg]}… → 途中棄権（DNF）`:o.k==='TR24.19'?`【審議】${o.i+1}番 ${h.name}：第${o.leg}→${o.leg+1}走の バトンパスが\nテイクオーバーゾーンの 外 → 失格（DQ TR24.19）`:`【審議】${o.i+1}番 ${h.name}：第${o.leg+1}走で\n内側の ラインを 踏んだ → 失格（DQ TR17.3.1）`;
+const relayIncTxt=(o,h)=>o.k==='FS'?`${o.i+1}番 ${h.name}：フライング → 失格（DQ TR16.8）`:o.k==='DNF'?`${o.i+1}番 ${h.name}：第${o.leg+1}走の ${h.mem[o.leg]}が\n${['バトンを 落とした','脚を 痛めて 止まった','バトンを 落とした','コースの 外へ 逃げた'][o.leg]}… → 途中棄権（DNF）`:o.k==='TR24.19'?`【審議】${o.i+1}番 ${h.name}：第${o.leg}→${o.leg+1}走の バトンパスが\nテイクオーバーゾーンの 外 → 失格（DQ TR24.19）`:`【審議】${o.i+1}番 ${h.name}：第${o.leg+1}走の ${h.mem[o.leg]}が\nレーン侵害 → 失格（DQ T${o.leg+1}）`;
 function keibaCard(vi){G.keiba=G.keiba||{};const no=keibaRaceNo()||12,r=lcg(vi*6151+G.day*97+no*29),cap=!!VIL[vi].capital,H1=cap?MH1:KH1,H2=cap?MH2:KH2,J1=cap?MJ1:KJ1,J2=cap?MJ2:KJ2;
   const used=new Set(),horses=[0,1,2,3,4,5,6,7].map(i=>{let n;do{n=H1[Math.floor(r()*H1.length)]+H2[Math.floor(r()*H2.length)];}while(used.has(n));used.add(n);
     const sp=.55+r()*r()*1.3,cd=.85+r()*.3;let j;do{j=J1[Math.floor(r()*J1.length)]+' '+J2[Math.floor(r()*J2.length)];}while(used.has(j));used.add(j);return{name:n,jk:j,kg:440+Math.floor(r()*80),cd:Math.round(cd*100)/100,w:Math.pow(sp*cd,2.2)};});
