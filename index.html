@@ -6296,9 +6296,13 @@ function ajRoomMenu(P,npcs,sync){const A=ajS();
   const OPT=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す'].concat(fkDone()?['庭に 出る','料理を 食べる']:[]).concat(['光熱費を 見る','電気の 契約（昇圧）','外に 出る','とじる']);
   choice('',OPT,rr=>{const lab=OPT[rr];if(lab==='庭に 出る'){gardenScr();return;}if(lab==='料理を 食べる'){eatScr();return;}if(lab==='光熱費を 見る'){ajBillScr();return;}if(lab==='電気の 契約（昇圧）'){ajAmpScr();return;}const r=['もようがえ','家具を しまう','仲間を 呼ぶ','仲間を 帰す','外に 出る','とじる'].indexOf(lab);
     if(r===0){const ks=AJ_KA.filter(k=>ajLeft(k)>0);if(!ks.length){dialog(A.furn.length?'置ける 家具が もう ない。\n（太陽家具で 買い足そう）':'まだ 家具を 持っていない。\n規模「大」以上の 町の「太陽家具」で 買おう。');return;}
-      listPick('どの 家具を 置く？',ks.map(k=>({t:AJ_F[k].n,r:`のこり${ajLeft(k)}`})),i=>ajPlace(ks[i],P,npcs));}
+      const B=A.builds||[],usedPc=A.furn.filter(f=>f.k==='pcj').map(f=>f.b),usedSv=A.furn.flatMap(f=>f.k==='rack'?(f.sv||[]):[]),IT=[];
+      ks.forEach(k=>{if(k==='pcj'||k==='srvj'){B.forEach((b,i)=>{if(!!b.srv===(k==='srvj')&&!(k==='pcj'?usedPc:usedSv).includes(i))IT.push({k,bi:i});});}else IT.push({k});});
+      if(!IT.length){dialog('置ける 家具が もう ない。');return;}
+      listPick('どの 家具を 置く？',IT.map(o=>o.bi!=null?{t:`${o.k==='srvj'?'自作サーバー':'自作PC'}「${B[o.bi].name}」`,r:pcPart(B[o.bi],'cpu')[0].slice(0,9),col:'#7ee07e'}:{t:AJ_F[o.k].n,r:`のこり${ajLeft(o.k)}`}),i=>ajPlace(IT[i].k,P,npcs,IT[i].bi),
+        i=>{const o=IT[i];if(!o||o.bi==null)return o?AJ_F[o.k].d||'':'';const b=B[o.bi];return `CPU：${pcPartName(b,'cpu')}\nGPU：${b.gpu!=null?pcPartName(b,'gpu'):'なし'}\nメモリ：${pcPartName(b,'mem')}`;});}
     else if(r===1){if(!A.furn.length){dialog('置いてある 家具は ない。');return;}
-      listPick('どの 家具を しまう？',A.furn.map(f=>({t:AJ_F[f.k].n+(f.up?'（上）':''),r:`(${f.x+1},${f.y-1})`})),i=>{const f=A.furn.splice(i,1)[0];let nu=0;if(!f.up&&AJ_F[f.k].sup){const w_=AJ_F[f.k].w||1;const keep=A.furn.filter(q=>!(q.up&&q.y===f.y&&q.x>=f.x&&q.x<f.x+w_));nu=A.furn.length-keep.length;A.furn=keep;}save();dialog(`${AJ_F[f.k].n}を しまった。`+(f.k==='rack'&&(f.n||(f.sv||[]).length)?`\n（載せていた サーバー ${(f.n||0)+(f.sv||[]).length}台も しまった）`:'')+(nu?`\n（上に 載せていた ${nu}個も しまった）`:''));});}
+      listPick('どの 家具を しまう？',A.furn.map(f=>({t:(f.k==='pcj'&&(A.builds||[])[f.b]?`自作PC「${A.builds[f.b].name}」`:AJ_F[f.k].n)+(f.up?'（上）':''),r:`(${f.x+1},${f.y-1})`})),i=>{const f=A.furn.splice(i,1)[0];let nu=0;if(!f.up&&AJ_F[f.k].sup){const w_=AJ_F[f.k].w||1;const keep=A.furn.filter(q=>!(q.up&&q.y===f.y&&q.x>=f.x&&q.x<f.x+w_));nu=A.furn.length-keep.length;A.furn=keep;}save();dialog(`${AJ_F[f.k].n}を しまった。`+(f.k==='rack'&&(f.n||(f.sv||[]).length)?`\n（載せていた サーバー ${(f.n||0)+(f.sv||[]).length}台も しまった）`:'')+(nu?`\n（上に 載せていた ${nu}個も しまった）`:''));});}
     else if(r===2){if(A.chars.length>=3){dialog('アジトに 呼べるのは 3人まで。\n（「仲間を 帰す」で 入れかえよう）');return;}
       const ids=ownedChars().filter(id=>!A.chars.includes(id)&&id!==G.party[0]);if(!ids.length){dialog('呼べる 仲間が いない。');return;}
       listPick(`アジトに 呼ぶ 仲間（${A.chars.length}/3）`,ids.map(id=>({t:ajName(id),r:RAR[CH[id].rar]?RAR[CH[id].rar].n||'':''})),i=>{const id=ids[i];A.chars.push(id);sync();
@@ -6307,18 +6311,18 @@ function ajRoomMenu(P,npcs,sync){const A=ajS();
       listPick('帰ってもらう 仲間',A.chars.map(id=>({t:ajName(id),r:''})),i=>{const id=A.chars.splice(i,1)[0];sync();save();dialog(`${ajName(id)}「じゃあ またね！」`);});}
     else if(r===4){pop();sfx('ok');save();}
   },96);}
-function ajPlace(k,P,npcs){const A=ajS(),h=AJ_F[k].h||1,wd=AJ_F[k].w||1;let cx=Math.min(AJ_W-1,Math.max(0,P.x)),cy=Math.max(2,Math.min(AJ_H-h,P.y-1));
+function ajPlace(k,P,npcs,bsel){const A=ajS(),h=AJ_F[k].h||1,wd=AJ_F[k].w||1;let cx=Math.min(AJ_W-1,Math.max(0,P.x)),cy=Math.max(2,Math.min(AJ_H-h,P.y-1));
   const ok=(x,y)=>{if(k==='rsv'||k==='srvj'){const r=ajFurnAt(x,y);return !!(r&&r.k==='rack'&&rackFree(r)>=(k==='srvj'?2:1));}if(ajCanUp(k,x,y))return true;for(let d=0;d<h;d++)for(let e=0;e<wd;e++){const yy=y+d,xx=x+e;if(!ajFloor(xx,yy)||ajFurnAt(xx,yy)||(P.x===xx&&P.y===yy)||npcs.some(n=>n.x===xx&&n.y===yy)||(xx===AJ_DX&&yy===AJ_H-1))return false;}return true;};
   push({full:true,upd(){if(I.B){pop();return;}
       if(I.pu)cy=Math.max(2,cy-1);if(I.pd)cy=Math.min(AJ_H-h,cy+1);if(I.pl)cx=Math.max(0,cx-1);if(I.pr)cx=Math.min(AJ_W-wd,cx+1);
       if(I.A){if(!ok(cx,cy)){sfx('bump');if(k==='rsv'||k==='srvj')toast(k==='srvj'?'空きが 2台分 ある サーバーラックに 載せよう':'サーバーラックの 上で 置こう');return;}if(k==='rsv'){const r=ajFurnAt(cx,cy);r.n=(r.n||0)+1;if(A.srvDay==null)A.srvDay=G.day;save();sfx('ok');pop();toast('サーバーを ラックに 載せた！');return;}
-        if(k==='srvj'){const r=ajFurnAt(cx,cy),used=A.furn.flatMap(f=>f.k==='rack'?(f.sv||[]):[]),bi=(A.builds||[]).findIndex((q,i)=>q.srv&&!used.includes(i));if(bi<0){pop();return;}r.sv=(r.sv||[]).concat([bi]);if(A.srvDay==null)A.srvDay=G.day;save();sfx('ok');pop();toast(`${A.builds[bi].name}を ラックに 載せた！（2台分）`);return;}
-        const up=ajCanUp(k,cx,cy),o={k,x:cx,y:cy};if(up)o.up=1;if(k==='pcj'){const used=A.furn.filter(f=>f.k==='pcj').map(f=>f.b);o.b=(A.builds||[]).findIndex((_,i)=>!used.includes(i));}A.furn.push(o);let lk=null;if(up&&(k==='hmini'||k==='hstudio'))lk=ajLinkMon(o);if(up&&k==='mon')A.furn.filter(q=>q.up&&(q.k==='hmini'||q.k==='hstudio')).forEach(q=>{if(!A.furn.some(m=>m.k==='mon'&&m.x===q.mx&&m.y===q.my))ajLinkMon(q);});save();if(ajTrip())setTimeout(()=>toast('電気が 足りない！ ブレーカーに 注意'),0);sfx('ok');pop();
-        toast(lk?`${AJ_F[k].n}を 置いて モニターに 自動で つないだ！`:up?`${AJ_F[k].n}を ${AJ_F[ajFurnAt(cx,cy).k].n}に 載せた！`:`${AJ_F[k].n}を 置いた！`);}},
+        if(k==='srvj'){const r=ajFurnAt(cx,cy),used=A.furn.flatMap(f=>f.k==='rack'?(f.sv||[]):[]),bi=bsel!=null?bsel:(A.builds||[]).findIndex((q,i)=>q.srv&&!used.includes(i));if(bi<0){pop();return;}r.sv=(r.sv||[]).concat([bi]);if(A.srvDay==null)A.srvDay=G.day;save();sfx('ok');pop();toast(`${A.builds[bi].name}を ラックに 載せた！（2台分）`);return;}
+        const up=ajCanUp(k,cx,cy),o={k,x:cx,y:cy};if(up)o.up=1;if(k==='pcj'){const used=A.furn.filter(f=>f.k==='pcj').map(f=>f.b);o.b=bsel!=null?bsel:(A.builds||[]).findIndex((q,i)=>!q.srv&&!used.includes(i));}A.furn.push(o);let lk=null;if(up&&(k==='hmini'||k==='hstudio'))lk=ajLinkMon(o);if(up&&k==='mon')A.furn.filter(q=>q.up&&(q.k==='hmini'||q.k==='hstudio')).forEach(q=>{if(!A.furn.some(m=>m.k==='mon'&&m.x===q.mx&&m.y===q.my))ajLinkMon(q);});save();if(ajTrip())setTimeout(()=>toast('電気が 足りない！ ブレーカーに 注意'),0);sfx('ok');pop();
+        const nm=k==='pcj'&&A.builds[o.b]?`自作PC「${A.builds[o.b].name}」`:AJ_F[k].n;toast(lk?`${nm}を 置いて モニターに 自動で つないだ！`:up?`${nm}を ${AJ_F[ajFurnAt(cx,cy).k].n}に 載せた！`:`${nm}を 置いた！`);}},
     drw(){ajDrawAll(npcs,P,null);const good=ok(cx,cy),sx=AJ_OX+cx*16,sy=AJ_OY+cy*16;
-      if((frame>>3)&1&&k!=='rsv'&&k!=='srvj'){ctx.globalAlpha=.75;ajDrawF(k,sx,sy,false,k==='pcj'?{b:(A.builds||[]).length-1}:null);ctx.globalAlpha=1;}
+      if((frame>>3)&1&&k!=='rsv'&&k!=='srvj'){ctx.globalAlpha=.75;ajDrawF(k,sx,sy,false,k==='pcj'?{b:bsel!=null?bsel:(A.builds||[]).length-1}:null);ctx.globalAlpha=1;}
       ctx.strokeStyle=good?'#58f898':'#fc7460';ctx.lineWidth=1;ctx.strokeRect(sx+.5,sy+.5,wd*16-1,h*16-1);
-      win(4,216,248,22);txt(k==='rsv'||k==='srvj'?'サーバーラックを 選ぶ　A：載せる　B：やめる':ajCanUp(k,cx,cy)?`${AJ_F[k].n}：A：${AJ_F[ajFurnAt(cx,cy).k].n}に 載せる　B：やめる`:`${AJ_F[k].n}：十字で 移動　A：置く　B：やめる`,10,222,good?'#fcfcfc':'#fc7460','left',236);}});}
+      const PN=(k==='pcj'||k==='srvj')&&bsel!=null&&A.builds[bsel]?`「${A.builds[bsel].name}」`:AJ_F[k].n;win(4,216,248,22);txt(k==='rsv'?'サーバーラックを 選ぶ　A：載せる　B：やめる':k==='srvj'?`${PN}：ラックを 選ぶ　A：載せる`:ajCanUp(k,cx,cy)?`${PN}：A：${AJ_F[ajFurnAt(cx,cy).k].n}に 載せる　B：やめる`:`${PN}：十字で 移動　A：置く　B：やめる`,10,222,good?'#fcfcfc':'#fc7460','left',236);}});}
 function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
   if(!A.cut&&ajTrip()&&AJ_ELEC.has(f.k)){sfx('bump');dialog(['バチン！ ……ブレーカーが 落ちた！',`電気の 使いすぎだ。\n（${fmt(ajLoad())}W／契約 ${fmt(ajCap())}W）`,'（メニューの「電気の 契約（昇圧）」で\n　容量を 上げるか、 家具を 減らそう）']);return;}
   if(A.cut&&AJ_ELEC.has(f.k)){dialog([`${F.n}は 動かない…`,'電気と 水道が 止められている。\n（銀行の 普通預金に お金を 入れよう）']);return;}
