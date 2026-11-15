@@ -1645,7 +1645,7 @@ const CODE_KIND=[
   {n:()=>'XR なかなか 開かない がま口財布',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gamaguchi');},u:'個'},
   {n:()=>'UR エイリア石',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_eiria');},u:'個'},
   {n:()=>'XXR 開発者神主 タムライツク＋\n専用武器 壊れたパソコン',give:(g,a)=>{for(let i=0;i<a;i++){addChar('itsuku');addWeapon('w_brokenpc');}fullHeal();},u:'セット'},
-  {n:g=>['UR 猫の小判（基礎Lv100）'][g],gmax:0,give:(g,a)=>{for(let i=0;i<a;i++){const w=G.weapons.w_koban;if(w)w.dup=Math.min(999,w.dup+100);else{addWeapon('w_koban');G.weapons.w_koban.dup=99;}}},u:'枚'}];
+  {n:g=>['UR 猫の小判（基礎Lv100）','【特別】 イェソ'][g],gmax:1,mul:g=>g===1?1e12:1,un:g=>g===1?'イェソ':'枚',give:(g,a)=>{if(g===1){G.coins+=a*1e12;return;}for(let i=0;i<a;i++){const w=G.weapons.w_koban;if(w)w.dup=Math.min(999,w.dup+100);else{addWeapon('w_koban');G.weapons.w_koban.dup=99;}}},u:'枚'}];
 function makeCode(kind,grade,amount,serial){const pl=kind*68719476736+grade*17179869184+amount*16384+serial,ck=cChk(pl),c=cEnc(xor40(pl,cMask(ck)))+cEnc(ck);return c.match(/.{4}/g).join('-');}
 function readCode(raw){const t=String(raw).toUpperCase().replace(/[^0-9A-Z]/g,'');if(t.length!==16||[...t].some(c=>!CODE_AL.includes(c)))return null;
   const ck=cDec(t.slice(8)),pl=xor40(cDec(t.slice(0,8)),cMask(ck));if(cChk(pl)!==ck)return null;
@@ -1655,7 +1655,7 @@ function redeemCode(raw){
   const c=readCode(raw);if(!c)return{ok:false,msg:['コードが ちがうようだ…\nもう一度 たしかめてみよう。']};
   if(!G.codes)G.codes={};if(G.codes[c.key])return{ok:false,msg:['このコードは もう 使われている。']};
   const K=CODE_KIND[c.kind];if(K.pick)return{ok:true,pick:c};K.give(c.grade,c.amount);G.codes[c.key]=G.day||1;save();
-  return{ok:true,msg:['プレゼントが とどいた！',`${K.n(c.grade)} ×${fmt(c.amount*(K.mul||1))}${K.u}を\n受け取った！`]};
+  return{ok:true,msg:['プレゼントが とどいた！',`${K.n(c.grade)} ×${fmt(c.amount*(typeof K.mul==='function'?K.mul(c.grade):(K.mul||1)))}${K.un?K.un(c.grade):K.u}を\n受け取った！`]};
 }
 function godPick(c,done){
   const ids=Object.keys(CH).filter(xrCand).sort((a,b)=>(a==='buddha')-(b==='buddha'));
