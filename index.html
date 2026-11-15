@@ -2021,7 +2021,7 @@ function trialBoss(){const L=trialBossList(),d=L[Math.floor(rnd()*L.length)],e=m
   e.magic=true;e.dboss=true;e.trial=1;return e;}
 /* 20回に 1回：開発者神主 タムライツク（超絶強敵） */
 function devBoss(){const e=trialBoss();e.name='開発者神主 タムライツク';e.c1='#fcfcfc';e.c2='#5cc8c8';e.shape='itsuku';e.w=56;e.h=74;
-  e.maxhp=e.hp=Math.round(e.maxhp*5);e.atk=Math.round(e.atk*1.8);e.mag=e.atk;e.def=Math.round(e.def*1.5);e.spd=Math.round(e.spd*1.3);e.multi=2;e.heavy=1;e.dev=1;return e;}
+  e.maxhp=e.hp=Math.round(e.maxhp*10);e.atk=Math.round(e.atk*2.5);e.mag=e.atk;e.def=Math.round(e.def*2);e.spd=Math.round(e.spd*1.5);e.multi=3;e.heavy=1;e.dev=1;return e;}
 function trialTalk(npc){const g=npc.trial==='guji',T_=G.trial||{w:0,l:0};
   const intro=g?['宮司 タムラダイジ「よう 参られた。\nわしは この 明木神社の 宮司、 タムラダイジじゃ」','「全てが 始まった この 地で\nそなたの 力、 試させて もらおう」']:['禰宜 タムライツク「禰宜の タムライツクです」','「万物が 生まれた この 地で…\nあなたの 本当の 力を 見せてください」'];
   dialog(intro,()=>choice(`明木の 試練に 挑みますか？\n相手は これまでの 強敵の 誰か…\n（試練 ${T_.w}勝 ${T_.l}敗）`,['挑む','やめる'],r=>{if(r!==0)return;
