@@ -6378,6 +6378,29 @@ function ajUse(f){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),F=AJ_F[f.k];
   if(f.k==='water'){G.party.forEach(id=>{const c=G.chars[id];if(!c||c.hp<=0)return;const s=cstat(id);c.hp=Math.min(s.hp,c.hp+Math.ceil(s.hp*.2));});if(G.fk)G.fk.heat=30;sfx('heal');save();dialog(['ウォーターサーバーで 冷たい 水を 飲んだ。','ごくごく… 生き返る！\n（HPが 少し 回復した・体が 冷えた）']);return;}
   if(f.k==='pcj'){const b=(A.builds||[])[f.b];if(!b){dialog('自作PCだ。');return;}if(b.unst&&rnd()<.25){dialog(['電源ON！　……ピッ。 …プツン。','（電源容量が 足りない… もう一度 押そう）']);return;}pcDesktop(f);return;}
   dialog(F.n);}
+/* アジトの ヒント（稀に 次回シナリオ アイヂ大戦編、ごく稀に 黒幕） */
+const AJ_HINT_N=[
+ '西の 海の 向こうに\nアイヂって 大陸が あるらしいよ。',
+ 'アイヂでは ヲワリと ミカワが\nずっと 争ってる って 聞いた。',
+ 'アイヂの 真ん中に でっかい 壁が\n建ってる らしいぜ。',
+ 'アツタの森は 壁の 向こうへ 行ける\nただ 一つの 道… なんだって。',
+ 'トコナメの 港から 船が\n出なくなった らしい。 戦の せいかな。',
+ '手羽先と 味噌… どっちが うまいかで\n戦争に なるなんて あるのかな。',
+ 'ラーメソの 匂いが する 夢を 見た。\nスプーソで 食べる やつ。',
+ 'テバサキ刀 って 知ってる？\nヲワリの 武将が 振り回すらしい。',
+ 'ミカワの 方で 味噌の 弾が\n飛び交ってる って うわさだよ。',
+ 'クサナギの… イヤホン？\nなんだか 聞き覚えが あるような。'];
+const AJ_HINT_K=[
+ ['…最近 北の 山の 方から\n妙な 気配が するんだ。','（気のせい… だよな？）'],
+ 'GPA って 言葉を 聞くと\nなぜか 寒気が するんだよな。',
+ ['ダンボールで できた 笏を 持った 男を\n見たって やつが いたよ。','…まさかね。'],
+ 'イトシロ… って 地名 知ってる？\n山奥の 村らしいけど。',
+ ['アイヂの 争いって 誰かが\n裏で 糸を 引いてる 気がする。','…ただの 勘 だけどね。'],
+ ['夜中に 遠くから 声真似 みたいな\n声が 聞こえたんだ。','…誰の 声だったっけ。']];
+const AJ_HINT_OWN={
+ tagaba:{n:['ミカワの 空気… 久しく 吸って いないな。','故郷が 燃えている 気がする。'],k:['精華寮で 同じ 部屋だった あいつ…\n元気に しているだろうか。','…資格の ことで ずいぶん 荒れていたが。']},
+ jouchan:{n:'ミカワの 味噌の 匂いが 恋しい。\n…なんでも ない。',k:'あいつ… 卒業式の 日 一人だけ\n笑って なかったな。'},
+ tomoya:{n:'アツタの 森か…\nなにか 落とし物を した 気がするぜ。',k:['イトシロの 神主？\n…ああ あいつか。','（目が 笑って なかったな…）']}};
 function ajTalk(id){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),n=ajName(id),L=[];
   if(id==='tomoya')L.push(has('slot')?'7を 揃えるのは 得意だぜ！\n覚醒ハイパー 見せてやろうか？':'スロット台は ないのか？\n…いや 別に 打ちたい わけじゃ ないけどな。');
   if(id==='tomoya')L.push(['いいご身分ですね'],['日本語も 読めない…\nまずいなぁ','（カチャ… 銃を 構える 音）']);
@@ -6387,7 +6410,12 @@ function ajTalk(id){const A=ajS(),has=k=>A.furn.some(q=>q.k===k),n=ajName(id),L=
   if(has('pcd')||has('pcn'))L.push('あとで PC 貸してね。');else L.push('ゲーミングPC ほしいなあ。');
   if(has('slot'))L.push('スロット 打っても いい？');
   L.push('ここ 落ち着くね。','次は アイヂ だっけ？\n準備 しなきゃね。','アジト いいね。 また 来るよ。');
-  const pk=L[Math.floor(rnd()*L.length)];dialog(Array.isArray(pk)?[`${n}「${pk[0]}」`,...pk.slice(1).map(x=>x[0]==='（'?x:`${n}「${x}」`)]:`${n}「${pk}」`);}
+  const hr=rnd(),own=AJ_HINT_OWN[id];let pk;
+  if(hr<.006)pk=own&&own.k&&rnd()<.5?own.k:AJ_HINT_K[Math.floor(rnd()*AJ_HINT_K.length)];
+  else if(hr<.05)pk=own&&own.n&&rnd()<.5?own.n:AJ_HINT_N[Math.floor(rnd()*AJ_HINT_N.length)];
+  else pk=L[Math.floor(rnd()*L.length)];
+  if(hr<.006&&AC&&!muted){tone(98,.5,'triangle',.12);tone(92,.6,'triangle',.1,null,.3);}
+  dialog(Array.isArray(pk)?[`${n}「${pk[0]}」`,...pk.slice(1).map(x=>x[0]==='（'?x:`${n}「${x}」`)]:`${n}「${pk}」`);}
 function ajSlotScr(){const A=ajS(),S=['7','BAR','ベル','チェ','リプ','ベル','リプ','BAR','チェ','ベル'],C={'7':'#d82800','BAR':'#fcfcfc','ベル':'#f8d878','チェ':'#f878f8','リプ':'#68ccfc'};
   const pos=[0,3,6],spin=[false,false,false];let bigW=false,ph='idle',msg='A：レバー　B：やめる',fan=0,t=0,games=0;
   push({full:true,upd(){t++;if(fan>0)fan--;for(let i=0;i<3;i++)if(spin[i])pos[i]=(pos[i]+.45)%S.length;
