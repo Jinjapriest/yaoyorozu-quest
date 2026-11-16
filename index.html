@@ -6449,9 +6449,44 @@ function hallPledge(vi,d){const dt=hallDay(vi,d);
   if(dt===2){const n=Math.floor(s56*.8);return (n?`イベ日：設定5以上 ${n}台以上`:'イベ日：高設定 投入（台数は 非公開）')+foc;}
   if(dt===1){const n=Math.floor(hi*.6);return n?`特日：設定4以上 ${n}台以上 使用`:'特日：高設定 投入 予定（台数は 非公開）';}
   return hallKind(vi)==='kpachi'?'通常営業（公約なし）\n…設定は ほぼ 1らしい':'通常営業（公約なし）';}
+/* スロ攻略ナビ 機種解析（機械割は シミュレーションによる 目安） */
+const SLA=(()=>{const st=(a,f)=>[0,1,2].map(i=>f(i,a[i])).join('\n'),st2=(a,f)=>[3,4,5].map(i=>f(i,a[i])).join('\n');
+  const tb=(B,Rr,W,lb)=>[`設定　${lb[0]}　${lb[1]}　機械割\n`+st(B,(i)=>`設定${i+1}　1/${B[i]}　1/${Rr[i]}　${W[i]}%`),st2(B,(i)=>`設定${i+1}　1/${B[i]}　1/${Rr[i]}　${W[i]}%`)];
+  return {
+  piero:{type:'Aタイプ（ノーマル）',sec:{
+    'スペック':[`【${MNAME.piero}】\nAタイプ　1G＝3枚\nBIG 240枚／REG 96枚`,...tb(SET_B,SET_R,[94.3,96.9,98.9,101.1,106.5,106.5],['BIG','REG']),'※機械割は 300万G シミュレーションの 目安'],
+    'ゲームフロー':['通常時 毎ゲーム ボーナスを 抽選。\n当たると 内部で 成立する。','成立ゲームで 25%、残りは\n次ゲームで GOGOランプが 点灯。','ランプが 光ったら もう一度 レバー。\n7を 狙えば ボーナス 揃い！','BIG 240枚／REG 96枚 獲得して\n通常時へ。 天井・モードは なし。'],
+    '小役・配当':['ぶどう　8枚　1/6.02〜1/5.85\nチェリー　2枚　約1/36\nリプレイ　再遊技　約1/7.3','ベル　14枚　1/1200\nピエロ　10枚　1/1200\n（どちらも レア役）'],
+    '設定差・攻略':['設定差は REGと ぶどうに 集中。\nREGが 1/300より 軽ければ 高設定かも。','ぶどうは 設定1 1/6.02 → 設定6 1/5.85。\n数千G 回して 数えると 見えてくる。','設定5と6は ボーナス確率が 同じ。\nぶどうの 差だけで 見分けよう。']}},
+  hana:{type:'Aタイプ（沖スロ）',sec:{
+    'スペック':[`【${MNAME.hana}】\nAタイプ　1G＝3枚\nBIG 220枚／REG 104枚`,...tb(HANA_B,HANA_R,[92.1,94.7,97.6,99.8,103.7,106.5],['BIG','REG']),'※機械割は 300万G シミュレーションの 目安'],
+    'ゲームフロー':['ボーナス 成立で ハイビスカスが 光る\n（告知タイプ）。','光ったら もう一度 レバーで 揃う。\nBIG 220枚／REG 104枚。','BIG後に サイドランプが 点灯。\n色で 設定を 示唆する。'],
+    '小役・配当':['ベル　10枚　1/7.48〜1/6.98\nチェリー　2枚　約1/40\nリプレイ　再遊技　約1/7.3'],
+    '設定差・攻略':['BIGは 1/256〜1/216、\nREGは 1/642〜1/395。 REGの 差が 大きい。','サイドランプ（BIG後）\n青＜黄＜緑＜赤＜虹 の順で 高設定 寄り。','虹は 設定3以上 確定！\n設定6は 虹 出現率 6%。']}},
+  biscus:{type:'沖スロ＋天国ループ',sec:{
+    'スペック':[`【${MNAME.biscus}】\n沖スロ（A＋天国ループ）\nBIG 42G×8枚／Mini 13G×8枚\nSUPER BIG 105G×11枚`,
+      `設定　初当り　ハイビ確率　機械割\n`+st(SLX.biscus.BP,(i)=>`設定${i+1}　1/${SLX.biscus.BP[i]}　${Math.round(SLX.biscus.HV[i]*100)}%　${[97.5,100.4,104.2,108.2,110.3,115.1][i]}%`),
+      st2(SLX.biscus.BP,(i)=>`設定${i+1}　1/${SLX.biscus.BP[i]}　${Math.round(SLX.biscus.HV[i]*100)}%　${[97.5,100.4,104.2,108.2,110.3,115.1][i]}%`),'※初当りは 通常時の 抽選確率\n※ハイビ確率＝ボーナス後に\n　ハイビスカスチャンスへ 行く割合\n※機械割は 1500万G シミュレーションの 目安'],
+    'ゲームフロー':['【通常時（A）】\nボーナス 1/182〜1/152。\n1299Gで 天井（必ず 当たる）。','【ボーナス後】\nA から → 55%で Bモードへ\nB から → 設定別 50〜69%で ハイビへ','【ハイビスカスチャンス】32G\nボーナス 約1/9.9 の 高確率！\nBIG 70％・Mini 20％・SUPER 10％','ハイビ中の ボーナス後は\nHA 72%／HB 80%／HC 88% で ループ。\n抜けると 通常時へ。','【逆回転】15枚ベル（1/60000）\nSUPER BIG＋HCモード 確定！'],
+    '小役・配当':['ベル　3枚　1/6\nリプレイ　1/15\nチェリー　6枚　1/89.9\nぶどう　4枚　1/99','チェリーA　1/8192\n→ ボーナス 確定！\n15枚ベル　1/60000\n→ SUPER BIG＋HC 確定'],
+    '設定差・攻略':['設定差は 通常時の 初当りと\nハイビスカスチャンスへの 移行率。','ボーナス後 「ハイビスカスが ゆらめく」\nメッセージが 出たら ハイビ 突入。\nやめずに 32G 回そう。','天井は 1299G。 深い ハマリ台を\n拾うのも 一つの 手。']}},
+  crimson:{type:'AT機（差枚管理）',sec:{
+    'スペック':[`【${MNAME.crimson}】\nAT機　1G＝3枚\nCZ → CRIMSON RUSH（差枚管理）\n有利区間 上限 2400枚`,
+      `設定　CZ成功率　AT初当り　機械割\n`+st(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[440,424,400,383,363,356][i]}　${[98,100.9,102.9,106.3,110.8,113.1][i]}%`),
+      st2(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[440,424,400,383,363,356][i]}　${[98,100.9,102.9,106.3,110.8,113.1][i]}%`),'CZ 初当り 約1/310\n※AT初当りと 機械割は\n　300万G シミュレーションの 目安'],
+    'ゲームフロー':['【通常時】\nレア役で CZ 抽選。100Gごとに\nCZ当選率 アップ。 600Gで CZ 天井。','【CZ】8G\n追憶チャンス：成功率 33〜61%（設定差）\n饗宴チャンス：成功率 75%','成功で CRIMSON RUSH 突入！\n初期枚数 150〜250枚。\n1200G ハマると CZ成功 確定。','【CRIMSON RUSH】差枚管理型AT\n押し順ナビで 純増。 残り枚数が\n0で 終了、2400枚で 完走。','AT中は レア役で 上乗せ。\n1/49で 決闘 → 勝てば\nブラッドラッシュ（大量上乗せ）。','ボスを 倒して 終了したら\n最終審判（5G）へ。\n成功で AT 再突入！','【紅図柄】1/2048\n通常時：EPISODE BONUS → AT 確定\nAT中：300〜2000枚 一撃 上乗せ'],
+    '小役・配当':['押し順ベル　10枚　約1/1.54\n（ナビなしは 1/6で 取れる）\nリプレイ　約1/7.3','弱チェリー　2枚　1/70.3\nスイカ　5枚　1/100.5\nチャンス目　1/292.5','強チェリー　2枚　1/356.2\n紅図柄　1/2048'],
+    '設定差・攻略':['設定差は 通常時の CZ当選率と\n追憶チャンスの 成功率。','饗宴チャンスは 設定に 関係なく 75%。\n出たら 大チャンス！','有利区間 2400枚で 完走すると\nAT 終了。 狙うなら 早めの 一撃を。']}},
+  pearl:{type:'A＋連荘モード',sec:{
+    'スペック':[`【${MNAME.pearl}】\nA＋連荘モード　1G＝3枚\nBIG 53G×13枚／REG 7G×13枚`,
+      `設定　通常時 初当り　機械割\n`+st(SLX.pearl.IH,(i)=>`設定${i+1}　1/${SLX.pearl.IH[i]}　${[96.6,100.4,102,106,107.7,111.3][i]}%`),
+      st2(SLX.pearl.IH,(i)=>`設定${i+1}　1/${SLX.pearl.IH[i]}　${[96.6,100.4,102,106,107.7,111.3][i]}%`),'通常時の BIG 比率は 15%\n上位連荘中 BIG 1/28\n※機械割は 1500万G シミュレーションの 目安\n（荒い 機種なので ブレは 大きい）'],
+    'ゲームフロー':['【通常時】\nボーナス 1/760〜1/500。\n999Gで 天井（REG）。','【REG後】\n通常時からの REGは 30%で\n連荘モード（32G）へ。','【連荘モード】32G\nボーナス 1/30。\n強チェリーで 30% 上位連荘へ 昇格。','【BIG後】\n上位連荘モード（32G）へ。\n連荘モードからの BIGは 85%で 連荘継続。','【上位連荘モード】32G\nBIG 1/28。 レア役で ストック。\n32G 後 ストックが あれば 放出。','ストックが なくても\n1/20で ラストチャンス 成功！\n有利区間 2400枚で 上位連荘 再スタート。'],
+    '小役・配当':['ベル　13枚　1/16.5\nリプレイ　1/7.3\nぶどう　6枚　1/90\n弱チェリー　2枚　1/60','強チェリー　2枚　1/400\n中段パール　1/16384\n（40%で BIG）'],
+    '設定差・攻略':['設定差は 通常時の 初当り だけ。\nモードの 振り分けは 全設定 共通。','上位連荘中の レア役は\nストックの チャンス。\n32Gの 残りに 注目！','荒い 台なので 低設定でも\n大連荘は ある。 引き際が 大事。']}}};})();
 function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i).filter(i=>hallKind(i));const known=H.filter(seen);
   const detail=vi=>{const [rate,rn]=hallRate(vi),dt=hallDay(vi),n=taHallN(vi),sch=hallSchedule(vi).slice(0,4);
-    dialog([`【${hallNm(vi)}】\n地域：${hallRegion(VIL[vi])}　交換率：${rn}\n設置：${MNAME.piero} ${n/2}台／${MNAME.hana} ${n/2}台`,
+    dialog([`【${hallNm(vi)}】\n地域：${hallRegion(VIL[vi])}　交換率：${rn}\n設置 ${(isKaso(vi)?KASO_L:HALL_L).length}台：${Object.entries((isKaso(vi)?KASO_L:HALL_L).reduce((o,k)=>(o[k]=(o[k]||0)+1,o),{})).map(([k,c])=>MSHORT[k]+c).join('・')}`,
       `本日（${G.day}日目）：${DAYN[dt]}\n${hallPledge(vi,G.day)}`,
       sch.length?`今後の 予定\n${sch.map(x=>x.replace(/：(特日|イベ日|周年日)$/,(m,a)=>'：'+a)).join('\n')}`:'今後の 予定：なし',
       dt>=2?'掲示板「朝イチ 並ぶしか ない」\n「抽選番号 次第だな」':hallKind(vi)==='kpachi'?'掲示板「過疎パチは 夢を 見る 場所じゃ ない」':'掲示板「今日は 様子見かな」']);};
@@ -6461,11 +6496,12 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
       const pick=()=>listPick(`ホール情報　${R0[k]}`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>{detail(L[j]);},s=>`${hallNm(L[s])}\n本日：${DAYN[hallDay(L[s])]}　${hallRate(L[s])[1]}\n${hallPledge(L[s],G.day).split('\n')[0]}`);pick();});};
   const today=()=>{const L=known.filter(i=>hallDay(i)>0).sort((a,b)=>hallDay(b)-hallDay(a));if(!L.length){dialog(`本日（${G.day}日目）は イベントの ある 店は ない。`);return;}
     listPick(`本日の イベント（${G.day}日目）`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>detail(L[j]),s=>hallPledge(L[s],G.day));};
-  const anal=()=>listPick('機種 解析',[{t:MNAME.piero,r:'Aタイプ'},{t:MNAME.hana,r:'Aタイプ'}],k=>{const hana=k===1,B=hana?HANA_B:SET_B,Rr=hana?HANA_R:SET_R,Z=hana?HANA_BELL:SET_G;
-    dialog([`【${hana?MNAME.hana:MNAME.piero}】 設定別 確率`,[0,1,2,3,4,5].map(i=>`設定${i+1}　BIG 1/${B[i]}　REG 1/${Rr[i]}`).slice(0,3).join('\n'),[0,1,2,3,4,5].map(i=>`設定${i+1}　BIG 1/${B[i]}　REG 1/${Rr[i]}`).slice(3).join('\n'),
-      `${hana?'ベル':'ぶどう'}確率：設定1 1/${Z[0]} 〜 設定6 1/${Z[5]}\n（小役を 数えると 設定が 見えてくる）`,hana?'サイドランプの 色にも 注目！\n虹色は 高設定の 証…かも？':'REGの 多さは 高設定の 目安。\n合算だけで 判断しないこと！']);});
+  const anal=()=>{const K=['piero','hana','biscus','crimson','pearl'];
+    listPick('機種 解析',K.map(k=>({t:MNAME[k],r:SLA[k].type})),k=>{const D=SLA[K[k]],sec=Object.keys(D.sec);
+      const pick=()=>listPick(MNAME[K[k]],sec.map(x=>({t:x,r:''})),j=>dialog(D.sec[sec[j]],pick),s=>D.sec[sec[s]][0].split('\n').slice(0,3).join('\n'));pick();},
+      s=>`${SLA[K[s]].type}\n${SLA[K[s]].sec['スペック'][0].split('\n').slice(1,3).join('\n')}`);};
   const menu=()=>listPick('スロ攻略ナビ',[{t:'ホール情報（地域別）',r:`${known.length}/${H.length}店`},{t:'本日の イベント・公約',r:`${known.filter(i=>hallDay(i)>0).length}店`},{t:'機種 解析',r:''}],k=>{[regions,today,anal][k]();},
-    s=>['行ったことの ある 町の パチンコ店の\n交換率・イベント日・公約が 見られる。','今日 イベントの ある 店と 公約の 一覧。','設定ごとの ボーナス確率と 小役確率。'][s]);
+    s=>['行ったことの ある 町の パチンコ店の\n交換率・イベント日・公約が 見られる。','今日 イベントの ある 店と 公約の 一覧。','全5機種の スペック・ゲームフロー・\n小役・設定差を 解析。'][s]);
   dialog(['スロ攻略ナビ「全国の ホール情報と\n機種解析を お届け！」'],menu);}
 /* ---------- パソコンの 画面（ウィンドウ風／hack風） ---------- */
 const doorLogo=(x,y,sz)=>{const w=sz,h=Math.round(sz*1.5);R(x-w/2,y-h/2,w,h,'#c87c3c');R(x-w/2+1,y-h/2+1,w-2,h-2,'#a05c28');R(x-w/2+2,y-h/2+2,w-4,Math.round(h*.35),'#a8e4fc');R(x+w/2-4,y+1,2,2,'#f8d878');};
