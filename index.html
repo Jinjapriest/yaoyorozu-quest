@@ -1812,7 +1812,7 @@ function skillView(id){
 function bookMenu(id,kind){
   const inv=kind==='char'?G.items.b:G.items.o,nm=kind==='char'?'経験値書':'鍛錬鉱',obj=()=>kind==='char'?G.chars[id]:G.weapons[id];
   const m=mkMenu([],{x:112,y:84,w:142,title:nm+'を使う'});
-  const CAP=kind==='char'?LVCAP():9999,NM=kind==='char'?BKN:ORN,TOP=kind==='char'?'経験値祝詞':'極上鉱石';
+  const CAP=kind==='char'?LVCAP():WLVCAP,NM=kind==='char'?BKN:ORN,TOP=kind==='char'?'経験値祝詞':'極上鉱石';
   const refresh=()=>{m.items=[...[0,1,2,3,4].map(k=>({t:NM(k).replace('（純度100%）',''),r:'×'+fmt(inv[k]),dis:inv[k]<=0||obj().lv>=CAP,col:k===4?'#f8b800':null})),{t:'ぜんぶ使う',dis:inv.every(v=>v<=0)||obj().lv>=CAP},{t:`極${HONO}→${TOP}`,dis:inv[3]<HONO,col:'#f8b800'}];m.rows=7;};refresh();
   const use=(k,q)=>{const o=obj();let used=0;while(used<q&&inv[k]>0&&o.lv<CAP){inv[k]--;used++;o.exp+=Math.round(BOOKV[k]*(kind==='char'?expMul():1));while(o.lv<CAP&&o.exp>=need(o.lv)){o.exp-=need(o.lv);o.lv++;}}if(o.lv>=CAP)o.exp=0;return used;};
   const finish=(before)=>{const o=obj();if(kind==='char'){const s=cstat(id);o.hp=s.hp;o.mp=s.mp;}
@@ -1858,9 +1858,9 @@ function weaponDetail(wid,after){
     drw(a){R(0,0,W,H,'#000');win(0,4,256,166);const d=WPD[wid],w=G.weapons[wid],s=wstat(wid),o=wOwner(wid);
       R(10,14,52,52,'#24188c');drawWIcon(wid,12,16,3);
       txt(RAR[d.rar].n+(RAR[d.rar].lab?'（'+RAR[d.rar].lab+'）':''),70,12,rcol(d.rar),'left',176);txt(d.name,70,24,'#fcfcfc','left',176);
-      txt(`Lv ${fmt(w.lv)} / 9999`,70,38,'#f8b800');txt(`基礎Lv ${w.dup+1}`,244,38,'#7ee07e','right');
-      const pr=w.lv>=9999?1:w.exp/need(w.lv);R(70,51,170,4,'#3c3c3c');R(70,51,Math.round(170*pr),4,'#f8b800');
-      txt(w.lv>=9999?'最大レベル':`次のLvまで ${fmt(need(w.lv)-w.exp)}`,70,58,'#bcbcbc','left',176);
+      txt(`Lv ${fmt(w.lv)} / ${fmt(WLVCAP)}`,70,38,'#f8b800');txt(`基礎Lv ${w.dup+1}`,244,38,'#7ee07e','right');
+      const pr=w.lv>=WLVCAP?1:w.exp/need(w.lv);R(70,51,170,4,'#3c3c3c');R(70,51,Math.round(170*pr),4,'#f8b800');
+      txt(w.lv>=WLVCAP?'最大レベル':`次のLvまで ${fmt(need(w.lv)-w.exp)}`,70,58,'#bcbcbc','left',176);
       txt(`種類：${d.type}`,12,80);txt(`攻撃 +${fmt(s.atk)}　魔力 +${fmt(s.mag)}`,12,94);
       txt(o?`${CH[o].name}が そうび中`:'だれも そうびしていない',12,108,'#bcbcbc','left',236);
       if(d.src!=='基本')txt('追加データ：'+d.src,12,122,'#7c7c7c','left',236);
@@ -3093,6 +3093,7 @@ function fromSrc(q,cb){const B=G.bank;
 /* 受け取り先（財布 or 普通預金） */
 function toDest(amt,msg){if(amt<=0){dialog(msg);return;}
   choice(`${msg.split('\n')[0]}\n${fmt(amt)}イェソの 受け取り先は？`,['財布へ','普通預金へ'],k=>{if(k===1){G.bank.sav+=amt;save();dialog(msg+'\n→ 普通預金に 入金しました。');}else{G.coins+=amt;save();dialog(msg+'\n→ 財布に 入れました。');}},96);}
+const WLVCAP=19999;
 const LVCAP=()=>G&&G.cap3?39999:G&&G.cap2?19999:9999;
 function addExp(o,amt,cap=9999){o.exp+=Math.round(amt);while(o.lv<cap&&o.exp>=need(o.lv)){o.exp-=need(o.lv);o.lv++;}if(o.lv>=cap)o.exp=0;}
 const expMul=()=>1+Math.floor((G.career||0)/15)*.1;
@@ -3134,8 +3135,8 @@ function restFac(){
 function dojoFac(){
   const base=tierCost(40),C=[['軽稽古',1],['本稽古',10],['猛稽古',100]];
   const course=(name,o,isChar)=>choice(`${name}の 鍛錬コース`,C.map(([n,m])=>`${n} ${fmt(base*m)}イェソ`),k=>{if(k<0)return;const cost=base*C[k][1];
-    if(G.coins<cost){dialog('イェソが たりないようだ。');return;}if(o.lv>=(isChar?LVCAP():9999)){dialog('もう 鍛える ところが ない！');return;}
-    G.coins-=cost;const b=o.lv;addExp(o,cost*2.2*(isChar?expMul():1),isChar?LVCAP():9999);sfx('hit');setTimeout2(()=>sfx('lvup'),8);
+    if(G.coins<cost){dialog('イェソが たりないようだ。');return;}if(o.lv>=(isChar?LVCAP():WLVCAP)){dialog('もう 鍛える ところが ない！');return;}
+    G.coins-=cost;const b=o.lv;addExp(o,cost*2.2*(isChar?expMul():1),isChar?LVCAP():WLVCAP);sfx('hit');setTimeout2(()=>sfx('lvup'),8);
     if(isChar){const id=Object.keys(G.chars).find(x=>G.chars[x]===o);if(id){const s=cstat(id);o.hp=s.hp;o.mp=s.mp;}}
     save();dialog(`エイ！ ヤー！\n${name}は Lv${fmt(b)} → Lv${fmt(o.lv)} に なった！`);},150);
   choice('鍛錬場へ ようこそ。 何を 鍛える？',['キャラの 稽古','武器の 打ち込み','やめる'],r=>{
