@@ -157,7 +157,7 @@ td.n{text-align:right}
     <button id="hhExit" type="button">✕ 携帯機モードをやめる</button>
     <div class="hhside" aria-hidden="true"><div><b>十字キー</b><br>左スティック<br>移動</div><div><b>SELECT</b><br>モード切替</div></div>
     <div class="cab"><canvas id="scr" width="512" height="480" aria-label="ゲーム画面"></canvas></div>
-    <div class="hhside" aria-hidden="true"><div><b>A</b><br>決定<br>長押しで早送り</div><div><b>B</b><br>もどる</div><div><b>Y・START</b><br>メニュー</div></div>
+    <div class="hhside" aria-hidden="true"><div><b>B</b><br>決定<br>長押しで早送り</div><div><b>A</b><br>もどる</div><div><b>Y・START</b><br>メニュー</div></div>
     <div class="pad" aria-label="タッチ操作">
       <div class="dpad" id="dpad" data-dir="">
         <div class="arm v"></div><div class="arm h"></div>
@@ -391,7 +391,8 @@ let padPrev={};
 function pollPad(){const gps=navigator.getGamepads?navigator.getGamepads():[];const st={};
   for(const g of gps){if(!g||!g.connected)continue;const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=i=>g.axes[i]||0;
     st.PadU=st.PadU||b(12)||ax(1)<-.5;st.PadD=st.PadD||b(13)||ax(1)>.5;st.PadL=st.PadL||b(14)||ax(0)<-.5;st.PadR=st.PadR||b(15)||ax(0)>.5;
-    st.PadA=st.PadA||b(0);st.PadB=st.PadB||b(1);st.PadM=st.PadM||b(9)||b(3);st.PadS=st.PadS||b(8);}
+    const hh=document.documentElement.classList.contains('hh');/* 携帯機モードは B決定・Aもどる */
+    st.PadA=st.PadA||b(hh?1:0);st.PadB=st.PadB||b(hh?0:1);st.PadM=st.PadM||b(9)||b(3);st.PadS=st.PadS||b(8);}
   if(st.PadS&&!padPrev.PadS&&typeof hhToggle==='function')hhToggle();
   for(const k of ['PadU','PadD','PadL','PadR','PadA','PadB','PadM']){if(st[k]){if(!padPrev[k]){hit.add(k);if(k==='PadM')vMenu=true;initAudio();}keys.add(k);}else keys.delete(k);}
   padPrev=st;}
@@ -475,7 +476,7 @@ document.getElementById('fsExit').addEventListener('click',fsLeave);
 function hhFit(){if(!fsRoot.classList.contains('hh')){cv.style.width='';cv.style.height='';return;}const dpr=devicePixelRatio||1,k=Math.max(1,Math.floor(Math.min(innerWidth*dpr/256,innerHeight*dpr/240)));cv.style.width=(256*k/dpr)+'px';cv.style.height=(240*k/dpr)+'px';}
 function hhSet(on){fsRoot.classList.toggle('hh',on);try{localStorage.setItem('yq_hh',on?'1':'0');}catch(e){}document.getElementById('hhBtn').textContent=on?'携帯機モードをやめる':'携帯機モード';hhFit();
   if(on){const el=fsRoot,req=el.requestFullscreen||el.webkitRequestFullscreen;if(req&&!(document.fullscreenElement||document.webkitFullscreenElement)){try{const p=req.call(el,{navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{});}catch(e){}}}}
-function hhToggle(){hhSet(!fsRoot.classList.contains('hh'));try{toast(fsRoot.classList.contains('hh')?'携帯機モード：SELECTで もとに もどる':'携帯機モードを やめた');}catch(e){}}
+function hhToggle(){hhSet(!fsRoot.classList.contains('hh'));try{toast(fsRoot.classList.contains('hh')?'携帯機モード：B決定 Aもどる（SELECTで 解除）':'携帯機モードを やめた');}catch(e){}}
 document.getElementById('hhBtn').addEventListener('click',hhToggle);document.getElementById('hhExit').addEventListener('click',()=>hhSet(false));
 addEventListener('resize',hhFit);
 {let want=false;try{want=/[?&]hh=1/.test(location.search)||localStorage.getItem('yq_hh')==='1';}catch(e){}if(want)hhSet(true);}
