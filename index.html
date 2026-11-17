@@ -3949,14 +3949,40 @@ const SLX={
       if(st.m!=='N'&&!st.h){st.cyc--;if(st.cyc<=0){if(st.m==='UP'&&st.stock>0){st.stock--;st.h='BIG';st.lamp=true;res.msg='ストック 放出！';}
         else if(st.m==='UP'&&R()<1/20){st.h='BIG';st.lamp=true;res.msg='ラストチャンス 成功！！';}else{res.msg=(st.m==='UP'?'上位連荘':'連荘')+' モード 終了…';st.m='N';st.stock=0;st.g=0;}}}
       if(st.lamp){res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+'パールランプが 光った！ もう一度 レバー';res.snd='g3';}
-      res.info=st.m==='UP'?`上位連荘　残り ${st.cyc}G　ストック ${st.stock}`:st.m==='REN'?`連荘モード　残り ${st.cyc}G`:`${st.g}G`;return res;}}
+      res.info=st.m==='UP'?`上位連荘　残り ${st.cyc}G　ストック ${st.stock}`:st.m==='REN'?`連荘モード　残り ${st.cyc}G`:`${st.g}G`;return res;}},
+  /* ---------- 裏 闇王 YAMIOH（闇スロ 専用・A＋爆裂モード・天井なし） ---------- */
+  yami:{name:'裏 闇王 -YAMIOH-',short:'闇王',lb:['BIG','REG'],hist:[[808,747,692,621,546,467],[1317,1253,1202,1153,1115,1075]],
+    NB:[640,600,560,520,480,440],BKP:[.013,.015,.018,.021,.026,.033],FALL:1/180,
+    init:()=>({m:'N',g:0,h:null,lamp:false,bn:null,left:0,su:0,fall:1/180,from:'N',bk:0}),
+    step(st,s,R,free){const Y=SLX.yami,BN={BIG:{n:'BIG',g:60,p:13},REG:{n:'REG',g:10,p:13}};
+      if(st.bn){st.left--;const b=BN[st.bn];const res={d:'bell',pay:b.p,info:`${b.n} BONUS　残り ${st.left}G${st.m==='BK'?`　（爆裂 ${st.bk}連）`:''}`,bonus:1};
+        if(st.left<=0){st.bn=null;st.g=0;res.msg=`${b.n} BONUS 終了`;
+          if(st.from==='N'){if(R()<Y.BKP[s]){st.m='BK';st.fall=Y.FALL;st.bk=0;res.msg+='\n…台が 震えだした！ 爆裂モード 突入！！';res.snd='g5';}else if(R()<.15){st.m='SU';st.su=SLX_RI(R,300,1500);}}}
+        return res;}
+      if(st.h&&st.lamp){const b=BN[st.h];st.bn=st.h;st.left=b.g;st.from=st.m;st.h=null;st.lamp=false;if(st.m==='BK')st.bk++;
+        return {d:st.bn,pay:0,msg:st.m==='BK'?`${b.n} BONUS！　爆裂 ${st.bk}連目！`:`${b.n} BONUS！`,info:`${b.n} BONUS`,cnt:st.bn==='BIG'?'b':'r',fan:st.m==='BK'?150:120,snd:'win'};}
+      if(st.h&&!st.lamp)st.lamp=true;
+      st.g++;let res={d:'lose',pay:0};const r=R();let a=0,rare=0;
+      if(r<(a+=1/65536)){res={d:'pierrot',pay:0,msg:'闇の 扉が 開いた……！！'};rare=3;}
+      else if(r<(a+=1/300)){res={d:'cherry',pay:2,msg:'強チェリー！'};rare=2;}
+      else if(r<(a+=1/48)){res={d:'cherry',pay:2};rare=1;}
+      else if(r<(a+=1/7.6))res={d:'bell',pay:9};
+      else if(r<(a+=1/7.3))res={d:'replay',pay:0,rep:1};
+      else if(r<(a+=1/8))res={d:'grape',pay:3};
+      if(rare===3){st.m='BK';st.fall=1/150;st.bk=0;st.h='BIG';st.lamp=true;}
+      if(!st.h){
+        if(st.m==='BK'){if(R()<1/8)st.h='BIG';else if(R()<st.fall){const n=st.bk;st.m=R()<.4?'SU':'N';if(st.m==='SU')st.su=SLX_RI(R,300,1500);st.g=0;res.msg=`爆裂モード 終了…（${n}連）`;}}
+        else{const p=st.m==='SU'?1/3000:1/Y.NB[s]*(rare===2?20:rare===1?2:1);if(R()<p)st.h=R()<.4?'BIG':'REG';if(st.m==='SU'&&st.g>=st.su)st.m='N';}
+        if(st.h)st.lamp=st.m==='BK'||R()<.5;}
+      if(st.lamp){res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+'闇ランプが 光った！ もう一度 レバー';res.snd=res.snd||'g3';}
+      res.info=st.m==='BK'?`爆裂モード　${st.bk}連中`:`${st.g}G`;return res;}}
 };
 /* SLX-END */
 
 /* 機種の 並び（1店 24台・過疎店 8台） */
 const HALL_L=[...Array(6).fill('piero'),...Array(6).fill('hana'),...Array(4).fill('biscus'),...Array(4).fill('crimson'),...Array(4).fill('pearl')],KASO_L=['piero','piero','hana','hana','biscus','biscus','pearl','crimson'];
 const mTypeOf=(vi,n)=>(isKaso(vi)?KASO_L:HALL_L)[n]||'piero';
-const MSHORT={piero:'ピエロ',hana:'ハイビスカス',biscus:'スーパービスカス',crimson:'紅夜',pearl:'パールラグーン'};
+const MSHORT={piero:'ピエロ',hana:'ハイビスカス',biscus:'スーパービスカス',crimson:'紅夜',pearl:'パールラグーン',yami:'闇王'};
 const taHs=()=>{const A=G&&G.ta;if(!A)return[];if(!A.halls){A.halls=A.hall&&A.hall.vi!=null?[A.hall]:[];A.hall={vi:null};}return A.halls;};
 const taHallName=h=>h.name||`TAホール ${VIL[h.vi].name.replace(/^.* /,'')}店`;
 const taHallOf=vi=>taHs().find(h=>h.vi===vi)||null;
@@ -3978,7 +4004,7 @@ function drawSym(k,x,y){
     case 2:[[12,5],[18,5],[15,9],[9,9],[21,9],[12,13],[18,13]].forEach(([a,b])=>pc(x+a,y+b,2,'#8040c0'));R(x+15,y+2,2,3,'#00a800');break;
     case 3:pc(x+11,y+13,3,'#d82800');pc(x+20,y+13,3,'#d82800');R(x+12,y+4,1,7,'#00a800');R(x+19,y+4,1,7,'#00a800');R(x+12,y+3,8,1,'#00a800');break;
     case 4:R(x+12,y+4,8,2,'#f8b800');R(x+10,y+6,12,6,'#f8b800');R(x+8,y+12,16,2,'#f8b800');R(x+15,y+14,2,2,'#a05000');break;
-    case 5:if(SYMSET==='crimson'){pc(x+16,y+10,7,'#3c0000');pc(x+16,y+10,5,'#d82800');pc(x+16,y+10,2,'#000');R(x+17,y+7,1,1,'#fcfcfc');R(x+8,y+3,16,1,'#d82800');break;}if(SYMSET==='pearl'){pc(x+16,y+10,7,'#e8f0f8');pc(x+14,y+8,2,'#fcfcfc');R(x+18,y+13,2,1,'#bcc8e8');break;}if(SYMHANA){for(let k=0;k<5;k++){const a=k/5*Math.PI*2-Math.PI/2;pc(x+16+Math.round(Math.cos(a)*5),y+10+Math.round(Math.sin(a)*5),3,'#d82800');}pc(x+16,y+10,2,'#f8b800');break;}pc(x+16,y+10,6,'#fcfcfc');R(x+13,y+8,2,2,'#000');R(x+18,y+8,2,2,'#000');R(x+15,y+11,2,2,'#d82800');R(x+13,y+14,6,1,'#d82800');R(x+10,y+2,12,3,'#3cbcfc');break;
+    case 5:if(SYMSET==='yami'){pc(x+16,y+10,7,'#3c0000');pc(x+16,y+10,6,'#101010');pc(x+13,y+9,2,'#d82800');pc(x+19,y+9,2,'#d82800');R(x+13,y+14,7,1,'#f8b800');R(x+9,y+2,3,4,'#a81000');R(x+20,y+2,3,4,'#a81000');break;}if(SYMSET==='crimson'){pc(x+16,y+10,7,'#3c0000');pc(x+16,y+10,5,'#d82800');pc(x+16,y+10,2,'#000');R(x+17,y+7,1,1,'#fcfcfc');R(x+8,y+3,16,1,'#d82800');break;}if(SYMSET==='pearl'){pc(x+16,y+10,7,'#e8f0f8');pc(x+14,y+8,2,'#fcfcfc');R(x+18,y+13,2,1,'#bcc8e8');break;}if(SYMHANA){for(let k=0;k<5;k++){const a=k/5*Math.PI*2-Math.PI/2;pc(x+16+Math.round(Math.cos(a)*5),y+10+Math.round(Math.sin(a)*5),3,'#d82800');}pc(x+16,y+10,2,'#f8b800');break;}pc(x+16,y+10,6,'#fcfcfc');R(x+13,y+8,2,2,'#000');R(x+18,y+8,2,2,'#000');R(x+15,y+11,2,2,'#d82800');R(x+13,y+14,6,1,'#d82800');R(x+10,y+2,12,3,'#3cbcfc');break;
     case 6:txt('Re',x+16,y+6,'#0058f8','center');R(x+6,y+4,20,1,'#0058f8');R(x+6,y+15,20,1,'#0058f8');break;
   }
 }
@@ -4043,7 +4069,7 @@ function slotScr(vi,mc){
 }
 /* 追加機種（Super Biscus・紅夜・PEARL LAGOON CRYSTAL）の 台 */
 function slxScr(vi,mc){
-  const P=G.pachi,card=P.cards['v'+vi],E=SLX[mc.type],ty=mc.type;if(!mc.x)mc.x=E.init();
+  const P=G.pachi,card=mc.yami?null:P.cards['v'+vi],E=SLX[mc.type],ty=mc.type;if(!mc.x)mc.x=E.init();
   let ph='idle',pos=[0,7,14],stopped=[true,true,true],target=[0,0,0],res=null,lamp=!!mc.x.lamp,free=false,t=0,auto=false,fan=0,msg='レバーを たたいてね（A）',sd=0,info='';
   const sym=(i,p)=>STRIP[i][((p%21)+21)%21];
   const findPos=(i,s)=>{const c=[];STRIP[i].forEach((v,p)=>{if(v===s)c.push(p);});return c[Math.floor(rnd()*c.length)];};
@@ -4055,9 +4081,9 @@ function slxScr(vi,mc){
     else if(o==='SBIG')target=[0,1,2].map(i=>findPos(i,1));
     else{do{target=[0,1,2].map(()=>Math.floor(rnd()*21));}while(sym(0,target[0])===3||(sym(0,target[0])===sym(1,target[1])&&sym(1,target[1])===sym(2,target[2])));}
   };
-  const busy=()=>!!(mc.x.bn||mc.x.h||(mc.x.m&&mc.x.m!=='N'&&mc.x.m!=='A'&&mc.x.m!=='B'));
+  const busy=()=>!!(mc.x.bn||mc.x.h||(mc.x.m&&mc.x.m!=='N'&&mc.x.m!=='A'&&mc.x.m!=='B'&&mc.x.m!=='SU'));
   const lever=()=>{
-    if(!busy()&&!pachiOpen()){auto=false;sfx('ng');pop();dialog(['♪ 蛍の光が 流れてきた…','店内放送「本日は ご来店 まことに\nありがとう ございました。\n22時45分を もちまして 閉店です」','（遊技を 終了した）']);return;}
+    if(!busy()&&!(mc.yami?kanOpen('yami'):pachiOpen())){auto=false;sfx('ng');pop();dialog(mc.yami?['黒服「…夜明けだ。 今日は ここまでだ」','（遊技を 終了した）']:['♪ 蛍の光が 流れてきた…','店内放送「本日は ご来店 まことに\nありがとう ございました。\n22時45分を もちまして 閉店です」','（遊技を 終了した）']);return;}
     if(!free){if(P.medals<3){msg='メダルが ありません';auto=false;sfx('ng');return;}P.medals-=3;mc.diff-=3;sd-=3;}
     const fr=free;free=false;mc.spins++;G.pachi.sc=(G.pachi.sc||0)+1;if(G.pachi.sc%12===0)timeAdd(1);if(card){card.pt=(card.pt||0)+(mc.spins%10===0?1:0);}
     res=E.step(mc.x,mc.s,rnd,fr);free=!!res.rep;setDisplay(res.d);ph='spin';stopped=[false,false,false];t=0;msg='';sfx('cur');
@@ -4069,7 +4095,7 @@ function slxScr(vi,mc){
     msg=(res.msg||(pay>1?`${pay}枚`:res.rep?'リプレイ':'')).replace(/\n/g,'　');
     if(res.snd)sfx(res.snd);else if(pay>1)sfx('coin');
   };
-  const TH={biscus:{bg:'#005858',fl:'#fc7460',tc:'#fc7460'},crimson:{bg:'#2c0008',fl:'#d82800',tc:'#fc3c3c'},pearl:{bg:'#0c1c4c',fl:'#a8e4fc',tc:'#e8f0f8'}}[ty];
+  const TH={biscus:{bg:'#005858',fl:'#fc7460',tc:'#fc7460'},crimson:{bg:'#2c0008',fl:'#d82800',tc:'#fc3c3c'},pearl:{bg:'#0c1c4c',fl:'#a8e4fc',tc:'#e8f0f8'},yami:{bg:'#0c0008',fl:'#a81000',tc:'#f8b800'}}[ty];
   push({full:true,canBack:true,
     upd(){
       t++;if(fan>0)fan--;
@@ -4080,13 +4106,14 @@ function slxScr(vi,mc){
     drw(){
       SYMHANA=ty==='biscus';SYMSET=ty;
       R(0,0,W,H,'#14081c');R(28,4,200,232,'#3c3c3c');R(30,6,196,228,fan>0&&(frame&4)?TH.fl:TH.bg);
-      big(E.name,128,10,TH.tc,'center',ty==='biscus'?14:10);txt(`${mc.no}番台`,40,30,'#fcfcfc');txt(hallRate(vi)[1],216,30,'#bcbcbc','right');
+      big(E.name,128,10,TH.tc,'center',ty==='biscus'?14:10);txt(`${mc.no}番台`,40,30,'#fcfcfc');txt(mc.yami?'1枚 100イェソ':hallRate(vi)[1],216,30,'#bcbcbc','right');
       R(44,44,168,74,'#000');
       for(let i=0;i<3;i++){const x=48+i*54;R(x,46,50,70,'#fcfcfc');
         const p=pos[i],base=Math.floor(p),fr=p-base;for(let k=-2;k<=2;k++){const yy=Math.round(70+(k-fr)*22);if(yy<38||yy>104)continue;ctx.save();ctx.beginPath();ctx.rect(x,46,50,70);ctx.clip();drawSym(sym(i,base+k),x+9,yy);ctx.restore();}}
       R(44,80,168,1,'#d82800');
       R(44,124,64,30,'#000');
-      if(ty==='biscus'){const on=lamp&&(frame&8);for(let k=0;k<5;k++){const a=k/5*Math.PI*2-Math.PI/2;pc(76+Math.round(Math.cos(a)*7),139+Math.round(Math.sin(a)*7),5,on?'#ff3050':'#3c1c1c');}pc(76,139,3,on?'#f8b800':'#3c3c1c');}
+      if(ty==='yami'){const bk=mc.x.m==='BK',on=lamp&&(frame&8)||bk&&(frame&16);pc(76,139,11,on?'#a81000':'#1c0008');pc(71,137,2,on?'#f8f800':'#3c0000');pc(81,137,2,on?'#f8f800':'#3c0000');R(72,144,9,1,on?'#f8b800':'#3c0000');if(bk)txtS('爆裂',76,126,'#f8b800','center');}
+      else if(ty==='biscus'){const on=lamp&&(frame&8);for(let k=0;k<5;k++){const a=k/5*Math.PI*2-Math.PI/2;pc(76+Math.round(Math.cos(a)*7),139+Math.round(Math.sin(a)*7),5,on?'#ff3050':'#3c1c1c');}pc(76,139,3,on?'#f8b800':'#3c3c1c');}
       else if(ty==='pearl'){const on=lamp&&(frame&8);pc(76,139,11,on?'#fcfcfc':'#28304c');if(on){pc(72,135,3,'#e8f8fc');R(66,128,2,2,'#a8e4fc');R(86,148,2,2,'#a8e4fc');}}
       else{const m=mc.x.m,on=m==='AT'||m==='EB'||m==='CZ'||m==='JD'||lamp;pc(76,139,10,on?((frame>>3)&1?'#d82800':'#7c0000'):'#2c0000');pc(76,139,4,'#000');if(on)R(78,135,2,2,'#fcfcfc');txtS(m==='AT'?'RUSH':m==='EB'?'EB':m==='CZ'?'CZ':m==='JD'?'審判':'',76,126,'#f8b800','center');}
       win(112,122,108,34);txt('持ち',118,128,'#bcbcbc');txt(fmt(P.medals)+'枚',214,128,'#f8b800','right');txt('差枚',118,140,'#bcbcbc');txt((sd>=0?'+':'')+fmt(sd),214,140,sd>=0?'#7ee07e':'#fc7460','right');
@@ -6478,6 +6505,13 @@ const SLA=(()=>{const st=(a,f)=>[0,1,2].map(i=>f(i,a[i])).join('\n'),st2=(a,f)=>
     'ゲームフロー':['【通常時】\nレア役で CZ 抽選。100Gごとに\nCZ当選率 アップ。 600Gで CZ 天井。','【CZ】8G\n追憶チャンス：成功率 33〜61%（設定差）\n饗宴チャンス：成功率 75%','成功で CRIMSON RUSH 突入！\n初期枚数 150〜250枚。\n1200G ハマると CZ成功 確定。','【CRIMSON RUSH】差枚管理型AT\n押し順ナビで 純増。 残り枚数が\n0で 終了、2400枚で 完走。','AT中は レア役で 上乗せ。\n1/49で 決闘 → 勝てば\nブラッドラッシュ（大量上乗せ）。','ボスを 倒して 終了したら\n最終審判（5G）へ。\n成功で AT 再突入！','【紅図柄】1/2048\n通常時：EPISODE BONUS → AT 確定\nAT中：300〜2000枚 一撃 上乗せ'],
     '小役・配当':['押し順ベル　10枚　約1/1.54\n（ナビなしは 1/6で 取れる）\nリプレイ　約1/7.3','弱チェリー　2枚　1/70.3\nスイカ　5枚　1/100.5\nチャンス目　1/292.5','強チェリー　2枚　1/356.2\n紅図柄　1/2048'],
     '設定差・攻略':['設定差は 通常時の CZ当選率と\n追憶チャンスの 成功率。','饗宴チャンスは 設定に 関係なく 75%。\n出たら 大チャンス！','有利区間 2400枚で 完走すると\nAT 終了。 狙うなら 早めの 一撃を。']}},
+  yami:{type:'裏モノ（闇スロ）',sec:{
+    'スペック':['【裏 闇王 -YAMIOH-】（裏情報）\nA＋爆裂モード　1G＝3枚\nBIG 60G×13枚／REG 10G×13枚\n1枚 100イェソ・天井なし',
+      '設定　ボーナス　爆裂移行　機械割\n'+[0,1,2].map(i=>`設定${i+1}　1/${SLX.yami.NB[i]}　${(SLX.yami.BKP[i]*100).toFixed(1)}%　${[96.7,99.4,102.2][i]}%`).join('\n'),
+      [3,4,5].map(i=>`設定${i+1}　1/${SLX.yami.NB[i]}　${(SLX.yami.BKP[i]*100).toFixed(1)}%　${[106.4,112,119.9][i]}%`).join('\n'),'※爆裂移行＝通常時の ボーナス後に\n　爆裂モードへ 行く割合\n※機械割は 3000万G シミュレーションの 目安'],
+    'ゲームフロー':['【通常時】\nボーナス 1/640〜1/440（BIG 4割）。\n天井は ない。','ボーナス後 1.3〜3.3%で 爆裂モード。\n15%で 吸い込みモード（300〜1500G、\nボーナス 1/3000）へ 落ちる。','【爆裂モード】\n毎ゲーム 1/8で BIG。\n1/180で 転落するまで 続く。\n平均 20連以上・上限なし！','【闇の扉】1/65536\nBIG＋転落しにくい 爆裂モード 確定。'],
+    '小役・配当':['ベル　9枚　1/7.6\nぶどう　3枚　1/8\nリプレイ　1/7.3','弱チェリー　2枚　1/48（当選 2倍）\n強チェリー　2枚　1/300（当選 20倍）'],
+    '設定差・攻略':['設定差は 初当りと 爆裂移行率。\n既存の 機種より ずっと 荒い。','1日 8000Gで ±数万枚も ありえる。\n吸い込みに 入ると 地獄…','闇スロは 違法営業。\n警察の 手入れで 店ごと なくなることも。']}},
   pearl:{type:'A＋連荘モード',sec:{
     'スペック':[`【${MNAME.pearl}】\nA＋連荘モード　1G＝3枚\nBIG 53G×13枚／REG 7G×13枚`,
       `設定　通常時 初当り　機械割\n`+st(SLX.pearl.IH,(i)=>`設定${i+1}　1/${SLX.pearl.IH[i]}　${[96.6,100.4,102,106,107.7,111.3][i]}%`),
@@ -6497,9 +6531,9 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
       const pick=()=>listPick(`ホール情報　${R0[k]}`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>{detail(L[j]);},s=>`${hallNm(L[s])}\n本日：${DAYN[hallDay(L[s])]}　${hallRate(L[s])[1]}\n${hallPledge(L[s],G.day).split('\n')[0]}`);pick();});};
   const today=()=>{const L=known.filter(i=>hallDay(i)>0).sort((a,b)=>hallDay(b)-hallDay(a));if(!L.length){dialog(`本日（${G.day}日目）は イベントの ある 店は ない。`);return;}
     listPick(`本日の イベント（${G.day}日目）`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>detail(L[j]),s=>hallPledge(L[s],G.day));};
-  const anal=()=>{const K=['piero','hana','biscus','crimson','pearl'];
-    listPick('機種 解析',K.map(k=>({t:MNAME[k],r:SLA[k].type})),k=>{const D=SLA[K[k]],sec=Object.keys(D.sec);
-      const pick=()=>listPick(MNAME[K[k]],sec.map(x=>({t:x,r:''})),j=>dialog(D.sec[sec[j]],pick),s=>D.sec[sec[s]][0].split('\n').slice(0,3).join('\n'));pick();},
+  const anal=()=>{const K=['piero','hana','biscus','crimson','pearl',...(yamiAll().length?['yami']:[])];
+    listPick('機種 解析',K.map(k=>({t:MNAME[k]||SLX[k].name,r:SLA[k].type,col:k==='yami'?'#fc7460':null})),k=>{const D=SLA[K[k]],sec=Object.keys(D.sec);
+      const pick=()=>listPick(MNAME[K[k]]||SLX[K[k]].name,sec.map(x=>({t:x,r:''})),j=>dialog(D.sec[sec[j]],pick),s=>D.sec[sec[s]][0].split('\n').slice(0,3).join('\n'));pick();},
       s=>`${SLA[K[s]].type}\n${SLA[K[s]].sec['スペック'][0].split('\n').slice(1,3).join('\n')}`);};
   const menu=()=>listPick('スロ攻略ナビ',[{t:'ホール情報（地域別）',r:`${known.length}/${H.length}店`},{t:'本日の イベント・公約',r:`${known.filter(i=>hallDay(i)>0).length}店`},{t:'機種 解析',r:''}],k=>{[regions,today,anal][k]();},
     s=>['行ったことの ある 町の パチンコ店の\n交換率・イベント日・公約が 見られる。','今日 イベントの ある 店と 公約の 一覧。','全5機種の スペック・ゲームフロー・\n小役・設定差を 解析。'][s]);
@@ -6937,11 +6971,13 @@ function taDaily(){const A=G.ta;if(!A)return[];const msgs=[],F=A.fin;
     H.rep=clamp(H.rep+(avg-2.6)*.04+(H.ev===G.day?.08:0),.15,2.5);
     const cust=Math.round((isKaso(H.vi)?120:VIL[H.vi].size>=6?2400:VIL[H.vi].size>=5?1600:VIL[H.vi].size>=4?1000:600)*Math.pow(H.rep,1.5)*(H.ev===G.day?1.6:1)*(hallDay(H.vi)?1.3:1)*(.85+rnd()*.3)),pl=Math.round(cust*300000*(1-pay));
     A.cash+=pl;H.last={cust,pl};}
+  msgs.push(...yamiDaily());
   if(G.day%7===0)msgs.push(`TAインダストリアル 週報\n資金 ${fmt(A.cash)}イェソ　貸付残高 ${fmt(F.out)}\n${(()=>{const L=taHs();if(!L.length)return'TAホール：未出店';const c=L.reduce((a,h)=>a+(h.last?h.last.cust:0),0),pl=L.reduce((a,h)=>a+(h.last?h.last.pl:0),0);return`TAホール ${L.length}店 昨日 ${c}人・収支 ${pl>=0?'+':''}${fmt(pl)}`;})()}`);
   return msgs;}
 function taScr(){const A=G.ta;if(!A){dialog('（帝愛 地下帝国編を クリアすると 事業継承できる）');return;}const F=A.fin,HL=taHs();
   choice(`TAインダストリアル　資金 ${fmt(A.cash)}イェソ\n貸付残高 ${fmt(F.out)}${F.susp?`（営業停止 あと${F.susp}日）`:''}\nTAホール：${HL.length?HL.length+'店（'+HL.map(h=>VIL[h.vi].name.replace(/^.* /,'')).slice(0,3).join('・')+(HL.length>3?'…':'')+'）':'未出店'}`,
-    ['TAファイナンス（消費者金融）','TAホール（パチンコ店）','資金を 入れる','利益を 引き出す','やめる'],k=>{
+    ['TAファイナンス（消費者金融）','TAホール（パチンコ店）',`TA闇スロ（歓楽街）${yamiAll().length?' '+yamiAll().length+'店':''}`,'資金を 入れる','利益を 引き出す','やめる'],k=>{
+    if(k===2){yamiList();return;}if(k>2)k--;
     if(k===0)taFin();else if(k===1)taHall();
     else if(k===2)askAmt('TAに 入れる 金額',G.coins,a=>{if(!(a>0)||a>G.coins){toast('財布の イェソが たりない');return;}noCount(()=>{G.coins-=a;});A.cash+=a;save();toast(`${fmt(a)}イェソを 入れた`);taScr();});
     else if(k===3)askAmt('引き出す 金額',Math.floor(A.cash),a=>{if(!(a>0)||a>A.cash)return;A.cash-=a;noCount(()=>{G.coins+=a;});sfx('coin');save();toast(`${fmt(a)}イェソを 引き出した`);taScr();});},150);}
@@ -6978,6 +7014,59 @@ function taHallOne(H){const A=G.ta;taSetFix(H);
     if(k===3){const back=Math.round(TA_OPEN(H.vi)*.5);choice(`${nm}を 手放しますか？\n（売却額 ${fmt(back)}イェソ）`,['手放す','やめる'],r=>{if(r!==0){taHallOne(H);return;}const HL=taHs();HL.splice(HL.indexOf(H),1);A.cash+=back;G.pachi.mkey=null;save();sfx('coin');dialog(`${nm}を 手放した。\n（${fmt(back)}イェソが TAの 資金に 入った）`,taHall);},150);return;}
     taHall();},150);}
 
+/* ===================== TA闇スロ（歓楽街の 空き店舗に TAインダストリアルで 開業） ===================== */
+const YAMI_N=8,YAMI_PAY=[.967,.994,1.022,1.064,1.12,1.199],YAMI_RATE=100,YAMI_NM=['裏カジノ 黒猫','会員制 クラブ 月影','闇スロ 夜叉','地下遊技場 奈落','スロット倶楽部 冥','ナイトクラブ 鬼灯'];
+const yamiCost=vi=>Math.round(5e8*landMul(vi));
+const yamiAll=()=>{const R0=[];if(!G.kan)return R0;for(const k in G.kan)G.kan[k].lots.forEach((L,i)=>{if(L.t==='yami'&&L.own)R0.push({vi:+k.slice(1),i,L});});return R0;};
+function yamiOffer(vi,i){const ops=[...(reOn()?['テナント契約で 出店']:[]),'TAインダストリアルで 闇スロを 開業','やめる'];
+  choice('不動産屋「この 物件で お店を 開きますか？」',ops,k=>{const o=ops[k];if(!o||o==='やめる')return;if(o[0]==='テ'){kanTenant(vi,i);return;}yamiOpen(vi,i);},150);}
+function yamiOpen(vi,i){const A=G.ta,cost=yamiCost(vi);
+  dialog(['（黒服の 男が 近づいてきた）','黒服「TAの 方ですね。 話は 聞いてます」','「看板の ない 店で 裏モノの 台を 8台。\n1枚 100イェソの 高レート、 換金は 店の 中で 現金…」','「もちろん 違法です。 警察の 手入れには\nくれぐれも ご注意を」'],()=>
+    choice(`闇スロを 開業しますか？\n開業資金 ${fmt(cost)}イェソ（TAの 資金から）\n営業 20時〜翌5時・台 8台（裏 闇王）`,['開業する','やめる'],r=>{if(r!==0)return;
+      if(A.cash<cost){dialog(`TAの 資金が たりない。\n（資金 ${fmt(A.cash)}イェソ）`);return;}
+      askText('闇スロの 店名',[{label:'店名（12文字まで）',placeholder:YAMI_NM[0],max:12}],v=>{if(!v)return;const nm=String(v[0]||'').trim()||YAMI_NM[Math.floor(rnd()*YAMI_NM.length)];
+        A.cash-=cost;const L=kanSt(vi).lots[i];for(const k in L)delete L[k];Object.assign(L,{t:'yami',own:1,nm,set:Array(YAMI_N).fill(3),rep:1,mem:0,since:G.day,tot:0,last:null});save();sfx('g5');
+        if(TW&&TW.kanShop)exitKanShop();
+        dialog([`闇スロ「${nm}」を 開業した！`,'台の 設定は 1〜6を 自由に 決められる。\n高設定ほど 客が つき 評判が 上がるが\n店の もうけは 減る。','会員制に すると 客は 減るが\n警察に 目を つけられにくい。','（店の 鉄の扉から 経営・遊技が できる。\nTAインダストリアルの メニューからも 管理できる）']);});},150));}
+function yamiMach(vi,i){const L=kanSt(vi).lots[i],key=G.day;if(L.mach&&L.mach.key===key)return L.mach.list;const r=lcg(vi*733+i*31+G.day*17),E=SLX.yami;
+  const list=L.set.map((s0,n)=>{const s=s0-1,spins=200+Math.floor(r()*3000);return{no:n+1,s,type:'yami',yami:1,spins,big:Math.round(spins/E.hist[0][s]*(0.3+r()*1.6)),reg:Math.round(spins/E.hist[1][s]*(0.5+r())),diff:0};});
+  L.mach={key,list};return list;}
+function yamiEnter(vi,i){const L=kanSt(vi).lots[i],op=kanOpen('yami');
+  if(!op){choice(`看板の ない 鉄の 扉だ。\n「${L.nm}」…営業は 20時〜翌5時。`,['経営する','やめる'],k=>{if(k===0)yamiManage(vi,i);},150);return;}
+  dialog(['（鉄の 扉を ノックした）','（のぞき窓が 開いた）\n黒服「…オーナーでしたか。 どうぞ」'],()=>choice(`闇スロ「${L.nm}」\n薄暗い 店内に 裏モノの 台が 並ぶ…`,['台を 打つ','経営する','やめる'],k=>{if(k===0)yamiPlay(vi,i);else if(k===1)yamiManage(vi,i);},150));}
+function yamiPlay(vi,i){const L=kanSt(vi).lots[i],P=G.pachi,hk='y'+vi+'_'+i;
+  if(P.hall!==hk){if(P.medals>0&&P.hall!=null){}P.hall=hk;P.medals=0;}
+  const cash=cb=>{if(P.medals>0){const y=P.medals*YAMI_RATE;G.coins+=y;sfx('coin');const n=P.medals;P.medals=0;save();dialog(`コイン ${fmt(n)}枚を その場で 換金した。\n${fmt(y)}イェソ 受け取った。`,cb);}else cb&&cb();};
+  const menu=()=>choice(`闇スロ「${L.nm}」　持ちコイン ${fmt(P.medals)}枚\n（1枚 ${YAMI_RATE}イェソ・その場で 換金）`,['台を えらぶ','コインを 買う','換金して 帰る'],k=>{
+    if(k===0){if(!kanOpen('yami')){dialog('黒服「…もう 閉店だ」');return;}const ms=yamiMach(vi,i);
+      listPick('台えらび（裏 闇王）',ms.map(mc=>({t:`${mc.no}番台 闇王`,r:`${fmt(mc.spins)}G B${mc.big} R${mc.reg} 設${mc.s+1}`})),j=>{slxScr(vi,ms[j]);},
+        sel=>{const mc=ms[sel];return mc?`合成 ${mc.big+mc.reg?'1/'+Math.round(mc.spins/(mc.big+mc.reg)):'---'}　BIG ${mc.big?'1/'+Math.round(mc.spins/mc.big):'---'}\n天井なし・爆裂モードあり（超荒い）\n（オーナーなので 設定が 見える）`:'';},()=>menu());return;}
+    if(k===1){const opts=[[1e5,1e3],[1e6,1e4],[1e7,1e5]].filter(([c])=>c<=G.coins);if(!opts.length){toast('イェソが たりません');menu();return;}
+      choice('黒服「いくら 入れる？」\n（1枚 100イェソ）',opts.map(([c,n])=>`${fmt(c)}イェソ→${fmt(n)}枚`),j=>{if(j>=0){const [c,n]=opts[j];G.coins-=c;P.medals+=n;sfx('coin');save();}menu();},150);return;}
+    cash(()=>{});},150);
+  menu();}
+function yamiManage(vi,i){const L=kanSt(vi).lots[i],A=G.ta,avg=(L.set.reduce((a,b)=>a+b,0)/YAMI_N).toFixed(1),Ls=L.last;
+  choice(`闇スロ「${L.nm}」（${VIL[vi].name.replace(/^.* /,'')} 歓楽街）\n平均設定 ${avg}　評判 ${L.rep.toFixed(2)}　${L.mem?'会員制':'一見さん OK'}\n${Ls?`昨日 ${Ls.cust}人・収支 ${Ls.pl>=0?'+':''}${fmt(Ls.pl)}`:'（営業 1日目）'}`,
+    ['台ごとに 設定','全台 一括で 設定',L.mem?'会員制を やめる':'会員制に する','店名を 変える','店を たたむ','もどる'],k=>{
+    if(k===0){const pick=()=>listPick(`${L.nm}　台の 設定`,L.set.map((s,j)=>({t:`${j+1}番台 闇王`,r:`設定${s}`,col:s>=5?'#f8b800':s<=2?'#7c7c7c':null})),j=>choice(`${j+1}番台の 設定`,['1','2','3','4','5','6'],s=>{if(s>=0){L.set[j]=s+1;L.mach=null;save();}pick();},48),null,()=>yamiManage(vi,i));pick();return;}
+    if(k===1){choice('全台の 設定',['1','2','3','4','5','6'],s=>{if(s>=0){L.set=Array(YAMI_N).fill(s+1);L.mach=null;save();toast(`全台 設定${s+1}に した`);}yamiManage(vi,i);},48);return;}
+    if(k===2){L.mem=L.mem?0:1;save();sfx('ok');dialog(L.mem?['会員制に した。','紹介が ないと 入れない。\n客は 減るが 手入れの 危険も 減る。']:['会員制を やめた。','一見さんも 入れる。\n客は 増えるが 目立つ…'],()=>yamiManage(vi,i));return;}
+    if(k===3){askText('新しい 店名',[{label:'店名（12文字まで）',max:12,placeholder:L.nm}],v=>{if(v){const t=String(v[0]||'').trim();if(t)L.nm=t;save();}yamiManage(vi,i);});return;}
+    if(k===4){const back=Math.round(yamiCost(vi)*.3);choice(`闇スロ「${L.nm}」を たたみますか？\n（台と 内装の 売却 ${fmt(back)}イェソ）`,['たたむ','やめる'],r=>{if(r!==0){yamiManage(vi,i);return;}A.cash+=back;const S=kanSt(vi);S.lots[i]={t:null};save();sfx('coin');dialog(`「${L.nm}」を たたんだ。\n（${fmt(back)}イェソが TAの 資金に 入った）`);},150);return;}
+    if(TW&&!TW.kanIn&&!TW.kanShop)taScr();},150);}
+function yamiList(){const Y=yamiAll();if(!Y.length){dialog(['TA闇スロ：まだ 1店も ない。','（都会 以上の 町の 歓楽街の 空き店舗で\n開業できる）'],taScr);return;}
+  listPick(`TA闇スロ（${Y.length}店）　資金 ${fmt(G.ta.cash)}`,Y.map(o=>({t:o.L.nm,r:o.L.last?`${o.L.last.pl>=0?'+':''}${fmt(o.L.last.pl)}`:'1日目',col:o.L.last&&o.L.last.pl<0?'#fc7460':null})),k=>yamiManage(Y[k].vi,Y[k].i),
+    k=>{const o=Y[k];return o?`${VIL[o.vi].name} 歓楽街\n平均設定 ${(o.L.set.reduce((a,b)=>a+b,0)/YAMI_N).toFixed(1)}　評判 ${o.L.rep.toFixed(2)}　${o.L.mem?'会員制':''}\n${o.L.last?`昨日 ${o.L.last.cust}人`:''}`:'';},()=>taScr());}
+function yamiDaily(){const A=G.ta,msgs=[];if(!A)return msgs;
+  for(const {vi,i,L} of yamiAll()){const avg=L.set.reduce((a,b)=>a+b,0)/YAMI_N,pay=L.set.reduce((a,s)=>a+YAMI_PAY[s-1],0)/YAMI_N,sz=VIL[vi].size||4;
+    L.rep=clamp(L.rep+(avg-2.8)*.05,.2,2.5);
+    const cust=Math.max(1,Math.round((sz>=6?160:sz>=5?110:70)*Math.pow(L.rep,1.5)*(L.mem?.55:1)*(.6+rnd()*.8))),pl=Math.round(cust*1e7*(1-pay)*(.4+rnd()*1.2));
+    A.cash+=pl;L.last={cust,pl};L.tot=(L.tot||0)+pl;
+    const risk=.012*(L.mem?.35:1)*(.6+L.rep*.4)*(cust>100?1.5:1);
+    if(rnd()<risk){const fine=Math.round(Math.max(0,A.cash)*.3);A.cash-=fine;kanSt(vi).lots[i]={t:null};
+      msgs.push(`【速報】${VIL[vi].name}の 歓楽街で\n違法スロット店に 警察の 手入れ！`,`闇スロ「${L.nm}」が 摘発された…\n台は すべて 押収、 店は 閉鎖。\n罰金 ${fmt(fine)}イェソ（TAの 資金から）`);}
+    else if(rnd()<.01){const v=Math.round(3e8*sz/5*(L.mem?1.5:1));A.cash+=v;L.last.pl+=v;L.tot+=v;msgs.push(`【${L.nm}】 VIP客が 一晩で\n大金を 落としていった！（+${fmt(v)}イェソ）`);}}
+  return msgs;}
 /* 連立政権（総長総選挙編 クリア報酬） */
 const COAL={haruna:{n:'ハルナ会（商人ギルド）',s:40,k:'ken',m:.85,d:'建設費 −15%',w:'裏金スキャンダルが 1.5倍 起きやすい'},
   myogi:{n:'ミョウギ自治連合（地方の 村）',s:30,k:'jin',m:.85,d:'奉納・造営 −15%',w:'特に なし'},
@@ -7714,6 +7803,7 @@ const KAN={cab:{n:'キャバクラ',sh:'CLUB',col:'#f878f8',setup:6e8,rent:3e6,b
   host:{n:'ホストクラブ',sh:'HOST',col:'#f8b800',setup:5e8,rent:2.5e6,base:1.3e7,wage:4.5e6,vol:.3,open:[20,29],cust:2.5e6},
   izakaya:{n:'居酒屋',sh:'居酒屋',col:'#fc7460',setup:8e7,rent:6e5,base:3e6,wage:9e5,vol:.08,open:[17,26],cust:1e5}};
 const KANK=Object.keys(KAN);
+KAN.yami={n:'闇スロ',sh:'SLOT',col:'#a81000',setup:0,rent:0,base:0,wage:0,vol:0,open:[20,29],cust:0};
 const KAN_NM={cab:['クラブ 月下美人','クラブ ルミエール','クラブ 胡蝶','クラブ ヴィーナス','シャングリラ','クラブ 紅'],lounge:['ラウンジ 雅','ラウンジ ミラージュ','ラウンジ 碧','ラウンジ エデン','ラウンジ 朧月'],
   gay:['ママの店 ひまわり','バー 薔薇の園','バー 夜明けの虹','バー 天照','バー 乙姫'],concafe:['にゃんにゃん堂','めいどの国','ぴゅあ★きゃっと','妖精の森カフェ','巫女カフェ 神楽'],
   karaoke:['カラオケ うたげ','カラオケ 八百万','マイクの森','歌うたいの館','カラオケ 天岩戸'],snack:['スナック 夜明け','スナック のぞみ','スナック 灯','スナック 美智子','スナック ゆかり','スナック 港'],
@@ -7746,7 +7836,7 @@ const kanSucc=(vi,L)=>Math.round((KAN[L.t].setup+KAN[L.t].base*60*L.rep)*landMul
 /* 毎日の 収支（普通預金へ） */
 function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
   for(const k in G.kan){const vi=+k.slice(1),lm=landMul(vi),tx=taxRate(vi);
-    G.kan[k].lots.forEach(L=>{if(!L.own||!L.t)return;const K=KAN[L.t];if(L.buzz>0)L.buzz--;
+    G.kan[k].lots.forEach(L=>{if(!L.own||!L.t||L.t==='yami')return;const K=KAN[L.t];if(L.buzz>0)L.buzz--;
       const CT=CASTT[L.t],ST=CT?kstarOf(L.star,L.t):null;if(L.star&&!ST)L.star=null;
       const mul=(L.rep+(ST?ST.rep:0))*(1+.12*(L.lv||0))*(L.buzz>0?1.5:1)*(ST?ST.mul:1);
       let gross=K.base*lm*mul*(1+(rnd()-.5)*2*K.vol)*(CT?.3:1),cost=(K.rent+K.wage)*lm;
@@ -7817,6 +7907,8 @@ function kanBump(c){if(c.t==='kshop'){kanEnter(TW.vi,c.L);return true;}
       i=>{const L=S.lots[i];return L?L.t?`${KAN[L.t].n}「${L.nm}」\n営業 ${kanHrs(L.t)}　${kanOpen(L.t)?'営業中':'準備中'}\n評判 ${'★'.repeat(Math.max(1,Math.min(5,Math.round(L.rep*2.5))))}`:'テナント 募集中の 空き店舗':'';});return true;}
   if(c.t==='kanwall'){dialog(isNight()?'雑居ビルの 窓に 明かりが ともっている。':'雑居ビルだ。 昼間は ひっそり している。');return true;}return false;}
 function kanLot(vi,i){const L=kanSt(vi).lots[i];
+  if(L.t==='yami'){yamiEnter(vi,i);return;}
+  if(!L.t&&G.ta){yamiOffer(vi,i);return;}
   if(!L.t){if(!reOn()){dialog(['「テナント募集中」の 貼り紙が ある。','（不動産業が 解放されると 契約できる）']);return;}
     dialog(['「テナント募集中」','不動産屋「ここで 店を 開くなら\n業態を 選んでくださいね」'],()=>kanTenant(vi,i));return;}
   if(L.own){kanOwn(vi,i);return;}
@@ -7901,12 +7993,13 @@ function buildKanShop(vi,i){const L=kanSt(vi).lots[i],t=L.t||'none',w=13,h=10,C=
   return{kanShop:true,lot:i,title:L.t?`${KAN[L.t].n}「${L.nm}」`:'空き店舗',vi,v:VIL[vi],w,h,cx:6,C,npcs,city:true,sz:VIL[vi].size,px:6,py:h-2,top:0};}
 let kanShopPrev=null;
 function kanEnter(vi,i){const L=kanSt(vi).lots[i];
+  if(L.t==='yami'){yamiEnter(vi,i);return;}
   if(L.t&&!L.own&&!kanOpen(L.t)){dialog(`「${L.nm}」は 準備中だ。\n（営業 ${kanHrs(L.t)}）`);return;}
   kanShopPrev={TW,px:TW.px,py:TW.py};TW=buildKanShop(vi,i);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');
   toast(L.t?(L.own?`オーナー として ${L.nm}に 入った`:`${KAN[L.t].n}「${L.nm}」に 入った`):'空き店舗に 入った');}
 function exitKanShop(){const p=kanShopPrev;kanShopPrev=null;if(!p){exitJogai();return;}TW=p.TW;TW.px=p.px;TW.py=p.py;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 function kanNpc(npc){const vi=TW.vi,i=TW.lot,L=kanSt(vi).lots[i];
-  if(npc.kan==='tenant'){if(!reOn()){dialog(['不動産屋「ここは テナント 募集中です」','（不動産業が 解放されると 契約できる）']);return;}dialog(['不動産屋「この 物件で お店を 開きますか？」'],()=>kanTenant(vi,i));return;}
+  if(npc.kan==='tenant'){if(G.ta){yamiOffer(vi,i);return;}if(!reOn()){dialog(['不動産屋「ここは テナント 募集中です」','（不動産業が 解放されると 契約できる）']);return;}dialog(['不動産屋「この 物件で お店を 開きますか？」'],()=>kanTenant(vi,i));return;}
   if(!L.t)return;const K=KAN[L.t];
   if(!kanOpen(L.t)){dialog(L.own?`${npc.kan==='mama'?(L.t==='izakaya'?'大将':'ママ'):'スタッフ'}「オーナー、 おはようございます。\n開店は ${K.open[0]}時からです」`:'「…まだ 準備中です」');return;}
   const greet={cab:'黒服「いらっしゃいませ。\nご指名は ございますか？」',lounge:'黒服「いらっしゃいませ。 お席へ ご案内いたします」',concafe:'メイド「おかえりなさいませ、 ご主人さま♪」',karaoke:'受付「いらっしゃいませ！\nお時間は どうなさいますか？」',gay:'ママ「あら〜 いらっしゃい！\nなに 飲む？」',snack:'ママ「いらっしゃい。\nゆっくり していきなさいね」',host:'内勤「いらっしゃいませ！\n初回の お客さまですね？」',izakaya:'大将「へい らっしゃい！\nカウンター どうぞ！」'}[L.t];
