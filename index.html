@@ -1743,14 +1743,16 @@ function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f
 const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c'],'目的':['目','#d8a020'],'デイリー':['日','#e8603c']};
 /* ===================== 11/19：デイリークエスト ===================== */
 const DQ_POOL=[{k:'win',n:10,t:'戦闘で 10回 勝つ'},{k:'win',n:25,t:'戦闘で 25回 勝つ'},{k:'gacha',n:10,t:'ガチャを 10回 引く'},{k:'gacha',n:1,t:'ガチャを 1回 引く'},{k:'pray',n:1,t:'神社に 参拝する'},{k:'pray',n:3,t:'神社に 3回 参拝する'},{k:'step',n:300,t:'300歩 あるく'},{k:'step',n:800,t:'800歩 あるく'}];
-function dqS(){const D=G.dq=G.dq||{day:0,q:[],got:0,streak:0,last:0};if(D.day!==G.day){const r=lcg(G.day*9973+7),ks=new Set(),q=[];let n=0;while(q.length<3&&n++<50){const p=DQ_POOL[Math.floor(r()*DQ_POOL.length)];if(ks.has(p.k))continue;ks.add(p.k);q.push({...p,c:0});}D.day=G.day;D.q=q;D.got=0;}return D;}
+/* デイリーは 現実の 1日（端末の 日付）で 切りかわる */
+const realDay=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/864e5);
+function dqS(){const D=G.dq=G.dq||{day:0,q:[],got:0,streak:0,last:0,rd:1};if(!D.rd){D.rd=1;D.day=0;D.last=0;D.streak=0;}const RD=realDay();if(D.day!==RD){const r=lcg(RD*9973+7),ks=new Set(),q=[];let n=0;while(q.length<3&&n++<50){const p=DQ_POOL[Math.floor(r()*DQ_POOL.length)];if(ks.has(p.k))continue;ks.add(p.k);q.push({...p,c:0});}D.day=RD;D.q=q;D.got=0;}return D;}
 function dqHit(k,n=1){if(!G)return;const D=dqS();if(D.got)return;let done=false;D.q.forEach(q=>{if(q.k===k&&q.c<q.n){q.c=Math.min(q.n,q.c+n);if(q.c>=q.n)done=true;}});if(done&&D.q.every(q=>q.c>=q.n))toast('デイリークエスト 達成！ メニューの「デイリー」で 報酬を 受け取ろう');}
-function dqScr(){const D=dqS(),all=D.q.every(q=>q.c>=q.n),nx=D.last===G.day-1||D.last===G.day?D.streak:0;
+function dqScr(){const D=dqS(),RD=realDay(),all=D.q.every(q=>q.c>=q.n),nx=D.last===RD-1||D.last===RD?D.streak:0;
   const lines=D.q.map(q=>`${q.c>=q.n?'✓':'・'} ${q.t}（${fmt(q.c)}/${fmt(q.n)}）`).join('\n');
-  const head=`【デイリークエスト】 ${G.day}日目\n${lines}\n連続 ${nx}日（10日で UR・30日で XR）`;
-  if(D.got){dialog([head,'今日の 報酬は 受け取りずみ。 また 明日！']);return;}
+  const head=`【デイリークエスト】 ${new Date().getMonth()+1}月${new Date().getDate()}日\n${lines}\n連続 ${nx}日（10日で UR・30日で XR）`;
+  if(D.got){dialog([head,'今日の 報酬は 受け取りずみ。\n（現実の 日付が 変わると 新しい クエストに なる）']);return;}
   if(!all){dialog([head,'3つ ぜんぶ 達成すると\nSR以上確定チケットが もらえる。']);return;}
-  D.got=1;D.streak=D.last===G.day-1?D.streak+1:1;D.last=G.day;G.items.srtk=(G.items.srtk||0)+1;const pg=[head,'デイリークエスト 達成！\nSR以上確定チケットを 1枚 もらった！'];
+  D.got=1;D.streak=D.last===RD-1?D.streak+1:1;D.last=RD;G.items.srtk=(G.items.srtk||0)+1;const pg=[head,'デイリークエスト 達成！\nSR以上確定チケットを 1枚 もらった！'];
   if(D.streak%30===0){G.items.xrtk=(G.items.xrtk||0)+1;pg.push(`${D.streak}日 連続 達成！！\nXR確定チケットを 1枚 もらった！`);}else if(D.streak%10===0){G.items.urtk=(G.items.urtk||0)+1;pg.push(`${D.streak}日 連続 達成！\nUR確定チケットを 1枚 もらった！`);}
   save();sfx('lvup');dialog(pg);}
 /* ===================== 11/19：歓楽街の 暴力団 ===================== */
@@ -1822,18 +1824,61 @@ function stadTeam(vi){const B=bbS();return BB_TEAMS.find(t=>B.home[t.id]===vi)||
 function drawStad(sx,sy){R(sx+1,sy+3,14,12,'#bcbcbc');R(sx+2,sy+4,12,10,'#00a800');R(sx+5,sy+7,6,6,'#c89058');R(sx+7,sy+9,2,2,'#fcfcfc');R(sx+1,sy+3,14,1,'#fcfcfc');for(const x of [2,13])R(sx+x,sy,1,4,'#7c7c7c');pc(sx+2,sy,1,'#fcfc80');pc(sx+13,sy,1,'#fcfc80');}
 /* 11/19：野球場の 中を 歩ける */
 function enterStad(vi,back){if(!bbOK()){G.pos={x:back.x,y:back.y};dialog(['大きな 野球場だ。','「現在 改修工事中」の 看板が 立っている…','（ナメガワマチ総長選挙編を クリアすると 開放される）']);return;}
-  const w=17,h=14,C=[],tm=stadTeam(vi);for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'rgrass',k:'stad',x,y});}
-  for(let x=0;x<w;x++){C[0][x]={t:'rstand',k:'stad',x};C[1][x]={t:'rstand',k:'stad',x};C[h-1][x]={t:'rstand',k:'stad',x};}for(let y=0;y<h;y++){C[y][0]={t:'rstand',k:'stad',x:y};C[y][w-1]={t:'rstand',k:'stad',x:y};}
-  for(let x=6;x<=10;x++)C[0][x]={t:'rscore',k:'stad',x};
-  const hx=8,hy=10;for(let d=0;d<=4;d++){for(const [x,y] of [[hx+d,hy-d],[hx-d,hy-d],[hx+d,hy-8+d],[hx-d,hy-8+d]])if(C[y]&&C[y][x])C[y][x]={t:'rdirt',k:'stad',x,y};}
-  for(const [x,y] of [[hx,hy],[hx+4,hy-4],[hx,hy-8],[hx-4,hy-4]])C[y][x]={t:'rbase',k:'stad',x,y};C[hy-4][hx]={t:'rdirt',k:'stad',mound:1,x:hx,y:hy-4};
-  C[h-1][hx]={t:'exit'};C[h-2][hx]={t:'rdirt',k:'stad',x:hx,y:h-2};
-  const npcs=[{x:hx+2,y:hy+1,col:tm?tm.col:'#24188c',hair:'#000000',sp:'stad_play',line:''},{x:2,y:11,col:'#fcfcfc',hair:'#000000',sp:'stad_office',line:''},{x:14,y:11,col:'#3c3c3c',hair:'#7c7c7c',sp:'stad_bet',line:''},{x:hx,y:2,col:'#f8b800',hair:'#000000',sp:'stad_board',line:''},
-    {x:3,y:3,col:'#d82800',hair:'#7c4c10',line:`ファン「${tm?tm.s:'地元'}、 今年こそ 優勝だ！」`},{x:13,y:4,col:'#fcfcfc',hair:'#000000',line:'売り子「ビール いかがですか〜！」'},{x:4,y:8,col:tm?tm.col:'#00a800',hair:'#000000',line:'選手「よし、 今日も ノック 100本だ！」'}];
-  roomPrev={field:back};TW={room:'stad',stadVi:vi,title:tm?`${tm.n} 本拠地 球場`:`${VIL[vi].name.replace(/^.* /,'')} 球場`,vi,v:VIL[vi],w,h,cx:hx,C,npcs,city:true,sz:VIL[vi].size,px:hx,py:h-2,top:0};
+  const B=bbS(),tm=stadTeam(vi),w=33,h=26,cx=16,hy=20,RF=15,C=[];
+  for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++){const dx=x-cx,dy=hy-y,d=Math.hypot(dx,dy),fair=dy>=Math.abs(dx)-.01;let t;
+      if(y>=h-3)t='bconc';else if(y>=hy+2)t=y===hy+2&&Math.abs(dx)<=3?'bback':'bstand';
+      else if(fair&&d>RF+.6)t='bstand';else if(fair&&d>RF-.4)t='bfence';else if(fair&&d>RF-1.5)t='bwarn';
+      else if(!fair&&(d>RF-1.5||Math.abs(dx)>dy+5||x<=1||x>=w-2))t='bstand';
+      else if(dy>=0&&Math.abs(Math.abs(dx)-dy)<.01&&d<RF-1.4)t='bline';
+      else if(fair&&d>=5.5&&d<=9.2&&dy>=1)t='bdirt';
+      else if(!fair&&d<4)t='bdirt';else t='bgr';
+      C[y].push({t,x,y,k:'stad'});}}
+  const set=(x,y,t,o={})=>{if(C[y]&&C[y][x])C[y][x]={t,x,y,k:'stad',...o};};
+  set(cx,hy,'bplate');set(cx-1,hy,'bdirt',{box:1});set(cx+1,hy,'bdirt',{box:1});set(cx,hy+1,'bdirt');
+  set(cx+4,hy-4,'bbase');set(cx,hy-8,'bbase');set(cx-4,hy-4,'bbase');set(cx,hy-4,'bmound');
+  for(let k=1;k<4;k++){set(cx+k,hy-k,'bpath');set(cx-k,hy-k,'bpath');set(cx+4-k,hy-4-k,'bpath');set(cx-4+k,hy-4-k,'bpath');}
+  for(let x=cx-7;x<=cx-4;x++)set(x,hy+1,'bdug',{side:3});for(let x=cx+4;x<=cx+7;x++)set(x,hy+1,'bdug',{side:1});
+  const fp=Math.round(RF/Math.SQRT2);set(cx-fp,hy-fp,'bpole');set(cx+fp,hy-fp,'bpole');
+  for(let x=cx-5;x<=cx+5;x++){set(x,0,'bscore',{sx:x-cx});set(x,1,'bscore',{sx:x-cx,row:1});}
+  for(const [x,y] of [[1,2],[w-2,2],[1,hy-2],[w-2,hy-2]])set(x,y,'blight');
+  set(cx,h-1,'exit');for(let y=hy+2;y<h-1;y++)set(cx,y,'bconc');set(cx-1,hy+2,'bconc');set(cx+1,hy+2,'bconc');
+  set(3,h-3,'bshop',{n:'グッズ'});set(4,h-3,'bshop',{n:'グッズ',r:1});set(w-5,h-3,'bshop',{n:'売店'});set(w-4,h-3,'bshop',{n:'売店',r:1});
+  const L=tm?B.ros[tm.id]:[],pos=(p)=>L.find(q=>q.pos===p),fld=[['投',cx,hy-5],['捕',cx,hy+1],['一',cx+5,hy-5],['二',cx+2,hy-8],['遊',cx-2,hy-8],['三',cx-5,hy-5],['左',cx-7,hy-12],['中',cx,hy-13],['右',cx+7,hy-12]];
+  const npcs=[{x:cx-5,y:hy+1,col:tm?tm.col:'#24188c',hair:'#000000',sp:'stad_play',line:''},{x:8,y:h-2,col:'#fcfcfc',hair:'#000000',sp:'stad_office',line:''},{x:w-2,y:h-2,col:'#3c3c3c',hair:'#7c7c7c',sp:'stad_bet',line:''},
+    {x:cx-2,y:h-2,col:'#24188c',hair:'#000000',line:'改札係「いらっしゃいませ！\nチケットは 年間シートで ご用意しております」'},{x:5,y:h-2,col:'#f8b800',hair:'#7c4c10',sp:'stad_goods',line:''},{x:w-6,y:h-2,col:'#fcfcfc',hair:'#000000',sp:'stad_food',line:''},
+    {x:cx+5,y:hy+1,col:'#7c7c7c',hair:'#000000',line:'相手チームの コーチ「…今日は 負けんぞ」'}];
+  if(tm)fld.forEach(([p,x,y])=>{const P=pos(p);if(!P||!C[y]||!C[y][x])return;const lines={'投':`${P.n}（投手）「今日も 完封 ねらいますよ」\n球威 ${P.pit}　スタミナ ${P.pit?P.sta:''}`,'捕':`${P.n}（捕手）「サインは 任せてください」\nミート ${P.bat}　パワー ${P.pow}`};
+    npcs.push({x,y,col:tm.col,hair:'#fcfcfc',line:lines[p]||`${P.n}（${p}）「ナイス ノック！」\nミート ${P.bat}　パワー ${P.pow}　走力 ${P.spd}`});});
+  roomPrev={field:back};TW={room:'stad',stadVi:vi,title:tm?`${tm.n} 本拠地 球場`:`${VIL[vi].name.replace(/^.* /,'')} 球場`,vi,v:VIL[vi],w,h,cx,C,npcs,city:true,sz:VIL[vi].size,px:cx,py:h-2,top:0};
   townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast(tm?`ようこそ ${tm.s}の 本拠地へ！`:'野球場に 入った');}
+function stadCell(c,sx,sy){const tm=TW&&TW.stadVi!=null?stadTeam(TW.stadVi):null,TC=tm?tm.col:'#24188c',f=frame;
+  const grass=()=>{const st=((c.y||0)>>1)&1;R(sx,sy,16,16,st?'#00a800':'#10b810');if(((c.x||0)+(c.y||0))%5===0)R(sx+5,sy+9,1,1,'#2cc42c');};
+  switch(c.t){
+    case 'bgr':grass();break;
+    case 'bdirt':case 'bpath':R(sx,sy,16,16,'#c89058');if(((c.x||0)*3+(c.y||0))%4===0)R(sx+4,sy+7,1,1,'#b07840');if(c.box){R(sx+3,sy+2,10,12,'#c89058');ctx.strokeStyle='#fcfcfc';ctx.lineWidth=1;ctx.strokeRect(sx+3.5,sy+2.5,9,11);}if(c.t==='bpath')R(sx+6,sy+6,4,4,'#d8a068');break;
+    case 'bline':grass();{const L=(c.x||0)<TW.cx;ctx.strokeStyle='#fcfcfc';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(sx+(L?16:0),sy+16);ctx.lineTo(sx+(L?0:16),sy);ctx.stroke();}break;
+    case 'bwarn':R(sx,sy,16,16,'#a86c38');R(sx+3,sy+5,1,1,'#8c5428');break;
+    case 'bfence':R(sx,sy,16,16,'#14481c');R(sx,sy,16,3,'#f8b800');R(sx,sy+3,16,1,'#000');for(let k=0;k<4;k++)R(sx+k*4,sy+6,2,8,'#1c5c24');if(((c.x||0)+(c.y||0))%3===0){R(sx+2,sy+6,12,6,'#fcfcfc');txt(['八','百','万'][(c.x||0)%3],sx+8,sy+5,'#d82800','center',12);}break;
+    case 'bstand':{R(sx,sy,16,16,'#4c4c5c');for(let k=0;k<4;k++)R(sx,sy+k*4+3,16,1,'#3c3c4c');const cheer=((f>>3)+(c.x||0)*7+(c.y||0)*3)%11<3;
+      for(let k=0;k<4;k++){const x=1+k*4,y=1+(((c.x||0)+k*2)%3)*4,col=[TC,'#fcfcfc',TC,'#f8d878','#fc7460','#3cbcfc'][((c.x||0)*5+(c.y||0)+k)%6];R(sx+x,sy+y-(cheer&&k%2?1:0),2,3,col);pc(sx+x+1,sy+y-1-(cheer&&k%2?1:0),1,'#f8c8a0');}break;}
+    case 'bback':R(sx,sy,16,16,'#3c3c4c');for(let k=0;k<16;k+=3)R(sx+k,sy,1,16,'#7c7c8c');R(sx,sy+5,16,1,'#7c7c8c');R(sx,sy+11,16,1,'#7c7c8c');break;
+    case 'bdug':R(sx,sy,16,16,'#3c3c3c');R(sx,sy,16,3,c.side===1?'#7c7c7c':TC);R(sx,sy+10,16,4,'#7c4c10');R(sx,sy+10,16,1,'#a87c40');break;
+    case 'bplate':R(sx,sy,16,16,'#c89058');ctx.fillStyle='#fcfcfc';ctx.beginPath();ctx.moveTo(sx+4,sy+5);ctx.lineTo(sx+12,sy+5);ctx.lineTo(sx+12,sy+9);ctx.lineTo(sx+8,sy+12);ctx.lineTo(sx+4,sy+9);ctx.fill();break;
+    case 'bmound':grass();pc(sx+8,sy+8,7,'#c89058');pc(sx+8,sy+8,5,'#d8a068');R(sx+5,sy+7,6,2,'#fcfcfc');break;
+    case 'bbase':R(sx,sy,16,16,'#c89058');R(sx+4,sy+4,8,8,'#fcfcfc');R(sx+4,sy+11,8,1,'#bcbcbc');break;
+    case 'bpole':R(sx,sy,16,16,'#14481c');R(sx+6,sy,4,16,'#f8d800');R(sx+10,sy+2,4,10,'#f8d80088');break;
+    case 'blight':R(sx,sy,16,16,'#4c4c5c');R(sx+7,sy+5,2,11,'#7c7c7c');R(sx+2,sy,12,6,'#3c3c3c');for(let k=0;k<3;k++)for(let j=0;j<2;j++)R(sx+3+k*4,sy+1+j*3,2,2,isNight()?'#fcfcc0':'#bcbcbc');break;
+    case 'bscore':{R(sx,sy,16,16,'#0c0c0c');R(sx,sy,16,1,'#3c3c3c');const B=bbS(),sx0=c.sx;
+      if(!c.row){if(sx0===-5)txt('チーム',sx+2,sy+3,'#f8b800','left',40);else if(sx0===0)txt(tm?tm.s:'八百万',sx+8,sy+3,'#fcfcfc','center',70);else if(sx0>=2&&sx0<=4)txt(String(sx0-1),sx+8,sy+3,'#7ee07e','center',12);}
+      else{if(sx0===-5)txt(`第${B.season}期`,sx+2,sy+3,'#bcbcbc','left',40);else if(sx0===0&&tm)txt(`${B.rec[tm.id].w}勝${B.rec[tm.id].l}敗`,sx+8,sy+3,'#f8d878','center',70);else if(sx0>=2&&sx0<=4)txt(String(((f>>6)+sx0)%10),sx+8,sy+3,'#f8b800','center',12);}break;}
+    case 'bconc':R(sx,sy,16,16,'#9c9ca8');if(((c.x||0)+(c.y||0))&1)R(sx+1,sy+1,14,14,'#a8a8b4');break;
+    case 'bshop':R(sx,sy,16,16,'#7c4c10');R(sx,sy,16,5,c.n==='グッズ'?TC:'#d82800');R(sx+1,sy+6,14,9,'#f8e8c8');if(!c.r)txt(c.n,sx+16,sy-1,'#fcfcfc','center',30);
+      for(let k=0;k<3;k++)R(sx+2+k*4,sy+8,3,5,c.n==='グッズ'?[TC,'#fcfcfc','#f8b800'][k]:['#f8d878','#d82800','#7c4c10'][k]);break;}}
 function stadTalk(k){const vi=TW.stadVi,B=bbS(),tm=stadTeam(vi),back=()=>{};
   if(k==='stad_board'){bbStandings();return;}
+  if(k==='stad_food'){listPick(`売店　財布 ${fmt(G.coins)}イェソ`,[{t:'ビール',r:'800イェソ'},{t:'焼きそば（HP 回復）',r:'600イェソ'},{t:'球場カレー（全回復）',r:'1,500イェソ'}],j=>{const pr=[800,600,1500][j];if(G.coins<pr){toast('イェソが たりません');return;}G.coins-=pr;sfx('heal');
+      if(j>0)G.party.forEach(id=>{const st=cstat(id),c=G.chars[id];if(c.hp<=0)return;c.hp=j===2?st.hp:Math.min(st.hp,c.hp+Math.round(st.hp*.3));if(j===2)c.mp=st.mp;});save();dialog(j===0?'ビールを 飲んだ。 球場で 飲む ビールは 格別だ！':j===1?'焼きそばを 食べた。 みんなの HPが 少し 回復した。':'球場カレーを 食べた。 みんなの HPと MPが 全回復した！');});return;}
+  if(k==='stad_goods'){const tn=tm?tm.s:'八百万';listPick(`${tn} グッズ売り場`,[{t:`${tn} ユニフォーム`,r:'12,000イェソ'},{t:'応援タオル',r:'2,500イェソ'},{t:'メガホン',r:'1,200イェソ'}],j=>{const pr=[12000,2500,1200][j];if(G.coins<pr){toast('イェソが たりません');return;}G.coins-=pr;sfx('coin');save();dialog([`${['ユニフォーム','応援タオル','メガホン'][j]}を 買った！`,tm?`これで ${tn}の 一員だ！ 応援 するぞ！`:'球場の 雰囲気を 楽しもう！']);});return;}
   if(k==='stad_bet'){if(!tm||B.ph!=='reg'){dialog('怪しい 男「…今日は 何も ねぇよ」');return;}bbBet(tm.id,back);return;}
   if(k==='stad_play'){if(!B.own){dialog(['監督「オーナーに なって くれる 人が いたら\nこの チームも 変わるんだがなあ」','（球団事務所で 球団を 買収できる）']);return;}
     const td=bbToday();if(B.ph!=='reg'||!td){dialog('監督「今日は 試合が ない。」');return;}if(B.played===B.gd){dialog('監督「今日の 試合は もう 終わりました。\nまた 明日も お願いします！」');return;}
@@ -2976,7 +3021,7 @@ const FAC={lotto:{n:'宝くじ売り場',s:'籤',c:'#d82800'},inn:{n:'宿坊',s:
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
   kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase']);
+const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase','bgr','bdirt','bpath','bline','bwarn','bdug','bplate','bmound','bbase','bconc']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -3230,6 +3275,7 @@ function drawCell(c,sx,sy,city){
     case 'kanann':{R(sx,sy,16,16,'#18182c');if(c.part===0){R(sx,sy+3,16,10,'#f8d878');if(c.dx===2)txt('無料案内所',sx-8,sy+4,'#d82800','center',46);}else{R(sx,sy,16,16,'#3c3c5c');R(sx+2,sy+2,12,12,c.dx===1?'#f8d878':'#24242c');}break;}
     case 'kanarch':{R(sx,sy,16,16,'#18182c');const f=(frame>>4)&1;R(sx,sy+2,16,2,f?'#f878f8':'#7ee0fc');R(sx,sy+12,16,2,f?'#7ee0fc':'#f878f8');if(c.x===18)txt('八百万 歓楽街',sx-40,sy+4,'#f8d878','center',100);break;}
     case 'rfl':case 'rtat':case 'rwall':case 'rcnt':case 'rshelf':case 'ratm':case 'rgacha':case 'rbed':case 'rtable':case 'rboard':case 'rpanel':case 'rposter':case 'rplant':case 'rgrass':case 'rdirt':case 'rbase':case 'rstand':case 'rscore':roomDraw(c,sx,sy);break;
+    case 'bgr':case 'bdirt':case 'bpath':case 'bline':case 'bwarn':case 'bfence':case 'bstand':case 'bback':case 'bdug':case 'bplate':case 'bmound':case 'bbase':case 'bpole':case 'blight':case 'bscore':case 'bconc':case 'bshop':stadCell(c,sx,sy);break;
     case 'kanfl':case 'kiwall':case 'kchand':case 'ksofa':case 'ktable':case 'kbar':case 'kroom':case 'koffice':kanShopDraw(c,sx,sy);break;
     case 'trift':R(sx,sy,16,16,'#1c0010');{const f=(frame>>3)%4;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,5,f&1?'#a80020':'#6800a8');pc(sx+8,sy+8,3,'#d82800');pc(sx+8,sy+8,1+(f>>1),'#fcfcfc');}break;
     case 's':case 'exit':R(sx,sy,16,16,city?'#6c6c6c':'#fcd8a8');if(!city){R(sx+5,sy+6,1,1,'#e4a858');R(sx+12,sy+12,1,1,'#e4a858');}else{R(sx,sy,16,1,'#7c7c7c');}
@@ -3511,7 +3557,7 @@ function roomBump(c){if(c.t==='rcnt'||c.t==='rpanel'){roomUse();return true;}
   if(c.t==='ratm'){atmScr();return true;}if(c.t==='rshelf'){dialog(TW.room==='conv'?'おにぎり・弁当・雑誌が ならんでいる。\n（レジで 買える）':'商品が ぎっしり ならんでいる。\n（カウンターで 買える）');return true;}
   if(c.t==='rgacha'){openGacha();return true;}if(c.t==='rbed')return dialog('ふかふかの 布団だ。\n（受付で 泊まれる）'),true;if(c.t==='rtable')return dialog('ていねいに ふかれた テーブルだ。'),true;
   if(c.t==='rboard')return dialog('掲示板に 求人や お知らせが はってある。'),true;if(c.t==='rposter')return dialog(['ポスター「年末ジャンボ 1等 7億イェソ！」','「当たるも 八卦… 買わなきゃ 当たらない！」']),true;
-  if(c.t==='rplant')return dialog('観葉植物だ。'),true;if(c.t==='rstand')return dialog('観客席だ。 応援の 声が ひびいている！'),true;if(c.t==='rscore'){bbStandings();return true;}if(c.t==='rwall')return true;return false;}
+  if(c.t==='rplant')return dialog('観葉植物だ。'),true;if(c.t==='rstand'||c.t==='bstand')return dialog('観客席だ。 応援の 声が ひびいている！'),true;if(c.t==='bfence')return dialog('外野フェンスだ。 ここを 越えれば ホームラン！'),true;if(c.t==='bpole')return dialog('ファウルポールだ。'),true;if(c.t==='blight')return dialog('照明塔だ。 ナイターでは 球場を 明るく 照らす。'),true;if(c.t==='bback')return dialog('バックネットだ。'),true;if(c.t==='bscore'){bbStandings();return true;}if(c.t==='bshop'){stadTalk(c.n==='グッズ'?'stad_goods':'stad_food');return true;}if(c.t==='rscore'){bbStandings();return true;}if(c.t==='rwall')return true;return false;}
 function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
   const fl=()=>{if(c.t==='rtat'||c.k==='inn'){R(sx,sy,16,16,'#c8b878');R(sx,sy,16,1,'#8c7c3c');R(sx,sy+8,16,1,'#a89858');}else{R(sx,sy,16,16,F[0]);if(((c.x||0)+(c.y||0))&1)R(sx+1,sy+1,14,14,F[1]);}};
   switch(c.t){case 'rfl':case 'rtat':fl();break;
