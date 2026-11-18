@@ -1645,7 +1645,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     if(bl)txt(`加護+${G.bless.pct}% 残り${G.bless.left}戦`,12,46,'#7ee07e','left',112);
   }
 };
-function startField(){setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
+function startField(){if(!window._goalShown&&G&&G.day>1){window._goalShown=1;setTimeout(()=>{try{toast('目的：'+goalInfo().t+'（メニュー→目的）');}catch(e){}},1500);}setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
 function onStep(pv){timeAdd(5);fkHeatStep();
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
@@ -1705,10 +1705,34 @@ function openShop(vi){
 function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right',G.coins>=1e9?92:62);
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
 /* メニュー：スマホ風（アプリの アイコンを 選ぶ） */
-const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c']};
+const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c'],'目的':['目','#d8a020']};
+/* ===================== 目的（いま 何を すれば いいか） ===================== */
+const vByName=n=>VIL.findIndex(v=>v.name===n||v.name.replace(/^.* /,'')===n);
+function dirTo(x,y){if(!G||!G.pos)return '';const dx=x-G.pos.x,dy=y-G.pos.y,d=Math.round(Math.hypot(dx,dy));if(d<2)return 'すぐ ちかく';
+  const a=Math.atan2(dy,dx)*180/Math.PI,D=['東','南東','南','南西','西','北西','北','北東'],k=((Math.round(a/45)%8)+8)%8;return `ここから ${D[k]}へ 約${d}マス`;}
+function goalInfo(){const g=[];const at=(vi)=>vi>=0?{x:VIL[vi].x,y:VIL[vi].y,n:VIL[vi].name}:null;
+  if(G.boss<UK_UNLOCK)return {t:'八岐大蛇を 鎮める',d:`北の 洞窟に 棲む 八岐大蛇を 倒そう。\n（いま Lv${G.boss+1}／Lv${UK_UNLOCK}まで 倒すと 次へ 進める）\n勝てない ときは ガチャと 修行で 強くなろう`,p:{x:CAVE.x,y:CAVE.y,n:'八岐大蛇の 洞窟'}};
+  if(!G.cap3)return {t:'裏千日回峰行を 満行する',d:'八岐大蛇 Lv15を 倒し、 裏千日回峰行が 解放された。\n法螺ヶ岳行者町の 修行場で\n「裏千日回峰行」を 満行しよう（裏大阿闍梨に なる）',p:at(vByName('法螺ヶ岳行者町'))};
+  const gm=gmS();
+  if(!gm.ch)return {t:'グンマーていこくへ 向かう',d:'裏千日回峰行を 満行した！\n東の 果ての 巨大な 城壁「国境門」から\nグンマーていこくへ 入ろう',p:{x:GGATE.x,y:GGATE.y,n:'グンマー 国境門'}};
+  if(!gm.free){const D={1:'帝都の 出国管理局「官」へ 行って\n出国手形を 申請しよう',2:'帝城へ 謁見を 申し込もう。\n（その 前に 帝都の 街を 見て まわろう）',3:'帝城へ 謁見を 申し込もう。\n（その 前に 帝都の 街を 見て まわろう）',4:'帝城の 地下保管施設へ 向かおう（3連戦）',5:'帝城の 地下保管施設へ 向かおう（3連戦）',6:'古書店主の 手掛かりを 探そう',7:'出国管理局で 出国手形を 受け取ろう'};
+    return {t:'グンマー帝国編：出国手形を 手に入れる',d:D[gm.ch]||'帝都で 出国手形を 手に入れよう',p:at(GCAP())};}
+  const gs=gsS();
+  if(gs.ch<6){const D={0:G.pol?'帝都の 帝城へ 行こう。\n空位の 総長の 座を 選挙で 決めるらしい':'本土（マホロバ）の 役所で 政党を 立ち上げよう。\n（政治メニュー から）\nそれから 帝都の 帝城へ',1:'三つの 封鎖区画の 神主を 訪ねよう',2:'封鎖区画の 神主を 訪ねよう（3連戦）',3:'封鎖区画の 神主を 訪ねよう（3連戦）',4:'帝城の 地下へ 向かおう',5:'帝城へ 急げ！（最終決戦）'};
+    return {t:'総長総選挙編',d:D[gs.ch]||'総長総選挙を 勝ちぬこう',p:at(gs.ch===0&&!G.pol?vByName('首都 マホロバ'):GCAP())};}
+  if(!gs.chief)return {t:'総長総選挙編：連立を 組む',d:'政治メニュー →「連立を 組む」で\n新しい 総長を 決めよう',p:null};
+  const ti=tiS();
+  if(!ti.clear)return {t:'帝愛産業 地下帝国の乱',d:ti.ch===0?'帝都の 帝城で 総長に 会おう。\n帝愛の 地下帝国の うわさが…':'地下帝国で 借金を 返し\nイカサマ賭博を 暴こう\n（ひろった 物が ヒントに なる）',p:at(GCAP())};
+  const sk=skS();
+  if(!sk.clear){const D={0:'黒幕の 根城は 南の サキタマ。\n国境門を 出て 南の 町 クマガヤへ',1:'クマガヤの 自警団長 アツミの 話を 聞こう。\n…何かを 隠している ようだ'};
+    return {t:'ぶっ飛びサキタマ編：ナメガワマチを 取り戻せ',d:D[sk.ch]||`サキタマの 町を めぐって 仲間と 情報を 集め\nナメガワマチを 取り戻そう（第${sk.ch}章）`,p:at(vByName(sk.ch<=1?'国境の町 クマガヤ':'完全平和都市 ナメガワマチ'))};}
+  return {t:'つぎの 物語を 待つ',d:'人類保管計画の 物語は 完結した！\n次回「アイヂ大戦編」は\n2027年1月1日 配信予定。\nそれまで 八岐大蛇 Lv30・裏闘技場・経営などで\n強くなっておこう',p:null};}
+function goalScr(){const g=goalInfo(),pg=[`【目的】${g.t}`,g.d];if(g.p)pg.push(`行き先：${g.p.n}\n${dirTo(g.p.x,g.p.y)}`);
+  const side=[];if(G.job)side.push(`ジョブ「${G.job.name}」 ${G.job.prog}/${G.job.need}`);
+  if(side.length)pg.push('【寄り道】\n'+side.join('\n'));dialog(pg);}
 function openMenu(){
-  const NM=['つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
-  if(ajOK()){NM.splice(8,0,'アジト');FN.splice(8,0,ajMenu);}
+  const NM=['目的','つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[goalScr,statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
+  if(ajOK()){NM.splice(9,0,'アジト');FN.splice(9,0,ajMenu);}
   const PX=53,PY=2,PW=150,PH=236,SX=PX+6,SY=PY+12,SW=PW-12,SH=PH-24,GY=SY+70,CW=SW/4,RH=35;let sel=0,click=null,t=0;
   const icon=(i,x,y,on)=>{const [g,c]=PH_APP[NM[i]]||['？','#5c5c5c'];const up=on?-2:0;R(x+1,y+up,20,22,c);R(x,y+1+up,22,20,c);R(x+1,y+1+up,20,3,'rgba(255,255,255,.25)');big(g,x+11,y+4+up,'#fcfcfc','center',12);
     if(on){ctx.strokeStyle='#fcfcfc';ctx.lineWidth=1;ctx.strokeRect(x-2.5,y-3.5+up,27,27);}};
@@ -2303,6 +2327,8 @@ function startBattle(boss,rift=null,sp=null){
   en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
+  /* 11/19：ボスが 弱いと 言われたので 強化（HP 1.8倍・攻撃/魔力 1.3倍・守備 1.15倍） */
+  en.forEach(e=>{if(e.boss||e.dboss||boss){for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*1.8);for(const q of ['atk','mag'])e[q]=Math.round(e[q]*1.3);e.def=Math.round(e.def*1.15);}});
   BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:BGC[bt]||BGC[T.GRASS]};ngClamp();;
   if(sp&&sp.guests)sp.guests.forEach(id=>{if(G.chars[id]&&!G.party.includes(id))BT.pt.push({id,ab:0,av:0,db:0,dv:0,guard:false,guest:1});});
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
@@ -3217,9 +3243,11 @@ function addExp(o,amt,cap=9999){o.exp+=Math.round(amt);while(o.lv<cap&&o.exp>=ne
 const expMul=()=>1+Math.floor((G.career||0)/15)*.1;
 
 /* 宿坊 */
+/* 11/19：宿坊の 宿泊費は 町の 規模ごとに 統一 */
+const INN_COST=[100,300,800,2000,5000,10000,20000];
 function innFac(){
   if(G.innBan&&G.day<G.innBan){dialog(['宿坊の 僧侶「…お客さま、地下帰りの 方ですね。」',`「心が 落ち着くまで\nあと ${G.innBan-G.day}日は お泊めできません。」`,'（裏・賭郎に 負けた ショックで\n3日間は 宿坊で 休めない）']);return;}
-  const free=cardPerk('tcb',1),cost=free?0:tierCost(15);
+  const free=cardPerk('tcb',1),cost=free?0:INN_COST[Math.max(0,Math.min(6,VIL[curVil].size||0))];
   choice(free?`宿坊へ ようこそ。\nTCBカード会員さまは 宿泊 無料です。\n朝のお勤めで 3戦 経験値書が 2割増し。`:`宿坊へ ようこそ。 ひと晩 ${fmt(cost)}イェソです。\n朝のお勤めを すると 3戦のあいだ\n経験値書が 2割 多く 手に入ります。`,['泊まる','やめる'],r=>{
     if(r!==0)return;if(G.coins<cost){dialog('イェソが たりないようですね。');return;}
     payFor(cost,()=>{sfx('bell');let t=0;
@@ -6584,7 +6612,8 @@ Object.keys(HK_P).forEach(k=>{PC_FIX[k]={name:AJ_F[k].n,v:2,hk:1,arm:1,P:HK_P[k]
 function pcSpecOf(f){const A=ajS();if(f.k==='pcj')return (A.builds||[])[f.b];return PC_FIX[f.k];}
 /* ---------- パチスロ 攻略サイト「スロ攻略ナビ」 ---------- */
 function hallKind(vi){const v=VIL[vi];if(!v||v.tokoyo||v.depop)return null;const f=FAC_SIZE[Math.min(3,v.size)];if(f.includes('pachi'))return 'pachi';if(f.includes('kpachi')&&kpachiOK(vi))return 'kpachi';return null;}
-const hallRegion=v=>v.gm?'グンマー':v.kq?'コクラ':v.sk?'サキタマ':'はじまりの 国';
+/* 11/19：はじまりの 大陸は シマネ（八岐大蛇・八雲と つながる） */
+const hallRegion=v=>v.gm?'グンマー':v.kq?'コクラ':v.sk?'サキタマ':v.yama?'マホロバ':v.tier===11?'北方大陸':'シマネ';
 const hallNm=vi=>{const H=taHallOf(vi);return H?taHallName(H):hallKind(vi)==='kpachi'?`${VIL[vi].name.replace(/^.* /,'')}の 過疎パチ屋`:`${VIL[vi].name.replace(/^.* /,'')}の パチンコ店`;};
 function hallPledge(vi,d){const dt=hallDay(vi,d);
   if(d!==G.day)return dt===3?'周年日：全機種に 高設定を 投入 予定！':dt===2?'イベ日：高設定 多数 投入 予定':dt===1?'特日：高設定 投入 予定':'通常営業（公約なし）';
@@ -6643,7 +6672,7 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
       `本日（${G.day}日目）：${DAYN[dt]}\n${hallPledge(vi,G.day)}`,
       sch.length?`今後の 予定\n${sch.map(x=>x.replace(/：(特日|イベ日|周年日)$/,(m,a)=>'：'+a)).join('\n')}`:'今後の 予定：なし',
       dt>=2?'掲示板「朝イチ 並ぶしか ない」\n「抽選番号 次第だな」':hallKind(vi)==='kpachi'?'掲示板「過疎パチは 夢を 見る 場所じゃ ない」':'掲示板「今日は 様子見かな」']);};
-  const regions=()=>{const R0=['はじまりの 国','グンマー','コクラ','サキタマ'].filter(r=>known.some(i=>hallRegion(VIL[i])===r));
+  const regions=()=>{const R0=['シマネ','北方大陸','マホロバ','グンマー','コクラ','サキタマ'].filter(r=>known.some(i=>hallRegion(VIL[i])===r));
     if(!R0.length){dialog('まだ どの パチンコ店にも 行ったことが ない。');return;}
     listPick('ホール情報　地域を 選ぶ',R0.map(r=>({t:r,r:`${known.filter(i=>hallRegion(VIL[i])===r).length}店`})),k=>{const L=known.filter(i=>hallRegion(VIL[i])===R0[k]);
       const pick=()=>listPick(`ホール情報　${R0[k]}`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>{detail(L[j]);},s=>`${hallNm(L[s])}\n本日：${DAYN[hallDay(L[s])]}　${hallRate(L[s])[1]}\n${hallPledge(L[s],G.day).split('\n')[0]}`);pick();});};
@@ -6998,7 +7027,7 @@ const AMZ=[['natsu','夏みかん',200,'base'],['yakiman','焼きまんじゅう
   ['senbei','草加せんべい',200,'sk'],['gokabo','五家宝',250,'sk'],['negi','深谷ネギ',300,'fk'],['broc','ブロッコリー',250,'fk'],['imo','ヤマトイモ',400,'fk'],['kome','お米',500,'fk'],['mitsu','雪くまの 氷みつ',300,'fk'],
   ['s_negi','ネギの 種',100,'fk'],['s_broc','ブロッコリーの 種',100,'fk'],['s_imo','ヤマトイモの 種いも',150,'fk'],['s_kome','稲の 苗',200,'fk']];
 const AMZ_N=Object.fromEntries(AMZ.map(a=>[a[0],a[1]]));
-const AMZ_REG={base:'はじまりの 国',gm:'グンマー',kq:'コクラ',ti:'帝愛 地下帝国',sk:'サキタマ',fk:'フカヤ'};
+const AMZ_REG={base:'シマネ',gm:'グンマー',kq:'コクラ',ti:'帝愛 地下帝国',sk:'サキタマ',fk:'フカヤ'};
 function amzReg(r){const seen=f=>VIL.some((v,i)=>f(v)&&G.seen&&G.seen['v'+i]);
   if(r==='base')return true;if(r==='gm')return seen(v=>!!v.gm)||gmS().ch>=1;if(r==='kq')return seen(v=>!!v.kq);if(r==='ti')return !!(G.ti&&(G.ti.ch>0||G.ti.clear));if(r==='sk'||r==='fk')return seen(v=>!!v.sk);return false;}
 const RCP=[{k:'negima',n:'ネギま焼き',m:{negi:1,yakitori:1},e:{atk:.15},dur:5},{k:'onigiri',n:'ネギ味噌おにぎり',m:{kome:1,negi:1},e:{heal:1}},
