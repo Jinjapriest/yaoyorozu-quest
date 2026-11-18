@@ -1155,12 +1155,21 @@ const tierAt=(x,y)=>VIL[nearestVil(x,y)].tier;
 
 /* タイル画像 */
 function mkTile(fn){const c=document.createElement('canvas');c.width=16;c.height=16;const g=c.getContext('2d');fn((x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);});return c;}
-const grassBase=P=>{P(0,0,16,16,'#58d854');[[2,3],[9,1],[13,7],[5,10],[11,13],[1,14]].forEach(([x,y])=>{P(x,y,1,2,'#00a800');P(x+1,y+1,1,1,'#00a800');});};
+/* 11/19：草むら・森・山を 精細に */
+const grassBase=P=>{P(0,0,16,16,'#58d854');[[0,5],[6,2],[12,0],[3,12],[14,10],[8,7],[10,4],[1,9],[7,14],[13,14]].forEach(([x,y])=>P(x,y,1,1,'#4cc444'));
+  [[2,3],[9,1],[13,7],[5,10],[11,13],[1,14]].forEach(([x,y],i)=>{P(x,y+1,1,2,'#00a800');P(x+1,y,1,3,'#00a800');P(x+2,y+1,1,2,'#00a800');P(x+1,y,1,1,'#98f088');if(i%3===0)P(x+2,y,1,1,'#88e070');});
+  [[7,5],[4,7],[14,3]].forEach(([x,y])=>P(x,y,1,1,'#a8f8a0'));};
 const TILES=[];
 TILES[T.SEA]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#0000a8');P(2+f*4,4,5,1,'#0058f8');P(9-f*3,11,5,1,'#0058f8');}));
 TILES[T.GRASS]=[mkTile(grassBase)];
-TILES[T.FOREST]=[mkTile(P=>{grassBase(P);P(4,1,8,2,'#005800');P(2,3,12,6,'#005800');P(3,9,10,2,'#005800');P(5,3,3,2,'#00a800');P(4,5,2,2,'#00a800');P(7,11,2,4,'#7c4c10');})];
-TILES[T.MOUNT]=[mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=1+r;P(8-Math.ceil(w/2),2+r,w,1,r<4?'#fcfcfc':'#ac7c00');P(8,2+r,Math.floor(w/2),1,r<4?'#bcbcbc':'#7c4c10');}})];
+TILES[T.FOREST]=[mkTile(P=>{grassBase(P);P(3,14,10,2,'#3c9c38');
+  const W=[4,8,10,12,12,12,12,12,10,8,4];W.forEach((w,r)=>{const x=8-w/2,y=1+r;P(x,y,w,1,'#006c00');P(x+w-2,y,2,1,'#004800');if(r<6)P(x+1,y,Math.max(1,Math.floor(w/3)),1,'#00a000');});
+  [[4,3],[6,2],[3,5],[5,6],[9,4],[7,8],[11,7],[4,9]].forEach(([x,y],i)=>P(x,y,1,1,i<4?'#58d854':'#008800'));[[10,9],[12,6],[8,10]].forEach(([x,y])=>P(x,y,1,1,'#003800'));
+  P(7,12,2,3,'#7c4c10');P(8,12,1,3,'#503000');P(6,14,4,1,'#503000');})];
+TILES[T.MOUNT]=[mkTile(P=>{grassBase(P);for(let r=0;r<14;r++){const w=2+r,x=8-Math.ceil(w/2),snow=r<4||(r===4&&true);
+    P(x,1+r,w,1,snow?'#fcfcfc':'#b48430');P(8,1+r,Math.floor(w/2),1,snow?'#c8c8d8':'#8c5c18');if(!snow&&r%3===1)P(x+1,1+r,1,1,'#d8a850');}
+  P(5,5,2,1,'#fcfcfc');P(9,5,3,1,'#c8c8d8');P(6,6,1,1,'#fcfcfc');P(10,6,1,1,'#c8c8d8');
+  [[6,9],[9,8],[4,12],[11,11],[7,13],[10,13]].forEach(([x,y])=>{P(x,y,2,1,'#6c4410');P(x,y-1,1,1,'#d8a850');});P(0,15,16,1,'#5c3c10');})];
 TILES[T.WATER]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#0058f8');P(2+f*4,4,5,1,'#3cbcfc');P(9-f*3,11,5,1,'#3cbcfc');}));
 TILES[T.ROAD]=[mkTile(P=>{P(0,0,16,16,'#fcd8a8');[[3,4],[11,2],[7,9],[13,12],[2,13]].forEach(([x,y])=>P(x,y,1,1,'#c89058'));})];
 TILES[T.BRIDGE]=[mkTile(P=>{P(0,0,16,16,'#0058f8');P(0,3,16,10,'#a05000');for(let x=0;x<16;x+=4)P(x,3,1,10,'#503000');P(0,3,16,1,'#503000');P(0,12,16,1,'#503000');})];
@@ -1656,7 +1665,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
   }
 };
 function startField(){if(!window._goalShown&&G&&G.day>1){window._goalShown=1;setTimeout(()=>{try{toast('目的：'+goalInfo().t+'（メニュー→目的）');}catch(e){}},1500);}setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
-function onStep(pv){timeAdd(5);fkHeatStep();
+function onStep(pv){timeAdd(5);dqHit('step');fkHeatStep();
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
   {const n=namidaPos();if(n.x===x&&n.y===y){namidaEv();return;}}
@@ -1679,7 +1688,7 @@ function onStep(pv){timeAdd(5);fkHeatStep();
 
 /* ===================== 村・神社・道具屋 ===================== */
 let curVil=0;
-function prayScr(rank,name,key,cb){
+function prayScr(rank,name,key,cb){dqHit('pray');
   let t=0,done=false;
   const s={full:true,upd(){t++;if(I.A&&t<130)t=130;if(t===56||t===74)sfx('clap');if(t===118)sfx('bell');
     if(t>=140&&!done){done=true;const lines=doPray(rank,name,key);dialog(lines,()=>{pop();cb&&cb();});}},
@@ -1716,7 +1725,29 @@ function openShop(vi){
 function coinWin(x,y){win(x,y,108,36);if(G.coins<1e9)txt('イェソ',x+8,y+8,'#f8b800');txt(`${fmt(G.coins)}イェソ`,x+100,y+8,'#fcfcfc','right',G.coins>=1e9?92:62);
   txt(G.bless&&G.bless.left>0?`加護+${G.bless.pct}%（${G.bless.left}戦）`:'加護なし',x+8,y+21,G.bless&&G.bless.left>0?'#7ee07e':'#7c7c7c','left',92);}
 /* メニュー：スマホ風（アプリの アイコンを 選ぶ） */
-const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c'],'目的':['目','#d8a020']};
+const PH_APP={'つよさ':['強','#d83c3c'],'へんせい':['編','#3c6cd8'],'キャラ育成':['育','#2c9c4c'],'武器の鍛錬':['鍛','#6c6c7c'],'どうぐ':['袋','#a0602c'],'ジョブ':['職','#1c8c8c'],'ガチャ':['ガ','#e8508c'],'ワープ':['翔','#3cacec'],'アジト':['家','#e87c20'],'不動産':['土','#c8a020'],'政治':['政','#28386c'],'コード入力':['贈','#8c4cd8'],'せってい':['設','#5c5c64'],'きろく':['記','#3c8c3c'],'目的':['目','#d8a020'],'デイリー':['日','#e8603c']};
+/* ===================== 11/19：デイリークエスト ===================== */
+const DQ_POOL=[{k:'win',n:10,t:'戦闘で 10回 勝つ'},{k:'win',n:25,t:'戦闘で 25回 勝つ'},{k:'gacha',n:10,t:'ガチャを 10回 引く'},{k:'gacha',n:1,t:'ガチャを 1回 引く'},{k:'pray',n:1,t:'神社に 参拝する'},{k:'pray',n:3,t:'神社に 3回 参拝する'},{k:'step',n:300,t:'300歩 あるく'},{k:'step',n:800,t:'800歩 あるく'}];
+function dqS(){const D=G.dq=G.dq||{day:0,q:[],got:0,streak:0,last:0};if(D.day!==G.day){const r=lcg(G.day*9973+7),ks=new Set(),q=[];let n=0;while(q.length<3&&n++<50){const p=DQ_POOL[Math.floor(r()*DQ_POOL.length)];if(ks.has(p.k))continue;ks.add(p.k);q.push({...p,c:0});}D.day=G.day;D.q=q;D.got=0;}return D;}
+function dqHit(k,n=1){if(!G)return;const D=dqS();if(D.got)return;let done=false;D.q.forEach(q=>{if(q.k===k&&q.c<q.n){q.c=Math.min(q.n,q.c+n);if(q.c>=q.n)done=true;}});if(done&&D.q.every(q=>q.c>=q.n))toast('デイリークエスト 達成！ メニューの「デイリー」で 報酬を 受け取ろう');}
+function dqScr(){const D=dqS(),all=D.q.every(q=>q.c>=q.n),nx=D.last===G.day-1||D.last===G.day?D.streak:0;
+  const lines=D.q.map(q=>`${q.c>=q.n?'✓':'・'} ${q.t}（${fmt(q.c)}/${fmt(q.n)}）`).join('\n');
+  const head=`【デイリークエスト】 ${G.day}日目\n${lines}\n連続 ${nx}日（10日で UR・30日で XR）`;
+  if(D.got){dialog([head,'今日の 報酬は 受け取りずみ。 また 明日！']);return;}
+  if(!all){dialog([head,'3つ ぜんぶ 達成すると\nSR以上確定チケットが もらえる。']);return;}
+  D.got=1;D.streak=D.last===G.day-1?D.streak+1:1;D.last=G.day;G.items.srtk=(G.items.srtk||0)+1;const pg=[head,'デイリークエスト 達成！\nSR以上確定チケットを 1枚 もらった！'];
+  if(D.streak%30===0){G.items.xrtk=(G.items.xrtk||0)+1;pg.push(`${D.streak}日 連続 達成！！\nXR確定チケットを 1枚 もらった！`);}else if(D.streak%10===0){G.items.urtk=(G.items.urtk||0)+1;pg.push(`${D.streak}日 連続 達成！\nUR確定チケットを 1枚 もらった！`);}
+  save();sfx('lvup');dialog(pg);}
+/* ===================== 11/19：歓楽街の 暴力団 ===================== */
+const ykS=vi=>{G.yk=G.yk||{};return G.yk['v'+vi]=G.yk['v'+vi]||{on:0,day:0};};
+function ykDaily(){const msgs=[];if(!G.kan)return msgs;for(const k in G.kan){const vi=+k.slice(1),Y=ykS(vi),own=G.kan[k].lots.filter(L=>L.own&&L.t&&L.t!=='yami');
+    if(!Y.on){if(own.length&&G.day-Y.day>14&&rnd()<.03){Y.on=1;Y.day=G.day;msgs.push(`【${VIL[vi].name.replace(/^.* /,'')} 歓楽街】\n暴力団「鬼瓦組」が 事務所を かまえた…！\n店の 評判が 下がり みかじめ料を 取られる`);}continue;}
+    let fee=0;own.forEach(L=>{const g=L.guard&&G.chars.guard_n;L.rep=Math.max(.4,Math.round((L.rep-(g?.005:.015))*1000)/1000);fee+=Math.round(KAN[L.t].base*landMul(vi)*(g?.04:.08));});
+    if(fee>0){G.bank.sav-=fee;msgs.push(`【鬼瓦組】みかじめ料 ${fmt(fee)}イェソを\n取られた…（${VIL[vi].name.replace(/^.* /,'')} 歓楽街）`);}}
+  return msgs;}
+function ykTalk(){const vi=TW.vi,Y=ykS(vi);if(!Y.on){dialog('…');return;}
+  dialog(['組員「あぁ？ なんだ てめぇ」','「この 街は 鬼瓦組の シマだ。\n店を 出すなら みかじめ料を 払うのが 筋ってもんよ」'],()=>choice('鬼瓦組と 戦いますか？\n（勝てば この 街から 撤退させられる）',['戦う','やめる'],r=>{if(r!==0)return;
+    G.townBack=jogaiPrev&&jogaiPrev.TW?{vi,px:jogaiPrev.px,py:jogaiPrev.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'yakuza',vi});},96));}
 /* ===================== 目的（いま 何を すれば いいか） ===================== */
 const vByName=n=>VIL.findIndex(v=>v.name===n||v.name.replace(/^.* /,'')===n);
 function dirTo(x,y){if(!G||!G.pos)return '';const dx=x-G.pos.x,dy=y-G.pos.y,d=Math.round(Math.hypot(dx,dy));if(d<2)return 'すぐ ちかく';
@@ -1742,8 +1773,8 @@ function goalScr(){const g=goalInfo(),pg=[`【目的】${g.t}`,g.d];if(g.p)pg.pu
   const side=[];if(G.job)side.push(`ジョブ「${G.job.name}」 ${G.job.prog}/${G.job.need}`);
   if(side.length)pg.push('【寄り道】\n'+side.join('\n'));dialog(pg);}
 function openMenu(){
-  const NM=['目的','つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[goalScr,statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
-  if(ajOK()){NM.splice(9,0,'アジト');FN.splice(9,0,ajMenu);}
+  const NM=['目的','デイリー','つよさ','へんせい','キャラ育成','武器の鍛錬','どうぐ','ジョブ','ガチャ','ワープ','不動産','政治','コード入力','せってい','きろく'],FN=[goalScr,dqScr,statusScr,partyScr,charListScr,weaponListScr,itemScr,jobInfoScr,openGacha,warpScr,reMenuScr,polScr,codeScr,settingsScr,saveScr];
+  if(ajOK()){NM.splice(10,0,'アジト');FN.splice(10,0,ajMenu);}
   const PX=53,PY=2,PW=150,PH=236,SX=PX+6,SY=PY+12,SW=PW-12,SH=PH-24,GY=SY+70,CW=SW/4,RH=35;let sel=0,click=null,t=0;
   const icon=(i,x,y,on)=>{const [g,c]=PH_APP[NM[i]]||['？','#5c5c5c'];const up=on?-2:0;R(x+1,y+up,20,22,c);R(x,y+1+up,22,20,c);R(x+1,y+1+up,20,3,'rgba(255,255,255,.25)');big(g,x+11,y+4+up,'#fcfcfc','center',12);
     if(on){ctx.strokeStyle='#fcfcfc';ctx.lineWidth=1;ctx.strokeRect(x-2.5,y-3.5+up,27,27);}};
@@ -2063,7 +2094,7 @@ function openGacha(){
   banIdx=clamp(banIdx,0,GB.length-1);
   let st='menu',res=[],at=0,best=0,rp=0;const prevBgm=bgm;playBGM('gacha');
   const m=mkMenu([],{x:4,y:148,w:248,rows:6,rh:13});
-  const tkAll=()=>G.items.tk+G.items.srtk+(G.items.urtk||0);
+  const tkAll=()=>G.items.tk+G.items.srtk+(G.items.urtk||0)+(G.items.xrtk||0);
   const gc=n=>Math.round(n*GACHA_PRICE*gachaDisc());const items=()=>[{t:'1回 引く',r:fmt(gc(1))+'イェソ',dis:G.coins<gc(1)},{t:'10連 引く（SSR以上1つ確定）',r:fmt(gc(10))+'イェソ',dis:G.coins<gc(10)},{t:'100連 引く（UR以上1つ確定）',r:fmt(gc(100))+'イェソ',dis:G.coins<gc(100)},{t:'チケットで 引く（まとめて 引くも）',r:`${fmt(tkAll())}枚`,dis:tkAll()<=0},{t:'XRが 出るまで 引く',r:fmt(gc(1))+'/回',dis:G.coins<gc(1)&&(G.items.tk||0)<=0},{t:'提供割合とラインナップ'},{t:'もどる'}];
   m.items=items();
   const close=()=>{pop();save();playBGM(prevBgm||'field');};
@@ -2079,9 +2110,9 @@ function openGacha(){
         if(I.pl||I.pr){banIdx=(banIdx+(I.pr?1:GB.length-1))%GB.length;sfx('cur');}
         const r=menuUpd(m);
         if(r==='cancel'||r===6){close();return;}
-        const go=(n,minR)=>{res=pull(b,n,minR);best=Math.max(...res.map(x=>x.rar));st='anim';at=0;rp=0;save();};
+        const go=(n,minR)=>{res=pull(b,n,minR);dqHit('gacha',n);best=Math.max(...res.map(x=>x.rar));st='anim';at=0;rp=0;save();};
         if(r===0||r===1||r===2){const n=[1,10,100][r];G.coins-=gc(n);go(n,0);}
-        if(r===3){const TK=[['tk','ガチャチケット',0],['srtk','SR以上確定チケット',2],['urtk','UR確定チケット',4]];
+        if(r===3){const TK=[['tk','ガチャチケット',0],['srtk','SR以上確定チケット',2],['urtk','UR確定チケット',4],['xrtk','XR確定チケット',6]];
           choice('どの チケットを 使いますか？',TK.map(([k,nm])=>({t:`${nm}（${fmt(G.items[k]||0)}枚）`,dis:!((G.items[k]||0)>0)})),k=>{if(k<0)return;
             const [key,nm,minR]=TK[k],have=G.items[key]||0,ns=[1,10,100,have];
             choice(`${nm}を 何枚 使いますか？\n（所持 ${fmt(have)}枚）`,ns.map((n,q)=>({t:q===3?`まとめて 全部 引く（${fmt(have)}枚）`:n===1?'1回 引く':n===10?'10連（10枚）':'100連（100枚）',dis:q===3?have<2:have<n})),j=>{if(j<0)return;
@@ -2113,7 +2144,7 @@ function openGacha(){
         if(b.pickup.length){txt(b.lim?(b.left<=1?'PICK UP!　期間限定 今日まで！':`PICK UP!　期間限定 あと${b.left}日`):'PICK UP!',128,116,`hsl(${(frame*5)%360},100%,70%)`,'center');
         txt('同じレアリティの中で ピックアップが 50%',128,128,'#fce0a8','center',240);}
         else txt('期間限定ガチャは 毎週月曜0時に 入れかわる',128,122,'#fce0a8','center',240);
-        txt(`${fmt(G.coins)}イェソ`,194,8,'#f8b800','right',120);txt(`チケット ${fmt(G.items.tk)}・SR ${fmt(G.items.srtk)}・UR ${fmt(G.items.urtk||0)}`,128,138,'#bcbcbc','center',240);
+        txt(`${fmt(G.coins)}イェソ`,194,8,'#f8b800','right',120);txt(`チケット ${fmt(G.items.tk)}・SR ${fmt(G.items.srtk)}・UR ${fmt(G.items.urtk||0)}${G.items.xrtk?'・XR '+fmt(G.items.xrtk):''}`,128,138,'#bcbcbc','center',240);
         menuDraw(m,a);
       }else if(st==='rates'){
         win(4,46,248,192);
@@ -2223,6 +2254,7 @@ function spTalk(npc){const k=npc.sp;
     dialog(['防衛団員「おい！ おまえ 見ない 顔だな！」','「この 町は ぼくたち 防衛団が まもってるんだ！\n勝負だ！」'],()=>choice('防衛団と 勝負しますか？',['勝負する','やめる'],r=>{if(r!==0)return;
       G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'bouei'});},96));return;}
   if(k==='room'){roomUse();return;}
+  if(k==='yakuza'){ykTalk();return;}
   if(k==='catch'){catchTalk();return;}
   if(k==='singer'){singerTalk();return;}}
 function catchTalk(){const ids=['catch_g','catch_u'].filter(id=>G.chars[id]);
@@ -2323,6 +2355,7 @@ function startBattle(boss,rift=null,sp=null){
     else{const g=mkEnemy(12,['大海神 オオワダツミ','snake','#0058f8','#fcfcfc']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*12);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.5);g.magic=true;g.dboss=true;en.push(g);
       for(let k=0;k<2;k++){const e=mkEnemy(12,ETIER[10][0]);e.name='わだつみの眷属';en.push(e);}}
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*TOKO_F);}
+  else if(sp&&sp.kind==='yakuza'){const N=['鬼瓦組 組員','鬼瓦組 若頭','鬼瓦組 組長'];for(let k=0;k<3;k++){const e=mkEnemy(Math.max(9,tierAt(G.pos.x,G.pos.y)),['ヤクザ','oni','#000000',k===2?'#f8b800':'#d82800']);e.name=N[k];const m=k===2?3:k===1?1.8:1.2;for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*m*1.5);for(const q of ['atk','def'])e[q]=Math.round(e[q]*m);en.push(e);}}
   else if(sp&&sp.kind==='bouei'){const N=['防衛団員 リーダー','防衛団員 おにぎり','防衛団員 メガネ'];for(let k=0;k<3;k++){const e=mkEnemy(9,ETIER[9][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*(k?1:1.6));en.push(e);}}
   else if(sp&&sp.kind==='mine'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(9,ETIER[9][ri(0,2)]);e.name='山の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*1.3);en.push(e);}}
   else if(rift!=null&&VIL[nearestVil(G.pos.x,G.pos.y)].yama){const{t:yt,f:yf}=yamaTier(),n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(yt,ETIER[yt][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*yf);e.rift=true;en.push(e);}}
@@ -2347,6 +2380,7 @@ function startBattle(boss,rift=null,sp=null){
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
   if(sp&&sp.kind==='trial'&&sp.dev)BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ……ん？」`,'空間に ノイズが はしった…！\nデバッグ画面が ひらいていく…','？？？「…テストプレイ中に 失礼します。\nこの ゲームの 開発者です」',`${en[0].name}が あらわれた！\n（超絶強敵）`);
+  else if(sp&&sp.kind==='yakuza')BT.pend.push('組長「てめぇら、 やっちまえ！」','鬼瓦組が あらわれた！');
   else if(sp&&sp.kind==='bouei')BT.pend.push('防衛団「この 町は ぼくたちが まもる！\nいくぞー！」','防衛団が あらわれた！');
   else if(sp&&sp.kind==='trial')BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ${en[0].name}！」`,`${en[0].name}が あらわれた！\n（明木の 試練）`);
   if(sp&&sp.kind==='uorochi')BT.pend.push('裏オロチ「千の 峰に 積もった 怨念…\nすべて 喰らいつくしてくれる！！」');
@@ -2706,6 +2740,8 @@ function winBattle(){
   if(G.taki>0)G.taki--;
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
   if(BT.sp&&(BT.sp.kind==='ukaiho'||BT.sp.kind==='udoiri'||BT.sp.kind==='uorochi'))ukaihoWin(pages);
+  dqHit('win');
+  if(BT.sp&&BT.sp.kind==='yakuza'){const Y=ykS(BT.sp.vi);Y.on=0;Y.day=G.day;pages.push('組長「…くっ、 覚えてやがれ！」','鬼瓦組は 歓楽街から 撤退した！\n（店の 評判が 戻りはじめる）');}
   if(BT.sp&&BT.sp.kind==='trial')trialWin(pages);
   if(BT.sp&&BT.sp.kind==='bouei'){G.boueiDay=G.day;const nw=addChar('mamoru');pages.push('防衛団員 リーダー「…ちぇっ、 まけたぜ。\nおまえ なかなか やるな！」',nw?'防衛団の 園児 マモル「ぼくも つれてって！\nこの 町みたいに みんなを まもるんだ！」':'マモル「また 勝負しような！」',nw?'LR 防衛団の園児 マモルが 仲間に なった！':`マモルの 基礎Lvが あがった！（基礎Lv ${G.chars.mamoru.dup+1}）`);}
   if(BT.sp&&BT.sp.kind==='mine'){G.career++;pages.push(`峰入り修行を やりとげた！\n研修歴 +1（いま ${G.career}回）`);if(G.career%50===0){G.items.srtk++;pages.push('研修歴 50回ごとの 特典！\nSR以上確定チケットを 1枚 もらった。');}}
@@ -2744,6 +2780,7 @@ function winBattle(){
 function loseBattle(){
   BT.ph='end';stopBGM();sfx('lose');
   if(BT.sp&&BT.sp.kind==='trial'){trialLose();return;}
+  if(BT.sp&&BT.sp.kind==='yakuza'){const f=Math.round(Math.max(0,G.coins)*.1);G.coins-=f;dialog(['ぜんめつ してしまった…','組員「二度と なめた 真似 すんじゃねぇぞ」',`財布から ${fmt(f)}イェソ 取られた…`],()=>{fullHeal();returnField();});return;}
   if(BT.sp&&BT.sp.kind==='bouei'){dialog(['ぜんめつ してしまった…','防衛団員「へへーん！ 出直してこーい！」','（防衛団の 勝負では イェソは 減らない）'],()=>{fullHeal();returnField();});return;}
   G.townBack=null;
   if(BT.sp&&BT.sp.kind==='gimwild'){gimWildLose();return;}
@@ -3927,7 +3964,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...taDaily());msgs.push(...ajDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...ykDaily(),...taDaily());msgs.push(...ajDaily());
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
@@ -8003,8 +8040,9 @@ function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=
   if(tot>1e14&&rnd()<.03*polMul('kin')){const ch=Math.floor((tot-1e14)*.2);const b=Math.min(G.coins,ch);G.coins-=b;if(ch>b&&G.bank)G.bank.sav-=Math.min(G.bank.sav,ch-b);
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
-const POL_SEATS=300,POL_MAJ=151,POL_EVERY=50;
-const POL_REG=[{n:'本土',s:180,f:v=>!v.kq&&!v.gm&&!v.yama&&!v.sk},{n:'マホロバ',s:20,f:v=>!!v.yama},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm}];
+/* 11/19：国と 大陸が 増えたので 議席を 調整（6地域・380議席） */
+const POL_SEATS=380,POL_MAJ=191,POL_EVERY=50;
+const POL_REG=[{n:'シマネ',s:140,f:v=>!v.kq&&!v.gm&&!v.yama&&!v.sk&&v.tier!==11},{n:'北方大陸',s:50,f:v=>!v.kq&&!v.gm&&!v.yama&&!v.sk&&v.tier===11},{n:'マホロバ',s:40,f:v=>!!v.yama},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm},{n:'サキタマ',s:50,f:v=>!!v.sk}];
 const NPC_PARTY=['自由八百万党','民衆の 会','帝国再興党','無所属'];
 const ZOKU={ken:{n:'建設族',d:'建設費 -10%'},jin:{n:'神社族',d:'奉納・造営 -10%'},uma:{n:'競馬族',d:'馬主の 賞金 +30%'},kin:{n:'金融族',d:'超富裕層課税・査察 -20%'}};
 const POLICY={tax:{n:'富裕層 減税',d:'超富裕層課税・査察が 半分',k:'kin',m:.5},jin:{n:'神社 振興',d:'奉納・造営 -30%',k:'jin',m:.7},ken:{n:'国土 強靭化',d:'建設費 -30%',k:'ken',m:.7},uma:{n:'競馬 振興',d:'馬主の 賞金 2倍',k:'uma',m:2}};
@@ -8157,7 +8195,8 @@ function buildKanraku(vi){const w=31,h=21,C=[];kanSt(vi);for(let y=0;y<h;y++){C.
     {x:14,y:18,col:'#000000',hair:'#bcbcbc',line:n?'呼び込み「お兄さん、 1セット いかがっすか〜！\n今なら 指名料 無料っすよ！」':'呼び込み「…まだ 準備中っす。\n夜に また 来てくださいよ」'},
     {x:16,y:11,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'},
     ...(n&&(G.chars.catch_g||G.chars.catch_u)?[{x:20,y:18,col:'#000000',hair:'#f8b800',sp:'catch',line:''}]:[]),
-    ...(n&&lcg(G.day*31+vi)()<.7?[{x:13,y:11,col:'#00a800',hair:'#7c4c10',sp:'singer',line:''}]:[])];
+    ...(n&&lcg(G.day*31+vi)()<.7?[{x:13,y:11,col:'#00a800',hair:'#7c4c10',sp:'singer',line:''}]:[]),
+    ...(ykS(vi).on?[{x:8,y:11,col:'#000000',hair:'#f8b800',sp:'yakuza',line:''},{x:22,y:11,col:'#3c3c3c',hair:'#000000',sp:'yakuza',line:''}]:[])];
   const DAY=['掃除の おじさん「夜の あとは ゴミが すごいんじゃ」','若い 女性「夜は この 街で 働いてるの。\n昼は 寝る 時間よ」','配達員「おしぼりと 氷の 配達っす！」','観光客「昼の 歓楽街って 静かなんだね」'];
   const NIGHT=['酔っぱらい「ういっく… もう 一軒 いくぞぉ〜」','キャバ嬢「今日は 同伴 なんだ〜。\nあ、 今度 お店にも 来てね！」','ホスト「姫〜！ 今夜も 会いに 来てくれたの？」','サラリーマン「部長の 二次会… 長いなあ」',
     '会社員「終電… 逃した…」','女子大生「カラオケ オールしよ〜！」','おじさん「このへんの スナックは 全部 行ったぞ」','客引き「居酒屋 どうっすか！ 飲み放題 あるっす！」','観光客「ネオンが すごい！ 写真 撮ろう！」','黒服「…いい 街だろ。 夜は これからだ」'];
