@@ -485,7 +485,7 @@ addEventListener('resize',hhFit);
 const RAR=[{n:'N',c:'#bcbcbc'},{n:'R',c:'#3cbcfc'},{n:'SR',c:'#f878f8'},{n:'SSR',c:'#f8b800'},{n:'UR',c:'#fc7460',lab:'超激レア'},{n:'LR',c:'#fcfcfc',lab:'超超激レア'},{n:'XR',c:'#fcfcfc',lab:'超越'},{n:'XXR',c:'#f8d878',lab:'開発者'}];
 const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
-const WT={'リュック':{a:1.7,m:1.1},'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
+const WT={'本':{a:.9,m:1.9},'棒':{a:1.1,m:.3},'果物':{a:.9,m:.9},'拳':{a:1.25,m:0},'リュック':{a:1.7,m:1.1},'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
 const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami'];
 const BASE_SKILLS={
@@ -511,6 +511,33 @@ const BASE_SKILLS={
   yarimasu:{name:'やりますねぇ！',mp:14,target:'allies',kind:'song',power:1.3,amount:.7,turns:4,verb:'ほめちぎった'},
   senpaiage:{name:'先輩の背中',mp:12,target:'enemies',kind:'phys',power:2.1,verb:'見せつけた'},
   nichirin:{name:'日輪の恵み',mp:0,target:'allies',kind:'mprec',verb:'さずけた'},
+  /* 11/19 追加キャラの 技 */
+  ak_multi:{name:'マルチリンガル',mp:14,target:'enemies',kind:'mag',power:1.7,verb:'まくしたてた'},ak_keihatsu:{name:'啓発活動',mp:16,target:'allies',kind:'song',power:1.25,amount:.6,turns:4,verb:'語りかけた'},
+  ys_pose:{name:'マッスルポーズ',mp:10,target:'allies',kind:'buff',stat:'atk',amount:.7,turns:4,verb:'きめた'},ys_knee:{name:'とび膝蹴り',mp:12,target:'enemy',kind:'phys',power:2.9,verb:'はなった'},
+  oy_shusse:{name:'出世払い',mp:14,target:'allies',kind:'heal',power:1.4,verb:'おごった'},oy_jihibiki:{name:'地響き',mp:14,target:'enemies',kind:'phys',power:1.6,verb:'うなった'},
+  km_tousotsu:{name:'鬼の統率力',mp:12,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'しきった'},km_encho:{name:'延長',mp:16,target:'allies',kind:'song',power:1.2,amount:.5,turns:5,verb:'すすめた'},
+  mc_koe:{name:'声真似',mp:10,target:'enemies',kind:'debuff',amount:.5,turns:3,verb:'まねた'},mc_mono:{name:'モノマネ',mp:12,target:'enemy',kind:'mag',power:2.6,verb:'ひろうした'},
+  tk_rizume:{name:'理詰め',mp:12,target:'enemy',kind:'mag',power:2.8,verb:'つめた'},tk_akuma:{name:'悪魔の証明',mp:16,target:'enemies',kind:'debuff',amount:.55,turns:4,verb:'もとめた'},
+  tt_wood:{name:'木製の盾',mp:6,target:'allies',kind:'buff',stat:'def',amount:.5,turns:4,verb:'かまえた'},tt_dia:{name:'ダイヤモンドの盾',mp:18,target:'allies',kind:'buff',stat:'def',amount:1.0,turns:4,verb:'かまえた'},
+  md_zou:{name:'ぞうさん',mp:12,target:'allies',kind:'heal',power:1.3,verb:'うたった'},md_yagi:{name:'やぎさんゆうびん',mp:12,target:'enemies',kind:'debuff',amount:.45,turns:3,verb:'とどけた'},
+  ms_kodama:{name:'こだまでしょうか？',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'問いかけた'},ms_minna:{name:'私と小鳥と鈴と',mp:12,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'よみあげた'},
+  mn_seiseki:{name:'成績優秀',mp:10,target:'enemy',kind:'mag',power:2.4,verb:'ときあかした'},mn_fukushu:{name:'復習（復讐）',mp:10,target:'enemy',kind:'phys',power:.9,hits:3,verb:'くりかえした'},
+  mm_dango:{name:'どろだんご',mp:6,target:'enemy',kind:'phys',power:1.8,verb:'なげた'},mm_suberi:{name:'すべり台ダッシュ',mp:10,target:'enemies',kind:'phys',power:1.2,verb:'すべりこんだ'},
+  mb_kona:{name:'ハッピーな粉',mp:10,target:'enemies',kind:'debuff',amount:.45,turns:3,verb:'まいた'},mb_jou:{name:'危険な錠剤',mp:14,target:'allies',kind:'song',power:1.4,amount:.8,turns:3,verb:'くばった'},mb_plant:{name:'自家栽培の植物',mp:12,target:'enemy',kind:'drain',power:1.6,verb:'ふるまった'},
+  cg_hima:{name:'オニサンヒマ？',mp:8,target:'enemies',kind:'debuff',amount:.35,turns:3,verb:'声を かけた'},cg_kebab:{name:'ケバブアルヨ！',mp:10,target:'allies',kind:'heal',power:1.0,verb:'すすめた'},cg_goin:{name:'強引なキャッチ',mp:10,target:'enemy',kind:'phys',power:2.0,verb:'つかまえた'},
+  cu_1000:{name:'1000円ポッキリ',mp:6,target:'enemies',kind:'debuff',amount:.3,turns:3,verb:'さそった'},cu_chara:{name:'チャラいキャッチ',mp:6,target:'enemy',kind:'phys',power:1.6,verb:'からんだ'},cu_uso:{name:'大嘘のキャッチ',mp:10,target:'enemies',kind:'mag',power:1.0,verb:'ついた'},
+  gm_gaman:{name:'がまんする',mp:4,target:'allies',kind:'buff',stat:'def',amount:.5,turns:4,verb:'こらえた'},gm_gaman2:{name:'まだ がまんする',mp:6,target:'allies',kind:'buff',stat:'def',amount:.8,turns:4,verb:'こらえた'},gm_buchi:{name:'ブチギレる',mp:12,target:'enemy',kind:'phys',power:3.2,verb:'ぶちまけた'},
+  yh_mitsu:{name:'ミツバチ',mp:5,target:'enemy',kind:'phys',power:.5,hits:3,verb:'はなった'},yh_suzume:{name:'スズメバチ',mp:8,target:'enemy',kind:'phys',power:1.8,verb:'はなった'},yh_oosuzu:{name:'オオスズメバチ',mp:14,target:'enemies',kind:'phys',power:1.5,verb:'はなった'},
+  kg_seminar:{name:'起業セミナー',mp:6,target:'enemies',kind:'debuff',amount:.3,turns:3,verb:'ひらいた'},kg_chotatsu:{name:'資金調達',mp:6,target:'ally',kind:'heal',power:1.2,verb:'あつめた'},
+  hn_champ:{name:'安い シャンパン',mp:6,target:'allies',kind:'heal',power:.6,verb:'あけた'},ccn_jiga:{name:'自我の 迷子',mp:4,target:'enemies',kind:'debuff',amount:.25,turns:2,verb:'まよわせた'},
+  ln_yasumi:{name:'今日も 休み',mp:3,target:'allies',kind:'buff',stat:'def',amount:.3,turns:3,verb:'ねむった'},gd_tate:{name:'身を 盾にする',mp:5,target:'allies',kind:'buff',stat:'def',amount:.5,turns:3,verb:'たちはだかった'},
+  rn_anki:{name:'丸暗記',mp:6,target:'enemy',kind:'mag',power:1.6,verb:'となえた'},fr_daihen:{name:'代返',mp:4,target:'enemy',kind:'phys',power:1.3,verb:'ごまかした'},sg_uta:{name:'魂の 弾き語り',mp:8,target:'allies',kind:'song',power:1.1,amount:.4,turns:3,verb:'うたった'},
+  ws_jisho:{name:'語彙の 暴力',mp:30,target:'enemies',kind:'mag',power:3.6,verb:'ぶつけた'},ws_jihyo:{name:'一身上の 都合',mp:24,target:'enemy',kind:'phys',power:4.2,verb:'たたきつけた'},
+  /* 固有スキル */
+  toku:{name:'究極のトーク力',mp:60,target:'enemies',kind:'xr',verb:'語りだした'},psyche:{name:'サイケ',mp:60,target:'enemies',kind:'xr',verb:'はなった'},imashika:{name:'やるなら今しかねぇ',mp:60,target:'enemies',kind:'xr',verb:'さけんだ'},
+  bottle:{name:'ボトルキープ',mp:60,target:'enemies',kind:'xr',verb:'入れた'},henkao:{name:'変顔',mp:60,target:'enemies',kind:'xr',verb:'した'},shitsumon:{name:'質問来てた',mp:60,target:'enemies',kind:'xr',verb:'読みあげた'},
+  absolute:{name:'アブソリュート・ウォール',mp:60,target:'enemies',kind:'xr',verb:'はった'},tomouta:{name:'ともだちの うた',mp:60,target:'enemies',kind:'xr',verb:'うたった'},tairyo:{name:'大漁',mp:60,target:'enemies',kind:'xr',verb:'よみあげた'},
+  jiriki:{name:'自分の 力で がんばる',mp:60,target:'enemies',kind:'xr',verb:'こころに きめた'},ohirune:{name:'お昼寝バリア',mp:60,target:'enemies',kind:'xr',verb:'はった'},
   nantoka:{name:'まぁ、なんとかなるやろ',mp:60,target:'enemies',kind:'xr',verb:'つぶやいた'},
   ujigami:{name:'氏神バースト',mp:60,target:'enemies',kind:'xr',verb:'解き放った'},
   unabarising:{name:'ウナバライジング',mp:60,target:'enemies',kind:'xr',verb:'巻き起こした'},
@@ -657,6 +684,31 @@ const BASE_PACK={
     {id:'izanagi',name:'伊邪那岐命',short:'伊邪那岐',rarity:'XR',weight:1,weapon:'any',special:'god',hp:165,mp:80,atk:44,mag:38,def:34,spd:24,skills:['hikari','tenkei'],look:{head:'crown',hair:'#000000',body:'#fcfcfc',accent:'#3cbcfc',legs:'#24188c',held:'神宝'}},
     {id:'michizane',name:'天神 菅原道真公',short:'菅原道真',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:160,mp:120,atk:36,mag:56,def:32,spd:28,skills:['dazaifu','kitano','umekaze'],look:{head:'eboshi',hair:'#000000',body:'#1c1c3c',accent:'#f878f8',legs:'#fcfcfc',held:'扇'}},
     {id:'umagami',name:'馬神 サイキナヲ',short:'サイキナヲ',rarity:'XR',weight:1,nogacha:1,weapon:'any',special:'god',hp:170,mp:100,atk:58,mag:34,def:30,spd:40,skills:['saiki_makuri','saiki_kimagure','saiki_kago'],look:{head:'umagami',hair:'#7c4c10',body:'#f8b800',accent:'#fcfcfc',legs:'#5c3000',held:'リュック'}},
+    /* 11/19 追加キャラ */
+    {id:'aiki',name:'インテリゲイ タナカアイキ',short:'アイキ',rarity:'XR',weight:1,weapon:'any',hp:160,mp:120,atk:32,mag:56,def:28,spd:34,skills:['ak_multi','ak_keihatsu'],look:{head:'hair',hair:'#000000',body:'#f878f8',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
+    {id:'yushi',name:'マッスルエンペラー YUSHI',short:'YUSHI',rarity:'XR',weight:1,weapon:'any',hp:190,mp:70,atk:62,mag:14,def:36,spd:38,skills:['ys_pose','ys_knee'],look:{head:'hair',hair:'#f8b800',body:'#e4a080',accent:'#d82800',legs:'#000000',held:'片手剣'}},
+    {id:'oyaji',name:'西新宿の親父',short:'親父',rarity:'XR',weight:1,weapon:'any',hp:185,mp:90,atk:52,mag:30,def:38,spd:24,skills:['oy_shusse','oy_jihibiki'],look:{head:'band',band:'#fcfcfc',hair:'#000000',body:'#000000',accent:'#fcfcfc',legs:'#3c3c3c',held:'マイク'}},
+    {id:'koume',name:'スーパーラウンジ嬢 コウメちゃん',short:'コウメ',rarity:'XR',weight:1,weapon:'any',special:'hostess',hp:155,mp:120,atk:30,mag:50,def:30,spd:36,skills:['km_tousotsu','km_encho'],look:{head:'hostess',hair:'#7c4c10',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
+    {id:'menchi',name:'声真似芸人 メンチカツ',short:'メンチカツ',rarity:'XR',weight:1,weapon:'any',hp:165,mp:110,atk:36,mag:50,def:28,spd:32,skills:['mc_koe','mc_mono'],look:{head:'hair',hair:'#000000',body:'#f8b800',accent:'#d82800',legs:'#3c3c3c',held:'マイク'}},
+    {id:'takeshi',name:'最強の弁護士 タケシ',short:'タケシ',rarity:'LR',weapon:'any',hp:145,mp:110,atk:22,mag:50,def:30,spd:26,skills:['tk_rizume','tk_akuma'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#f8b800',legs:'#24188c',held:'杖'}},
+    {id:'tatekun',name:'成り上がりの盾使い',short:'盾使い',rarity:'LR',weapon:'any',hp:190,mp:70,atk:26,mag:20,def:56,spd:18,skills:['tt_wood','tt_dia'],look:{head:'helm',body:'#00a800',accent:'#bcbcbc',legs:'#503000',held:'メイス'}},
+    {id:'mado',name:'優しい老詩人 まどみちお',short:'まどみちお',rarity:'LR',nogacha:1,weapon:'any',hp:150,mp:130,atk:18,mag:48,def:28,spd:20,skills:['md_zou','md_yagi'],look:{head:'hair',hair:'#fcfcfc',body:'#7c4c10',accent:'#f8d878',legs:'#3c3c3c',held:'杖'}},
+    {id:'misuzu',name:'悲劇の詩人 金子みすゞ',short:'みすゞ',rarity:'LR',nogacha:1,weapon:'any',hp:135,mp:140,atk:16,mag:54,def:24,spd:26,skills:['ms_kodama','ms_minna'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
+    {id:'manabu',name:'ガリ勉少年 マナブ',short:'マナブ',rarity:'LR',weapon:'any',hp:130,mp:110,atk:30,mag:46,def:24,spd:30,skills:['mn_seiseki','mn_fukushu'],look:{head:'hair',hair:'#000000',body:'#f8b800',accent:'#fcfcfc',legs:'#24188c',held:'杖'}},
+    {id:'mamoru',name:'防衛団の園児 マモル',short:'マモル',rarity:'LR',weapon:'any',hp:150,mp:80,atk:40,mag:24,def:32,spd:34,skills:['mm_dango','mm_suberi'],look:{head:'cap',hat:'#f8d878',hair:'#000000',body:'#d82800',accent:'#f8d878',legs:'#f8d878',held:'片手剣'}},
+    {id:'mitsubai',name:'密売人X',short:'密売人X',rarity:'UR',weapon:'any',hp:100,mp:60,atk:24,mag:30,def:18,spd:28,skills:['mb_kona','mb_jou','mb_plant'],look:{head:'hood',hood:'#000000',body:'#000000',accent:'#3c3c3c',legs:'#24188c',held:'杖'}},
+    {id:'catch_g',name:'外国人のキャッチ',short:'外国人キャッチ',rarity:'UR',weapon:'any',hp:110,mp:40,atk:32,mag:16,def:22,spd:24,skills:['cg_hima','cg_kebab','cg_goin'],look:{head:'hair',hair:'#000000',body:'#fcfcfc',accent:'#00a800',legs:'#24188c',held:'メイス'}},
+    {id:'catch_u',name:'大学生キャッチ',short:'大学生キャッチ',rarity:'SR',weapon:'any',hp:66,mp:24,atk:16,mag:10,def:10,spd:14,skills:['cu_1000','cu_chara','cu_uso'],look:{head:'hair',hair:'#f8b800',body:'#3c3c3c',accent:'#fcfcfc',legs:'#24188c',held:'メイス'}},
+    {id:'gaman',name:'我慢の限界サラリーマン',short:'限界リーマン',rarity:'R',weapon:'any',hp:62,mp:16,atk:13,mag:6,def:13,spd:9,skills:['gm_gaman','gm_gaman2','gm_buchi'],look:{head:'hair',hair:'#000000',body:'#3c3c3c',accent:'#d82800',legs:'#3c3c3c',held:'片手剣'}},
+    {id:'youhou',name:'養蜂家',short:'養蜂家',rarity:'R',weapon:'any',hp:56,mp:18,atk:14,mag:8,def:11,spd:11,skills:['yh_mitsu','yh_suzume','yh_oosuzu'],look:{head:'hood',hood:'#fcfcfc',body:'#fcfcfc',accent:'#f8b800',legs:'#bcbcbc',held:'杖'}},
+    {id:'kigyo',name:'無名起業家',short:'起業家',rarity:'R',weapon:'any',hp:50,mp:22,atk:10,mag:12,def:9,spd:11,skills:['kg_seminar','kg_chotatsu'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#24188c',held:'スマホ'}},
+    {id:'host_n',name:'売れないホスト',short:'売れないホスト',rarity:'N',weapon:'any',hp:40,mp:12,atk:8,mag:6,def:6,spd:9,skills:['hn_champ'],look:{head:'hair',hair:'#f8b800',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
+    {id:'cc_n',name:'自我が曖昧なコンカフェ嬢',short:'曖昧コンカフェ嬢',rarity:'N',weapon:'any',special:'hostess',hp:36,mp:16,atk:5,mag:9,def:5,spd:9,skills:['ccn_jiga'],look:{head:'maid',hair:'#f8b0c8',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'杖'}},
+    {id:'lounge_n',name:'出勤しないラウンジ嬢',short:'出勤しない嬢',rarity:'N',weapon:'any',hp:36,mp:14,atk:5,mag:8,def:6,spd:8,skills:['ln_yasumi'],look:{head:'hostess',hair:'#7c4c10',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
+    {id:'guard_n',name:'ボディーガードマン',short:'ボディーガード',rarity:'N',weapon:'any',hp:52,mp:6,atk:9,mag:2,def:10,spd:6,skills:['gd_tate'],look:{head:'hair',hair:'#000000',body:'#000000',accent:'#000000',legs:'#000000',held:'メイス'}},
+    {id:'ronin5',name:'5浪目の浪人生',short:'5浪生',rarity:'N',weapon:'any',hp:38,mp:16,atk:5,mag:10,def:5,spd:7,skills:['rn_anki'],look:{head:'band',band:'#d82800',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#3c3c3c',held:'杖'}},
+    {id:'fran',name:'Fラン大学生',short:'Fラン大学生',rarity:'N',weapon:'any',hp:42,mp:8,atk:8,mag:4,def:6,spd:9,skills:['fr_daihen'],look:{head:'hair',hair:'#f8b800',body:'#7ee0fc',accent:'#fcfcfc',legs:'#24188c',held:'スマホ'}},
+    {id:'singer',name:'売れない路上シンガー',short:'路上シンガー',rarity:'N',weapon:'any',hp:38,mp:14,atk:6,mag:8,def:5,spd:8,skills:['sg_uta'],look:{head:'hair',hair:'#7c4c10',body:'#00a800',accent:'#f8b800',legs:'#24188c',held:'マイク'}},
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
@@ -692,6 +744,8 @@ const BASE_PACK={
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
     ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_ryuck','無駄に 重い リュックサック','XR','リュック',230],['w_eiria','エイリア石','UR','神器',80],['w_koban','猫の小判','UR','小判',70],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
+    ['w_jisho','辞書','XR','本',230],['w_jihyo','辞表','LR','本',110],['w_kyuyo','給与明細書','UR','本',80],['w_roppo','六法全書','UR','本',85],['w_kensho','神社本庁憲章の解説','UR','本',85],
+    ['w_inubou','犬が歩いて拾った棒','SR','棒'],['w_butaki','豚が上った木の枝','SR','棒'],['w_kaki','隣の客の柿','SR','果物'],['w_knuckle','アメリケンサック','N','拳'],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
   banners:[
     {id:'pu_kannushi',name:'浄階・明階 神主ピックアップ',type:'char',pickup:['kn5','kn4']},
@@ -705,6 +759,9 @@ const BASE_PACK={
     {id:'pu_meito',name:'名刀・名剣ピックアップ',type:'weapon',pickup:['w_raikiri','w_zantetsu']},
     {id:'pu_kamigami',name:'八百万の神々 降臨ピックアップ',type:'char',pickup:['amaterasu','susanoo','tsukuyomi','okuninushi']},
     {id:'pu_senpai',name:'やりますねぇ先輩ピックアップ（LR）',type:'char',pickup:['yarimasu','bard']},
+    {id:'pu_yorumachi',name:'夜の街の 住人たち（XR）',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi']},
+    {id:'pu_lr1119',name:'新LR ピックアップ',type:'char',pickup:['takeshi','tatekun','manabu','mamoru']},
+    {id:'pu_jisho',name:'XR 辞書・LR 辞表 ピックアップ',type:'weapon',pickup:['w_jisho','w_jihyo','w_kyuyo','w_roppo','w_kensho']},
     {id:'pu_newface',name:'新キャラ 登場ピックアップ',type:'char',pickup:['gambler','buddha','miko','archer']},
     {id:'pu_new2',name:'新キャラ 第2弾ピックアップ',type:'char',pickup:['samurai','comedian','hostess']},
     {id:'pu_katana',name:'名刀ピックアップ',type:'weapon',pickup:['w_murasame','w_wazamono']},
@@ -823,7 +880,7 @@ rebuild();
 const NOGACHA=['w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc','w_koban','w_ryuck'];
 const hasSkW=(cid,w)=>{const c=G&&G.chars[cid];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes(w);};
 const hasTgPhone=id=>{const c=G&&G.chars[id];return !!c&&id==='tagaba'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_tgphone');};
-const WSK={w_ryuck:'ws_ryuck',w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
+const WSK={w_jisho:'ws_jisho',w_jihyo:'ws_jihyo',w_ryuck:'ws_ryuck',w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
 const wSkills=id=>{const c=G&&G.chars[id];if(!c)return[];const L=[c.wpn,typeof twoSlot==='function'&&twoSlot(id)?c.wpn2:null].filter(Boolean).map(w=>WSK[baseW(w)]).filter(k=>k&&SK[k]);return[...new Set(L)];};
 const hasUmegae=id=>{const c=G&&G.chars[id];return !!c&&id==='michizane'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_umegae');};
 const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.copy&&!NOGACHA.includes(baseW(w.id)));
@@ -958,7 +1015,8 @@ const SKR={x0:132,y0:136,x1:188,y1:178};
     ['小江戸 コエド','川越氷川神社',169,167,3,4,A+4,[],'蔵造りの 町並みと 時の鐘の 町'],
     ['鉄道の街 オオミヤ','武蔵一宮 氷川神社',179,172,4,6,A+5,['skomiya'],'線路が 集まる サキタマ 最大の 街'],
     ['せんべいの町 ソウカ','草加神社',184,162,1,2,A+6,[],'焼きたての せんべいの 香りが ただよう 町'],
-    ['レジスタンスの集落 マツゥヤマ','箭弓稲荷神社',150,167,1,2,A+4,[],'ナメガワマチから 逃げ出した 人々が 身を 寄せる 丘の 集落']];
+    ['レジスタンスの集落 マツゥヤマ','箭弓稲荷神社',150,167,1,2,A+4,[],'ナメガワマチから 逃げ出した 人々が 身を 寄せる 丘の 集落'],
+    ['防衛団の町 カスカベ','春日部八幡神社',178,151,3,4,A+7,[],'大きな 凧と 元気な 子どもたちの 町']];
   SV.forEach(([name,shrine,x,y,size,rank,from,f,desc])=>VIL.push({x,y,name,shrine,rank,tier:12,size,from,sk:1,kqf:f,desc,...(name.endsWith('ナメガワマチ')?{skn:'namegawa',skb:'sktower'}:{}),...(name.endsWith('マツゥヤマ')?{skb:'skjin'}:{})}));}
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
@@ -1147,7 +1205,7 @@ function fixHp(id){const s=cstat(id),c=G.chars[id];c.hp=clamp(c.hp,0,s.hp);c.mp=
 function fullHeal(){for(const id of ownedChars()){const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;}}
 function addChar(id){const c=G.chars[id];if(c){const was=xrReady(id);c.dup=Math.min(999,c.dup+1);if(!was&&xrReady(id)){applyXR();xrNews.push(id);}return false;}G.chars[id]={lv:1,exp:0,dup:0,wpn:null,hp:1,mp:0};const s=cstat(id);G.chars[id].hp=s.hp;G.chars[id].mp=s.mp;return true;}
 /* XR：神と仏陀は 基礎Lv100で 全てを超越せし 存在に なる */
-const XRSK={takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga',umagami:'nantoka'};
+const XRSK={aiki:'toku',yushi:'psyche',oyaji:'imashika',koume:'bottle',menchi:'henkao',takeshi:'shitsumon',tatekun:'absolute',mado:'tomouta',misuzu:'tairyo',manabu:'jiriki',mamoru:'ohirune',takao:'ranryo',tomoya:'kakuhyper',jouchan:'predplant',tagaba:'teiaiou',momo:'moekyun',izanagi:'kuniumi',izanami:'yomotsu',amaterasu:'ujigami',susanoo:'unabarising',tsukuyomi:'nightparry',okuninushi:'kunizukuri',buddha:'yuiga',umagami:'nantoka'};
 const XR_MPR=.6,skCost=(id,k)=>SK[k]&&SK[k].k==='xr'?(XRSK[id]===k&&!isXR(id)?Math.min(cstat(id).mp,Math.ceil(cstat(id).mp*XR_MPR*1.5)):Math.ceil(cstat(id).mp*XR_MPR)):SK[k].mp;
 var ITSUKU_SK=null;const itsukuSk=()=>{if(ITSUKU_SK)return ITSUKU_SK;const S=new Set();for(const d of Object.values(CH)){if(d.id==='itsuku')continue;(d.sk||[]).forEach(k=>S.add(k));}Object.values(XRSK).forEach(k=>S.add(k));['shoranjo','chogeishi'].forEach(k=>S.add(k));return ITSUKU_SK=[...S].filter(k=>SK[k]);};
 const skillsOf=id=>{if(id==='itsuku'){const b=itsukuSk().slice();if(typeof wSkills==='function')wSkills(id).forEach(k=>{if(!b.includes(k))b.push(k);});return b;}const d=CH[id];let b=(id==='takao'&&isXR(id)?['shoranjo','chogeishi']:(d.sk||[])).filter(k=>SK[k]);if(XRSK[id]&&SK[XRSK[id]]&&(isXR(id)||(G&&G.chars&&G.chars[id])))b=b.concat([XRSK[id]]);if(typeof spearPair==='function'&&spearPair(id)&&!(typeof BT!=='undefined'&&BT&&BT.ngUsed))b=b.concat(['addimpact']);if(typeof ngReady==='function'&&ngReady(id))b=b.concat(['neongenesis']);if(typeof hasUmegae==='function'&&hasUmegae(id))b=b.concat(['sakatari']);if(typeof wSkills==='function')b=b.concat(wSkills(id).filter(k=>!b.includes(k)));if(id==='tagaba'&&SK.goddice){const inB=typeof BT!=='undefined'&&BT&&BT.pt;if(!inB||(!BT.gdUsed&&gdPinch()))b=b.concat(['goddice']);}return b;};
@@ -1203,7 +1261,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
 const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||baseW(wid)==='w_ryuck'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
-function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||t==='小判'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';if(t==='リュック')return cid==='umagami';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
+function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='本'||t==='棒'||t==='果物'||t==='拳')return true;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||t==='小判'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';if(t==='リュック')return cid==='umagami';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
 const ownedWeapons=()=>Object.keys(G.weapons).filter(id=>WPD[id]).sort((a,b)=>WPD[b].rar-WPD[a].rar||Object.keys(WPD).indexOf(a)-Object.keys(WPD).indexOf(b));
 const wOwner=wid=>Object.keys(G.chars).find(c=>CH[c]&&(G.chars[c].wpn===wid||G.chars[c].wpn2===wid));
@@ -2116,6 +2174,42 @@ function trialBoss(){const L=trialBossList(),d=L[Math.floor(rnd()*L.length)],e=m
 /* 20回に 1回：開発者神主 タムライツク（超絶強敵） */
 function devBoss(){const e=trialBoss();e.name='開発者神主 タムライツク';e.c1='#fcfcfc';e.c2='#5cc8c8';e.shape='itsuku';e.w=56;e.h=74;
   e.maxhp=e.hp=Math.round(e.maxhp*10);e.atk=Math.round(e.atk*2.5);e.mag=e.atk;e.def=Math.round(e.def*2);e.spd=Math.round(e.spd*1.5);e.multi=3;e.heavy=1;e.dev=1;return e;}
+/* 11/19：特別な 人との 会話 */
+function spTalk(npc){const k=npc.sp;
+  if(k==='mado'){dialog(['少年「ねえ ねえ、 ぞうさんの おはなしって 知ってる？」','少年「ぞうさんの おかあさんの おはなは\nどんな おはなだと 思う？」'],()=>choice('ぞうさんの おかあさんの おはなは…？',['ながい','みじかい','わからない'],r=>{
+      if(r!==0){dialog('少年「えー、 ちがうよぉ。\nまた 考えてみてね！」');return;}
+      const nw=addChar('mado');if(nw)G.chars.mado.dup=99;save();sfx('g5');
+      dialog(['少年「そうだよね！ ながいんだよ！\nだって おかあさんと おんなじだもん！」','（そばの ベンチに 座っていた おじいさんが\nにっこり ほほえんだ）','老詩人「…やさしい 答えだねぇ。\nどうぶつも 人も みんな いっしょなんだよ」','老詩人「わしも いっしょに 行っても いいかい？」','LR 優しい老詩人 まどみちおが 仲間に なった！\n（基礎Lv 100）'],()=>{if(TW){const j=TW.npcs.indexOf(npc);if(j>=0)TW.npcs.splice(j,1);}});},96));return;}
+  if(k==='misuzu'){dialog(['（ここは 金子みすゞ記念館。\n古い 本屋を 再現した 館内に 詩が ならぶ）','店員「…ようこそ。 ひとつ 聞いても いいですか？」','店員「『遊ぼう』っていうと 『遊ぼう』っていう。\n…こだまでしょうか？」'],()=>choice('店員「こだまでしょうか？」',['いいえ、誰でも','はい、こだまです','わかりません'],r=>{
+      if(r!==0){dialog('店員「…そうですか。\nまた いつでも いらしてくださいね」');return;}
+      const nw=addChar('misuzu');if(nw)G.chars.misuzu.dup=99;save();sfx('g5');
+      dialog(['店員「…いいえ、 誰でも。」','店員「その 答えを 知っている 人を\nずっと 待っていました」','（奥から 着物の 女性が あらわれた）','詩人「みんな ちがって、 みんな いい。\n…わたしも あなたと 旅を してみたい」','LR 悲劇の詩人 金子みすゞが 仲間に なった！\n（基礎Lv 100）'],()=>{if(TW){const j=TW.npcs.indexOf(npc);if(j>=0)TW.npcs.splice(j,1);}});},96));return;}
+  if(k==='bouei'){if(G.boueiDay===G.day){dialog('防衛団員「今日は もう 勝負 おわり！\nまた あした な！」');return;}
+    dialog(['防衛団員「おい！ おまえ 見ない 顔だな！」','「この 町は ぼくたち 防衛団が まもってるんだ！\n勝負だ！」'],()=>choice('防衛団と 勝負しますか？',['勝負する','やめる'],r=>{if(r!==0)return;
+      G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'bouei'});},96));return;}
+  if(k==='catch'){catchTalk();return;}
+  if(k==='singer'){singerTalk();return;}}
+function catchTalk(){const ids=['catch_g','catch_u'].filter(id=>G.chars[id]);
+  if(!ids.length){dialog('元締め「…あんたに 用は ねぇよ」');return;}
+  if(G.catchDay===G.day){dialog('元締め「今夜は もう 店じまいだ。\nまた 明日の 夜に 来な」');return;}
+  dialog(['元締め「おう、 あんたの とこの キャッチ、\n今夜 この 通りで 立たせて みるか？」','「客を 引っぱれば 紹介料が 入る。\n…ただし サツに 見つかったら 知らねぇぞ」'],()=>
+    listPick('誰に キャッチを させる？（捕まる 可能性 あり）',ids.map(id=>({t:CH[id].name,r:RAR[CH[id].rar].n})),j=>{const id=ids[j],ur=id==='catch_g',vi=TW.vi;G.catchDay=G.day;
+      if(rnd()<.3){const fine=Math.round((ur?5e5:3e5)*Math.max(1,landMul(vi)/3));G.coins=Math.max(0,G.coins-fine);save();sfx('ng');
+        dialog([ur?'外国人のキャッチ「オニサン、 ヒマ？ …アッ」':'大学生キャッチ「お兄さん 1000円ポッキリで… あっ」','警察官「はい ちょっと いいかな。\n客引き行為は 条例違反だよ」','（交番に 連れていかれた…）',`罰金 ${fmt(fine)}イェソを はらった。`]);return;}
+      const v=Math.round((ur?2e5+rnd()*1.8e6:5e4+rnd()*4.5e5)*Math.max(1,landMul(vi)/3));G.coins+=v;
+      const own=kanSt(vi).lots.filter(L=>L.own&&L.t&&L.t!=='yami');own.forEach(L=>{L.rep=Math.min(2.5,Math.round((L.rep+.02)*100)/100);});save();sfx('coin');
+      dialog([ur?'外国人のキャッチ「ケバブ アルヨ！ オミセ アルヨ！」':'大学生キャッチ「お兄さん 今日 どうっすか〜！\n1000円ポッキリっすよ〜！」','（次々と 客を 店に 送りこんだ！）',`紹介料 ${fmt(v)}イェソを 手に入れた！${own.length?'\nあなたの お店の 評判も 少し 上がった。':''}`]);},null,()=>{}));}
+function singerTalk(){const S=G.singer=G.singer||{fame:0,st:0,day:0};
+  if(S.st===3&&G.day-S.day>=7){S.st=4;}
+  if(S.st===4){S.st=0;S.fame=0;save();dialog(['路上シンガー「……」','「…調子に 乗りすぎた。\n事務所も クビ、 ファンも 離れた」','「また ここから やりなおすよ。\n…聴いて くれるかい？」','（路上シンガーは 干されて 路上に 戻ってきた）']);return;}
+  const L=[['（ギターを 抱えた 若者が 歌っている。\n立ち止まる 人は いない…）','路上シンガー「…聴いて くれて ありがとう」'],['（数人の 客が 足を 止めている）','路上シンガー「最近 ちょっとずつ\n聴いて くれる 人が 増えてきたんだ！」'],['（人だかりが できている！）','路上シンガー「みんな ありがとう！\nあなたの おかげで ここまで 来れたよ」'],['（取り巻きに 囲まれている）','路上シンガー「あ？ 小銭なら いらねぇよ。\nオレ、 もう 路上の 人間じゃ ねぇから」']][S.st];
+  dialog(L,()=>choice(`路上シンガーに お金を わたす？\n（人気 ${S.fame}）`,['1,000イェソ','10,000イェソ','100,000イェソ','やめる'],r=>{if(r<0||r>2)return;const amt=[1e3,1e4,1e5][r];
+    if(G.coins<amt){toast('イェソが たりません');return;}if(S.st===3&&r<2){dialog('路上シンガー「…そんな はした金、 いらねぇって」');return;}
+    G.coins-=amt;S.fame+=[1,3,8][r];const pg=[`${fmt(amt)}イェソを ギターケースに 入れた。`];
+    if(S.st===0&&S.fame>=10){S.st=1;pg.push('路上シンガー「最近 ちょっと 売れてきたかも…！」');}
+    else if(S.st===1&&S.fame>=30){S.st=2;G.items.srtk=(G.items.srtk||0)+1;pg.push('路上シンガー「ついに メジャーデビューが 決まった！\nずっと 応援して くれた あなたに これを！」','SR以上確定チケットを 1枚 もらった！');}
+    else if(S.st===2&&S.fame>=60){S.st=3;S.day=G.day;pg.push('路上シンガー「フッ… オレも 有名に なったもんだ。\nサインなら 事務所を 通してくれ」','（なんだか 傲慢に なってきた…）');}
+    else pg.push('路上シンガー「ありがとう！ 次の 曲も 聴いてって！」');save();sfx('coin');dialog(pg);},96));}
 function trialTalk(npc){const g=npc.trial==='guji',T_=G.trial||{w:0,l:0};
   const intro=g?['宮司 タムラダイジ「よう 参られた。\nわしは この 明木神社の 宮司、 タムラダイジじゃ」','「全てが 始まった この 地で\nそなたの 力、 試させて もらおう」']:['禰宜 タムライツク「禰宜の タムライツクです」','「万物が 生まれた この 地で…\nあなたの 本当の 力を 見せてください」'];
   dialog(intro,()=>choice(`明木の 試練に 挑みますか？\n相手は これまでの 強敵の 誰か…\n（試練 ${T_.w}勝 ${T_.l}敗）`,['挑む','やめる'],r=>{if(r!==0)return;
@@ -2193,6 +2287,7 @@ function startBattle(boss,rift=null,sp=null){
     else{const g=mkEnemy(12,['大海神 オオワダツミ','snake','#0058f8','#fcfcfc']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*12);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.5);g.magic=true;g.dboss=true;en.push(g);
       for(let k=0;k<2;k++){const e=mkEnemy(12,ETIER[10][0]);e.name='わだつみの眷属';en.push(e);}}
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*TOKO_F);}
+  else if(sp&&sp.kind==='bouei'){const N=['防衛団員 リーダー','防衛団員 おにぎり','防衛団員 メガネ'];for(let k=0;k<3;k++){const e=mkEnemy(9,ETIER[9][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*(k?1:1.6));en.push(e);}}
   else if(sp&&sp.kind==='mine'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(9,ETIER[9][ri(0,2)]);e.name='山の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*1.3);en.push(e);}}
   else if(rift!=null&&VIL[nearestVil(G.pos.x,G.pos.y)].yama){const{t:yt,f:yf}=yamaTier(),n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(yt,ETIER[yt][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*yf);e.rift=true;en.push(e);}}
   else if(rift!=null){const kq=VIL[nearestVil(G.pos.x,G.pos.y)].kq,n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(t,kq?KQ_EN[ri(0,KQ_EN.length-1)]:ETIER[t][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*(kq?KQ_F:(FIELD_F[t]||1)));e.rift=true;en.push(e);}}
@@ -2214,6 +2309,7 @@ function startBattle(boss,rift=null,sp=null){
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
   if(sp&&sp.kind==='trial'&&sp.dev)BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ……ん？」`,'空間に ノイズが はしった…！\nデバッグ画面が ひらいていく…','？？？「…テストプレイ中に 失礼します。\nこの ゲームの 開発者です」',`${en[0].name}が あらわれた！\n（超絶強敵）`);
+  else if(sp&&sp.kind==='bouei')BT.pend.push('防衛団「この 町は ぼくたちが まもる！\nいくぞー！」','防衛団が あらわれた！');
   else if(sp&&sp.kind==='trial')BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ${en[0].name}！」`,`${en[0].name}が あらわれた！\n（明木の 試練）`);
   if(sp&&sp.kind==='uorochi')BT.pend.push('裏オロチ「千の 峰に 積もった 怨念…\nすべて 喰らいつくしてくれる！！」');
   if(sp&&sp.kind==='gimwild')BT.pend.push('残滓「血だ… 血を よこせえええ！！」\n総書記の 怨念が 襲いかかってきた！');
@@ -2319,6 +2415,17 @@ function predEatAlly(m,i){if(!BT||!isAlive(m))return null;const al=BT.pt.filter(
   const keep=BT.cmds[i];BT.cmds[i]={type:'skill',k,t:sk.tg==='enemy'?(en.length?en[ri(0,en.length-1)]:0):i};G.chars[m.id].mp+=skCost(m.id,k);
   NOW([()=>`${an}の 力を 取りこんだ！\n${CH[m.id].short}の 体から 「${sk.name}」が あふれだす！`]);pAct(i);BT.cmds[i]=keep;return msg;}
 function xrEffect(k,m,i,st){const live=()=>BT.en.filter(e=>e.alive),me=st(),F=BT.urx||1,DB=v=>1-(1-v)*F,TN=n=>Math.max(1,Math.round(n*F)),FH=t=>{const tc=G.chars[t.id],mx=cstat(t.id,t).hp;tc.hp=Math.max(tc.hp,Math.round(mx*F));};
+        if(k==='toku'){live().forEach(e=>{e.stun=TN(3);e.charm=1;});BT.pt.forEach(t=>{t.ab=t.db=4;t.av=t.dv=.8*F;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.25))):null));sfx('magic');BT.shake=12;return '究極の トーク力が 炸裂した！\n敵は 話に 聞きいって 3ターン 動けない！\nみかたの 攻撃・守備 +80%！';}
+        if(k==='psyche'){const L=[];for(let n=0;n<8;n++)L.push(()=>{const al=live();if(!al.length)return null;const e=al[ri(0,al.length-1)];return dmgEnemy(e,phys(me.atk,e.def,2.2)+Math.ceil(e.maxhp*(e.dboss?.01:.03)));});NOW(L);m.extra=TN(2);sfx('g5');BT.shake=18;return 'サイケ！！\n目にも とまらぬ 連撃が 敵を 襲う！';}
+        if(k==='imashika'){BT.pt.forEach(t=>{if(!isAlive(t))return;const tc=G.chars[t.id];tc.mp=cstat(t.id,t).mp;t.ab=t.db=4;t.av=t.dv=1.0*F;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,phys(me.atk,e.def,2.5)):null));sfx('g5');BT.shake=16;return '「やるなら 今しか ねぇ！！」\nみかたの MPが 全回復！\n攻撃・守備 +100%（4ターン）！';}
+        if(k==='bottle'){BT.pt.forEach(t=>{if(!isAlive(t))return;t.shield=Math.round(cstat(t.id,t).hp*.5*F);t.shT=5;t.regen=5;t.regenM=F;});live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.5));e.mag=Math.round(e.mag*DB(.5));e.def=Math.round(e.def*DB(.5));}e.deb=5;});sfx('heal');BT.shake=8;return '「ボトル キープで〜す♡」\nみかたに シールド＋毎ターン 回復！\n敵は 長居して 攻撃・魔力・守備が 半分に！';}
+        if(k==='henkao'){live().forEach(e=>{e.stun=TN(3);e.charm=2;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.2))):null));sfx('magic');BT.shake=10;return '渾身の 変顔！！\n敵は 笑いころげて 3ターン 動けない！';}
+        if(k==='shitsumon'){live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.5));e.mag=Math.round(e.mag*DB(.5));e.def=Math.round(e.def*DB(.5));}e.deb=5;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.25))):null));BT.pt.forEach(t=>{if(!isAlive(t))return;const tc=G.chars[t.id],mx=cstat(t.id,t).mp;tc.mp=Math.min(mx,tc.mp+Math.round(mx*.5));});sfx('magic');BT.shake=12;return '「はい、 質問 来てた」\n敵の 言い分を すべて 論破した！\n敵の 攻撃・魔力・守備 -50%！';}
+        if(k==='absolute'){BT.pt.forEach(t=>{if(!isAlive(t))return;t.shield=Math.round(cstat(t.id,t).hp*1.0*F);t.shT=4;t.db=4;t.dv=1.5*F;});sfx('heal');BT.shake=8;return '絶対防壁 アブソリュート・ウォール！\nみかた 全員に 強力な シールド！\n守備 +150%（4ターン）！';}
+        if(k==='tomouta'){BT.pt.forEach(t=>{FH(t);t.regen=4;t.regenM=F;});sfx('heal');return 'やさしい うたが ひびきわたる…\nみかた 全員が 全回復（倒れた 仲間も 復活）！\n4ターン 毎ターン 回復する！';}
+        if(k==='tairyo'){NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.35))+magd(me.mag,e.def,3.5)):null));sfx('magic');BT.shake=16;return '朝焼け 小焼けだ 大漁だ…\n浜は 祭りの ような にぎわい！';}
+        if(k==='jiriki'){m.ab=m.db=5;m.av=m.dv=2.0*F;m.extra=TN(3);sfx('lvup');return '「だれにも たよらない！\n自分の 力で がんばるんだ！」\n攻撃・守備 +200%・3ターン 追加攻撃！';}
+        if(k==='ohirune'){BT.pt.forEach(t=>{if(!isAlive(t))return;t.shield=Math.round(cstat(t.id,t).hp*.4*F);t.shT=3;});live().forEach(e=>{e.stun=TN(2);e.charm=0;});sfx('heal');return 'お昼寝の 時間だぞ〜！\nみかたに シールド！\n敵は ぐっすり ねむって 2ターン 動けない！';}
         if(k==='ujigami'){BT.pt.forEach(t=>{t.ab=t.db=5;t.av=t.dv=.6*F;});NOW(live().map(e=>()=>e.alive?dmgEnemy(e,Math.max(1,Math.ceil(e.maxhp*.25))):null));sfx('magic');BT.shake=14;return '氏神の 光が 降りそそぐ！\nみかたの 攻撃と 守備が あがり\n敵全体の HPが 25% けずられた！';}
         if(k==='unabarising'){live().forEach(e=>{e.stun=TN(5);e.charm=0;});m.extra=TN(5);BT.shake=16;return '大海原が 荒れくるう！\n敵は 5ターン 動けない！\n須佐之男は 5ターン 追加攻撃する！';}
         if(k==='nightparry'){BT.pt.forEach(t=>{t.ab=t.db=5;t.av=t.dv=1.2*F;});live().forEach(e=>{if(!(e.deb>0)){e._deb={atk:e.atk,mag:e.mag,def:e.def};e.atk=Math.round(e.atk*DB(.5));e.mag=Math.round(e.mag*DB(.5));e.def=Math.round(e.def*DB(.5));}e.deb=5;});return '月夜の パーティーが はじまった！\nみかたの 攻撃と 守備が 超強化！\n敵の 攻撃・魔力・守備が 半分に！';}
@@ -2427,7 +2534,12 @@ function execTurn(){BT.turns=(BT.turns||0)+1;
   BT.en.forEach((e,i)=>{if(e.alive)for(let k=0;k<(e.boss?2:1);k++)acts.push({e:i,s:e.spd*(.75+rnd()*.5)});});
   acts.sort((a,b)=>b.s-a.s);BT.q=acts;
 }
-const XR_DESC={ranryo:'恐ろしい 仮面を つけて 陵王の 舞を 舞う。\n敵全体に 最大HPの 30%＋強攻撃\nみかたの 攻撃力 +80%・敵の 攻撃・魔力 -40%（4ターン）',moekyun:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方の 攻撃・守備 +80%（4ターン）\n＋敵全体が 見とれて 3ターン 動けない',ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n＋敵全体の HPを 最大HPの 25% 削る',
+const XR_DESC={toku:'究極の トーク力で 場を 支配する。\n敵全体の 最大HPの 25% 削り 3ターン 動けなくする\n味方の 攻撃・守備 +80%（4ターン）',
+  psyche:'目にも とまらぬ 連撃 8発！\nさらに 2ターン 追加攻撃する',imashika:'魂の 叫びで 味方を 奮い立たせる。\n味方の MP 全回復・攻撃・守備 +100%（4ターン）\n敵全体に 強攻撃',
+  bottle:'ボトルを キープして 長居させる。\n味方に シールド・5ターン 毎ターン 回復\n敵の 攻撃・魔力・守備 -50%（5ターン）',henkao:'渾身の 変顔で 敵を 笑わせる。\n敵全体の 最大HPの 20% 削り\n3ターン 動けなくする',
+  shitsumon:'「質問 来てた」\n敵の 攻撃・魔力・守備 -50%（5ターン）\n最大HPの 25% 削る・味方の MP 半分 回復',absolute:'絶対に 破れない 壁を はる。\n味方全員に 最大HP ぶんの シールド（4ターン）\n守備 +150%',
+  tomouta:'やさしい うたで 味方を つつむ。\n味方 全員 全回復（倒れた 仲間も 復活）\n4ターン 毎ターン 回復',tairyo:'大漁の 浜の にぎわい…\n敵全体の 最大HPの 35% 削り 強い 魔法攻撃',
+  jiriki:'自分の 力だけで がんばる。\n自分の 攻撃・守備 +200%（5ターン）\n3ターン 追加攻撃する',ohirune:'お昼寝の 時間だよ。\n味方に シールド（3ターン）\n敵は ねむって 2ターン 動けない',ranryo:'恐ろしい 仮面を つけて 陵王の 舞を 舞う。\n敵全体に 最大HPの 30%＋強攻撃\nみかたの 攻撃力 +80%・敵の 攻撃・魔力 -40%（4ターン）',moekyun:'味方全員の HPを 全回復（倒れた 仲間も 復活）\n＋味方の 攻撃・守備 +80%（4ターン）\n＋敵全体が 見とれて 3ターン 動けない',ujigami:'味方全体の 攻撃・守備 +60%（5ターン）\n＋敵全体の HPを 最大HPの 25% 削る',
   unabarising:'敵全体を 5ターン 行動不能にし\n自分は 5ターン 毎ターン 追加攻撃する',
   nightparry:'味方全体の 攻撃・守備 +120%（5ターン）\n＋敵全体の 攻撃・魔力・守備 -50%（5ターン）',
   kunizukuri:'味方全体に 最大HPの 60%の シールド\n＋5ターン 毎ターン HPが 35% 回復',
@@ -2557,6 +2669,7 @@ function winBattle(){
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
   if(BT.sp&&(BT.sp.kind==='ukaiho'||BT.sp.kind==='udoiri'||BT.sp.kind==='uorochi'))ukaihoWin(pages);
   if(BT.sp&&BT.sp.kind==='trial')trialWin(pages);
+  if(BT.sp&&BT.sp.kind==='bouei'){G.boueiDay=G.day;const nw=addChar('mamoru');pages.push('防衛団員 リーダー「…ちぇっ、 まけたぜ。\nおまえ なかなか やるな！」',nw?'防衛団の 園児 マモル「ぼくも つれてって！\nこの 町みたいに みんなを まもるんだ！」':'マモル「また 勝負しような！」',nw?'LR 防衛団の園児 マモルが 仲間に なった！':`マモルの 基礎Lvが あがった！（基礎Lv ${G.chars.mamoru.dup+1}）`);}
   if(BT.sp&&BT.sp.kind==='mine'){G.career++;pages.push(`峰入り修行を やりとげた！\n研修歴 +1（いま ${G.career}回）`);if(G.career%50===0){G.items.srtk++;pages.push('研修歴 50回ごとの 特典！\nSR以上確定チケットを 1枚 もらった。');}}
   if(BT.sp&&BT.sp.kind==='gimrift'){const O=G.gimOcc['v'+BT.sp.vi];if(O){(O.closed=O.closed||[]).push(BT.sp.k);}G.items.b[3]+=300;G.items.o[3]+=300;G.items.urtk=(G.items.urtk||0)+1;
     pages.push('町の 烈穴を 塞いだ！','経験値書（極）×300・鍛錬鉱（極）×300\nUR確定チケット×1を 手に入れた！');}
@@ -2593,6 +2706,7 @@ function winBattle(){
 function loseBattle(){
   BT.ph='end';stopBGM();sfx('lose');
   if(BT.sp&&BT.sp.kind==='trial'){trialLose();return;}
+  if(BT.sp&&BT.sp.kind==='bouei'){dialog(['ぜんめつ してしまった…','防衛団員「へへーん！ 出直してこーい！」','（防衛団の 勝負では イェソは 減らない）'],()=>{fullHeal();returnField();});return;}
   G.townBack=null;
   if(BT.sp&&BT.sp.kind==='gimwild'){gimWildLose();return;}
   dialog(['ぜんめつ してしまった…'],()=>{if(G.sk)skGuestOff();noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
@@ -2751,6 +2865,9 @@ function buildTown(vi){
   if(v.shrine==='松陰神社'&&G.party&&G.party.includes('shoin')&&!(G.tbox&&G.tbox.kinsho)){C[top+1][cx+3]={t:'tbox',id:'kinsho'};C[top+2][cx+3]={t:'s'};}
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
+  /* 11/19：町の 特別な 人（まどみちお・金子みすゞ・防衛団） */
+  {const bn=v.name.replace(/^.* /,''),spn=bn==='トイシ'&&!G.chars.mado?{sp:'mado',col:'#3cbcfc',hair:'#000000'}:bn==='イイヤマ'&&!G.chars.misuzu?{sp:'misuzu',col:'#7c4c10',hair:'#000000'}:bn==='カスカベ'?{sp:'bouei',col:'#d82800',hair:'#000000'}:null;
+    if(spn){let put=false;for(let d=2;d<9&&!put;d++)for(const [dx,dy] of [[d,4],[-d,4],[d,6],[-d,6],[d,8],[-d,8]]){const x=cx+dx,y=top+dy,c=C[y]&&C[y][x];if(!c||!['s','g','flower','pz'].includes(c.t)||npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;npcs.push({x,y,...spn,line:''});put=true;break;}}}
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
   if(v.dict&&v.dict.gim&&occupied(vi)){const O=G.gimOcc['v'+vi]||{},closed=O.closed||[],rr=lcg(vi*131+(O.day||1)*17);let n=0,tries=0;const want=4+Math.min(4,sz);
     while(n<want&&tries++<400){const x=1+Math.floor(rr()*(w-2)),y=top+4+Math.floor(rr()*(h-6));const c=C[y]&&C[y][x];if(!c||(c.t!=='s'&&c.t!=='g'&&c.t!=='flower')||x===cx)continue;
@@ -2995,7 +3112,7 @@ const townScr={full:true,mv:null,bt:0,
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
+    if(npc){if(fresh){if(npc.sp){spTalk(npc);return;}if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
       /* 方向キーを 押しつづけると 通行人と 入れかわって 通りぬける（道を ふさがれない ように） */
       if(!(npc.debtor||npc.loser||npc.trial||npc.kan||npc.yoso||npc.gambler||npc.fix||npc.zan!=null)&&c&&TPASS.has(c.t)){npc.x=TW.px;npc.y=TW.py;this.mv={x1:nx,y1:ny,dx,dy,t:0};}return;}
     if(!c)return;
@@ -7817,8 +7934,12 @@ const CASTT={cab:{w:'キャバ嬢',k:4e6,wg:2.5e5,fee:5e6,s3:'お酒',hint:'（�
   concafe:{w:'キャスト',k:2.4e6,wg:1.5e5,fee:3e6,s3:'萌え',hint:'（ガチャの コンカフェ嬢・巫女・\n幻のコンカフェ嬢 もも（XR）・\n東みかん（LR）が 出勤できる）'}};
 const hasCast=t=>!!CASTT[t];
 const KSTAR_MOMO={n:'もも',mul:2.0,rep:.5,pow:40,buzz:4,teach:5,d:'店の 売上 2倍・評判 +0.5\nほかの キャストの 指名力 +5\nSNSで 話題に なりやすい（4倍）'};
-const kstarOf=(id,t='cab')=>!id||!G.chars[id]||!CH[id]||!hasCast(t)?null:id==='momo'?(t==='concafe'?KSTAR_MOMO:null):id==='mikan'?(t==='cab'?KSTAR_M:{...KSTAR_M,n:'東みかん（一日店長）',mul:1.4,d:'店の 売上 1.4倍・評判 +0.3\nほかの キャストの 指名力 +3\nSNSで 話題に なりやすい（3倍）'}):
-  (t==='cab'?/^hostess/:/^(miko|cafegirl)/).test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
+/* 11/19：ガチャキャラが 歓楽街の お店で 働ける（看板） */
+const KSTAR_X={aiki:{t:'gay',n:'タナカアイキ',mul:2.5,rep:.4,d:'ゲイバーの 看板ママ\n店の 売上 2.5倍・評判 +0.4'},yushi:{t:'host',n:'YUSHI',mul:2.5,rep:.4,d:'ホストクラブの 伝説の 帝王\n店の 売上 2.5倍・評判 +0.4'},
+  oyaji:{t:'izakaya',n:'西新宿の親父',mul:1.8,rep:.3,d:'居酒屋の 名物 親父\n店の 売上 1.8倍・評判 +0.3'},koume:{t:'lounge',n:'コウメちゃん（チーママ）',mul:2.0,rep:.4,d:'ラウンジの チーママ\n店の 売上 2倍・評判 +0.4'},
+  menchi:{t:'karaoke',n:'メンチカツ（看板店員）',mul:1.8,rep:.3,d:'カラオケの 看板店員\n店の 売上 1.8倍・評判 +0.3'}};
+const kstarOf=(id,t='cab')=>id&&KSTAR_X[id]?(G.chars[id]&&KSTAR_X[id].t===t?{...KSTAR_X[id],pow:0,buzz:2,teach:0}:null):!id||!G.chars[id]||!CH[id]||!hasCast(t)?null:id==='momo'?(t==='concafe'?KSTAR_MOMO:null):id==='mikan'?(t==='cab'?KSTAR_M:{...KSTAR_M,n:'東みかん（一日店長）',mul:1.4,d:'店の 売上 1.4倍・評判 +0.3\nほかの キャストの 指名力 +3\nSNSで 話題に なりやすい（3倍）'}):
+  (t==='cab'?/^hostess/:/^(miko|cafegirl|cc_n)/).test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
 const kstarIds=(t='cab')=>Object.keys(G.chars).filter(id=>kstarOf(id,t)).sort((a,b)=>(b==='momo')-(a==='momo')||(b==='mikan')-(a==='mikan')||CH[b].rar-CH[a].rar);
 const kstarPow=(L)=>{const S=kstarOf(L.star,L.t);return S?Math.round(S.pow*(1+.1*Math.min(10,(G.chars[L.star].dup||0)))):0;};
 const kanHrs=t=>{const[a,b]=KAN[t].open;return`${a}時〜${b>24?'翌'+(b-24):b}時`;};
@@ -7838,7 +7959,7 @@ const kanSucc=(vi,L)=>Math.round((KAN[L.t].setup+KAN[L.t].base*60*L.rep)*landMul
 function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
   for(const k in G.kan){const vi=+k.slice(1),lm=landMul(vi),tx=taxRate(vi);
     G.kan[k].lots.forEach(L=>{if(!L.own||!L.t||L.t==='yami')return;const K=KAN[L.t];if(L.buzz>0)L.buzz--;
-      const CT=CASTT[L.t],ST=CT?kstarOf(L.star,L.t):null;if(L.star&&!ST)L.star=null;
+      const CT=CASTT[L.t],ST=kstarOf(L.star,L.t);if(L.star&&!ST)L.star=null;
       const mul=(L.rep+(ST?ST.rep:0))*(1+.12*(L.lv||0))*(L.buzz>0?1.5:1)*(ST?ST.mul:1);
       let gross=K.base*lm*mul*(1+(rnd()-.5)*2*K.vol)*(CT?.3:1),cost=(K.rent+K.wage)*lm;
       if(CT){const out=[];(L.cast||[]).forEach(c=>{c.days++;let x=(c.pow+(ST?ST.teach:0))/10*CT.k*lm*mul*(.6+rnd()*.8);if(rnd()<.03)x*=3;x=Math.round(x);c.sales+=x;gross+=x;cost+=c.wage;if(c.days>20&&rnd()<.003)out.push(c);});
@@ -7846,7 +7967,7 @@ function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
         out.forEach(c=>{L.cast.splice(L.cast.indexOf(c),1);msgs.push(`【${L.nm}】 ${CT.w}の ${c.n}が\n${rnd()<.5?'他店に 引き抜かれて しまった…':'寿退店 した！ おめでとう！'}`);});}
       const e=rnd();
       if(e<.006*(ST?ST.buzz:1)){L.buzz=10;msgs.push(`【${L.nm}】 SNSで 話題に なった！\n10日間 売上 1.5倍！`);}
-      else if(e<.01){L.rep=Math.max(.4,Math.round((L.rep-.1)*100)/100);msgs.push(`【${L.nm}】 悪い 口コミが 広まった…\n評判が 下がった。`);}
+      else if(e<.01&&!(L.guard&&G.chars.guard_n&&rnd()<.6)){L.rep=Math.max(.4,Math.round((L.rep-.1)*100)/100);msgs.push(`【${L.nm}】 悪い 口コミが 広まった…\n評判が 下がった。`);}
       else if(e<.014){L.rep=Math.min(2.5,Math.round((L.rep+.08)*100)/100);msgs.push(`【${L.nm}】 常連客が 増えてきた！\n評判が 上がった。`);}
       if(L.since!=null&&G.day-L.since<=30&&L.rep<1)L.rep=Math.min(1,Math.round((L.rep+.007)*1000)/1000);
       let p=gross-cost;if(p>0)p*=1-tx;p=Math.round(p);L.last=p;L.tot=(L.tot||0)+p;net+=p;});}
@@ -7875,7 +7996,9 @@ function buildKanraku(vi){const w=31,h=21,C=[];kanSt(vi);for(let y=0;y<h;y++){C.
   /* 入口の ネオンゲート */for(let x=12;x<=18;x++)C[h-1][x]={t:'kanarch',x};C[h-1][15]={t:'exit'};
   const n=isNight(),r=lcg(G.day*733+vi*17+(n?1:0)),npcs=[
     {x:14,y:18,col:'#000000',hair:'#bcbcbc',line:n?'呼び込み「お兄さん、 1セット いかがっすか〜！\n今なら 指名料 無料っすよ！」':'呼び込み「…まだ 準備中っす。\n夜に また 来てくださいよ」'},
-    {x:16,y:11,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'}];
+    {x:16,y:11,col:'#3c3c3c',hair:'#000000',line:'黒服「この 街の 店は テナント契約か\n事業継承で 手に入るぜ。\n…不動産業が できるなら な」'},
+    ...(n&&(G.chars.catch_g||G.chars.catch_u)?[{x:20,y:18,col:'#000000',hair:'#f8b800',sp:'catch',line:''}]:[]),
+    ...(n&&lcg(G.day*31+vi)()<.7?[{x:13,y:11,col:'#00a800',hair:'#7c4c10',sp:'singer',line:''}]:[])];
   const DAY=['掃除の おじさん「夜の あとは ゴミが すごいんじゃ」','若い 女性「夜は この 街で 働いてるの。\n昼は 寝る 時間よ」','配達員「おしぼりと 氷の 配達っす！」','観光客「昼の 歓楽街って 静かなんだね」'];
   const NIGHT=['酔っぱらい「ういっく… もう 一軒 いくぞぉ〜」','キャバ嬢「今日は 同伴 なんだ〜。\nあ、 今度 お店にも 来てね！」','ホスト「姫〜！ 今夜も 会いに 来てくれたの？」','サラリーマン「部長の 二次会… 長いなあ」',
     '会社員「終電… 逃した…」','女子大生「カラオケ オールしよ〜！」','おじさん「このへんの スナックは 全部 行ったぞ」','客引き「居酒屋 どうっすか！ 飲み放題 あるっす！」','観光客「ネオンが すごい！ 写真 撮ろう！」','黒服「…いい 街だろ。 夜は これからだ」'];
@@ -7930,11 +8053,17 @@ function kanBuy(vi,i,price){const L=kanSt(vi).lots[i],K=KAN[L.t];
       sfx('lvup');save();dialog([`${K.n}「${L.nm}」を\n事業継承で 手に入れた！`,'前の オーナー「あとは 頼みましたよ」',...(hasCast(L.t)?[`在籍 ${CASTT[L.t].w} ${L.cast.length}人も 引き継いだ。`]:[])]);});},96);}
 function kanOwn(vi,i){const L=kanSt(vi).lots[i],K=KAN[L.t],lm=landMul(vi);
   const head=`【オーナー】${K.n}「${L.nm}」\n評判 ${L.rep.toFixed(2)}　内装Lv${L.lv||0}${L.buzz>0?'　話題沸騰中！':''}\n前日の 収支 ${(L.last||0)>=0?'+':''}${fmt(L.last||0)}`;
-  const ops=['経営状況',...(hasCast(L.t)?[{t:`${CASTT[L.t].w}の 管理`,col:'#f878f8'}]:[]),'内装を 改装する','客として 入る','店名を 変える','手放す','やめる'];
+  const xs=Object.keys(KSTAR_X).filter(id=>KSTAR_X[id].t===L.t&&G.chars[id]);
+  const ops=['経営状況',...(hasCast(L.t)?[{t:`${CASTT[L.t].w}の 管理`,col:'#f878f8'}]:[]),...(!hasCast(L.t)&&xs.length?[{t:'看板を 出勤させる',col:'#f8b800'}]:[]),...(G.chars.guard_n?[L.guard?'ボディーガードを 外す':'ボディーガードを 置く']:[]),'内装を 改装する','客として 入る','店名を 変える','手放す','やめる'];
   choice(head,ops,k=>{if(k<0||!ops[k])return;const lab=typeof ops[k]==='string'?ops[k]:ops[k].t;
     if(lab==='経営状況'){const days=Math.max(0,G.day-(L.since||G.day));dialog([`${K.n}「${L.nm}」\n営業 ${days}日目　評判 ${L.rep.toFixed(2)}\n累計 収支 ${(L.tot||0)>=0?'+':''}${fmt(L.tot||0)}イェソ`,
       `家賃 ${fmt(Math.round(K.rent*lm))}／日\n人件費 ${fmt(Math.round(K.wage*lm))}／日`+(hasCast(L.t)?`\n${CASTT[L.t].w} ${L.cast.length}人（日給 計 ${fmt(L.cast.reduce((a,c)=>a+c.wage,0))}）`:''),'評判は 改装・口コミ・SNSで 変わる。\n内装Lvごとに 売上 +12%。'],()=>kanOwn(vi,i));return;}
     if(/の 管理$/.test(lab)){castScr(vi,i);return;}
+    if(lab==='看板を 出勤させる'){const cur=kstarOf(L.star,L.t);listPick(`看板（${cur?cur.n:'なし'}）`,[...xs.map(id=>({t:CH[id].name,r:RAR[CH[id].rar].n})),{t:'休ませる',col:'#7c7c7c'}],j=>{
+        if(j>=xs.length){L.star=null;save();dialog('看板を 休ませた。',()=>kanOwn(vi,i));return;}const id=xs[j];for(const k2 in G.kan)G.kan[k2].lots.forEach(o=>{if(o.star===id)o.star=null;});L.star=id;save();sfx('lvup');
+        dialog([{aiki:'アイキ「あら、 ここで 働くの？\nいいわよ、 お客さん 全員 落としてあげる」',yushi:'YUSHI「…今夜も 帝王の 時間だ」',oyaji:'親父「よっしゃ！ 今日も 店 開けるぞ！\nお前ら 飲んでけ！」',koume:'コウメ「はーい、 今日から チーママの コウメでーす♡\nみんな ちゃんと 動いてね！」',menchi:'メンチカツ「いらっしゃいませ〜…\n（大物歌手の 声で）いらっしゃいませぇ〜！」'}[id],`${CH[id].name}が 「${L.nm}」で 働きはじめた！\n${KSTAR_X[id].d}`],()=>kanOwn(vi,i));},
+      j=>{const id=xs[j];return id?KSTAR_X[id].d:'看板を 外す';},()=>kanOwn(vi,i));return;}
+    if(lab==='ボディーガードを 置く'||lab==='ボディーガードを 外す'){L.guard=L.guard?0:1;save();dialog(L.guard?['ボディーガードマン「…おまかせを」','店の 入口に ボディーガードが 立った。\n悪い 口コミや トラブルが 起きにくくなる。']:'ボディーガードを 外した。',()=>kanOwn(vi,i));return;}
     if(lab==='内装を 改装する'){if((L.lv||0)>=5){dialog('もう 最高級の 内装だ。',()=>kanOwn(vi,i));return;}const c=Math.round(K.setup*lm*.4*((L.lv||0)+1));
       choice(`内装を 改装する（Lv${L.lv||0}→${(L.lv||0)+1}）\n費用 ${fmt(c)}イェソ\n売上 +12%・評判 少し アップ`,['改装する','やめる'],r=>{if(r!==0){kanOwn(vi,i);return;}
         rePay(c,()=>{L.lv=(L.lv||0)+1;L.rep=Math.min(2.5,Math.round((L.rep+.1)*100)/100);L.paid=(L.paid||0)+c;sfx('lvup');save();dialog(`改装 完了！ 内装Lv${L.lv}に なった。`,()=>kanOwn(vi,i));});},96);return;}
