@@ -887,8 +887,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=182,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -1042,6 +1042,13 @@ function shufR(a,r){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function mkNoise(seed,cell,ww=MAINW){const r=lcg(seed),gw=Math.ceil(ww/cell)+2,gh=Math.ceil(MH/cell)+2,g=[];for(let i=0;i<gw*gh;i++)g.push(r());
   return(x,y)=>{const fx=x/cell,fy=y/cell,ix=Math.floor(fx),iy=Math.floor(fy),s=t=>t*t*(3-2*t),u=s(fx-ix),v=s(fy-iy);
     const a=g[iy*gw+ix],b=g[iy*gw+ix+1],c=g[(iy+1)*gw+ix],d=g[(iy+1)*gw+ix+1];return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;};}
+const STADS=[],BB_TEAMS=[
+  {id:'mikados',n:'テンメイ・ミカドス',s:'ミカドス',c:'天鳴の都',par:'tenmei',lg:0,col:'#24188c'},{id:'orochis',n:'ヤクモ・オロチーズ',s:'オロチーズ',c:'八雲市',par:'iwato',lg:0,col:'#00a800'},
+  {id:'phoenix',n:'キンポウ・フェニックス',s:'フェニックス',c:'商都 金鳳',par:'kinpou',lg:0,col:'#f8b800'},{id:'fugus',n:'マホロバ・フグース',s:'フグース',c:'首都 マホロバ',par:'ryugu',lg:0,col:'#3cbcfc'},
+  {id:'weavers',n:'ニシキ・ウィーバーズ',s:'ウィーバーズ',c:'錦織の街',par:'nishiki',lg:0,col:'#f878f8'},{id:'crowns',n:'ヴェルナ・クラウンズ',s:'クラウンズ',c:'金冠都市 ヴェルナ',par:'kohaku',lg:0,col:'#a87c00'},
+  {id:'leons',n:'サキタマ・レオンズ',s:'レオンズ',c:'オオミヤ',par:'yaotetsu',lg:1,col:'#0058f8'},{id:'emperors',n:'グンマー・エンペラーズ',s:'エンペラーズ',c:'帝都 グンマー',par:'teiai',lg:1,col:'#000000'},
+  {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'グラード・コールズ',s:'コールズ',c:'炭都 グラード',par:'hoppou',lg:1,col:'#3c3c3c'},
+  {id:'gladiators',n:'コロッセア・グラディエーターズ',s:'グラディエーターズ',c:'闘都 コロッセア',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
 const ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
@@ -1145,6 +1152,12 @@ function genMap(){
       if(tileAt(x,y)!==T.GRASS||ROADSIDE.some(o=>Math.abs(o.x-x)+Math.abs(o.y-y)<2))continue;
       if(![[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>tileAt(x+dx,y+dy)===T.ROAD))continue;
       setT(x,y,k==='conv'?T.CONV:T.LOVEH);ROADSIDE.push({x,y,k,vi,n:k==='conv'?CONV_N[(h+r)%3]:LOVE_N[(h+a)%LOVE_N.length]});done=true;}}});
+  /* 11/19：野球場（球団の 本拠地の 町の そば） */
+  STADS.length=0;BB_TEAMS.forEach(tm=>{const vi=VIL.findIndex(v=>v.name===tm.c||v.name.replace(/^.* /,'')===tm.c);if(vi<0)return;tm.vi=vi;const v=VIL[vi];let done=false;
+    for(let r=2;r<=6&&!done;r++)for(let a=0;a<16&&!done;a++){const an=a/16*Math.PI*2,x=v.x+Math.round(Math.cos(an)*r),y=v.y+Math.round(Math.sin(an)*r),t=tileAt(x,y);
+      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y))continue;
+      let cx=v.x,cy=v.y;while(cx!==x||cy!==y){if(cx!==x)cx+=Math.sign(x-cx);else cy+=Math.sign(y-cy);if(cx===x&&cy===y)break;const t2=tileAt(cx,cy);if(!isTownT(t2)&&t2!==T.SHR&&t2!==T.KEIBAJO&&t2!==T.CONV&&t2!==T.LOVEH&&t2!==T.WALL&&t2!==T.GGATE)setT(cx,cy,t2===T.WATER||t2===T.SEA?T.BRIDGE:t2===T.MOUNT?T.YAMA:T.ROAD);}
+      setT(x,y,T.STAD);STADS.push({x,y,vi});done=true;}});
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1191,7 +1204,7 @@ TILES[T.GGATE]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c44');P(0,0,16,3,'#8c8c9
 TILES[T.KQSPOT]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#000030');for(let y=0;y<14;y++){const hw=Math.min(8,Math.floor(y*0.62)+1);P(8-hw,2+y,hw*2,1,y<3?'#5c5c5c':'#24402c');}
   P(7,1,2,2,f?'#fcfcfc':'#f8d878');P(6,0,1,1,'#f8d878');P(9,0,1,1,'#f8d878');for(let k=0;k<7;k++)P(2+k,13-k,1,1,'#bcbcbc');P(f?4:5,f?10:9,3,2,'#d82800');
   for(let k=0;k<6;k++)P(1+((k*5)%14),14+(k%2),1,1,['#f8d878','#3cbcfc','#fcfcfc'][k%3]);}));
-TILES[T.CONV]=[mkTile(grassBase)];TILES[T.LOVEH]=[mkTile(grassBase)];
+TILES[T.CONV]=[mkTile(grassBase)];TILES[T.STAD]=[mkTile(grassBase)];TILES[T.LOVEH]=[mkTile(grassBase)];
 TILES[T.KEIBAJO]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#00a800');P(1,4,14,10,'#e4c890');P(3,6,10,6,'#00a800');P(4,7,8,4,'#00c800');P(1,4,14,1,'#fcfcfc');P(1,13,14,1,'#fcfcfc');
   P(2,0,12,4,'#3c3c3c');P(1,0,14,1,'#00a800');for(let x=3;x<13;x+=2)P(x,2,1,1,['#d82800','#fcfcfc','#f8b800','#0058f8'][(x+f)%4]);P(f?5:9,8,3,2,'#7c4c10');P(f?6:10,7,1,1,'#d82800');}));
 TILES[T.GSEAL]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c3c');P(2,4,12,12,'#5c5c5c');P(4,1,8,3,'#7c7c7c');P(5,8,6,8,'#000');P(2,4,12,1,'#bcbcbc');P(6,10,4,1,f?'#d82800':'#f8b800');P(1,13,14,1,'#f8b800');P(1,14,14,1,'#000');for(let x=1;x<15;x+=4)P(x,13,2,1,'#000');}));
@@ -1653,6 +1666,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     for(const q of G.rifts){const sx=q.x*16-camX,sy=q.y*16-camY;if(sx<-16||sy<-16||sx>W||sy>H)continue;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,4,'#6800a8');
       for(let k=0;k<6;k++){const an=k/6*Math.PI*2+frame*.1;R(Math.round(sx+8+Math.cos(an)*5),Math.round(sy+8+Math.sin(an)*5),2,2,k%2?'#d82800':'#f878f8');}}
     {const n=namidaPos(),sx=n.x*16-camX,sy=n.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawNamida(sx,sy);}
+    for(const o of STADS){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawStad(sx,sy);}
     for(const o of ROADSIDE){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawRoadside(o,sx,sy);}
     if(G.ajito&&G.ajito.x!=null&&ajOK()){const sx=G.ajito.x*16-camX,sy=G.ajito.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAjHouse(sx,sy);}
     drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();fkHeatBadge();
@@ -1672,6 +1686,7 @@ function onStep(pv){timeAdd(5);dqHit('step');fkHeatStep();
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
   if(t===T.KQSPOT){kqFac('kqcable');return;}
+  if(t===T.STAD){const o=STADS.find(q=>q.x===x&&q.y===y);if(o){stadEnter(o.vi,pv||{x,y:y+1});return;}}
   if(t===T.CONV||t===T.LOVEH){const o=ROADSIDE.find(q=>q.x===x&&q.y===y);if(o){enterRoom(o.k,{field:pv||{x,y:y+1},o});return;}}
   if(t===T.KEIBAJO){const ck=CHIHO.find(c=>c.x===x&&c.y===y);if(ck){chihoEnter(ck);return;}enterKeibajo(x===MJO.x&&y===MJO.y?VIL.findIndex(v=>v.capital):undefined);return;}
   if(isTownT(t)){enterVillage(VIL.findIndex(v=>v.x===x&&v.y===y));return;}
@@ -1748,6 +1763,141 @@ function ykDaily(){const msgs=[];if(!G.kan)return msgs;for(const k in G.kan){con
 function ykTalk(){const vi=TW.vi,Y=ykS(vi);if(!Y.on){dialog('…');return;}
   dialog(['組員「あぁ？ なんだ てめぇ」','「この 街は 鬼瓦組の シマだ。\n店を 出すなら みかじめ料を 払うのが 筋ってもんよ」'],()=>choice('鬼瓦組と 戦いますか？\n（勝てば この 街から 撤退させられる）',['戦う','やめる'],r=>{if(r!==0)return;
     G.townBack=jogaiPrev&&jogaiPrev.TW?{vi,px:jogaiPrev.px,py:jogaiPrev.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'yakuza',vi});},96));}
+/* ===================== 11/19：ナメガワマチ総長選挙編（プチストーリー） ===================== */
+const nmS=()=>{G.nm=G.nm||{ch:0,rally:[],sup:40};if(!G.nm.rally)G.nm.rally=[];return G.nm;};
+const nmOpen=()=>!!(G&&G.sk&&G.sk.clear);
+function nmNpc(bn){if(!nmOpen())return null;const N=nmS();if(N.clear)return null;
+  if(bn==='ナメガワマチ'&&(N.ch===0||N.ch===2))return {sp:N.ch===0?'nmstart':'nmvote',col:'#fcfcfc',hair:'#000000'};
+  if(N.ch===1&&['クマガヤ','コエド','オオミヤ'].includes(bn)&&!N.rally.some(n=>n.endsWith(bn)))return {sp:'nmrally',col:'#d82800',hair:'#000000',town:bn};return null;}
+function nmTalk(k){const N=nmS();
+  if(k==='nmstart'){scene('skn',['── 完全平和都市 ナメガワマチ ──','街の 人「ニズゥーイッツァイが 消えて\nこの 街には 首長が いない まま…」','役人「首長 不在の まま 都市を 回すのは 危険です。\nそこで ナメガワマチ総長選挙を 開くことに なりました！」','レジスタンスの 代表「…おれたちも 党を 作った。\n『解放改革の会』だ」','「あんたたちの 力を 貸してくれ！\n街の 人に おれたちの 声を 届けたい」','役人「ただ… 対立候補は キョーサン派と\n手を 組んだ『共白統治党』です」','「ニズゥーイッツァイの 意志を 継ぐ 残党…\n書記長の 名前は まだ 明かされていません」'],()=>{N.ch=1;save();
+      dialog(['目的：解放改革の会を 応援しよう！','（クマガヤ・コエド・オオミヤの 演説台で\n応援演説を しよう）']);});return;}
+  if(k==='nmrally'){const npc=TW.npcs.find(p=>p.sp==='nmrally'),bn=npc?npc.town:'';
+    dialog([`解放改革の会の 演説台だ。\n${bn}の 人たちが 集まっている。`,'候補者「みなさん！ もう 誰かに 決められる\n『平和』は いりません！」'],()=>choice('応援演説の テーマは？',['自由に 生きる 権利','街の 復興と 仕事','サキタマを ひとつに'],r=>{if(r<0)return;
+      G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;G.nmTmp=bn;fullHeal();while(stack.length>1)pop();
+      dialog(['聴衆「おおっ！」','…そのとき 演説台に 物が 投げこまれた！','活動家「解放改革の会の 演説を やめさせろ！」'],()=>startBattle(false,null,{kind:'nmriot'}));},120));return;}
+  if(k==='nmvote'){scene('skn',['── 投票日 ──','街じゅうの 人が 投票所に ならんでいる…','開票速報「解放改革の会… 当選確実！！」','歓声が 街を つつんだ――','……が。','共白統治党の 本部から 黒い 霧が あふれだした！','現れたのは…','タガバに 倒された はずの 男――\n帝愛 元幹部 コブシデ…！','…いや、 もう 人の 目を していない。\nギムの 残滓を 極限まで 吸いこんでいる…！','共白統治党 書記長 コブシデ「……セン…キョ……\nミト…メ…ナイ……」'],()=>
+      choice('書記長 コブシデと 戦いますか？（裏ボス）',['戦う','準備してから'],r=>{if(r!==0)return;G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'kobushide'});},96));return;}}
+function nmRiotWin(pages){const N=nmS(),bn=G.nmTmp||'';G.nmTmp=null;if(bn&&!N.rally.includes(bn))N.rally.push(bn);N.sup=Math.min(70,(N.sup||40)+10);
+  pages.push(`妨害を はねのけた！\n${bn}の 演説は 大成功！（支持率 ${N.sup}%）`);if(N.rally.length>=3){N.ch=2;pages.push('解放改革の会の 支持が 広がった！','（ナメガワマチで 投票日を むかえよう）');}}
+function nmBossWin(pages){const N=nmS();N.ch=3;N.clear=1;G.items.urtk=(G.items.urtk||0)+5;G.items.xrtk=(G.items.xrtk||0)+1;
+  pages.push('コブシデの 体から ギムの 残滓が 抜けていく…','コブシデ「……タガ…バ…… すまな…かっ…た……」','コブシデは 光の 粒に なって 消えた。','解放改革の会の 代表が ナメガワマチ 総長に 就任した！','ナメガワマチ総長選挙編 クリア！','UR確定チケット ×5・XR確定チケット ×1を 手に入れた！','【クリア報酬】野球が 解放された！\n大都会の そばの 野球場で 試合・球団経営・\nドラフト・トレード・FA・野球賭博が できる');}
+/* ===================== 11/19：野球（あまつリーグ・くにつリーグ） ===================== */
+const BB_LG=['あまつリーグ','くにつリーグ'],BB_GAMES=60,BB_POS=['捕','一','二','三','遊','左','中','右','指'];
+const BB_SN=['山田','佐藤','鈴木','高橋','田中','伊藤','渡辺','中村','小林','加藤','吉田','山本','松本','井上','木村','林','清水','山崎','森','池田','橋本','阿部','石川','前田','藤田','小川','岡田','後藤','長谷川','村上','近藤','坂本','遠藤','青木','福田','太田','西村','藤井','金子','岡本'];
+const BB_GN=['翔','大和','蓮','悠斗','陽太','颯','健太','拓海','大輝','優','誠','翼','隼人','直樹','亮','剛','聖也','海斗','航','空','雄大','将','匠','光','勇気'],BB_FN=['ジョンソン','ロドリゲス','スミス','マルティネス','ガルシア','ブラウン','ウィルソン','ロペス','ペレス','ゴンザレス'];
+const bbOK=()=>typeof nmS==='function'&&nmS().clear;
+function bbMkP(r,pos,lv,foreign){const v=()=>Math.max(20,Math.min(99,Math.round(lv+(r()-.5)*30)));const P={n:foreign?BB_FN[Math.floor(r()*BB_FN.length)]:BB_SN[Math.floor(r()*BB_SN.length)]+' '+BB_GN[Math.floor(r()*BB_GN.length)],pos,age:20+Math.floor(r()*14),fa:2+Math.floor(r()*6),f:foreign?1:0};
+  if(pos==='投'){P.pit=v();P.sta=v();}else{P.bat=v();P.pow=v();P.spd=v();}return P;}
+const bbOvr=P=>P.pos==='投'?P.pit:Math.round(P.bat*.45+P.pow*.35+P.spd*.2);
+function bbS(){const B=G.bb=G.bb||{own:null,season:1,gd:0,ph:'reg',rec:{},ros:{},home:{},champ:[],bet:null,bans:0,built:[]};
+  BB_TEAMS.forEach((tm,i)=>{if(!B.rec[tm.id])B.rec[tm.id]={w:0,l:0};if(!B.ros[tm.id]){const r=lcg(9001+i*131),lv=55+r()*10,L=[];BB_POS.forEach(p=>L.push(bbMkP(r,p,lv)));for(let k=0;k<5;k++)L.push(bbMkP(r,'投',lv));for(let k=0;k<3;k++)L.push(bbMkP(r,['一','左','捕'][k],lv-8));B.ros[tm.id]=L;}if(B.home[tm.id]==null)B.home[tm.id]=tm.vi;});return B;}
+const bbT=id=>BB_TEAMS.find(t=>t.id===id);
+function bbStr(id){const L=bbS().ros[id]||[],F=L.filter(p=>p.pos!=='投').map(bbOvr).sort((a,b)=>b-a).slice(0,9),Pp=L.filter(p=>p.pos==='投').map(p=>p.pit).sort((a,b)=>b-a).slice(0,5);
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:40;return {off:avg(F),pit:avg(Pp)};}
+function bbPair(lg,gd){const ids=BB_TEAMS.filter(t=>t.lg===lg).map(t=>t.id),n=ids.length,fix=ids[0],rest=ids.slice(1),k=gd%(n-1),rot=rest.slice(k).concat(rest.slice(0,k)),arr=[fix,...rot],P=[];for(let i=0;i<n/2;i++)P.push(gd%2?[arr[i],arr[n-1-i]]:[arr[n-1-i],arr[i]]);return P;}
+function bbPois(l){let k=0,p=1;const L=Math.exp(-l);do{k++;p*=rnd();}while(p>L&&k<30);return k-1;}
+function bbSim(a,b){const A=bbStr(a),Bs=bbStr(b);let ra=bbPois(4*Math.pow(A.off/Bs.pit,1.6)),rb=bbPois(4*Math.pow(Bs.off/A.pit,1.6)*1.04);while(ra===rb){if(rnd()<.5)ra++;else rb++;}return [ra,rb];}
+function bbToday(){const B=bbS();if(B.ph!=='reg')return null;const own=B.own;if(!own)return null;const lg=bbT(own).lg;return bbPair(lg,B.gd).find(p=>p.includes(own))||null;}
+function bbRecord(a,b,ra,rb){const B=bbS();(ra>rb?B.rec[a]:B.rec[b]).w++;(ra>rb?B.rec[b]:B.rec[a]).l++;}
+function bbDaily(){if(!G||!bbOK())return[];const B=bbS(),msgs=[];
+  if(B.ph==='reg'){for(const lg of [0,1])for(const [a,b] of bbPair(lg,B.gd)){if(B.played===B.gd&&B.own&&(a===B.own||b===B.own))continue;const [ra,rb]=bbSim(a,b);bbRecord(a,b,ra,rb);
+      if(B.own&&(a===B.own||b===B.own)){const me=a===B.own,w=me?ra>rb:rb>ra;msgs.push(`【${bbT(B.own).s}】 ${bbT(a).s} ${ra}－${rb} ${bbT(b).s}\n（自動試合で ${w?'勝利！':'敗戦…'}）`);}
+      if(B.bet&&B.bet.gd===B.gd&&B.bet.tm&&(a===B.bet.tm||b===B.bet.tm)){const won=(a===B.bet.tm?ra>rb:rb>ra);if(won){const pay=Math.round(B.bet.amt*B.bet.odds);G.coins+=pay;msgs.push(`【野球賭博】 ${bbT(B.bet.tm).s}が 勝った！\n${fmt(pay)}イェソの 払いもどし`);}else msgs.push(`【野球賭博】 ${bbT(B.bet.tm).s}が 負けた…\n${fmt(B.bet.amt)}イェソが 消えた`);B.bet=null;}}
+    if(B.own){const H=bbT(B.own),R=B.rec[B.own],inc=Math.round(2e7*(.5+R.w/Math.max(1,R.w+R.l))*(VIL[B.home[B.own]].size||4)/5);G.bank.sav+=inc;}
+    B.gd++;B.played=null;
+    if(B.gd>=BB_GAMES){B.ph='post';const top=lg=>BB_TEAMS.filter(t=>t.lg===lg).map(t=>t.id).sort((x,y)=>B.rec[y].w-B.rec[x].w)[0],A=top(0),C=top(1);let wa=0,wc=0;while(wa<4&&wc<4){const [x,y]=bbSim(A,C);if(x>y)wa++;else wc++;}
+      const ch=wa===4?A:C;B.champ.push({s:B.season,id:ch});const T_=bbT(ch),S=stk();if(S.p[T_.par]!=null){S.p[T_.par]=Math.round(S.p[T_.par]*1.8);}
+      msgs.push(`【八百万シリーズ】 ${bbT(A).s} ${wa}－${wc} ${bbT(C).s}`,`${T_.n}が 八百万一に 輝いた！！\n親会社 ${(STOCKS.find(c=>c.id===T_.par)||{n:'？'}).n}の 株価が 爆上がり（1.8倍）！`);
+      if(ch===B.own){G.items.urtk=(G.items.urtk||0)+3;msgs.push('あなたの 球団が 優勝した！！\nUR確定チケット ×3');}}}
+  else if(B.ph==='post'){B.ph='off';B.offd=0;B.draft=B.own?bbDraftPool():null;B.faList=bbFaPool();msgs.push('【野球】 オフシーズンに 入った。\n（ドラフト・FA・トレードの 季節）');}
+  else if(B.ph==='off'){B.offd=(B.offd||0)+1;if(B.offd>=3){bbNewSeason();msgs.push(`【野球】 第${B.season}シーズンが 開幕した！`);}}
+  return msgs;}
+function bbNewSeason(){const B=bbS();B.season++;B.gd=0;B.ph='reg';B.draft=null;B.faList=null;BB_TEAMS.forEach(t=>{B.rec[t.id]={w:0,l:0};B.ros[t.id].forEach(P=>{P.age++;P.fa--;const g=P.age<27?3:P.age>32?-4:0;for(const k of ['bat','pow','spd','pit','sta'])if(P[k]!=null)P[k]=Math.max(20,Math.min(99,P[k]+g+Math.round((rnd()-.5)*4)));});
+  if(t.id!==B.own){const L=B.ros[t.id];L.sort((a,b)=>bbOvr(a)-bbOvr(b));if(L.length>17)L.splice(0,L.length-17);const r=lcg(G.day+t.id.length);while(L.length<17)L.push(bbMkP(r,L.filter(p=>p.pos==='投').length<6?'投':BB_POS[Math.floor(r()*8)],50));}});}
+function bbDraftPool(){const r=lcg(G.day*77+3);return Array.from({length:6},()=>{const P=bbMkP(r,rnd()<.4?'投':BB_POS[Math.floor(r()*8)],58+r()*14);P.age=18+Math.floor(r()*5);P.fa=8;return P;});}
+function bbFaPool(){const B=bbS(),L=[];BB_TEAMS.forEach(t=>{if(t.id===B.own)return;B.ros[t.id].forEach(P=>{if(P.fa<=0&&bbOvr(P)>=60&&rnd()<.5)L.push({P,from:t.id});});});return L.slice(0,8);}
+/* 野球場 */
+function stadTeam(vi){const B=bbS();return BB_TEAMS.find(t=>B.home[t.id]===vi)||null;}
+function drawStad(sx,sy){R(sx+1,sy+3,14,12,'#bcbcbc');R(sx+2,sy+4,12,10,'#00a800');R(sx+5,sy+7,6,6,'#c89058');R(sx+7,sy+9,2,2,'#fcfcfc');R(sx+1,sy+3,14,1,'#fcfcfc');for(const x of [2,13])R(sx+x,sy,1,4,'#7c7c7c');pc(sx+2,sy,1,'#fcfc80');pc(sx+13,sy,1,'#fcfc80');}
+function stadEnter(vi,back){if(!bbOK()){G.pos={x:back.x,y:back.y};dialog(['大きな 野球場だ。','「現在 改修工事中」の 看板が 立っている…','（ナメガワマチ総長選挙編を クリアすると 開放される）']);return;}
+  const B=bbS(),tm=stadTeam(vi);G.pos={x:back.x,y:back.y};save();
+  const head=tm?`${tm.n} 本拠地\n${BB_LG[tm.lg]}　${B.rec[tm.id].w}勝${B.rec[tm.id].l}敗`:`${VIL[vi].name}の 球場（本拠地の 球団なし）`;
+  const ops=[...(B.own&&B.ph==='reg'&&B.played!==B.gd&&bbToday()?[{t:'自分の 球団の 試合を する（7イニング）',col:'#f8b800'}]:[]),'順位表',...(tm&&B.ph==='reg'?['野球賭博（あぶない）']:[]),...(B.own?['球団経営']:[]),...(tm&&tm.id!==B.own?['この 球団を 買収する']:[]),'やめる'];
+  choice(`${head}\n第${B.season}シーズン　${B.ph==='reg'?`${B.gd+1}試合目／${BB_GAMES}`:B.ph==='post'?'ポストシーズン':'オフシーズン'}`,ops,k=>{const o=ops[k];if(!o)return;const lab=typeof o==='string'?o:o.t;
+    if(lab.startsWith('自分の')){const [a,b]=bbToday();bbPlay(a,b,()=>stadEnter(vi,back));return;}
+    if(lab==='順位表'){bbStandings(()=>stadEnter(vi,back));return;}
+    if(lab.startsWith('野球賭博')){bbBet(tm.id,()=>stadEnter(vi,back));return;}
+    if(lab==='球団経営'){bbManage(()=>stadEnter(vi,back));return;}
+    if(lab==='この 球団を 買収する'){bbBuy(tm.id,()=>stadEnter(vi,back));return;}},150);}
+function bbStandings(cb){const B=bbS(),pg=[0,1].map(lg=>`【${BB_LG[lg]}】\n`+BB_TEAMS.filter(t=>t.lg===lg).sort((x,y)=>B.rec[y.id].w-B.rec[x.id].w).map((t,i)=>`${i+1} ${t.s}${t.id===B.own?'★':''} ${B.rec[t.id].w}-${B.rec[t.id].l}`).join('\n'));
+  if(B.champ.length)pg.push('【歴代 優勝】\n'+B.champ.slice(-6).map(c=>`第${c.s}期 ${bbT(c.id).s}`).join('\n'));dialog(pg,cb);}
+function bbBet(tid,cb){const B=bbS();if(B.bans>G.day){dialog('（前に 捕まって いるので\nしばらくは 近づけない…）',cb);return;}const pr=bbPair(bbT(tid).lg,B.gd).find(p=>p.includes(tid));if(!pr){dialog('今日は 試合が ない。',cb);return;}
+  const op=pr[0]===tid?pr[1]:pr[0],a=bbStr(tid),b=bbStr(op),pw=1/(1+Math.pow((b.off+b.pit)/(a.off+a.pit),6)),odds=Math.max(1.1,Math.round(.9/pw*10)/10),odds2=Math.max(1.1,Math.round(.9/(1-pw)*10)/10);
+  dialog(['（球場の 裏手で 男が 声を かけてきた）','男「…今日の 試合、 張って いかねぇか？\n大きい 声じゃ 言えねぇがな」'],()=>choice(`${bbT(tid).s} 対 ${bbT(op).s}\nどちらに 賭ける？`,[`${bbT(tid).s}（${odds}倍）`,`${bbT(op).s}（${odds2}倍）`,'やめる'],k=>{if(k<0||k>1){cb&&cb();return;}
+    amtChoice('賭ける 金額',G.coins,a2=>{G.coins-=a2;if(rnd()<.08){B.bans=G.day+10;const f=Math.round(Math.max(0,G.coins)*.3);G.coins-=f;save();sfx('ng');dialog(['警察官「動くな！ 野球賭博の 現行犯だ！」','（賭け金は 没収された…）',`罰金 ${fmt(f)}イェソ。\n10日間 球場の 裏には 近づけない`],cb);return;}
+      B.bet={tm:k?op:tid,amt:a2,odds:k?odds2:odds,gd:B.gd};save();dialog(`${fmt(a2)}イェソを ${bbT(B.bet.tm).s}に 賭けた。\n（今日の 試合が 終わると 結果が わかる）`,cb);},true);},96));}
+function bbBuy(tid,cb){const B=bbS(),T_=bbT(tid),price=Math.round((5e9+bbStr(tid).off*1e8)*(VIL[B.home[tid]].size>=6?1.5:1));
+  choice(`${T_.n}を 買収しますか？\n買収額 ${fmt(price)}イェソ（普通預金からも 可）${B.own?`\n※ いまの ${bbT(B.own).s}は 手放します`:''}`,['買収する','やめる'],r=>{if(r!==0){cb&&cb();return;}
+    const tot=G.coins+G.bank.sav;if(tot<price){dialog('お金が たりない。',cb);return;}let x=price;const c=Math.min(G.coins,x);G.coins-=c;x-=c;G.bank.sav-=x;B.own=tid;save();sfx('g5');
+    dialog([`${T_.n}の オーナーに なった！`,'球場で「自分の 球団の 試合を する」で\n7イニングの 試合を 実際に 遊べる。\n（遊ばない 日は 自動で 試合）','「球団経営」で ドラフト・トレード・FA・\n海外選手・球場の 建設・移転が できる'],cb);},96);}
+function bbManage(cb){const B=bbS(),id=B.own,T_=bbT(id),L=B.ros[id],st=bbStr(id);
+  const ops=['選手一覧',...(B.ph==='off'&&B.draft?[{t:'ドラフト会議',col:'#f8b800'}]:[]),...(B.ph==='off'&&B.faList&&B.faList.length?[{t:'FA 交渉',col:'#7ee07e'}]:[]),'トレード','海外選手を 獲得','球場を 建設','球団を 移転','球団を 売却','もどる'];
+  choice(`${T_.n}（${VIL[B.home[id]].name.replace(/^.* /,'')}）\n打力 ${Math.round(st.off)}　投手力 ${Math.round(st.pit)}　選手 ${L.length}/20`,ops,k=>{const o=ops[k];if(!o||o==='もどる'){cb&&cb();return;}const lab=typeof o==='string'?o:o.t,back=()=>bbManage(cb);
+    if(lab==='選手一覧'){listPick(`${T_.s} 選手一覧`,L.map(P=>({t:`${P.pos} ${P.n}${P.f?'（外）':''}`,r:`総合${bbOvr(P)}`})),j=>{const P=L[j];choice(`${P.n}（${P.age}歳）\n${P.pos==='投'?`球威 ${P.pit}　スタミナ ${P.sta}`:`ミート ${P.bat}　パワー ${P.pow}　走力 ${P.spd}`}\nFAまで ${Math.max(0,P.fa)}年`,['戦力外に する','もどる'],r=>{if(r===0&&L.length>12){L.splice(j,1);save();dialog(`${P.n}を 戦力外に した。`,back);}else back();},96);},j=>{const P=L[j];return P?(P.pos==='投'?`球威 ${P.pit} スタミナ ${P.sta}`:`ミート ${P.bat} パワー ${P.pow} 走力 ${P.spd}`):'';},back);return;}
+    if(lab==='ドラフト会議'){const D=B.draft;listPick('ドラフト会議　1位 指名',D.map(P=>({t:`${P.pos} ${P.n}（${P.age}）`,r:`総合${bbOvr(P)}`})),j=>{if(L.length>=20){dialog('選手枠が いっぱい（20人）',back);return;}const P=D.splice(j,1)[0];L.push(P);B.draft=null;save();sfx('lvup');dialog([`ドラフト 1位で ${P.n}を 指名！`,`${P.n}「がんばります！」`],back);},null,back);return;}
+    if(lab==='FA 交渉'){const F=B.faList;listPick('FA 選手（契約金が 必要）',F.map(x=>({t:`${x.P.pos} ${x.P.n}`,r:`総合${bbOvr(x.P)}`})),j=>{const x=F[j],fee=bbOvr(x.P)*5e7;choice(`${x.P.n}（${bbT(x.from).s}）\n契約金 ${fmt(fee)}イェソ`,['契約する','やめる'],r=>{if(r!==0){back();return;}if(G.coins<fee){dialog('お金が たりない。',back);return;}if(L.length>=20){dialog('選手枠が いっぱい（20人）',back);return;}
+        G.coins-=fee;const R_=B.ros[x.from];R_.splice(R_.indexOf(x.P),1);x.P.fa=4;L.push(x.P);F.splice(j,1);save();sfx('lvup');dialog(`${x.P.n}と FA 契約した！`,back);},96);},null,back);return;}
+    if(lab==='トレード'){listPick('出す 選手',L.map(P=>({t:`${P.pos} ${P.n}`,r:`総合${bbOvr(P)}`})),j=>{const mine=L[j],v=bbOvr(mine),C=[];BB_TEAMS.forEach(t=>{if(t.id===id)return;B.ros[t.id].forEach(P=>{if(Math.abs(bbOvr(P)-v)<=4&&C.length<9)C.push({P,t:t.id});});});
+        if(!C.length){dialog('つりあう 相手が 見つからない。',back);return;}listPick(`${mine.n}と 交換する 選手`,C.map(x=>({t:`${x.P.pos} ${x.P.n}（${bbT(x.t).s}）`,r:`総合${bbOvr(x.P)}`})),q=>{const x=C[q],R_=B.ros[x.t];R_.splice(R_.indexOf(x.P),1,mine);L.splice(L.indexOf(mine),1,x.P);save();sfx('ok');dialog(`トレード 成立！\n${mine.n} ⇔ ${x.P.n}`,back);},null,back);},null,back);return;}
+    if(lab==='海外選手を 獲得'){const fee=3e9;choice(`代理人「いい 選手が いますよ」\n獲得費 ${fmt(fee)}イェソ（総合 70〜90）`,['獲得する','やめる'],r=>{if(r!==0){back();return;}if(G.coins<fee){dialog('お金が たりない。',back);return;}if(L.length>=20){dialog('選手枠が いっぱい（20人）',back);return;}
+        G.coins-=fee;const P=bbMkP(lcg(G.day*7+L.length),rnd()<.4?'投':BB_POS[Math.floor(rnd()*8)],80,true);L.push(P);save();sfx('lvup');dialog([`${P.n}（${P.pos}）が 入団した！`,`${P.n}「ヨロシク オネガイシマス！」\n総合 ${bbOvr(P)}`],back);},96);return;}
+    if(lab==='球場を 建設'){const C=VIL.map((v,i)=>i).filter(i=>VIL[i].size>=5&&!Object.values(B.home).includes(i)&&!B.built.includes(i)),fee=1e10;if(!C.length){dialog('建設できる 町が ない。',back);return;}
+      listPick(`球場を 建設（${fmt(fee)}イェソ）`,C.map(i=>({t:VIL[i].name})),j=>{if(G.coins<fee){dialog('お金が たりない。',back);return;}G.coins-=fee;B.built.push(C[j]);save();sfx('lvup');dialog([`${VIL[C[j]].name}に 新球場を 建設した！`,'（「球団を 移転」で 本拠地に できる）'],back);},null,back);return;}
+    if(lab==='球団を 移転'){const C=B.built.filter(i=>!Object.values(B.home).includes(i));if(!C.length){dialog('移転先の 球場が ない。\n（先に 球場を 建設しよう）',back);return;}
+      listPick('移転先',C.map(i=>({t:VIL[i].name})),j=>{B.home[id]=C[j];save();sfx('ok');dialog([`${T_.n}は ${VIL[C[j]].name}に 本拠地を 移転した！`,'（新しい 球場は その 町の 中の 施設「野球場」から 入れる）'],back);},null,back);return;}
+    if(lab==='球団を 売却'){const pr=Math.round((5e9+st.off*1e8)*.7);choice(`${T_.n}を 売却しますか？\n売却額 ${fmt(pr)}イェソ`,['売却する','やめる'],r=>{if(r!==0){back();return;}G.coins+=pr;B.own=null;save();dialog('球団を 売却した。',cb);},96);return;}},150);}
+/* 7イニングの 試合（実際に 遊べる） */
+function bbPlay(a,b,cb){const B=bbS(),me=B.own,home=b===me?1:0,LA=B.ros[a],LB=B.ros[b];
+  const lineup=L=>L.filter(p=>p.pos!=='投').sort((x,y)=>bbOvr(y)-bbOvr(x)).slice(0,9),ace=L=>L.filter(p=>p.pos==='投').sort((x,y)=>y.pit-x.pit)[0]||L[0];
+  const S={inn:1,half:0,out:0,b:0,s:0,base:[0,0,0],sc:[0,0],bi:[0,0],ln:[lineup(LA),lineup(LB)],pit:[ace(LA),ace(LB)],pc:[0,0],ph:'pitch',t:0,msg:'プレイボール！',swing:null,mark:0,ptype:0,auto:false,over:false,sel:0};
+  const bat=()=>S.half,fld=()=>1-S.half,mine=()=>(S.half===0?a:b)===me;
+  const batter=()=>{const L=S.ln[bat()];return L[S.bi[bat()]%L.length];},pitcher=()=>S.pit[fld()];
+  const adv=n=>{let r=0;for(let k=2;k>=0;k--)if(S.base[k]){if(k+n>=3){r++;S.base[k]=0;}else{S.base[k+n]=1;S.base[k]=0;}}if(n>=4)r++;else S.base[n-1]=1;S.sc[bat()]+=r;return r;};
+  const walk=()=>{if(S.base[0]){if(S.base[1]){if(S.base[2])S.sc[bat()]++;S.base[2]=1;}S.base[1]=1;}S.base[0]=1;};
+  const nextB=()=>{S.bi[bat()]++;S.b=0;S.s=0;};
+  const endHalf=()=>{S.out=0;S.base=[0,0,0];S.b=0;S.s=0;if(S.half===0){S.half=1;if(S.inn>=7&&S.sc[1]>S.sc[0]){S.over=true;}}else{S.half=0;S.inn++;}if(S.inn>7&&S.sc[0]!==S.sc[1]||S.inn>9)S.over=true;else if(S.inn>7&&S.sc[0]===S.sc[1]&&S.half===0&&S.inn>9)S.over=true;};
+  const outN=m=>{S.out++;S.msg=m;nextB();if(S.out>=3)endHalf();};
+  const contact=q=>{const Bt=batter(),P=pitcher(),pw=(Bt.bat*.6+Bt.pow*.4)/((P.pit||50)*(1+S.pc[fld()]/400)),x=rnd()*q*pw;
+    if(x<.35)return outN(['ショートゴロ','セカンドゴロ','センターフライ','レフトフライ','サードライナー'][Math.floor(rnd()*5)]+'… アウト');
+    const pp=Bt.pow/100;let h=x>1.05+.4*(1-pp)?4:x>.95?3-(rnd()<.6?1:0):x>.62?2:1;if(h===3&&Bt.spd<50)h=2;const r=adv(h);S.msg=['','ヒット！','ツーベース！','スリーベース！','ホームラン！！'][h]+(r?`　${r}点！`:'');sfx(h===4?'g5':'ok');nextB();};
+  const pitchRes=(swing,q)=>{const strike=S.ptype===3?rnd()<.2:rnd()<[.62,.55,.48][S.ptype];S.pc[fld()]++;
+    if(!swing){if(strike){S.s++;S.msg='ストライク！';if(S.s>=3)outN('見逃し三振！');}else{S.b++;S.msg='ボール';if(S.b>=4){walk();S.msg='フォアボール';nextB();}}return;}
+    const qq=q*(strike?1:.55)*(S.ptype===2?.85:1);if(qq<.25){S.s++;S.msg='空振り！';if(S.s>=3)outN('空振り三振！');return;}if(qq<.42){if(S.s<2)S.s++;S.msg='ファウル';return;}contact(qq);};
+  const aiAtBat=()=>{const sw=rnd()<.55,q=sw?.25+rnd()*.75*Math.min(1.3,batter().bat/70):0;pitchRes(sw,q);};
+  const simHalf=()=>{let n=0;const h=S.half,i=S.inn;while(S.half===h&&S.inn===i&&!S.over&&n++<80){S.ptype=Math.floor(rnd()*3);aiAtBat();}};
+  const finish=()=>{const ra=S.sc[0],rb=S.sc[1];let x=ra,y=rb;if(x===y){if(rnd()<.5)x++;else y++;}bbRecord(a,b,x,y);B.played=B.gd;save();const w=(a===me?x>y:y>x);sfx(w?'g5':'ng');pop();
+    dialog([`試合終了！\n${bbT(a).s} ${x} － ${y} ${bbT(b).s}`,w?`${bbT(me).s}の 勝利！！`:`${bbT(me).s}は 敗れた…`],cb);};
+  const PT=['ストレート','カーブ','フォーク','ボール球'];let click=null;
+  push({full:true,upd(){S.t++;if(S.over){if(S.t>40&&(I.A||I.B))finish();return;}
+      if(click!=null){const c=click;click=null;if(c==='auto'){S.auto=true;}else if(c==='swing'&&S.ph==='swing'){S.swing=S.mark;}else if(typeof c==='number'&&S.ph==='pitch'&&!mine())S.sel=c;}
+      if(S.auto){simHalf();if(!S.over&&S.half===0&&S.inn>7)S.over=true;S.t=0;if(S.over)S.t=0;return;}
+      if(mine()){/* 攻撃：タイミングで 打つ */if(S.ph==='pitch'){if(S.t>30){S.ph='swing';S.t=0;S.mark=0;S.swing=null;S.ptype=Math.floor(rnd()*3);}return;}
+        S.mark=S.t/40;if(I.A&&S.swing==null)S.swing=S.mark;if(S.t>=48){const q=S.swing==null?0:Math.max(0,1-Math.abs(S.swing-.8)/.35);pitchRes(S.swing!=null,q);S.ph='pitch';S.t=0;}if(I.B){S.auto=true;}return;}
+      /* 守備：球種を えらぶ */if(I.pl)S.sel=(S.sel+3)%4;if(I.pr)S.sel=(S.sel+1)%4;if(I.B){S.auto=true;return;}
+      if(I.A&&S.t>8){S.ptype=S.sel;aiAtBat();S.t=0;}},
+    drw(){R(0,0,W,H,'#0c3c0c');R(0,0,W,30,'#000');
+      txt(`${bbT(a).s}`,8,4,'#fcfcfc','left',90);txt(String(S.sc[0]),104,4,'#f8b800','right');txt(`${bbT(b).s}`,8,16,'#fcfcfc','left',90);txt(String(S.sc[1]),104,16,'#f8b800','right');
+      txt(`${S.inn}回${S.half?'裏':'表'}`,150,4,'#fcfcfc','center');txt(`B${'●'.repeat(S.b)} S${'●'.repeat(S.s)} O${'●'.repeat(S.out)}`,150,16,'#7ee07e','center',90);txt('7イニング制',220,4,'#7c7c7c','center');
+      /* ダイヤモンド */const cx=128,cy=110;ctx.fillStyle='#c89058';ctx.beginPath();ctx.moveTo(cx,cy-46);ctx.lineTo(cx+46,cy);ctx.lineTo(cx,cy+46);ctx.lineTo(cx-46,cy);ctx.fill();R(cx-30,cy-30+4,60,52,'#00a800');
+      [[cx+40,cy],[cx,cy-40],[cx-40,cy]].forEach(([x,y],k)=>R(x-4,y-4,8,8,S.base[k]?'#f8b800':'#fcfcfc'));R(cx-4,cy+38,8,8,'#fcfcfc');pc(cx,cy,4,'#d8a868');
+      const Bt=batter(),P=pitcher();txt(`打者 ${Bt.n}`,8,166,'#fcfcfc','left',150);txt(`ミート${Bt.bat} パワー${Bt.pow}`,8,178,'#bcbcbc','left',150);txt(`投手 ${P.n}`,248,166,'#fcfcfc','right',110);txt(`球威${P.pit} 球数${S.pc[fld()]}`,248,178,'#bcbcbc','right',110);
+      if(S.over){win(30,190,196,44);txt('試合終了！ A で 結果へ',128,206,'#f8b800','center');return;}
+      win(4,190,248,46);txt(S.msg,128,196,'#fcfcfc','center',230);
+      if(mine()){if(S.ph==='swing'){R(28,214,200,8,'#3c3c3c');R(28+Math.round(200*.62),214,Math.round(200*.36),8,'#f8b80055');R(28+Math.round(200*.8)-1,212,2,12,'#d82800');R(28+Math.min(196,Math.round(200*S.mark)),212,4,12,'#fcfcfc');if(S.swing!=null)R(28+Math.round(200*S.swing),210,2,16,'#3cbcfc');}
+        else txt('赤い 線で A！（B：おまかせ）',128,214,'#bcbcbc','center',230);region(0,40,W,150,()=>{click='swing';});}
+      else{PT.forEach((p,k)=>{const x=10+k*60;R(x,212,56,14,k===S.sel?'#f8b800':'#3c3c3c');txt(p,x+28,214,k===S.sel?'#000':'#fcfcfc','center',54);region(x,212,56,14,()=>{click=k;});});txt('←→で 球種・Aで 投げる（B：おまかせ）',128,200+28,'#7c7c7c','center',230);}
+      region(200,0,56,30,()=>{click='auto';});txt('おまかせ',228,16,'#7c7c7c','center');}});}
 /* ===================== 目的（いま 何を すれば いいか） ===================== */
 const vByName=n=>VIL.findIndex(v=>v.name===n||v.name.replace(/^.* /,'')===n);
 function dirTo(x,y){if(!G||!G.pos)return '';const dx=x-G.pos.x,dy=y-G.pos.y,d=Math.round(Math.hypot(dx,dy));if(d<2)return 'すぐ ちかく';
@@ -1768,6 +1918,7 @@ function goalInfo(){const g=[];const at=(vi)=>vi>=0?{x:VIL[vi].x,y:VIL[vi].y,n:V
   const sk=skS();
   if(!sk.clear){const D={0:'黒幕の 根城は 南の サキタマ。\n国境門を 出て 南の 町 クマガヤへ',1:'クマガヤの 自警団長 アツミの 話を 聞こう。\n…何かを 隠している ようだ'};
     return {t:'ぶっ飛びサキタマ編：ナメガワマチを 取り戻せ',d:D[sk.ch]||`サキタマの 町を めぐって 仲間と 情報を 集め\nナメガワマチを 取り戻そう（第${sk.ch}章）`,p:at(vByName(sk.ch<=1?'国境の町 クマガヤ':'完全平和都市 ナメガワマチ'))};}
+  if(typeof nmS==='function'&&!nmS().clear){const N=nmS();return {t:'ナメガワマチ総長選挙編',d:['ナメガワマチに 行こう。\n首長が いない 街で 選挙が 開かれるらしい','解放改革の会の 応援演説を しよう。\nクマガヤ・コエド・オオミヤの 演説台へ'+`（${(N.rally||[]).length}/3）`,'ナメガワマチで 投票日を むかえよう'][N.ch]||'',p:at(vByName(N.ch===1?['国境の町 クマガヤ','小江戸 コエド','鉄道の街 オオミヤ'].find(n=>!(N.rally||[]).includes(n))||'完全平和都市 ナメガワマチ':'完全平和都市 ナメガワマチ'))};}
   return {t:'つぎの 物語を 待つ',d:'人類保管計画の 物語は 完結した！\n次回「アイヂ大戦編」は\n2027年1月1日 配信予定。\nそれまで 八岐大蛇 Lv30・裏闘技場・経営などで\n強くなっておこう',p:null};}
 function goalScr(){const g=goalInfo(),pg=[`【目的】${g.t}`,g.d];if(g.p)pg.push(`行き先：${g.p.n}\n${dirTo(g.p.x,g.p.y)}`);
   const side=[];if(G.job)side.push(`ジョブ「${G.job.name}」 ${G.job.prog}/${G.job.need}`);
@@ -2254,6 +2405,7 @@ function spTalk(npc){const k=npc.sp;
     dialog(['防衛団員「おい！ おまえ 見ない 顔だな！」','「この 町は ぼくたち 防衛団が まもってるんだ！\n勝負だ！」'],()=>choice('防衛団と 勝負しますか？',['勝負する','やめる'],r=>{if(r!==0)return;
       G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;fullHeal();while(stack.length>1)pop();startBattle(false,null,{kind:'bouei'});},96));return;}
   if(k==='room'){roomUse();return;}
+  if(k.startsWith('nm')){nmTalk(k);return;}
   if(k==='yakuza'){ykTalk();return;}
   if(k==='catch'){catchTalk();return;}
   if(k==='singer'){singerTalk();return;}}
@@ -2355,6 +2507,9 @@ function startBattle(boss,rift=null,sp=null){
     else{const g=mkEnemy(12,['大海神 オオワダツミ','snake','#0058f8','#fcfcfc']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*12);for(const q of ['atk','mag','def'])g[q]=Math.round(g[q]*1.5);g.magic=true;g.dboss=true;en.push(g);
       for(let k=0;k<2;k++){const e=mkEnemy(12,ETIER[10][0]);e.name='わだつみの眷属';en.push(e);}}
     for(const e of en)for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*TOKO_F);}
+  else if(sp&&sp.kind==='nmriot'){const N=['キョーサン派 活動家','キョーサン派 扇動員','共白統治党 党員'];for(let k=0;k<3;k++){const e=mkEnemy(12,ETIER[10][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*UK_F*.25);en.push(e);}}
+  else if(sp&&sp.kind==='kobushide'){const g=mkEnemy(12,['書記長 コブシデ（暴走）','oni','#24003c','#d82800']);for(const q of ['maxhp','hp'])g[q]=Math.round(g[q]*40);for(const q of ['atk','mag'])g[q]=Math.round(g[q]*2.2);g.def=Math.round(g.def*1.8);g.magic=true;g.dboss=true;en.push(g);
+    for(let k=0;k<2;k++){const e=mkEnemy(12,['共白の 親衛隊','bones','#3c3c3c','#d82800']);for(const q of ['maxhp','hp','atk','def'])e[q]=Math.round(e[q]*UK_F*.3);en.push(e);}}
   else if(sp&&sp.kind==='yakuza'){const N=['鬼瓦組 組員','鬼瓦組 若頭','鬼瓦組 組長'];for(let k=0;k<3;k++){const e=mkEnemy(Math.max(9,tierAt(G.pos.x,G.pos.y)),['ヤクザ','oni','#000000',k===2?'#f8b800':'#d82800']);e.name=N[k];const m=k===2?3:k===1?1.8:1.2;for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*m*1.5);for(const q of ['atk','def'])e[q]=Math.round(e[q]*m);en.push(e);}}
   else if(sp&&sp.kind==='bouei'){const N=['防衛団員 リーダー','防衛団員 おにぎり','防衛団員 メガネ'];for(let k=0;k<3;k++){const e=mkEnemy(9,ETIER[9][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*(k?1:1.6));en.push(e);}}
   else if(sp&&sp.kind==='mine'){const n=ri(2,3);for(let k=0;k<n;k++){const e=mkEnemy(9,ETIER[9][ri(0,2)]);e.name='山の'+e.name;for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*1.3);en.push(e);}}
@@ -2380,6 +2535,8 @@ function startBattle(boss,rift=null,sp=null){
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
   if(sp&&sp.kind==='trial'&&sp.dev)BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ……ん？」`,'空間に ノイズが はしった…！\nデバッグ画面が ひらいていく…','？？？「…テストプレイ中に 失礼します。\nこの ゲームの 開発者です」',`${en[0].name}が あらわれた！\n（超絶強敵）`);
+  else if(sp&&sp.kind==='kobushide')BT.pend.push('コブシデ「…センキョ… ケッカ… ミトメナイ……」','ギムの 残滓が コブシデの 体から あふれだす！','書記長 コブシデが あらわれた！（裏ボス）');
+  else if(sp&&sp.kind==='nmriot')BT.pend.push('活動家「解放改革の会の 演説を 妨害しろ！」','キョーサン派が あらわれた！');
   else if(sp&&sp.kind==='yakuza')BT.pend.push('組長「てめぇら、 やっちまえ！」','鬼瓦組が あらわれた！');
   else if(sp&&sp.kind==='bouei')BT.pend.push('防衛団「この 町は ぼくたちが まもる！\nいくぞー！」','防衛団が あらわれた！');
   else if(sp&&sp.kind==='trial')BT.pend.push(`${sp.by==='guji'?'宮司 タムラダイジ':'禰宜 タムライツク'}「出でよ… ${en[0].name}！」`,`${en[0].name}が あらわれた！\n（明木の 試練）`);
@@ -2741,6 +2898,8 @@ function winBattle(){
   if(BT.sp&&(BT.sp.kind==='kaiho'||BT.sp.kind==='doiri'))kaihoWin(pages);
   if(BT.sp&&(BT.sp.kind==='ukaiho'||BT.sp.kind==='udoiri'||BT.sp.kind==='uorochi'))ukaihoWin(pages);
   dqHit('win');
+  if(BT.sp&&BT.sp.kind==='nmriot')nmRiotWin(pages);
+  if(BT.sp&&BT.sp.kind==='kobushide')nmBossWin(pages);
   if(BT.sp&&BT.sp.kind==='yakuza'){const Y=ykS(BT.sp.vi);Y.on=0;Y.day=G.day;pages.push('組長「…くっ、 覚えてやがれ！」','鬼瓦組は 歓楽街から 撤退した！\n（店の 評判が 戻りはじめる）');}
   if(BT.sp&&BT.sp.kind==='trial')trialWin(pages);
   if(BT.sp&&BT.sp.kind==='bouei'){G.boueiDay=G.day;const nw=addChar('mamoru');pages.push('防衛団員 リーダー「…ちぇっ、 まけたぜ。\nおまえ なかなか やるな！」',nw?'防衛団の 園児 マモル「ぼくも つれてって！\nこの 町みたいに みんなを まもるんだ！」':'マモル「また 勝負しような！」',nw?'LR 防衛団の園児 マモルが 仲間に なった！':`マモルの 基礎Lvが あがった！（基礎Lv ${G.chars.mamoru.dup+1}）`);}
@@ -2780,6 +2939,7 @@ function winBattle(){
 function loseBattle(){
   BT.ph='end';stopBGM();sfx('lose');
   if(BT.sp&&BT.sp.kind==='trial'){trialLose();return;}
+  if(BT.sp&&(BT.sp.kind==='nmriot'||BT.sp.kind==='kobushide')){dialog(['ぜんめつ してしまった…',BT.sp.kind==='kobushide'?'コブシデ「……ム……ダ……」':'活動家「解放改革の会など 負けるのだ！」','（イェソは 減らない。 体勢を 立てなおそう）'],()=>{fullHeal();returnField();});return;}
   if(BT.sp&&BT.sp.kind==='yakuza'){const f=Math.round(Math.max(0,G.coins)*.1);G.coins-=f;dialog(['ぜんめつ してしまった…','組員「二度と なめた 真似 すんじゃねぇぞ」',`財布から ${fmt(f)}イェソ 取られた…`],()=>{fullHeal();returnField();});return;}
   if(BT.sp&&BT.sp.kind==='bouei'){dialog(['ぜんめつ してしまった…','防衛団員「へへーん！ 出直してこーい！」','（防衛団の 勝負では イェソは 減らない）'],()=>{fullHeal();returnField();});return;}
   G.townBack=null;
@@ -2941,7 +3101,7 @@ function buildTown(vi){
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
   /* 11/19：町の 特別な 人（まどみちお・金子みすゞ・防衛団） */
-  {const bn=v.name.replace(/^.* /,''),spn=bn==='トイシ'&&!G.chars.mado?{sp:'mado',col:'#3cbcfc',hair:'#000000'}:bn==='イイヤマ'&&!G.chars.misuzu?{sp:'misuzu',col:'#7c4c10',hair:'#000000'}:bn==='カスカベ'?{sp:'bouei',col:'#d82800',hair:'#000000'}:null;
+  {const bn=v.name.replace(/^.* /,''),spn=bn==='トイシ'&&!G.chars.mado?{sp:'mado',col:'#3cbcfc',hair:'#000000'}:bn==='イイヤマ'&&!G.chars.misuzu?{sp:'misuzu',col:'#7c4c10',hair:'#000000'}:bn==='カスカベ'?{sp:'bouei',col:'#d82800',hair:'#000000'}:typeof nmNpc==='function'?nmNpc(bn):null;
     if(spn){let put=false;for(let d=2;d<9&&!put;d++)for(const [dx,dy] of [[d,4],[-d,4],[d,6],[-d,6],[d,8],[-d,8]]){const x=cx+dx,y=top+dy,c=C[y]&&C[y][x];if(!c||!['s','g','flower','pz'].includes(c.t)||npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;npcs.push({x,y,...spn,line:''});put=true;break;}}}
   /* 残滓の 魔力が 暴走：町の中に 烈穴 */
   if(v.dict&&v.dict.gim&&occupied(vi)){const O=G.gimOcc['v'+vi]||{},closed=O.closed||[],rr=lcg(vi*131+(O.day||1)*17);let n=0,tries=0;const want=4+Math.min(4,sz);
@@ -3964,7 +4124,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...ykDaily(),...taDaily());msgs.push(...ajDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...ykDaily(),...taDaily(),...bbDaily());msgs.push(...ajDaily());
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
