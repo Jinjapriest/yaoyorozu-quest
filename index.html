@@ -706,6 +706,10 @@ const BASE_PACK={
     {id:'kigyo',name:'無名起業家',short:'起業家',rarity:'R',weapon:'any',hp:50,mp:22,atk:10,mag:12,def:9,spd:11,skills:['kg_seminar','kg_chotatsu'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#24188c',held:'スマホ'}},
     {id:'host',name:'ホスト',short:'ホスト',rarity:'SR',weapon:'any',hp:52,mp:26,atk:14,mag:12,def:10,spd:16,skills:['hs_tower','hs_kotoba'],look:{head:'hair',hair:'#f8d878',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
     {id:'loungegirl',name:'ラウンジ嬢',short:'ラウンジ嬢',rarity:'SR',weapon:'any',hp:44,mp:32,atk:8,mag:16,def:8,spd:15,skills:['lg_toast','lg_iyashi'],look:{head:'hostess',hair:'#3c2c1c',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
+    {id:'host_mi',name:'見習いホスト',short:'見習ホスト',rarity:'N',weapon:'any',hp:38,mp:18,atk:10,mag:8,def:7,spd:13,skills:['hs_kotoba'],look:{head:'hair',hair:'#f8d878',body:'#000000',accent:'#7c7c7c',legs:'#000000',held:'片手剣'}},
+    {id:'host_ude',name:'腕利きのホスト',short:'腕利ホスト',rarity:'R',weapon:'any',hp:45,mp:22,atk:12,mag:10,def:9,spd:15,skills:['hs_kotoba','hs_tower'],look:{head:'hair',hair:'#f8d878',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
+    {id:'lounge_mi',name:'見習いラウンジ嬢',short:'見習ラウンジ嬢',rarity:'N',weapon:'any',hp:34,mp:24,atk:6,mag:12,def:6,spd:12,skills:['lg_iyashi'],look:{head:'hostess',hair:'#3c2c1c',body:'#a4b4fc',accent:'#7c7c7c',legs:'#24188c',held:'扇'}},
+    {id:'lounge_ude',name:'腕利きのラウンジ嬢',short:'腕利ラウンジ嬢',rarity:'R',weapon:'any',hp:40,mp:28,atk:7,mag:14,def:7,spd:14,skills:['lg_iyashi','lg_toast'],look:{head:'hostess',hair:'#3c2c1c',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
     {id:'host_n',name:'売れないホスト',short:'売れないホスト',rarity:'N',weapon:'any',hp:40,mp:12,atk:8,mag:6,def:6,spd:9,skills:['hn_champ'],look:{head:'hair',hair:'#f8b800',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
     {id:'cc_n',name:'自我が曖昧なコンカフェ嬢',short:'曖昧コンカフェ嬢',rarity:'N',weapon:'any',special:'hostess',hp:36,mp:16,atk:5,mag:9,def:5,spd:9,skills:['ccn_jiga'],look:{head:'maid',hair:'#f8b0c8',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'杖'}},
     {id:'lounge_n',name:'出勤しないラウンジ嬢',short:'出勤しない嬢',rarity:'N',weapon:'any',hp:36,mp:14,atk:5,mag:8,def:6,spd:8,skills:['ln_yasumi'],look:{head:'hostess',hair:'#7c4c10',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
@@ -8398,6 +8402,8 @@ const KSTAR_MOMO={n:'もも',mul:2.0,rep:.5,pow:40,buzz:4,teach:5,d:'店の 売�
 const KSTAR_X={aiki:{t:'gay',n:'タナカアイキ',mul:2.5,rep:.4,d:'ゲイバーの 看板ママ\n店の 売上 2.5倍・評判 +0.4'},yushi:{t:'host',n:'YUSHI',mul:2.5,rep:.4,d:'ホストクラブの 伝説の 帝王\n店の 売上 2.5倍・評判 +0.4'},
   oyaji:{t:'izakaya',n:'西新宿の親父',mul:1.8,rep:.3,d:'居酒屋の 名物 親父\n店の 売上 1.8倍・評判 +0.3'},koume:{t:'lounge',n:'コウメちゃん（チーママ）',mul:2.0,rep:.4,d:'ラウンジの チーママ\n店の 売上 2倍・評判 +0.4'},
   host:{t:'host',n:'ホスト',mul:1.4,rep:.15,d:'ホストクラブの キャスト\n店の 売上 1.4倍・評判 +0.15'},loungegirl:{t:'lounge',n:'ラウンジ嬢',mul:1.4,rep:.15,d:'ラウンジの キャスト\n店の 売上 1.4倍・評判 +0.15'},
+  host_mi:{t:'host',n:'見習いホスト',mul:1.1,rep:.05,d:'ホストクラブの 見習いキャスト\n店の 売上 1.1倍・評判 +0.05'},host_ude:{t:'host',n:'腕利きのホスト',mul:1.25,rep:.1,d:'ホストクラブの キャスト\n店の 売上 1.25倍・評判 +0.1'},
+  lounge_mi:{t:'lounge',n:'見習いラウンジ嬢',mul:1.1,rep:.05,d:'ラウンジの 見習いキャスト\n店の 売上 1.1倍・評判 +0.05'},lounge_ude:{t:'lounge',n:'腕利きのラウンジ嬢',mul:1.25,rep:.1,d:'ラウンジの キャスト\n店の 売上 1.25倍・評判 +0.1'},
   menchi:{t:'karaoke',n:'メンチカツ（看板店員）',mul:1.8,rep:.3,d:'カラオケの 看板店員\n店の 売上 1.8倍・評判 +0.3'}};
 const kstarOf=(id,t='cab')=>id&&KSTAR_X[id]?(G.chars[id]&&KSTAR_X[id].t===t?{...KSTAR_X[id],pow:0,buzz:2,teach:0}:null):!id||!G.chars[id]||!CH[id]||!hasCast(t)?null:id==='momo'?(t==='concafe'?KSTAR_MOMO:null):id==='mikan'?(t==='cab'?KSTAR_M:{...KSTAR_M,n:'東みかん（一日店長）',mul:1.4,d:'店の 売上 1.4倍・評判 +0.3\nほかの キャストの 指名力 +3\nSNSで 話題に なりやすい（3倍）'}):
   (t==='cab'?/^hostess/:/^(cafegirl|cc_n)/).test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
