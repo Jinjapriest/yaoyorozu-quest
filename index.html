@@ -1030,7 +1030,7 @@ const SKR={x0:132,y0:136,x1:188,y1:178};
   /* 11/19：サドの 島を 広げて 金山の 町を 追加 */
   VIL.push({x:78,y:35,name:'金山の町 アイカワ',shrine:'大山祇神社',rank:2,tier:7,size:2,from:VIL.findIndex(v=>v.name==='龍宮町 リョウツ'),island:1,sado:1,desc:'金山で 栄えた 島の 西の 町'});
   /* 11/19：シマネの 南西に ツワノ（島根県だが 経済圏は 山口＝マホロバ が 事実上 支配） */
-  VIL.push({x:48,y:50,name:'山陰の小京都 ツワノ',shrine:'太皷谷稲成神社',rank:3,tier:3,size:2,from:VIL.findIndex(v=>v.name==='湊町 ハマダ'),mahoRule:1,desc:'島根の 町だが 経済も 暮らしも マホロバ（山口）に 頼る 城下町'});
+  VIL.push({x:48,y:50,name:'山陰の小京都 ツワノ',shrine:'太皷谷稲成神社',rank:1,tier:3,size:2,from:VIL.findIndex(v=>v.name==='湊町 ハマダ'),mahoRule:1,desc:'島根の 町だが 経済も 暮らしも マホロバ（山口）に 頼る 城下町'});
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
 /* 財政破綻した 村（不活動法人の 村の 一部） */
 ['朽木村 カモ','鈴音村 シマント','空っ風の里','廃線沿いの村','焼きまんじゅう坂'].forEach(n=>{const v=VIL.find(x=>x.name===n);if(v)v.hatan=1;});
