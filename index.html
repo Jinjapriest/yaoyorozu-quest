@@ -759,6 +759,7 @@ const BASE_PACK={
     {id:'pu_meito',name:'名刀・名剣ピックアップ',type:'weapon',pickup:['w_raikiri','w_zantetsu']},
     {id:'pu_kamigami',name:'八百万の神々 降臨ピックアップ',type:'char',pickup:['amaterasu','susanoo','tsukuyomi','okuninushi']},
     {id:'pu_senpai',name:'やりますねぇ先輩ピックアップ（LR）',type:'char',pickup:['yarimasu','bard']},
+    {id:'pu_kaguya',name:'輝夜の主役たち',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi','hostess','cafegirl','miko','cc_n','guard_n']},
     {id:'pu_yorumachi',name:'夜の街の 住人たち（XR）',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi']},
     {id:'pu_lr1119',name:'新LR ピックアップ',type:'char',pickup:['takeshi','tatekun','manabu','mamoru']},
     {id:'pu_jisho',name:'XR 辞書・LR 辞表 ピックアップ',type:'weapon',pickup:['w_jisho','w_jihyo','w_kyuyo','w_roppo','w_kensho']},
@@ -2314,10 +2315,10 @@ function activeBanners(){
   /* 現実の 日本時間で 毎週月曜0時に 入れかわる */
   const D=Math.floor((Date.now()+9*3600000)/86400000),
     /* 特別キャンペーン（期間中は 専用ガチャ、終わったら ごちゃ混ぜ候補に 入る） */
-    CAMP=[{ids:['pu_kuniumi','pu_amanuboko'],start:'2026-11-12',end:'2026-11-29'},{ids:['pu_sakahoko'],start:'2026-11-12',end:'2026-12-06'}],dayOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000),
-    camp=CAMP.filter(c=>D>=dayOf(c.start)&&D<=dayOf(c.end)),hide=new Set(CAMP.filter(c=>D<dayOf(c.start)||D<=dayOf(c.end)).flatMap(c=>c.ids)),
+    CAMP=[{ids:['pu_kaguya'],start:'2026-11-19',end:'2026-11-21',once:1},{ids:['pu_kuniumi','pu_amanuboko'],start:'2026-11-12',end:'2026-11-29'},{ids:['pu_sakahoko'],start:'2026-11-12',end:'2026-12-06'}],dayOf=t=>Math.floor(Date.parse(t+'T00:00:00+09:00')/86400000),
+    camp=CAMP.filter(c=>D>=dayOf(c.start)&&D<=dayOf(c.end)),hide=new Set(CAMP.filter(c=>c.once||D<dayOf(c.start)||D<=dayOf(c.end)).flatMap(c=>c.ids)),
     P=Math.floor((D+3)/GACHA_PERIOD),left=GACHA_PERIOD-((D+3)%GACHA_PERIOD),r=lcg(P*7919+101);
-  const base=BANNERS.filter(b=>b.src==='基本'&&!hide.has(b.id)),extra=BANNERS.filter(b=>b.src!=='基本');
+  const base=BANNERS.filter(b=>b.src==='基本'&&!hide.has(b.id)),extra=BANNERS.filter(b=>b.src!=='基本'&&!hide.has(b.id));
   const CB=camp.flatMap(c=>c.ids.map(id=>BANNERS.find(b=>b.id===id)).filter(Boolean).map(b=>({...b,name:'【期間限定】'+b.name,lim:1,left:dayOf(c.end)-D+1})));
   const pool=t=>[...new Set(base.filter(b=>b.type===t).flatMap(b=>b.pickup))].filter(id=>(t==='weapon'?WPD:CH)[id]);
   const pick=(arr,n)=>{const a=arr.slice(),o=[];while(a.length&&o.length<n)o.push(a.splice(Math.floor(r()*a.length),1)[0]);return o;};
