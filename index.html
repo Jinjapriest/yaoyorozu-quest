@@ -943,10 +943,10 @@ const VIL=[
   {x:36,y:4,name:'星見の庵 ミホノセキ',shrine:'美保神社',rank:7,tier:7,size:0,from:7,desc:'星を見る行者がこもる庵'},
   {x:35,y:39,name:'灯ノ原村 ヒラタ',shrine:'宇美神社',rank:3,tier:3,size:0,from:9,depop:'aging',desc:'子どもの声が 消えた 山あいの村'},
   {x:9,y:18,name:'朽木村 カモ',shrine:'加茂八幡宮',rank:1,tier:6,size:0,from:6,depop:'ruin',desc:'魔物に 荒らされ 人が 去った村'},
-  {x:75,y:18,name:'南風島港 ナハ',shrine:'波上宮',rank:6,tier:5,size:2,island:1,port:1,desc:'南の風が 吹く 島の港町'},
-  {x:82,y:12,name:'椿の里 イトマン',shrine:'普天満宮',rank:0,tier:5,size:0,island:1,from:23,desc:'椿の花が 咲く 小さな 島の集落'},
-  {x:84,y:42,name:'龍宮町 リョウツ',shrine:'度津神社',rank:7,tier:7,size:3,island:1,port:1,desc:'海の神を まつる 島いちばんの 町'},
-  {x:91,y:37,name:'鯨浜 オギ',shrine:'木崎神社',rank:2,tier:7,size:1,island:1,from:25,desc:'鯨の骨が 祀られた 浜の村'},
+  {x:75,y:18,name:'島前の港 ベップ',shrine:'焼火神社',rank:3,tier:5,size:2,island:1,port:1,oki:1,desc:'隠岐 島前の 船が 集まる 港町'},
+  {x:82,y:12,name:'後鳥羽院の里 アマ',shrine:'隠岐神社',rank:3,tier:5,size:0,island:1,from:23,oki:1,desc:'後鳥羽院が 流された 島前の 里'},
+  {x:84,y:42,name:'隠岐の港 サイゴウ',shrine:'玉若酢命神社',rank:3,tier:7,size:3,island:1,port:1,oki:1,desc:'隠岐 島後 いちばんの 港町'},
+  {x:91,y:37,name:'杉の里 ゴカ',shrine:'水若酢神社',rank:7,tier:7,size:1,island:1,from:25,oki:1,desc:'隠岐一宮が 鎮まる 島後の 里'},
   {x:40,y:64,name:'浦の村 ウラド',shrine:'土佐神社',rank:7,tier:8,size:1,from:2,desc:'新大陸の 入口に ある 開拓の村'},
   {x:30,y:79,name:'行者町 ムロト',shrine:'室津神社',rank:2,tier:8,size:2,from:27,shugen:1,desc:'山伏たちが 修行に はげむ 修験道の町'},
   {x:70,y:71,name:'砂丘の宿場 フクベ',shrine:'宇倍神社',rank:7,tier:9,size:2,from:27,desc:'砂の 海を 越える 旅人の 宿場町'},
@@ -956,7 +956,7 @@ const VIL=[
   {x:117,y:84,name:'灰原村 ダイセン',shrine:'大神山神社',rank:7,tier:9,size:0,from:30,depop:'ruin',target:100,desc:'圧政と 魔物で 焼け野原に なった 村'},
   {x:88,y:60,name:'商都 ヨナゴ',shrine:'勝田神社',rank:3,tier:9,size:5,from:29,desc:'証券取引所の ある 新大陸 いちばんの 商いの都'},
   {x:12,y:68,name:'翠湖の町 サメウラ',shrine:'若宮八幡宮',rank:3,tier:8,size:3,from:28,desc:'みどりの 湖の ほとりに 栄える 町'},
-  {x:117,y:44,name:'常世の島',shrine:'常世神社',rank:7,tier:10,size:0,island:1,port:1,tokoyo:1,desc:'龍宮の 沖の 嵐の 向こうに ある 神の 島'},
+  {x:117,y:44,name:'常世の島',shrine:'常世神社',rank:7,tier:10,size:0,island:1,port:1,tokoyo:1,desc:'隠岐の 沖の 嵐の 向こうに ある 神の 島'},
   {x:47,y:103,name:'橋守の宿 トス',shrine:'四阿屋神社',rank:2,tier:11,size:2,from:32,desc:'大橋を 渡った 先の サガの 玄関口'},
   {x:30,y:108,name:'霜野の村 タラ',shrine:'大魚神社',rank:1,tier:11,size:1,from:37,desc:'霜の 降りる 寒い 開拓村'},
   {x:16,y:118,name:'炭都 タク',shrine:'天山神社',rank:3,tier:11,size:4,from:38,dict:{boss:'タク元帥',title:'元帥',hall:'元帥府',party:'軍',res:'coal',shape:'bones',c1:'#5c5c5c',c2:'#f8b800'},desc:'タク元帥が 支配する 煤けた 炭鉱の 都'},
@@ -1001,7 +1001,7 @@ const KQ={x0:109,y0:125,x1:131,y1:138},KQ_REC=22222,SARA={x:113,y:137},KJO={x:12
   VIL.push({x:119,y:137,name:'藤の里 カワチ',shrine:'藤森神社',rank:1,tier:12,size:0,from:A+1,kq:1,rec:KQ_REC,desc:'藤の 花の トンネルが 名物の 山あいの 里'});}
 /* 首都 マホロバ（北東の 海に 浮かぶ 首都圏・議会が ある） */
 const CAPR={x0:120,y0:13,x1:174,y1:38};
-{const KJ=VIL.findIndex(v=>v.name==='鯨浜 オギ');VIL.push({x:143,y:26,name:'首都 マホロバ',shrine:'野田神社・豊栄神社',rank:4,tier:10,size:6,from:KJ,capital:1,yama:1,rec:'＝平均',desc:'国会議事堂が そびえる この国の 首都'});
+{const KJ=VIL.findIndex(v=>v.name==='杉の里 ゴカ');VIL.push({x:143,y:26,name:'首都 マホロバ',shrine:'野田神社・豊栄神社',rank:4,tier:10,size:6,from:KJ,capital:1,yama:1,rec:'＝平均',desc:'国会議事堂が そびえる この国の 首都'});
   /* マホロバの島の 市町村（カタカナ） */
   const YM=[['ジングウコウゴウ','首都 マホロバ',128,25,1,'神功皇后神社','カルスト台地と 鍾乳洞の 町'],['シモノセキ','ジングウコウゴウ',121,30,4,'赤間神宮','ふく料理で 名高い 島の 西の 港町'],['イイヤマ','ジングウコウゴウ',124,18,1,'飯山八幡宮','棚田と 湯の 香る 北の 町'],
     ['ショウゴウ','シモノセキ',124,35,2,'松江八幡宮','港と 工場の 町'],['ウベ','ショウゴウ',131,36,3,'琴崎八幡宮','野外彫刻が 並ぶ 町'],['ハギ','首都 マホロバ',134,15,2,'松陰神社','城下町の 面影が 残る 古都'],
@@ -1027,8 +1027,8 @@ const SKR={x0:132,y0:136,x1:188,y1:178};
     ['レジスタンスの集落 マツゥヤマ','箭弓稲荷神社',150,167,1,2,A+4,[],'ナメガワマチから 逃げ出した 人々が 身を 寄せる 丘の 集落'],
     ['防衛団の町 カスカベ','春日部八幡神社',178,151,3,2,A+7,[],'大きな 凧と 元気な 子どもたちの 町']];
   SV.forEach(([name,shrine,x,y,size,rank,from,f,desc])=>VIL.push({x,y,name,shrine,rank,tier:12,size,from,sk:1,kqf:f,desc,...(name.endsWith('ナメガワマチ')?{skn:'namegawa',skb:'sktower'}:{}),...(name.endsWith('マツゥヤマ')?{skb:'skjin'}:{})}));}
-  /* 11/19：サドの 島を 広げて 金山の 町を 追加 */
-  VIL.push({x:78,y:35,name:'金山の町 アイカワ',shrine:'大山祇神社',rank:2,tier:7,size:2,from:VIL.findIndex(v=>v.name==='龍宮町 リョウツ'),island:1,sado:1,desc:'金山で 栄えた 島の 西の 町'});
+  /* 11/19：隠岐（島後）の 村を 追加 */
+  VIL.push({x:78,y:35,name:'岬の村 クミ',shrine:'伊勢命神社',rank:2,tier:7,size:2,from:VIL.findIndex(v=>v.name==='隠岐の港 サイゴウ'),island:1,oki:1,desc:'島後の 西の 岬に ある 漁村'});
   /* 11/19：シマネの 南西に ツワノ（島根県だが 経済圏は 山口＝マホロバ が 事実上 支配） */
   VIL.push({x:48,y:50,name:'山陰の小京都 ツワノ',shrine:'太皷谷稲成神社',rank:1,tier:3,size:2,from:VIL.findIndex(v=>v.name==='湊町 ハマダ'),mahoRule:1,desc:'島根の 町だが 経済も 暮らしも マホロバ（山口）に 頼る 城下町'});
 const inCAP=(x,y)=>x>=CAPR.x0-2&&x<=CAPR.x1+2&&y>=CAPR.y0-2&&y<=CAPR.y1+2;
@@ -4440,10 +4440,10 @@ function warpMap(seen,goTown){const trap=gmTrap(),P=[];
       win(4,208,248,30);txt(o.n,128,212,o.k==='town'?'#fcfcfc':o.c,'center',236);txt(o.k==='town'?`目安Lv${VIL[o.vi].rec||REC[VIL[o.vi].tier]}　十字キーで えらぶ・Aで ワープ`:'十字キーで えらぶ・Aで ワープ（Bで もどる）',128,224,'#7c7c7c','center',236);}});}
 /* ===================== 渡し船 ===================== */
 function boatFac(){
-  const vi=curVil,v=VIL[vi],ryu=VIL.findIndex(x=>x.name==='龍宮町 リョウツ');
+  const vi=curVil,v=VIL[vi],ryu=VIL.findIndex(x=>x.name==='隠岐の港 サイゴウ');
   const dests=v.tokoyo?[ryu]:VIL.map((x,i)=>i).filter(i=>i!==vi&&VIL[i].port&&(VIL[i].sea||'n')===(v.sea||'n')&&(!VIL[i].tokoyo||vi===ryu));
   const fee=i=>myPres('kaiun')||cardPerk('vesa',1)?0:VIL[i].tokoyo||v.tokoyo?50000:Math.ceil(Math.hypot(VIL[i].x-v.x,VIL[i].y-v.y)*25*(VIL[i].island&&v.island?.6:1));
-  dialog(v.tokoyo?'老船頭「リョウツへ もどるかい？\n帰りも 嵐の 海だ。」':vi===ryu?'漁師「島めぐりかい？\n…常世の島？ 嵐の 向こうだ。\n船賃は 50,000イェソ もらうぜ」':v.island?'漁師「本土に もどるかい？\nそれとも となりの 島へ 行くかい？」':'漁師「おう、島へ 渡りたいのか？\n船賃さえ もらえりゃ 乗せてやるぜ。」',()=>{
+  dialog(v.tokoyo?'老船頭「サイゴウへ もどるかい？\n帰りも 嵐の 海だ。」':vi===ryu?'漁師「島めぐりかい？\n…常世の島？ 嵐の 向こうだ。\n船賃は 50,000イェソ もらうぜ」':v.island?'漁師「本土に もどるかい？\nそれとも となりの 島へ 行くかい？」':'漁師「おう、島へ 渡りたいのか？\n船賃さえ もらえりゃ 乗せてやるぜ。」',()=>{
     listPick('渡し船（行き先を えらぶ）',dests.map(i=>({t:VIL[i].name+(VIL[i].island?'（島）':''),r:fmt(fee(i))+'イェソ',dis:G.coins<fee(i)})),k=>{
       const to=dests[k],f=fee(to);if(G.coins<f){dialog('漁師「船賃が 足りねえな。」');return;}
       G.coins-=f;sfx('coin');let t=0;const tv=VIL[to];
@@ -7081,8 +7081,8 @@ Object.keys(HK_P).forEach(k=>{PC_FIX[k]={name:AJ_F[k].n,v:2,hk:1,arm:1,P:HK_P[k]
 function pcSpecOf(f){const A=ajS();if(f.k==='pcj')return (A.builds||[])[f.b];return PC_FIX[f.k];}
 /* ---------- パチスロ 攻略サイト「スロ攻略ナビ」 ---------- */
 function hallKind(vi){const v=VIL[vi];if(!v||v.tokoyo||v.depop)return null;const f=FAC_SIZE[Math.min(3,v.size)];if(f.includes('pachi'))return 'pachi';if(f.includes('kpachi')&&kpachiOK(vi))return 'kpachi';return null;}
-/* 11/19：大陸ごとに 県（シマネ・トットリ・コウチ・サガ・オキナワ・サド） */
-VIL.forEach((v,i)=>{if(v.gm||v.kq||v.sk||v.yama||v.tokoyo)return;v.pref=v.mahoRule?'シマネ':v.sado||i===25||i===26?'サド':i<=22?'シマネ':i<=24?'オキナワ':[27,28,32,35].includes(i)?'コウチ':i<=35?'トットリ':i<=48?'サガ':'グンマー';});
+/* 11/19：大陸ごとに 県（シマネ〈隠岐を含む〉・トットリ・コウチ・サガ） */
+VIL.forEach((v,i)=>{if(v.gm||v.kq||v.sk||v.yama||v.tokoyo)return;v.pref=v.mahoRule||v.oki||i<=26?'シマネ':[27,28,32,35].includes(i)?'コウチ':i<=35?'トットリ':i<=48?'サガ':'グンマー';});
 const hallRegion=v=>v.gm?'グンマー':v.kq?'コクラ':v.sk?'サキタマ':v.yama||v.mahoRule?'マホロバ':v.pref||'シマネ';
 const hallNm=vi=>{const H=taHallOf(vi);return H?taHallName(H):hallKind(vi)==='kpachi'?`${VIL[vi].name.replace(/^.* /,'')}の 過疎パチ屋`:`${VIL[vi].name.replace(/^.* /,'')}の パチンコ店`;};
 function hallPledge(vi,d){const dt=hallDay(vi,d);
@@ -7142,7 +7142,7 @@ function slotSite(){const seen=i=>G.seen&&G.seen['v'+i];const H=VIL.map((v,i)=>i
       `本日（${G.day}日目）：${DAYN[dt]}\n${hallPledge(vi,G.day)}`,
       sch.length?`今後の 予定\n${sch.map(x=>x.replace(/：(特日|イベ日|周年日)$/,(m,a)=>'：'+a)).join('\n')}`:'今後の 予定：なし',
       dt>=2?'掲示板「朝イチ 並ぶしか ない」\n「抽選番号 次第だな」':hallKind(vi)==='kpachi'?'掲示板「過疎パチは 夢を 見る 場所じゃ ない」':'掲示板「今日は 様子見かな」']);};
-  const regions=()=>{const R0=['シマネ','トットリ','コウチ','サド','オキナワ','サガ','マホロバ','グンマー','コクラ','サキタマ'].filter(r=>known.some(i=>hallRegion(VIL[i])===r));
+  const regions=()=>{const R0=['シマネ','トットリ','コウチ','サガ','マホロバ','グンマー','コクラ','サキタマ'].filter(r=>known.some(i=>hallRegion(VIL[i])===r));
     if(!R0.length){dialog('まだ どの パチンコ店にも 行ったことが ない。');return;}
     listPick('ホール情報　地域を 選ぶ',R0.map(r=>({t:r,r:`${known.filter(i=>hallRegion(VIL[i])===r).length}店`})),k=>{const L=known.filter(i=>hallRegion(VIL[i])===R0[k]);
       const pick=()=>listPick(`ホール情報　${R0[k]}`,L.map(i=>({t:hallNm(i),r:DAYN[hallDay(i)]})),j=>{detail(L[j]);},s=>`${hallNm(L[s])}\n本日：${DAYN[hallDay(L[s])]}　${hallRate(L[s])[1]}\n${hallPledge(L[s],G.day).split('\n')[0]}`);pick();});};
@@ -8345,7 +8345,7 @@ function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=
 /* ===================== 政治（立党・選挙・族議員・政治資金パーティー・裏金） ===================== */
 /* 11/19：国と 大陸が 増えたので 議席を 調整（6地域・380議席） */
 const POL_SEATS=380,POL_MAJ=191,POL_EVERY=50;
-const POL_REG=[{n:'シマネ',s:80,f:v=>v.pref==='シマネ'&&!v.mahoRule},{n:'トットリ',s:30,f:v=>v.pref==='トットリ'},{n:'コウチ',s:25,f:v=>v.pref==='コウチ'},{n:'サド',s:5,f:v=>v.pref==='サド'},{n:'オキナワ',s:5,f:v=>v.pref==='オキナワ'},{n:'サガ',s:45,f:v=>v.pref==='サガ'},{n:'マホロバ',s:40,f:v=>!!v.yama||!!v.mahoRule},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm||v.pref==='グンマー'},{n:'サキタマ',s:50,f:v=>!!v.sk}];
+const POL_REG=[{n:'シマネ',s:90,f:v=>v.pref==='シマネ'&&!v.mahoRule},{n:'トットリ',s:30,f:v=>v.pref==='トットリ'},{n:'コウチ',s:25,f:v=>v.pref==='コウチ'},{n:'サガ',s:45,f:v=>v.pref==='サガ'},{n:'マホロバ',s:40,f:v=>!!v.yama||!!v.mahoRule},{n:'キタキュウ',s:40,f:v=>!!v.kq},{n:'グンマー',s:60,f:v=>!!v.gm||v.pref==='グンマー'},{n:'サキタマ',s:50,f:v=>!!v.sk}];
 const NPC_PARTY=['自由八百万党','民衆の 会','帝国再興党','無所属'];
 const ZOKU={ken:{n:'建設族',d:'建設費 -10%'},jin:{n:'神社族',d:'奉納・造営 -10%'},uma:{n:'競馬族',d:'馬主の 賞金 +30%'},kin:{n:'金融族',d:'超富裕層課税・査察 -20%'}};
 const POLICY={tax:{n:'富裕層 減税',d:'超富裕層課税・査察が 半分',k:'kin',m:.5},jin:{n:'神社 振興',d:'奉納・造営 -30%',k:'jin',m:.7},ken:{n:'国土 強靭化',d:'建設費 -30%',k:'ken',m:.7},uma:{n:'競馬 振興',d:'馬主の 賞金 2倍',k:'uma',m:2}};
