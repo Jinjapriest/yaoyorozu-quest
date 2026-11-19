@@ -3207,6 +3207,8 @@ function buildTown(vi){
   if(v.shrine==='松陰神社'&&G.party&&G.party.includes('shoin')&&!(G.tbox&&G.tbox.kinsho)){C[top+1][cx+3]={t:'tbox',id:'kinsho'};C[top+2][cx+3]={t:'s'};}
   if(v.name.replace(/^.* /,'')==='アキラギ'){for(const dx of [-3,3]){const c=C[top+3]&&C[top+3][cx+dx];if(c)C[top+3][cx+dx]={t:'g'};}
     npcs.push({x:cx-3,y:top+3,col:'#fcfcfc',hair:'#bcbcbc',trial:'guji',line:''},{x:cx+3,y:top+3,col:'#fcfcfc',hair:'#000000',trial:'negi',line:''});}
+  /* 隠岐神社の 横に ムラオ宮司 */
+  if(v.shrine==='隠岐神社'){const c=C[top+3]&&C[top+3][cx+3];if(c)C[top+3][cx+3]={t:'g'};npcs.push({x:cx+3,y:top+3,col:'#fcfcfc',hair:'#7c7c7c',line:'ムラオ宮司「……なごり寿司……」'});}
   /* 11/19：町の 特別な 人（まどみちお・金子みすゞ・防衛団） */
   {const bn=v.name.replace(/^.* /,''),spn=bn==='トイシ'&&!G.chars.mado?{sp:'mado',col:'#3cbcfc',hair:'#000000'}:bn==='イイヤマ'&&!G.chars.misuzu?{sp:'misuzu',col:'#7c4c10',hair:'#000000'}:bn==='カスカベ'?{sp:'bouei',col:'#d82800',hair:'#000000'}:typeof nmNpc==='function'?nmNpc(bn):null;
     if(spn){let put=false;for(let d=2;d<9&&!put;d++)for(const [dx,dy] of [[d,4],[-d,4],[d,6],[-d,6],[d,8],[-d,8]]){const x=cx+dx,y=top+dy,c=C[y]&&C[y][x];if(!c||!['s','g','flower','pz'].includes(c.t)||npcs.some(p=>p.x===x&&p.y===y)||(C[y-1]&&C[y-1][x]&&C[y-1][x].t==='door'))continue;npcs.push({x,y,...spn,line:''});put=true;break;}}}
