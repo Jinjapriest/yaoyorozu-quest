@@ -1944,22 +1944,24 @@ function bbPlay(a,b,cb){const B=bbS(),me=B.own,LA=B.ros[a],LB=B.ros[b];
   const ZX=128,ZY=132,ZW=26,ZH=30,PT=[['ストレート',0,0,34],['カーブ',-22,6,44],['スライダー',18,2,40],['フォーク',0,18,40]];
   const bat=()=>S.half,fld=()=>1-S.half,mine=()=>(S.half===0?a:b)===me;
   const batter=()=>{const L=S.ln[bat()];return L[S.bi[bat()]%L.length];},pitcher=()=>S.pit[fld()];
+  /* 投手の 体力：スタミナで 投げられる 球数が 決まり、減るほど 球威と 制球が 落ちる */
+  const cap=P=>60+(P.sta||50)*.8,hp=sd=>Math.max(0,1-S.pc[sd]/cap(S.pit[sd])),fat=()=>{const f=1-hp(fld());return f*f;},effPit=()=>(pitcher().pit||50)*1.06*(1-.35*fat());
   const adv=n=>{let r=0;for(let k=2;k>=0;k--)if(S.base[k]){if(k+n>=3){r++;S.base[k]=0;}else{S.base[k+n]=1;S.base[k]=0;}}if(n>=4)r++;else S.base[n-1]=1;S.sc[bat()]+=r;S.ls[bat()][S.inn-1]=(S.ls[bat()][S.inn-1]||0)+r;return r;};
   const walk=()=>{if(S.base[0]){if(S.base[1]){if(S.base[2]){S.sc[bat()]++;S.ls[bat()][S.inn-1]=(S.ls[bat()][S.inn-1]||0)+1;}S.base[2]=1;}S.base[1]=1;}S.base[0]=1;};
   const nextB=()=>{S.bi[bat()]++;S.b=0;S.s=0;};
   const endHalf=()=>{S.out=0;S.base=[0,0,0];S.b=0;S.s=0;S.ls[bat()][S.inn-1]=S.ls[bat()][S.inn-1]||0;if(S.half===0){S.half=1;if(S.inn>=7&&S.sc[1]>S.sc[0])S.over=true;}else{S.half=0;S.inn++;}if((S.inn>7&&S.sc[0]!==S.sc[1])||S.inn>9)S.over=true;};
   const outN=m=>{S.out++;S.msg=m;nextB();if(S.out>=3){S.msg+='　チェンジ！';endHalf();}};
-  const contact=q=>{const Bt=batter(),P=pitcher(),pw=(Bt.bat*.55+Bt.pow*.45)/((P.pit||50)*(1+S.pc[fld()]/400)),x=rnd()*.5+q*pw*.85;
+  const contact=q=>{const Bt=batter(),P=pitcher(),pw=(Bt.bat*.55+Bt.pow*.45)/effPit(),x=rnd()*.5+q*pw*.85;
     if(x<.64){S.fly={h:0,t:0};return outN(['ショートゴロ','セカンドゴロ','センターフライ','レフトフライ','サードライナー','ライトフライ'][Math.floor(rnd()*6)]+'… アウト');}
     const pp=Bt.pow/100;let h=x>1.25+.3*(1-pp)?4:x>1.15?3-(rnd()<.6?1:0):x>.98?2:1;if(h===3&&Bt.spd<50)h=2;S.fly={h,t:0};const r=adv(h);S.msg=['','ヒット！','ツーベース！','ストウヤース！','ホームラン！！'][h]+(r?`　${r}点！`:'');sfx(h===4?'g5':'ok');nextB();};
   const call=(strike,swung,q)=>{S.pc[fld()]++;
     if(!swung){if(strike){S.s++;S.msg='ストライク！';if(S.s>=3)outN('見逃し三振！');}else{S.b++;S.msg='ボール';if(S.b>=4){walk();S.msg='フォアボール';nextB();}}return;}
     if(q<=0){S.s++;S.msg='空振り！';sfx('cancel');if(S.s>=3)outN('空振り三振！');return;}if(q<.3){if(S.s<2)S.s++;S.msg='ファウル';return;}contact(q);};
-  const throwBall=(tx,ty,k)=>{const P=PT[k];S.ball={x0:128,y0:58,tx,ty,bx:P[1],by:P[2],T:P[3],t:0,k,strike:Math.abs(tx-ZX)<=ZW+2&&Math.abs(ty-ZY)<=ZH+2};S.swing=null;S.mode='pitch';};
+  const throwBall=(tx,ty,k)=>{const P=PT[k];S.ball={x0:128,y0:58,tx,ty,bx:P[1]*(1-fat()*.4),by:P[2]*(1-fat()*.4),T:Math.round(P[3]+fat()*8),t:0,k,strike:Math.abs(tx-ZX)<=ZW+2&&Math.abs(ty-ZY)<=ZH+2};S.swing=null;S.mode='pitch';};
   const ballAt=t=>{const B_=S.ball,p=Math.min(1.15,t/B_.T),e=p*p;return {x:B_.x0+(B_.tx-B_.x0)*p+B_.bx*(e-p),y:B_.y0+(B_.ty-B_.y0)*p+B_.by*(e*e-p*p),r:1.5+4*p};};
-  const aiPitch=()=>{const k=Math.floor(rnd()*4),st=rnd()<.6;const tx=ZX+(st?(rnd()*2-1)*ZW:(rnd()<.5?-1:1)*(ZW+6+rnd()*14)),ty=ZY+(st?(rnd()*2-1)*ZH:(rnd()*2-1)*(ZH+14));throwBall(tx,ty,k);};
+  const aiPitch=()=>{if(S.auto||fld()!==si)aiRelief(fld());const k=Math.floor(rnd()*4),st=rnd()<.6-fat()*.2;const tx=ZX+(st?(rnd()*2-1)*ZW:(rnd()<.5?-1:1)*(ZW+6+rnd()*14)),ty=ZY+(st?(rnd()*2-1)*ZH:(rnd()*2-1)*(ZH+14));throwBall(tx,ty,k);};
   const aiSwingResult=()=>{const B_=S.ball,Bt=batter(),P=pitcher(),edge=Math.max(Math.abs(B_.tx-ZX)/ZW,Math.abs(B_.ty-ZY)/ZH);const sw=B_.strike?rnd()<.72:rnd()<.28;
-    if(!sw)return call(B_.strike,false,0);const ratio=Math.max(.6,Math.min(1.4,Bt.bat/((P.pit||60)*(1-S.pc[fld()]/500)))),hitP=.55*ratio*(1-Math.min(1,edge)*.3)*(B_.k===3?.82:B_.k===0?1.05:.93);const q=rnd()<hitP?Math.min(1,.2+rnd()*.8*ratio):0;call(B_.strike,true,q);};
+    if(!sw)return call(B_.strike,false,0);const ratio=Math.max(.6,Math.min(1.4,Bt.bat/effPit())),hitP=.55*ratio*(1-Math.min(1,edge)*.3)*(B_.k===3?.82:B_.k===0?1.05:.93);const q=rnd()<hitP?Math.min(1,.2+rnd()*.8*ratio):0;call(B_.strike,true,q);};
   const simHalf=()=>{let n=0;const h=S.half,i=S.inn;while(S.half===h&&S.inn===i&&!S.over&&n++<80){aiPitch();aiSwingResult();}};
   const finish=()=>{let x=S.sc[0],y=S.sc[1];if(x===y){if(rnd()<.5)x++;else y++;}bbRecord(a,b,x,y);B.played=B.gd;save();const w=(a===me?x>y:y>x);sfx(w?'g5':'ng');pop();
     dialog([`試合終了！\n${bbT(a).s} ${x} － ${y} ${bbT(b).s}`,w?`${bbT(me).s}の 勝利！！`:`${bbT(me).s}は 敗れた…`],cb);};
@@ -1970,7 +1972,7 @@ function bbPlay(a,b,cb){const B=bbS(),me=B.own,LA=B.ros[a],LB=B.ros[b];
   const fs=p=>`ミート${p.bat} パワー${p.pow} 走力${p.spd}`;
   const subMenu=()=>{const ops=['投手交代',...(bat()===si?['代打']:[]),'守備交代','もどる'];
     choice(`選手交代（${bbT(me).s}）
-投手 ${S.pit[si].n}　球数 ${S.pc[si]}`,ops,k=>{const o=ops[k];if(!o||o==='もどる')return;
+投手 ${S.pit[si].n}　球数 ${S.pc[si]}　体力 ${Math.round(hp(si)*100)}%`,ops,k=>{const o=ops[k];if(!o||o==='もどる')return;
       if(o==='投手交代'){const L=benchP();if(!L.length){dialog('ベンチに 投手が いない。');return;}
         listPick('投手交代（リリーフを えらぶ）',L.map(p=>({t:`投 ${p.n}`,r:`球威${p.pit}`})),j=>{const P=L[j],o0=S.pit[si];S.gone.push(o0);S.pit[si]=P;S.pc[si]=0;S.msg=`ピッチャー ${o0.n} → ${P.n}`;S.mode='res';S.t=0;sfx('ok');},j=>L[j]?`球威 ${L[j].pit}　スタミナ ${L[j].sta}`:'');return;}
       if(o==='代打'){const L=benchF(),Ln=S.ln[si],ix=S.bi[si]%Ln.length,o0=Ln[ix];if(!L.length){dialog('ベンチに 野手が いない。');return;}
@@ -1979,7 +1981,7 @@ function bbPlay(a,b,cb){const B=bbS(),me=B.own,LA=B.ros[a],LB=B.ros[b];
           listPick(`${o0.n}に かえて 入る 選手`,L.map(p=>({t:`${p.pos} ${p.n}`,r:`総合${bbOvr(p)}`})),j=>{const P=L[j];S.gone.push(o0);Ln[i]=P;S.msg=`${o0.n} → ${P.n}`;S.mode='res';S.t=0;sfx('ok');},j=>L[j]?fs(L[j]):'');},i=>Ln[i]?fs(Ln[i]):'');}
     },96);};
   /* 相手チームは 球数が かさむと 継投 */
-  const aiRelief=()=>{const so=1-si,P=S.pit[so],lim=70+(P.sta||50)*.6;if(S.pc[so]<lim)return;const opp=so===0?a:b,R_=B.ros[opp].filter(p=>p.pos==='投'&&p!==P&&!S.gone.includes(p)).sort((x,y)=>y.pit-x.pit)[0];
+  const aiRelief=(so=1-si)=>{const P=S.pit[so];if(hp(so)>.2)return;const opp=so===0?a:b,R_=B.ros[opp].filter(p=>p.pos==='投'&&p!==P&&!S.gone.includes(p)).sort((x,y)=>y.pit-x.pit)[0];
     if(R_){S.gone.push(P);S.pit[so]=R_;S.pc[so]=0;S.msg=`${bbT(opp).s}　ピッチャー交代 ${R_.n}`;}};
   push({full:true,ptr:true,upd(){S.t++;if(S.over){if(S.t>40&&(I.A||I.B))finish();return;}
       if(click==='auto'){click=null;S.auto=true;}if(S.auto){simHalf();S.t=0;return;}
@@ -1998,7 +2000,7 @@ function bbPlay(a,b,cb){const B=bbS(),me=B.own,LA=B.ros[a],LB=B.ros[b];
             call(B_.strike,S.swing!=null,q);S.mode='res';S.t=0;}return;}}
       else{/* 守備：球種を えらび コースに 投げる */
         if(S.mode==='ready'){if(I.pl)S.sel=(S.sel+3)%4;if(I.pr)S.sel=(S.sel+1)%4;if(typeof click==='number'){S.sel=click;click=null;}if((I.A||click==='go')&&S.t>8){click=null;S.mode='aim';S.t=0;}return;}
-        if(S.mode==='aim'){mv(S.aim);if((I.A||click==='go')&&S.t>8){click=null;const P=pitcher(),err=(100-(P.pit||50))/6;throwBall(S.aim.x+(rnd()*2-1)*err,S.aim.y+(rnd()*2-1)*err,S.sel);}return;}
+        if(S.mode==='aim'){mv(S.aim);if((I.A||click==='go')&&S.t>8){click=null;const P=pitcher(),err=(100-(P.pit||50))/6+fat()*10;throwBall(S.aim.x+(rnd()*2-1)*err,S.aim.y+(rnd()*2-1)*err,S.sel);}return;}
         if(S.mode==='pitch'){S.ball.t++;if(S.ball.t>=S.ball.T+6){aiSwingResult();S.mode='res';S.t=0;}return;}}},
     drw(){/* 背景：外野と 観客席・マウンド */R(0,0,W,H,'#1c6c1c');for(let y=0;y<30;y+=4)for(let x=(y/4)%2*4;x<W;x+=8)R(x,y,3,3,['#d82800','#fcfcfc','#f8b800','#3cbcfc'][(x+y)%4]);R(0,30,W,4,'#14481c');R(0,34,W,2,'#f8b800');
       for(let y=36;y<H;y+=10)R(0,y,W,5,'#208020');ctx.fillStyle='#c89058';ctx.beginPath();ctx.ellipse(128,64,30,9,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(40,H);ctx.lineTo(108,96);ctx.lineTo(148,96);ctx.lineTo(216,H);ctx.fill();
@@ -2014,6 +2016,7 @@ function bbPlay(a,b,cb){const B=bbS(),me=B.own,LA=B.ros[a],LB=B.ros[b];
       /* スコアボード（左上） */R(2,2,124,28,'#000c');const ab=t=>bbT(t).s.slice(0,5);R(4,5+S.half*12,3,8,'#f8b800');txt(ab(a),10,4,'#fcfcfc','left',56);txt(String(S.sc[0]),84,4,'#f8b800','right');txt(ab(b),10,16,'#fcfcfc','left',56);txt(String(S.sc[1]),84,16,'#f8b800','right');
       R(90,4,1,24,'#5c5c5c');txt(`${S.inn}回`,108,4,'#fcfcfc','center',30);txt(S.half?'裏':'表',108,16,'#f8d878','center',30);
       /* BSO（右上） */R(176,2,78,40,'#000c');[['B',S.b,3,'#3cd83c'],['S',S.s,2,'#f8d800'],['O',S.out,2,'#fc3c3c']].forEach(([l,n,m,c],k)=>{txt(l,182,4+k*12,'#fcfcfc');for(let j=0;j<m;j++)pc(198+j*10,10+k*12,3,j<n?c:'#3c3c3c');});
+      /* 投手の 体力ゲージ */{const h=hp(fld()),gc=h>.5?'#3cd83c':h>.25?'#f8d800':'#fc3c3c';R(176,44,78,14,'#000c');txt('体力',180,46,'#fcfcfc');R(202,48,48,6,'#3c3c3c');R(202,48,Math.round(48*h),6,gc);if(h<=.25&&(S.t>>4)%2)R(202,48,Math.round(48*h),6,'#fcfcfc');}
       /* 塁（右上の ミニダイヤ） */const dx0=236,dy0=26;[[dx0+8,dy0],[dx0,dy0-8],[dx0-8,dy0]].forEach(([x,y],k)=>{ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle=S.base[k]?'#f8b800':'#5c5c5c';ctx.fillRect(-3,-3,6,6);ctx.restore();});
       /* 下：打者・投手 */R(0,196,W,44,'#000c');txt(`${S.bi[bat()]%9+1}番 ${Bt.n}`,6,198,'#fcfcfc','left',120);txt(`ミート${Bt.bat} パワー${Bt.pow} 走力${Bt.spd}`,6,210,'#bcbcbc','left',124);
       txt(`投 ${P.n}`,250,198,'#fcfcfc','right',118);txt(`球威${P.pit} 球数${S.pc[fld()]}`,250,210,'#bcbcbc','right',118);
