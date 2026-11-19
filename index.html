@@ -518,7 +518,7 @@ const BASE_SKILLS={
   km_tousotsu:{name:'鬼の統率力',mp:12,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'しきった'},km_encho:{name:'延長',mp:16,target:'allies',kind:'song',power:1.2,amount:.5,turns:5,verb:'すすめた'},
   mc_koe:{name:'声真似',mp:10,target:'enemies',kind:'debuff',amount:.5,turns:3,verb:'まねた'},mc_mono:{name:'モノマネ',mp:12,target:'enemy',kind:'mag',power:2.6,verb:'ひろうした'},
   tk_rizume:{name:'理詰め',mp:12,target:'enemy',kind:'mag',power:2.8,verb:'つめた'},tk_akuma:{name:'悪魔の証明',mp:16,target:'enemies',kind:'debuff',amount:.55,turns:4,verb:'もとめた'},
-  tt_wood:{name:'木製の盾',mp:6,target:'allies',kind:'buff',stat:'def',amount:.5,turns:4,verb:'かまえた'},tt_dia:{name:'ダイヤモンドの盾',mp:18,target:'allies',kind:'buff',stat:'def',amount:1.0,turns:4,verb:'かまえた'},
+  tt_hate:{name:'憤怒の盾',mp:10,target:'allies',kind:'tthate',verb:'かかげた'},tt_wood:{name:'木製の盾',mp:6,target:'allies',kind:'buff',stat:'def',amount:.5,turns:4,verb:'かまえた'},tt_dia:{name:'ダイヤモンドの盾',mp:18,target:'allies',kind:'buff',stat:'def',amount:1.0,turns:4,verb:'かまえた'},
   md_zou:{name:'ぞうさん',mp:12,target:'allies',kind:'heal',power:1.3,verb:'うたった'},md_yagi:{name:'やぎさんゆうびん',mp:12,target:'enemies',kind:'debuff',amount:.45,turns:3,verb:'とどけた'},
   ms_kodama:{name:'こだまでしょうか？',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'問いかけた'},ms_minna:{name:'私と小鳥と鈴と',mp:12,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'よみあげた'},
   mn_seiseki:{name:'成績優秀',mp:10,target:'enemy',kind:'mag',power:2.4,verb:'ときあかした'},mn_fukushu:{name:'復習（復讐）',mp:10,target:'enemy',kind:'phys',power:.9,hits:3,verb:'くりかえした'},
@@ -693,7 +693,7 @@ const BASE_PACK={
     {id:'koume',name:'スーパーラウンジ嬢 コウメちゃん',short:'コウメ',rarity:'XR',weight:1,weapon:'any',special:'hostess',hp:155,mp:120,atk:30,mag:50,def:30,spd:36,skills:['km_tousotsu','km_encho'],look:{head:'hostess',hair:'#7c4c10',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
     {id:'menchi',name:'声真似芸人 メンチカツ',short:'メンチカツ',rarity:'XR',weight:1,weapon:'any',hp:165,mp:110,atk:36,mag:50,def:28,spd:32,skills:['mc_koe','mc_mono'],look:{head:'hair',hair:'#000000',body:'#f8b800',accent:'#d82800',legs:'#3c3c3c',held:'マイク'}},
     {id:'takeshi',name:'最強の弁護士 タケシ',short:'タケシ',rarity:'LR',weapon:'any',hp:145,mp:110,atk:22,mag:50,def:30,spd:26,skills:['tk_rizume','tk_akuma'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#f8b800',legs:'#24188c',held:'杖'}},
-    {id:'tatekun',name:'成り上がりの盾使い',short:'盾使い',rarity:'LR',weapon:'any',hp:190,mp:70,atk:26,mag:20,def:56,spd:18,skills:['tt_wood','tt_dia'],look:{head:'helm',body:'#00a800',accent:'#bcbcbc',legs:'#503000',held:'メイス'}},
+    {id:'tatekun',name:'成り上がりの盾使い',short:'盾使い',rarity:'LR',weapon:'any',hp:300,mp:180,atk:20,mag:20,def:64,spd:16,skills:['tt_hate','tt_wood','tt_dia'],look:{head:'helm',body:'#00a800',accent:'#bcbcbc',legs:'#503000',held:'メイス'}},
     {id:'mado',name:'優しい老詩人 まどみちお',short:'まどみちお',rarity:'LR',nogacha:1,weapon:'any',hp:150,mp:130,atk:18,mag:48,def:28,spd:20,skills:['md_zou','md_yagi'],look:{head:'hair',hair:'#fcfcfc',body:'#7c4c10',accent:'#f8d878',legs:'#3c3c3c',held:'杖'}},
     {id:'misuzu',name:'悲劇の詩人 金子みすゞ',short:'みすゞ',rarity:'LR',nogacha:1,weapon:'any',hp:135,mp:140,atk:16,mag:54,def:24,spd:26,skills:['ms_kodama','ms_minna'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
     {id:'manabu',name:'ガリ勉少年 マナブ',short:'マナブ',rarity:'LR',weapon:'any',hp:130,mp:110,atk:30,mag:46,def:24,spd:30,skills:['mn_seiseki','mn_fukushu'],look:{head:'hair',hair:'#000000',body:'#f8b800',accent:'#fcfcfc',legs:'#24188c',held:'杖'}},
@@ -2495,6 +2495,8 @@ const ETIER=[
   [['けいびドローン','bat','#5c5c5c','#3cbcfc'],['ていこくきかいへい','bones','#7c7c7c','#fc7460'],['ネオンスライム','blob','#f878f8','#3cbcfc']],
 ];
 var FIELD_F={11:20,12:45},KQ_F=37;
+/* 11/19：野良敵（フィールドの 通常戦闘）を 弱く：HP 65%・攻撃/魔力 75%・守備 80% */
+const NORA_W={maxhp:.65,hp:.65,atk:.75,mag:.75,def:.8};
 const KQ_EN=[['かどうちスライム','blob','#f8b800','#fcfcfc'],['てっこつおに','oni','#5c5c5c','#d82800'],['やきうどんへび','snake','#a05000','#f8d878'],['しゅらこうもり','bat','#3c0000','#d82800'],['ど派手はかまれい','spirit','#f878f8','#f8d878']];
 const BGC={[T.SAND]:['#a81000','#fce0a8'],[T.YAMA]:['#000030','#7c4c10'],[T.GRASS]:['#000058','#00a800'],[T.FOREST]:['#000030','#005800'],[T.ROAD]:['#000058','#c89058'],[T.BRIDGE]:['#000058','#0058f8'],[T.SHR]:['#000058','#00a800'],[T.CAVE]:['#200000','#503000'],[T.MINE]:['#000030','#7c4c10'],[T.OIL]:['#200000','#fce0a8'],[T.COAL]:['#000000','#3c3c3c']};
 let BT=null;
@@ -2647,7 +2649,7 @@ function startBattle(boss,rift=null,sp=null){
   else if(rift!=null){const kq=VIL[nearestVil(G.pos.x,G.pos.y)].kq,n=ri(3,4);for(let k=0;k<n;k++){const e=mkEnemy(t,kq?KQ_EN[ri(0,KQ_EN.length-1)]:ETIER[t][ri(0,2)]);e.name='魔界の'+e.name;e.c2='#d82800';for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*1.35*(kq?KQ_F:(FIELD_F[t]||1)));e.rift=true;en.push(e);}}
   else if(VIL[nearestVil(G.pos.x,G.pos.y)].yama){const{t:yt,f:yf}=yamaTier(),n=ri(2,4);for(let k=0;k<n;k++){const e=mkEnemy(yt,ETIER[yt][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*yf*(1+.08*G.rifts.length));en.push(e);}}
   else if(VIL[nearestVil(G.pos.x,G.pos.y)].kq){const n=ri(2,4);for(let k=0;k<n;k++){const e=mkEnemy(12,KQ_EN[ri(0,KQ_EN.length-1)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*KQ_F*(1+.08*G.rifts.length));en.push(e);}}
-  else{const n=Math.min(4,ri(1,2+Math.floor(t/3))+(rnd()<.3?1:0)),sc=(1+.08*G.rifts.length)*(FIELD_F[t]||1);for(let k=0;k<n;k++){const e=mkEnemy(t,ETIER[t][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.round(e[s]*sc);en.push(e);}}
+  else{const n=Math.min(4,ri(1,2+Math.floor(t/3))+(rnd()<.3?1:0)),sc=(1+.08*G.rifts.length)*(FIELD_F[t]||1);for(let k=0;k<n;k++){const e=mkEnemy(t,ETIER[t][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.max(1,Math.round(e[s]*sc*NORA_W[s]));en.push(e);}}
   {const im=sp&&sp.st==='minus'?(infMul()>1?1.1:1):infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
   if(!boss&&!sp)fitEnemies(en);
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
@@ -2713,6 +2715,7 @@ function pAct(i){
     const st=()=>cstat(m.id,m);
     const healAmt=p=>Math.round(st().mag*1.8*p*rm*(.95+rnd()*.1));
     switch(sk.k){
+      case 'tthate':P_(()=>{if(!ok.v)return null;BT.taunt={i,t:3};m.db=Math.max(m.db||0,3);m.dv=Math.max(m.dv||0,.6);BT.shake=6;return `${nm}が 盾を かかげた！\n敵は ${nm}しか 攻撃できない（3ターン）\n${nm}の 守備力 +60%！`;});break;
       case 'krmz1':P_(()=>{if(!ok.v)return null;const mg=st().mag,use=mg*.3;m.mgMul=(m.mgMul||1)*.7;m.atAdd=(m.atAdd||0)+use*.5;return `魔力を ${fmt(Math.round(use))} 燃やした！\n${CH[m.id].short}の 攻撃力が ${fmt(Math.round(use*.5))} あがった！`;});break;
       case 'krmz2':P_(()=>{if(!ok.v)return null;const mg=st().mag,al=BT.pt.filter(t=>t!==m&&isAlive(t));G.chars[m.id].hp=0;al.forEach(t=>{t.mgAdd=(t.mgAdd||0)+mg*.5/Math.max(1,al.length);});return `「…帰国の 準備が できたでやんす」\n${CH[m.id].short}は 力を 使い果たして 倒れた…\n味方の 魔力が ${fmt(Math.round(mg*.5/Math.max(1,al.length)))}ずつ あがった！`;});break;
       case 'eiria':P_(()=>{if(!ok.v)return null;const mg=st().mag,al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return 'しかし 分ける 相手が いない！';m.mgMul=(m.mgMul||1)*.5;al.forEach(t=>{t.mgAdd=(t.mgAdd||0)+mg*.5/al.length;});return `エイリア石が 妖しく 光った！\n${CH[m.id].short}の 魔力を 味方に 分け与えた！\n（ひとり ${fmt(Math.round(mg*.5/al.length))}ずつ）`;});break;
@@ -2913,6 +2916,7 @@ const XR_DESC={toku:'究極の トーク力で 場を 支配する。\n敵全体
   addimpact:'XRスキル7種（氏神バースト・ウナバライジング・\nナイトパーリィ・国造ラッシュ・唯我独尊・\n国生み・黄泉津大神）から\nランダムで 2回 発動する'};
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
+    case 'tthate':return '3ターンの 間 敵の 攻撃を\nすべて 自分に 引きつけ\n自分の 守備力を 60% あげる';
     case 'krmz1':return '魔力の 3割を 燃やし\nその 半分を 自分の 攻撃力に 上乗せする\n（戦闘中 ずっと／重ねがけ できる）';
     case 'krmz2':return '自分の HPが 0に なる かわりに\n自分の 魔力の 半分を\n味方全員に 分けて 底上げする';
     case 'shichisei':return '七支刀の 固有スキル\n敵1体に 7回 攻撃。 1回ごとの 威力は\n小・中・大・特大・超絶から ランダム\n使うと 30%で 次の ターン 動けない';
