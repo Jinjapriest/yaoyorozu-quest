@@ -4394,7 +4394,8 @@ function warpScr(){
   const seen=VIL.map((v,i)=>i).filter(i=>(G.seen['v'+i]||G.warps.includes(i)||i===0)&&(!gmTrap()||VIL[i].gm));
   const goTown=vi=>{const v=VIL[vi];while(stack.length>1)pop();sfx('magic');G.pos={x:v.x,y:v.y+1};enterVillage(vi);toast(`${v.name}へ ワープした`);};
   const riftList=()=>G.rifts.filter(q=>!gmTrap()||inGun(q.x,q.y)).map((q,k)=>{let best=null,bd=1e9;for(const s of SHRS){if(s.rank)continue;const d=Math.abs(s.x-q.x)+Math.abs(s.y-q.y);if(d<bd){bd=d;best=s;}}return{q,k,s:best,d:bd};}).filter(o=>o.s);
-  choice('ワープの 鳥居\nどこへ 飛びますか？',[{t:`訪れた 町へ（${seen.length}か所）`},{t:`烈穴の 近くの 無格社へ（${G.rifts.length}か所）`,dis:!G.rifts.length},{t:'やめる'}],r=>{
+  choice('ワープの 鳥居\nどこへ 飛びますか？',[{t:'マップから えらぶ',col:'#f8b800'},{t:`訪れた 町へ（${seen.length}か所）`},{t:`烈穴の 近くの 無格社へ（${G.rifts.length}か所）`,dis:!G.rifts.length},{t:'やめる'}],r=>{
+    if(r===0){warpMap(seen,goTown);return;}r--;
     if(r===0){listPick('訪れた 町へ ワープ',seen.map(i=>{const v=VIL[i];return{t:v.name,r:`目安Lv${v.rec||REC[v.tier]}`,col:v.tier>=9?'#fc7460':null};}),k=>goTown(seen[k]),k=>{const v=VIL[seen[k]];return v?`${v.name}（${SIZES[v.size].n}）\n${v.shrine}（${RANKS[v.rank].n}）`+(v.island?'\n島の 町':''):'';});return;}
     if(r===1){const L=riftList();if(!L.length){dialog('近くに 無格社の ある 烈穴が ない。');return;}
       listPick('烈穴の 近くの 無格社へ ワープ',L.map(o=>({t:`${VIL[o.q.vi].name} 周辺の 烈穴`,r:`あと${o.d}歩`})),k=>{const o=L[k];
@@ -4405,6 +4406,32 @@ function warpScr(){
 }
 
 
+/* 11/19：マップから えらぶ ワープ（町・競馬場・球場・オロチの山） */
+let WARP_IMG=null;
+function warpImg(){if(WARP_IMG)return WARP_IMG;const c=document.createElement('canvas');c.width=MW;c.height=MH;const g=c.getContext('2d'),im=g.createImageData(MW,MH);
+  const COL={[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tileAt(x,y),q=COL[t]||(isTownT(t)?[252,252,252]:t===T.SHR?[216,40,0]:[88,200,84]),i=(y*MW+x)*4;im.data[i]=q[0];im.data[i+1]=q[1];im.data[i+2]=q[2];im.data[i+3]=255;}
+  g.putImageData(im,0,0);return WARP_IMG=c;}
+function warpMap(seen,goTown){const trap=gmTrap(),P=[];
+  seen.forEach(i=>{const v=VIL[i];P.push({x:v.x,y:v.y,n:v.name,k:'town',vi:i,c:'#fcfcfc'});});
+  if(!trap){P.push({x:CAVE.x,y:CAVE.y,n:'オロチの山（八岐大蛇の 洞窟）',k:'spot',c:'#d82800',s:'蛇'});
+    P.push({x:MJO.x,y:MJO.y,n:'中央競馬場',k:'spot',c:'#f8b800',s:'馬'});P.push({x:KJO.x,y:KJO.y,n:'コクラ競馬場',k:'spot',c:'#f8b800',s:'馬'});
+    CHIHO.forEach(ck=>{if(ck.x!=null)P.push({x:ck.x,y:ck.y,n:`${ck.name}競馬場（地方）`,k:'spot',c:'#f8d878',s:'馬'});});
+    if(bbOK())STADS.forEach(o=>{const tm=stadTeam(o.vi);P.push({x:o.x,y:o.y,n:tm?`${tm.n} 球場`:`${VIL[o.vi].name.replace(/^.* /,'')} 球場`,k:'spot',c:'#7ee07e',s:'球'});});}
+  else P.forEach((o,i)=>{});
+  const L=P.filter(o=>!trap||inGun(o.x,o.y));if(!L.length){dialog('ワープできる 場所が ない。');return;}
+  const sc=Math.min(240/MW,180/MH),ox=Math.round((W-MW*sc)/2),oy=26;let sel=Math.max(0,L.findIndex(o=>o.k==='town'&&Math.abs(o.x-G.pos.x)+Math.abs(o.y-G.pos.y)<6)),click=null,t=0;
+  const go=o=>{while(stack.length>1)pop();sfx('magic');if(o.k==='town'){goTown(o.vi);return;}
+    let p={x:o.x,y:o.y+1};for(const [dx,dy] of [[0,1],[1,0],[-1,0],[0,-1],[1,1],[-1,1]]){const t2=tileAt(o.x+dx,o.y+dy);if(PASS[t2]&&!isTownT(t2)&&t2!==T.KEIBAJO&&t2!==T.STAD&&t2!==T.CAVE){p={x:o.x+dx,y:o.y+dy};break;}}
+    G.pos=p;save();startField();toast(`${o.n}へ ワープした`);};
+  const near=(dx,dy)=>{const c=L[sel];let best=-1,bd=1e9;L.forEach((o,i)=>{if(i===sel)return;const ex=o.x-c.x,ey=o.y-c.y;if(dx&&Math.sign(ex)!==dx)return;if(dy&&Math.sign(ey)!==dy)return;const main=dx?Math.abs(ex):Math.abs(ey),side=dx?Math.abs(ey):Math.abs(ex);if(side>main*1.5+3)return;const d=main+side*2;if(d<bd){bd=d;best=i;}});if(best>=0){sel=best;sfx('cur');}};
+  push({full:true,upd(){t++;if(click!=null){const c=click;click=null;if(c===sel){go(L[sel]);return;}sel=c;sfx('cur');}
+      if(I.pl)near(-1,0);if(I.pr)near(1,0);if(I.pu)near(0,-1);if(I.pd)near(0,1);if(I.A&&t>6){go(L[sel]);return;}if(I.B){pop();}},
+    drw(){R(0,0,W,H,'#000');big('ワープ先を えらぶ',128,6,'#f8b800','center',12);ctx.imageSmoothingEnabled=false;ctx.drawImage(warpImg(),ox,oy,MW*sc,MH*sc);
+      const px=(G.pos.x+.5)*sc+ox,py=(G.pos.y+.5)*sc+oy;if((frame>>3)&1){R(Math.round(px)-1,Math.round(py)-1,3,3,'#f878f8');}
+      L.forEach((o,i)=>{const x=Math.round((o.x+.5)*sc+ox),y=Math.round((o.y+.5)*sc+oy);if(o.k==='town'){R(x-1,y-1,3,3,'#000');R(x-1,y-1,2,2,o.c);}else{R(x-2,y-2,5,5,'#000');R(x-1,y-1,3,3,o.c);}region(x-5,y-5,10,10,()=>{click=i;});});
+      const o=L[sel],x=Math.round((o.x+.5)*sc+ox),y=Math.round((o.y+.5)*sc+oy);ctx.strokeStyle=(frame>>2)&1?'#f8b800':'#fcfcfc';ctx.lineWidth=1;ctx.strokeRect(x-4.5,y-4.5,9,9);
+      win(4,208,248,30);txt(o.n,128,212,o.k==='town'?'#fcfcfc':o.c,'center',236);txt(o.k==='town'?`目安Lv${VIL[o.vi].rec||REC[VIL[o.vi].tier]}　十字キーで えらぶ・Aで ワープ`:'十字キーで えらぶ・Aで ワープ（Bで もどる）',128,224,'#7c7c7c','center',236);}});}
 /* ===================== 渡し船 ===================== */
 function boatFac(){
   const vi=curVil,v=VIL[vi],ryu=VIL.findIndex(x=>x.name==='龍宮町');
