@@ -529,6 +529,8 @@ const BASE_SKILLS={
   gm_gaman:{name:'がまんする',mp:4,target:'allies',kind:'buff',stat:'def',amount:.5,turns:4,verb:'こらえた'},gm_gaman2:{name:'まだ がまんする',mp:6,target:'allies',kind:'buff',stat:'def',amount:.8,turns:4,verb:'こらえた'},gm_buchi:{name:'ブチギレる',mp:12,target:'enemy',kind:'phys',power:3.2,verb:'ぶちまけた'},
   yh_mitsu:{name:'ミツバチ',mp:5,target:'enemy',kind:'phys',power:.5,hits:3,verb:'はなった'},yh_suzume:{name:'スズメバチ',mp:8,target:'enemy',kind:'phys',power:1.8,verb:'はなった'},yh_oosuzu:{name:'オオスズメバチ',mp:14,target:'enemies',kind:'phys',power:1.5,verb:'はなった'},
   kg_seminar:{name:'起業セミナー',mp:6,target:'enemies',kind:'debuff',amount:.3,turns:3,verb:'ひらいた'},kg_chotatsu:{name:'資金調達',mp:6,target:'ally',kind:'heal',power:1.2,verb:'あつめた'},
+  hs_tower:{name:'シャンパンタワー',mp:12,target:'allies',kind:'heal',power:1.0,verb:'積みあげた'},hs_kotoba:{name:'甘い ささやき',mp:8,target:'enemies',kind:'debuff',amount:.35,turns:3,verb:'ささやいた'},
+  lg_toast:{name:'乾杯',mp:8,target:'allies',kind:'buff',stat:'atk',amount:.4,turns:3,verb:'グラスを あげた'},lg_iyashi:{name:'聞き上手',mp:10,target:'ally',kind:'heal',power:1.4,verb:'話を 聞いた'},
   hn_champ:{name:'安い シャンパン',mp:6,target:'allies',kind:'heal',power:.6,verb:'あけた'},ccn_jiga:{name:'自我の 迷子',mp:4,target:'enemies',kind:'debuff',amount:.25,turns:2,verb:'まよわせた'},
   ln_yasumi:{name:'今日も 休み',mp:3,target:'allies',kind:'buff',stat:'def',amount:.3,turns:3,verb:'ねむった'},gd_tate:{name:'身を 盾にする',mp:5,target:'allies',kind:'buff',stat:'def',amount:.5,turns:3,verb:'たちはだかった'},
   rn_anki:{name:'丸暗記',mp:6,target:'enemy',kind:'mag',power:1.6,verb:'となえた'},fr_daihen:{name:'代返',mp:4,target:'enemy',kind:'phys',power:1.3,verb:'ごまかした'},sg_uta:{name:'魂の 弾き語り',mp:8,target:'allies',kind:'song',power:1.1,amount:.4,turns:3,verb:'うたった'},
@@ -702,6 +704,8 @@ const BASE_PACK={
     {id:'gaman',name:'我慢の限界サラリーマン',short:'限界リーマン',rarity:'R',weapon:'any',hp:62,mp:16,atk:13,mag:6,def:13,spd:9,skills:['gm_gaman','gm_gaman2','gm_buchi'],look:{head:'hair',hair:'#000000',body:'#3c3c3c',accent:'#d82800',legs:'#3c3c3c',held:'片手剣'}},
     {id:'youhou',name:'養蜂家',short:'養蜂家',rarity:'R',weapon:'any',hp:56,mp:18,atk:14,mag:8,def:11,spd:11,skills:['yh_mitsu','yh_suzume','yh_oosuzu'],look:{head:'hood',hood:'#fcfcfc',body:'#fcfcfc',accent:'#f8b800',legs:'#bcbcbc',held:'杖'}},
     {id:'kigyo',name:'無名起業家',short:'起業家',rarity:'R',weapon:'any',hp:50,mp:22,atk:10,mag:12,def:9,spd:11,skills:['kg_seminar','kg_chotatsu'],look:{head:'hair',hair:'#000000',body:'#24188c',accent:'#fcfcfc',legs:'#24188c',held:'スマホ'}},
+    {id:'host',name:'ホスト',short:'ホスト',rarity:'SR',weapon:'any',hp:52,mp:26,atk:14,mag:12,def:10,spd:16,skills:['hs_tower','hs_kotoba'],look:{head:'hair',hair:'#f8d878',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
+    {id:'loungegirl',name:'ラウンジ嬢',short:'ラウンジ嬢',rarity:'SR',weapon:'any',hp:44,mp:32,atk:8,mag:16,def:8,spd:15,skills:['lg_toast','lg_iyashi'],look:{head:'hostess',hair:'#3c2c1c',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
     {id:'host_n',name:'売れないホスト',short:'売れないホスト',rarity:'N',weapon:'any',hp:40,mp:12,atk:8,mag:6,def:6,spd:9,skills:['hn_champ'],look:{head:'hair',hair:'#f8b800',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'片手剣'}},
     {id:'cc_n',name:'自我が曖昧なコンカフェ嬢',short:'曖昧コンカフェ嬢',rarity:'N',weapon:'any',special:'hostess',hp:36,mp:16,atk:5,mag:9,def:5,spd:9,skills:['ccn_jiga'],look:{head:'maid',hair:'#f8b0c8',body:'#000000',accent:'#fcfcfc',legs:'#000000',held:'杖'}},
     {id:'lounge_n',name:'出勤しないラウンジ嬢',short:'出勤しない嬢',rarity:'N',weapon:'any',hp:36,mp:14,atk:5,mag:8,def:6,spd:8,skills:['ln_yasumi'],look:{head:'hostess',hair:'#7c4c10',body:'#a4b4fc',accent:'#fcfcfc',legs:'#24188c',held:'扇'}},
@@ -759,7 +763,7 @@ const BASE_PACK={
     {id:'pu_meito',name:'名刀・名剣ピックアップ',type:'weapon',pickup:['w_raikiri','w_zantetsu']},
     {id:'pu_kamigami',name:'八百万の神々 降臨ピックアップ',type:'char',pickup:['amaterasu','susanoo','tsukuyomi','okuninushi']},
     {id:'pu_senpai',name:'やりますねぇ先輩ピックアップ（LR）',type:'char',pickup:['yarimasu','bard']},
-    {id:'pu_kaguya',name:'輝夜の主役たち',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi','hostess','cafegirl','miko','cc_n','guard_n']},
+    {id:'pu_kaguya',name:'輝夜の主役たち',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi','hostess','cafegirl','host','loungegirl','cc_n','guard_n']},
     {id:'pu_yorumachi',name:'夜の街の 住人たち（XR）',type:'char',pickup:['aiki','yushi','oyaji','koume','menchi']},
     {id:'pu_lr1119',name:'新LR ピックアップ',type:'char',pickup:['takeshi','tatekun','manabu','mamoru']},
     {id:'pu_jisho',name:'XR 辞書・LR 辞表 ピックアップ',type:'weapon',pickup:['w_jisho','w_jihyo','w_kyuyo','w_roppo','w_kensho']},
@@ -8393,9 +8397,10 @@ const KSTAR_MOMO={n:'もも',mul:2.0,rep:.5,pow:40,buzz:4,teach:5,d:'店の 売�
 /* 11/19：ガチャキャラが 歓楽街の お店で 働ける（看板） */
 const KSTAR_X={aiki:{t:'gay',n:'タナカアイキ',mul:2.5,rep:.4,d:'ゲイバーの 看板ママ\n店の 売上 2.5倍・評判 +0.4'},yushi:{t:'host',n:'YUSHI',mul:2.5,rep:.4,d:'ホストクラブの 伝説の 帝王\n店の 売上 2.5倍・評判 +0.4'},
   oyaji:{t:'izakaya',n:'西新宿の親父',mul:1.8,rep:.3,d:'居酒屋の 名物 親父\n店の 売上 1.8倍・評判 +0.3'},koume:{t:'lounge',n:'コウメちゃん（チーママ）',mul:2.0,rep:.4,d:'ラウンジの チーママ\n店の 売上 2倍・評判 +0.4'},
+  host:{t:'host',n:'ホスト',mul:1.4,rep:.15,d:'ホストクラブの キャスト\n店の 売上 1.4倍・評判 +0.15'},loungegirl:{t:'lounge',n:'ラウンジ嬢',mul:1.4,rep:.15,d:'ラウンジの キャスト\n店の 売上 1.4倍・評判 +0.15'},
   menchi:{t:'karaoke',n:'メンチカツ（看板店員）',mul:1.8,rep:.3,d:'カラオケの 看板店員\n店の 売上 1.8倍・評判 +0.3'}};
 const kstarOf=(id,t='cab')=>id&&KSTAR_X[id]?(G.chars[id]&&KSTAR_X[id].t===t?{...KSTAR_X[id],pow:0,buzz:2,teach:0}:null):!id||!G.chars[id]||!CH[id]||!hasCast(t)?null:id==='momo'?(t==='concafe'?KSTAR_MOMO:null):id==='mikan'?(t==='cab'?KSTAR_M:{...KSTAR_M,n:'東みかん（一日店長）',mul:1.4,d:'店の 売上 1.4倍・評判 +0.3\nほかの キャストの 指名力 +3\nSNSで 話題に なりやすい（3倍）'}):
-  (t==='cab'?/^hostess/:/^(miko|cafegirl|cc_n)/).test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
+  (t==='cab'?/^hostess/:/^(cafegirl|cc_n)/).test(id)?{n:CH[id].name,mul:1.05+.03*CH[id].rar,rep:.05,pow:12+3*CH[id].rar,buzz:1,teach:0,d:`店の 売上 ${(1.05+.03*CH[id].rar).toFixed(2)}倍`}:null;
 const kstarIds=(t='cab')=>Object.keys(G.chars).filter(id=>kstarOf(id,t)).sort((a,b)=>(b==='momo')-(a==='momo')||(b==='mikan')-(a==='mikan')||CH[b].rar-CH[a].rar);
 const kstarPow=(L)=>{const S=kstarOf(L.star,L.t);return S?Math.round(S.pow*(1+.1*Math.min(10,(G.chars[L.star].dup||0)))):0;};
 const kanHrs=t=>{const[a,b]=KAN[t].open;return`${a}時〜${b>24?'翌'+(b-24):b}時`;};
