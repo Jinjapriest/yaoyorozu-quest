@@ -5178,10 +5178,10 @@ const GOD_START='2027-01-01',GOD_END='2027-01-03';
 const godDue=()=>{if(!G)return false;const d=jstDay();return d>=jstOf(GOD_START)&&d<=jstOf(GOD_END)&&G.godDay!==d;};
 const GOD_KUJI=[{n:'超安定タイプ',p:1/8.192,spins:10,od:'1/8.192×10回',win:{urtk:10,coins:1e7},wt:'UR確定チケ×10＋1000万（1回ごと）'},
   {n:'挑戦タイプ',p:1/8.192,spins:1,od:'1/8.192',win:{urtk:100,coins:1e8},wt:'UR確定チケ×100＋1億'},
-  {n:'超挑戦タイプ',p:1/81.92,spins:1,od:'1/81.92',win:{lrtk:300,xrtk:30,coins:1e11},wt:'LRチケ×300＋XRチケ×30＋1000億'},
-  {n:'激挑戦タイプ',p:1/819.2,spins:1,od:'1/819.2',win:{xrtk:300,lrtk:300,cryup:30,coins:1e13},wt:'XR・LRチケ×300＋高騰券30＋10兆'},
-  {n:'神々への挑戦',p:1/8192,spins:1,od:'1/8192',win:{xrtk:3000,lrtk:3000,lotto:1e6,coins:1e15},wp:1,ch:1,lg:1,wt:'XR・LRチケ×3000＋1000兆＋御神体＋主神＋？？？'},
-  {n:'神々からの挑戦',p:1/16384,spins:1,od:'1/16384',win:{xrtk:9000,lrtk:9000,lotto:3e6,coins:3e15},wp:3,ch:1,lg:1,wt:'神々への挑戦の 3倍＋御神体×3＋主神＋？？？',ura:1}];
+  {n:'超挑戦タイプ',p:1/81.92,spins:1,od:'1/81.92',win:{xrtk:100,coins:1e12},wt:'XR確定チケ×100＋1兆'},
+  {n:'激挑戦タイプ',p:1/819.2,spins:1,od:'1/819.2',win:{xrtk:2000,coins:1e13},wt:'XR確定チケ×2000＋10兆'},
+  {n:'神々への挑戦',p:1/8192,spins:1,od:'1/8192',win:{xrtk:8000,coins:1e14},wp:1,ch:1,lg:1,wt:'XRチケ×8000＋100兆＋御神体＋主神＋？？？'},
+  {n:'神々からの挑戦',p:1/16384,spins:1,od:'1/16384',win:{xrtk:10000,coins:1e15},wp:3,ch:1,lg:1,wt:'XRチケ×10000＋1000兆＋御神体×3＋主神＋？？？',ura:1}];
 const GOD_LOSE={kado:['門松',{tk:100}],mochi:['鏡餅',{srtk:50}],hama:['破魔矢',{urtk:5}]};
 /* 図柄（48×48） */
 function godSym(k,x,y,red){const P=(a,b,w,h,c)=>R(x+a,y+b,w,h,c);
