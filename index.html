@@ -2122,6 +2122,9 @@ const xor40=(a,b)=>(((Math.floor(a/P32)^Math.floor(b/P32))&255)*P32)+(((a%P32)^(
 const cEnc=n=>{let o='';for(let i=0;i<8;i++){o+=CODE_AL[n%32];n=Math.floor(n/32);}return o;};
 const cDec=t=>{let n=0;for(let i=7;i>=0;i--)n=n*32+CODE_AL.indexOf(t[i]);return n;};
 const cChk=pl=>h53(CODE_KEY+':'+pl)%P40,cMask=ck=>h53('m'+ck+'/'+CODE_KEY)%P40;
+/* 基礎Lv100で 渡す（すでに 持っていれば 100以上に 引き上げ） */
+function lv100W(id){addWeapon(id);const w=G.weapons[id];if(w)w.dup=Math.max(w.dup,99);}
+function lv100C(id){addChar(id);const c=G.chars[id];if(c)c.dup=Math.max(c.dup,XR_LV-1);applyXR();}
 const CODE_KIND=[
   {n:g=>`経験値書（${BN[g]}）`,give:(g,a)=>G.items.b[g]+=a,u:'冊'},
   {n:g=>`鍛錬鉱（${BN[g]}）`,give:(g,a)=>G.items.o[g]+=a,u:'個'},
@@ -2130,7 +2133,8 @@ const CODE_KIND=[
   {n:()=>'SR以上確定チケット',give:(g,a)=>G.items.srtk+=a,u:'枚'},
   {n:()=>'UR確定チケット',give:(g,a)=>G.items.urtk+=a,u:'枚'},
   {n:()=>'好きな 神か 仏陀',give:()=>{},u:'体',pick:true},
-  {n:()=>'XR ガイウスの槍（希望の槍）',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gaius');},u:'本'},
+  {n:g=>['XR ガイウスの槍（希望の槍）','XR GODの御神体（基礎Lv100）','XXR 八百万の主神 ゴッド（基礎Lv100）','？？？ 伝説の開発者 タムライツク（基礎Lv100）'][g],gmax:3,un:g=>g<=1?'本':'体',
+    give:(g,a)=>{if(g===0){for(let i=0;i<a;i++)addWeapon('w_gaius');return;}for(let i=0;i<a;i++){if(g===1)lv100W('w_godshintai');else lv100C(g===2?'godkami':'legend_itsuku');}fullHeal();},u:'本'},
   {n:()=>'【不動産融資キャンペーン】 イェソ',give:(g,a)=>{G.coins+=a*1e4;},u:'イェソ',mul:1e4},
   {n:()=>'XR 可能性の獣 トモヤヨシダ',give:(g,a)=>{for(let i=0;i<a;i++)addChar('tomoya');applyXR();fullHeal();},u:'体'},
   {n:()=>'XR 捕食植物 タケウチジョウチャン',give:(g,a)=>{for(let i=0;i<a;i++)addChar('jouchan');applyXR();fullHeal();},u:'体'},
@@ -5221,10 +5225,10 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
     if(res.god){hits++;add(K.win);fx=90;sfx('g5');msg=`GOD！！！ ${K.spins>1?`（${hits}回目）`:''}大当たり！`;}
     else if(res.lose){const L=GOD_LOSE[res.lose];add(L[1]);sfx('g3');msg=`${L[0]}が そろった！`;}
     else{sfx('g0');msg=K.spins>1?`はずれ（のこり ${K.spins-spin}回）`:'はずれ';}};
-  const finish=()=>{pop();scrGive(BAG);if(hits&&K.wp){for(let i=0;i<K.wp;i++)addWeapon('w_godshintai');}if(hits&&K.ch)addChar('godkami');if(hits&&K.lg)addChar('legend_itsuku');save();
+  const finish=()=>{pop();scrGive(BAG);if(hits&&K.wp){for(let i=0;i<K.wp;i++)lv100W('w_godshintai');}if(hits&&K.ch)lv100C('godkami');if(hits&&K.lg)lv100C('legend_itsuku');save();
     const L=scrLines(BAG),pg=[hits?(K.spins>1?`GOD ${hits}回！ おめでとう！！`:'神々への 挑戦… 大当たり！！'):'ミリオソゴッド 終了！'];
     for(let i=0;i<L.length;i+=3)pg.push((i?'':'手に入れた！\n')+L.slice(i,i+3).join('\n'));
-    if(hits&&K.wp)pg.push(`XR武器「GODの御神体」${K.wp>1?'×'+K.wp:''}を 手に入れた！`);if(hits&&K.ch)pg.push('XXR「八百万の主神 ゴッド」が 仲間に なった！！');if(hits&&K.lg)pg.push('…まばゆい 光の 中から だれかが 現れた。','レアリティ ？？？\n「伝説の開発者 タムライツク」が 仲間に なった！！！\n（全キャラの 技を どれでも MP100で 使える）');
+    if(hits&&K.wp)pg.push(`XR武器「GODの御神体」（基礎Lv100）${K.wp>1?'×'+K.wp:''}を 手に入れた！`);if(hits&&K.ch)pg.push('XXR「八百万の主神 ゴッド」（基礎Lv100）が 仲間に なった！！');if(hits&&K.lg)pg.push('…まばゆい 光の 中から だれかが 現れた。','レアリティ ？？？\n「伝説の開発者 タムライツク」（基礎Lv100）が 仲間に なった！！！\n（全キャラの 技を どれでも MP100で 使える）');
     pg.push('今年も よい 一年に なりますように。');dialog(pg);};
   push({full:true,ptr:true,upd(){t++;if(fx>0)fx--;const go=I.A||click!==null;click=null;
       if(ph==='idle'){if(go)startSpin();return;}
