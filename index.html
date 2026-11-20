@@ -5123,14 +5123,14 @@ function scrGive(R,m=1){for(const [k] of SCR_KEYS){const n=(R[k]||0)*m;if(!n)con
     else G.items[k]=(G.items[k]||0)+n;}save();}
 function scrShow(){const mode=scrMode()||'0',x7=mode==='7';G.scrDay=jstDay();save();const D=scrDate(),md=`${D.getUTCMonth()+1}月${D.getUTCDate()}日`;
   const mk=(syms,per)=>{const a=[];syms.forEach(k=>{for(let i=0;i<per;i++)a.push(k);});for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
-  const BAG={};const bag=R=>{for(const k in R)BAG[k]=(BAG[k]||0)+R[k];};let mult=1,exN=0;
+  const BAG={};const bag=R=>{for(const k in R)BAG[k]=(BAG[k]||0)+R[k];};let mult=1,exN=0,mainN=1;
   const fresh=ph=>({ph,n:ph==='main'?5:3,cells:ph==='main'?mk(LSC_SYM,5):mk(['torii','kagami','maga'],3),open:[],cur:ph==='main'?12:4,picks:ph==='main'?5:3,done:false,hit:null,t:0,mx:0});
   let st=fresh('main'),click=null;
   const PAY=x7?[['5つ','全部のせ','#fc74b4'],['4つ','UR＋1兆','#f8b800'],['3つ','SR＋くじ10万','#3cbcfc'],['2つ','チケ＋高騰5','#fcfcfc'],['はずれ','100イェソ','#bcbcbc']]
     :[['5つ','LRチケ×500','#fc74b4'],['4つ','URチケ×500','#f8b800'],['3つ','SRチケ×500','#3cbcfc'],['2つ','チケ×500','#fcfcfc'],['はずれ','100イェソ','#bcbcbc']];
   const judge=()=>{const c={};st.open.forEach(i=>c[st.cells[i]]=(c[st.cells[i]]||0)+1);const mx=Math.max(...Object.values(c)),k=Object.keys(c).find(q=>c[q]===mx);st.mx=mx;st.hit=mx>=2?k:null;st.done=true;st.t=0;
     const big_=st.ph==='main'?mx>=4:mx>=(st.ph==='bai'?2:3);sfx(big_?'g5':mx>=2?'g3':'g0');};
-  const next=ph=>{st=fresh(ph);};
+  const next=ph=>{if(ph==='main')mainN++;st=fresh(ph);};
   const toBai=()=>{dialog(['スクラッチ 終了！',`ここまでの 賞品：\n${scrLines(BAG).slice(0,4).join('\n')}`,'バイツチャレンジ 突入！\n3×3の マスから 3つ 削って\n図柄が 2つ そろうたびに 賞品が 倍に なる！\n全部 ちがう 図柄なら 終了'],()=>{next('bai');push(scr);});};
   const end7=()=>{scrGive(BAG,mult);dialog([`バイツチャレンジ 終了！　最終倍率 ×${fmt(mult)}`,...(()=>{const L=scrLines(BAG,mult),pg=[];for(let i=0;i<L.length;i+=3)pg.push((i?'':'手に入れた！\n')+L.slice(i,i+3).join('\n'));return pg;})()]);};
   const finish=()=>{pop();const ph=st.ph,mx=st.mx;
@@ -5139,10 +5139,10 @@ function scrShow(){const mode=scrMode()||'0',x7=mode==='7';G.scrDay=jstDay();sav
       if(!x7){scrGive(R);const pg=[head,scrLines(R).join('\n')+(mx>=2?' を 手に入れた！':' を 手に入れた。')];
         if(mx>=5){pg.push('さらに… エクストラチャレンジ 発生！\n3×3の マスから 3つ 削って\n3つ そろえば XR確定チケット ×500！');dialog(pg,()=>{next('ex');push(scr);});}else dialog(pg);return;}
       bag(R);const pg=[head,'獲得（バイツチャレンジで 倍に なるかも）：\n'+scrLines(R).slice(0,3).join('\n')];
-      if(mx>=5){pg.push('さらに… エクストラチャレンジ 発生！\n3つ そろえば XR確定チケット ×500\n＆ エクストラスクラッチ もう1回！');dialog(pg,()=>{next('ex');push(scr);});}else dialog(pg,toBai);return;}
+      if(mx>=5){pg.push('さらに… エクストラチャレンジ 発生！\n3つ そろえば XR確定チケット ×500\n＆ 5×5の スクラッチを もう1回！');dialog(pg,()=>{next('ex');push(scr);});}else dialog(pg,toBai);return;}
     if(ph==='ex'){exN++;
       if(mx>=3){if(!x7){scrGive({xrtk:500});dialog(['エクストラチャレンジ 成功！！','XR確定チケット ×500を 手に入れた！']);return;}
-        bag({xrtk:500});dialog([`エクストラチャレンジ 成功！！（${exN}回目）`,'XR確定チケット ×500 獲得！','エクストラスクラッチ もう1回！！'],()=>{next('ex');push(scr);});return;}
+        bag({xrtk:500});dialog([`エクストラチャレンジ 成功！！（${exN}回目）`,'XR確定チケット ×500 獲得！','エクストラバイツスクラッチ もう1回！！\n5×5の スクラッチに もどる！'],()=>{next('main');push(scr);});return;}
       if(!x7){dialog(['エクストラチャレンジは 残念…','（LR確定チケット ×500は 受け取り済み）']);return;}
       dialog(['エクストラチャレンジは ここまで…'],toBai);return;}
     if(ph==='bai'){if(mx>=2){mult*=2;dialog([`図柄が そろった！　倍率 ×${fmt(mult)}！！`,'バイツチャレンジ つづく！'],()=>{next('bai');push(scr);});}else end7();}};
@@ -5154,7 +5154,7 @@ function scrShow(){const mode=scrMode()||'0',x7=mode==='7';G.scrDay=jstDay();sav
       if(I.A)scrape(st.cur);if(click!==null){st.cur=click;scrape(click);click=null;}},
     drw(){R(0,0,W,H,x7?'#1c0024':'#000');const g=geo(),ph=st.ph;
       const ttl=ph==='ex'?'★ エクストラチャレンジ ★':ph==='bai'?'★ バイツチャレンジ ★':x7?'★ エクストラバイツスクラッチ ★':'★ 0のつく日 ログインボーナス ★';
-      const sub=ph==='ex'?(x7?'3つ そろえば XRチケ×500＋もう1回':'3つ そろえば XR確定チケット ×500'):ph==='bai'?`いまの 倍率 ×${fmt(mult)}　2つ そろえば 倍！`:`${md}　${x7?'7のつく日 ':''}スクラッチ`;
+      const sub=ph==='ex'?(x7?'3つ そろえば XRチケ×500＋5×5 もう1回':'3つ そろえば XR確定チケット ×500'):ph==='bai'?`いまの 倍率 ×${fmt(mult)}　2つ そろえば 倍！`:`${md}　${x7?'7のつく日 ':''}スクラッチ${mainN>1?`（${mainN}回目）`:''}`;
       win(4,4,248,30,x7?'#fc74b4':'#f8b800');big(ttl,128,10,ph==='main'?(x7?'#fc74b4':'#f8b800'):ph==='bai'?'#3cbcfc':'#fc74b4','center',12);txt(sub,128,23,'#fcfcfc','center',240);
       const left=st.picks-st.open.length;
       R(g.bx,g.by,g.bw,g.bw,ph==='bai'?'#3cbcfc':'#f8b800');R(g.bx+2,g.by+2,g.bw-4,g.bw-4,x7?'#5c0058':'#24188c');
