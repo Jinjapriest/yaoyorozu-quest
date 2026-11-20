@@ -1065,7 +1065,7 @@ const STADS=[],BB_TEAMS=[
   {id:'leons',n:'サキタマ・レオンズ',s:'レオンズ',c:'オオミヤ',par:'yaotetsu',lg:1,col:'#0058f8'},{id:'emperors',n:'グンマー・エンペラーズ',s:'エンペラーズ',c:'帝都 グンマー',par:'teiai',lg:1,col:'#000000'},
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
-const ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
+const AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
@@ -1174,6 +1174,10 @@ function genMap(){
       if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y))continue;
       let cx=v.x,cy=v.y;while(cx!==x||cy!==y){if(cx!==x)cx+=Math.sign(x-cx);else cy+=Math.sign(y-cy);if(cx===x&&cy===y)break;const t2=tileAt(cx,cy);if(!isTownT(t2)&&t2!==T.SHR&&t2!==T.KEIBAJO&&t2!==T.CONV&&t2!==T.LOVEH&&t2!==T.WALL&&t2!==T.GGATE)setT(cx,cy,t2===T.WATER||t2===T.SEA?T.BRIDGE:t2===T.MOUNT?T.YAMA:T.ROAD);}
       setT(x,y,T.STAD);STADS.push({x,y,vi});done=true;}});
+  /* 11/20：アイヂ編の 予告（サキタマの 南の はずれに 手がかり） */
+  AIDI_H.length=0;[[146,176,'teba'],[157,177,'miso'],[167,176,'ebi'],[176,178,'shachi'],[185,176,'sign']].forEach(([tx,ty,k])=>{let done=false;
+    for(let r=0;r<=6&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=tx+dx,y=ty+dy,t=tileAt(x,y);
+      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y))continue;AIDI_H.push({x,y,k});done=true;}});
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1707,6 +1711,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     {const n=namidaPos(),sx=n.x*16-camX,sy=n.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawNamida(sx,sy);}
     for(const o of STADS){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawStad(sx,sy);}
     for(const o of ROADSIDE){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawRoadside(o,sx,sy);}
+    for(const o of AIDI_H){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAidiH(o,sx,sy);}
     if(G.ajito&&G.ajito.x!=null&&ajOK()){const sx=G.ajito.x*16-camX,sy=G.ajito.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAjHouse(sx,sy);}
     drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();fkHeatBadge();
     const vi=nearestVil(G.pos.x,G.pos.y),v=VIL[vi],t=v.tier;
@@ -1726,6 +1731,7 @@ function onStep(pv){timeAdd(5);dqHit('step');fkHeatStep();
   if(t===T.GSEAL){const g=GSEALS.find(q=>q.x===x&&q.y===y);if(g){gsealScr(g);return;}}
   if(t===T.KQSPOT){kqFac('kqcable');return;}
   if(t===T.STAD){const o=STADS.find(q=>q.x===x&&q.y===y);if(o){enterStad(o.vi,pv||{x,y:y+1});return;}}
+  {const o=AIDI_H.find(q=>q.x===x&&q.y===y);if(o){aidiStep(o);return;}}
   if(t===T.CONV||t===T.LOVEH){const o=ROADSIDE.find(q=>q.x===x&&q.y===y);if(o){enterRoom(o.k,{field:pv||{x,y:y+1},o});return;}}
   if(t===T.KEIBAJO){const ck=CHIHO.find(c=>c.x===x&&c.y===y);if(ck){chihoEnter(ck);return;}enterKeibajo(x===MJO.x&&y===MJO.y?VIL.findIndex(v=>v.capital):undefined);return;}
   if(isTownT(t)){enterVillage(VIL.findIndex(v=>v.x===x&&v.y===y));return;}
@@ -3677,6 +3683,21 @@ function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
     case 'rstand':R(sx,sy,16,16,'#5c5c6c');for(let k=0;k<4;k++)R(sx,sy+k*4,16,1,'#3c3c4c');for(let k=0;k<3;k++)R(sx+2+k*5,sy+1+((c.x||0)*3+k)%3*4,2,2,['#d82800','#fcfcfc','#3cbcfc','#f8b800'][((c.x||0)+k)%4]);break;
     case 'rscore':R(sx,sy,16,16,'#000');R(sx,sy,16,1,'#5c5c5c');if(c.x===8)txt('SCORE',sx+8,sy+4,'#f8b800','center',40);else for(let k=0;k<3;k++)R(sx+3+k*4,sy+6,2,4,(frame>>4)%2?'#7ee07e':'#3c7c3c');break;
     case 'rplant':fl();R(sx+6,sy+10,4,5,'#a05000');pc(sx+8,sy+7,5,'#00a800');pc(sx+6,sy+5,3,'#00c800');break;}}
+/* アイヂの 手がかり（フィールドの 小物） */
+function drawAidiH(o,x,y){const P=(a,b,w,h,c)=>R(x+a,y+b,w,h,c);
+  if(o.k==='teba'){for(const [a,b] of [[3,9],[7,7],[10,10],[5,12],[9,5]]){P(a,b,4,1,'#fcf0d8');P(a-1,b-1,1,1,'#fcf0d8');P(a+4,b+1,1,1,'#fcf0d8');}P(6,13,2,1,'#a05000');}
+  else if(o.k==='miso'){P(2,8,12,5,'#5c1c00');P(3,7,10,7,'#5c1c00');P(4,8,6,2,'#882c00');P(5,8,2,1,'#c87c3c');if((frame>>4)%3===0)P(10,10,1,1,'#c87c3c');}
+  else if(o.k==='ebi'){P(5,9,6,3,'#d87c00');P(4,10,1,1,'#d87c00');P(11,8,2,2,'#d82800');P(12,7,2,1,'#d82800');P(13,9,1,2,'#d82800');P(6,9,4,1,'#fcbc3c');}
+  else if(o.k==='shachi'){const g=frame%60<30?'#f8d878':'#f8b800';P(5,8,3,3,g);P(9,10,3,3,g);P(6,12,3,3,g);P(5,8,1,1,'#fcfcfc');P(9,10,1,1,'#fcfcfc');}
+  else if(o.k==='sign'){P(2,9,12,5,'#a05000');P(3,10,10,3,'#f8d878');P(4,11,8,1,'#1c1c1c');P(6,14,1,2,'#7c4c10');P(10,13,1,2,'#7c4c10');}
+}
+const AIDI_T={teba:['食べつくされた 手羽先の 骨が\nあちこちに 散らばっている…','甘辛い タレの 匂いが まだ 残っている。\n…南の 方から 持ちこまれた ものらしい。'],
+  miso:['赤黒い 水たまりが ある。','…なめてみると 濃い 味噌の 味が する！\nこれは 八丁味噌…？\n南の 国では 何にでも 味噌を かけるらしい。'],
+  ebi:['大きな エビフライの しっぽが 落ちている。','衣は さくさく… 誰かが\n「エビフリャー うみゃあでよ」と 言いながら\n食べていったのだろうか。'],
+  shachi:['金色の 大きな うろこが 光っている。','魚の ものでは ない… 城の 屋根に\n乗っている 金のシャチホコの ものだろうか？'],
+  sign:['倒れた 看板が ある。','「この先 アイヂ　どえりゃあ 遠いでよ」\n…ここから 南へ 道が つづいて いたらしい。']};
+function aidiStep(o){if(!G.aidi)G.aidi={};const first=!G.aidi[o.k];G.aidi[o.k]=1;const n=Object.keys(G.aidi).length;
+  const pg=AIDI_T[o.k].slice();if(first){pg.push(n>=5?'アイヂの 手がかりを すべて 見つけた！（5/5）\nサキタマの 南に… 新しい 国が あるらしい。':`アイヂの 手がかり ${n}/5`);sfx(n>=5?'g5':'ok');}dialog(pg);}
 function drawRoadside(o,sx,sy){if(o.k==='conv'){const c=o.n==='ローソソ'?'#3c7cfc':o.n==='エイトトゥウェルブ'?'#00a800':'#f8b800';
     R(sx,sy+4,16,12,'#fcfcfc');R(sx,sy+3,16,3,c);R(sx,sy+6,16,1,c==='#00a800'?'#d82800':'#fcfcfc');R(sx+2,sy+8,5,4,'#a4e4fc');R(sx+9,sy+8,5,8,'#a4e4fc');R(sx+11,sy+8,1,8,'#7c7c7c');txt(o.n[0],sx+8,sy-2,c,'center',16);}
   else{const on=(frame>>4)&1;R(sx+1,sy+2,14,14,'#a8287c');R(sx+1,sy+1,14,2,'#f878f8');for(let k=0;k<3;k++)R(sx+3+k*4,sy+5,2,3,'#f8d878');R(sx+5,sy+11,6,5,'#3c0c3c');R(sx+2,sy-2,12,3,on?'#f878f8':'#7c287c');txt('♥',sx+8,sy-3,on?'#fcfcfc':'#f878f8','center',12);}}
@@ -6611,7 +6632,7 @@ function skLines(vi){const S=skS(),v=VIL[vi],nm=v.name.replace(/^.* /,'');
   if(nm==='チチブ')return['武甲山は 削られて 形が 変わっちまった。','坑道の 奥から 夜な夜な 呻き声が…','秩父神社の 夜祭りは 冬の 名物だよ。'];
   if(nm==='オオミヤ')return['真夜中に 白い 列車が 走るんだ。 時刻表に ない 列車が。','鉄道の 街だからね。 列車の 音で 目が 覚めるのさ。','氷川さまの 参道は 日本一 長いんだって。'];
   if(nm==='コエド')return['蔵造りの 町並みと 時の鐘が 自慢だよ。','いもの お菓子を 食べていきな。','ナメガワマチから 逃げてきた 人を かくまってる 家が あるらしい。'];
-  return['せんべい 焼きたてだよ！','サキタマは 海が ない。 だから 川と 田んぼを 大事に するんだ。','ナメガワマチの 噂？ …あまり 大きな 声では 言えないね。'];}
+  return['南の はずれで 手羽先の 骨を 見たって 話だ。\n…南に まだ 国が あるのかねえ。','南から 来た 旅人が「でら」とか「だがや」とか\n変わった 言葉を しゃべってたよ。','せんべい 焼きたてだよ！','サキタマは 海が ない。 だから 川と 田んぼを 大事に するんだ。','ナメガワマチの 噂？ …あまり 大きな 声では 言えないね。'];}
 function skFac(kind){const S=skS(),q=skQ();
   if(kind==='sknegi'&&fkOpen()){fkFac('fknegi');return;}
   if(kind==='skkuma'){
