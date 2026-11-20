@@ -5211,6 +5211,61 @@ function godSelect(){let cur=0,ura=false,seq='',fl=0,click=null;
         txt(`${i+1}. ${K.n}`,18,y+6,K.ura?'#fc7460':sel?'#f8d878':'#fcfcfc');txt(K.od,240,y+6,'#bcbcbc','right');txt(K.wt,18,y+17,'#bcbcbc','left',220);
         if(sel&&(frame>>3)%2)txt('▶',10,y+6,'#f8b800');region(8,y,240,29,()=>{click=i;});}
       if(!ura)txt('二礼 二拍手 一礼…？',128,206,'#3c3c3c','center');}});}
+/* GOD揃い後の フリーズ演出（虹の閃光 → 天への階段 → GODエンブレム） */
+let GODEMB=null;
+function godEmblem(red,shine){if(!GODEMB){GODEMB=document.createElement('canvas');GODEMB.width=480;GODEMB.height=240;}
+  const g=GODEMB.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,480,240);g.setTransform(2,0,0,2,0,0);
+  const P=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+  const fr=red?'#3c0000':'#5c2c00',rim=red?'#d82800':'#f8b800',rimHi=red?'#fc7460':'#fcf0a8',rimLo=red?'#7c0000':'#c88000',base=red?'#1c0000':'#24188c',baseHi=red?'#5c0000':'#3c3cbc';
+  for(const [a,b,w,h] of [[116,0,8,14],[116,106,8,14],[0,56,12,8],[228,56,12,8]])P(a,b,w,h,rim);
+  P(8,12,224,96,fr);P(12,16,216,88,rim);P(12,16,216,6,rimHi);P(12,98,216,6,rimLo);P(20,24,200,72,fr);P(22,26,196,68,base);P(22,26,196,20,baseHi);
+  P(2,48,10,24,fr);P(228,48,10,24,fr);P(4,52,6,16,red?'#a800a8':'#3cb8fc');P(230,52,6,16,red?'#a800a8':'#3cb8fc');
+  g.font='64px '+FONT;g.textAlign='center';g.textBaseline='middle';
+  for(let d=7;d>=1;d--){g.fillStyle=d>5?'#000':red?'#5c0000':'#7c3000';g.fillText('GOD',120+d*.5,61+d);}
+  g.lineJoin='round';g.lineWidth=5;g.strokeStyle=red?'#1c0000':'#2c1000';g.strokeText('GOD',120,61);
+  const gr=g.createLinearGradient(0,34,0,90);
+  if(red){gr.addColorStop(0,'#fcfcfc');gr.addColorStop(.45,'#fcc8b8');gr.addColorStop(.5,'#fc7460');gr.addColorStop(1,'#d82800');}
+  else{gr.addColorStop(0,'#fcfcd8');gr.addColorStop(.42,'#f8d878');gr.addColorStop(.5,'#f8b800');gr.addColorStop(.8,'#e08800');gr.addColorStop(1,'#fcd858');}
+  g.fillStyle=gr;g.fillText('GOD',120,61);g.lineWidth=1.5;g.strokeStyle=red?'#fcd8d0':'#fcfcd8';g.globalAlpha=.6;g.strokeText('GOD',119,60);g.globalAlpha=1;
+  if(shine!=null){g.globalCompositeOperation='source-atop';g.fillStyle='rgba(255,255,255,.85)';g.beginPath();g.moveTo(shine,0);g.lineTo(shine+22,0);g.lineTo(shine-18,120);g.lineTo(shine-40,120);g.fill();
+    g.fillStyle='rgba(255,255,255,.4)';g.beginPath();g.moveTo(shine+30,0);g.lineTo(shine+38,0);g.lineTo(shine-2,120);g.lineTo(shine-10,120);g.fill();g.globalCompositeOperation='source-over';}
+  return GODEMB;}
+function godFreeze(red,cb){let t=0;const END=360,CX=128,VY=46;
+  const rays=(cx,cy,n,rot,c1,c2,len=400)=>{for(let i=0;i<n;i++){const a0=rot+i*Math.PI*2/n,a1=a0+Math.PI/n;ctx.fillStyle=typeof c1==='function'?c1(i):(i%2?c1:c2);
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a0)*len,cy+Math.sin(a0)*len);ctx.lineTo(cx+Math.cos(a1)*len,cy+Math.sin(a1)*len);ctx.fill();}};
+  const glow=(x,y,r,c,a=1)=>{const gr=ctx.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,c);gr.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=a;ctx.fillStyle=gr;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.globalAlpha=1;};
+  const sky=()=>{const gr=ctx.createLinearGradient(0,0,0,H);
+    if(red){gr.addColorStop(0,'#fcc8b8');gr.addColorStop(.3,'#d82800');gr.addColorStop(1,'#1c0000');}else{gr.addColorStop(0,'#fcfcd8');gr.addColorStop(.35,'#f8d878');gr.addColorStop(1,'#a85800');}
+    ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);};
+  const cloud=(x,y,s)=>{const c=red?'#a83c3c':'#fcf0d0',sh=red?'#5c1010':'#e0b860';pe(x,y+3*s,26*s,8*s,sh);pe(x-14*s,y,14*s,9*s,c);pe(x+12*s,y-1*s,16*s,11*s,c);pe(x,y-6*s,13*s,10*s,c);pe(x,y+2*s,26*s,7*s,c);};
+  const stairs=k=>{sky();glow(CX,VY,110,red?'rgba(255,220,200,.95)':'rgba(255,255,240,.95)');
+    ctx.globalAlpha=.18;for(let i=0;i<7;i++){const x=CX+(i-3)*30+Math.sin(k*.02+i)*6;R(x-5,0,10,H,'#fff');}ctx.globalAlpha=1;
+    const ph=(k*.012)%1,N=16,yAt=u=>VY+(H+20-VY)*u*u,wAt=u=>14+230*u*u;
+    for(let i=0;i<N;i++){const u0=(i+ph)/N,u1=(i+1+ph)/N,y0=yAt(u0),y1=yAt(u1),w0=wAt(u0),w1=wAt(u1),ym=y0+(y1-y0)*.55;
+      ctx.fillStyle=red?'#7c1010':'#c88000';ctx.beginPath();ctx.moveTo(CX-w0/2,y0);ctx.lineTo(CX+w0/2,y0);ctx.lineTo(CX+w1/2,ym);ctx.lineTo(CX-w1/2,ym);ctx.fill();
+      ctx.fillStyle=red?'#d84040':'#fcf0b0';ctx.beginPath();ctx.moveTo(CX-w1/2,ym);ctx.lineTo(CX+w1/2,ym);ctx.lineTo(CX+w1/2,y1);ctx.lineTo(CX-w1/2,y1);ctx.fill();
+      if(i%2===0){const ph2=Math.max(2,30*u1*u1),pw=Math.max(1,8*u1);for(const sx of [-1,1]){const px=CX+sx*(w1/2+pw);R(px-pw/2,y1-ph2*2.2,pw,ph2*2.2,red?'#fcb8a8':'#fcfcfc');R(px-pw/2,y1-ph2*2.2,Math.max(1,pw/3),ph2*2.2,red?'#a83c3c':'#e0c880');R(px-pw,y1-ph2*2.2-2,pw*2,2,red?'#fcd8d0':'#fcfcd8');}}}
+    for(let i=0;i<6;i++){const s=1+((k*.004+i/6)%1)*1.6,side=i%2?1:-1,y=120+((k*.4+i*37)%140);cloud(CX+side*(70+s*30),y,s*.8);}};
+  push({full:true,ptr:true,upd(){t++;
+      if(t===1){sfx('crit');sfx('lg_rise');}if(t===40)sfx('lg_line');if(t===120)sfx('lg_glint');if(t===150)sfx('lg_rise');if(t===176){sfx('crit');sfx('lg_chord');}if(t===210||t===290)sfx('lg_glint');
+      if(I.A&&t>45&&t<END-10)t=Math.max(t,END-10);if(t>=END){pop();cb();}},
+    drw(){ctx.save();
+      if(t<26){R(0,0,W,H,'#000');rays(CX,110,28,t*.09,i=>`hsl(${(i*360/28+t*18)%360},95%,${t%4<2?60:72}%)`,null);glow(CX,110,60+t*4,'rgba(255,255,255,1)');if(t>18)R(0,0,W,H,`rgba(255,255,255,${(t-18)/8})`);}
+      else if(t<176){const k=t-26;stairs(k);
+        const zs=t<150?1.4+k*.008:2.4,fy=VY-14*zs+Math.sin(t*.08)*1.5;glow(CX,fy+8*zs,30*zs,red?'rgba(255,200,180,.9)':'rgba(255,255,255,.95)');
+        if(t<165)drawChar('godkami',CX-8*zs,fy,(t>>4)&1,zs);
+        if(t>=110){const p=t<150?0:Math.min(1,(t-150)/26),e=p*p,s=.22+e*1.0,cy=VY-26+(110-VY+26)*e;ctx.globalAlpha=t<150?Math.min(1,(t-110)/20):1;
+          ctx.drawImage(godEmblem(red,null),CX-120*s,cy-60*s,240*s,120*s);ctx.globalAlpha=1;if(p>.6)R(0,0,W,H,`rgba(255,255,255,${(p-.6)*2.5})`);}
+        if(t<46)R(0,0,W,H,`rgba(255,255,255,${t<36?1:1-(t-36)/10})`);}
+      else{const u=t-176,sh=u<24?(24-u)/24*4:0;ctx.translate(Math.round((Math.random()-.5)*sh*2),Math.round((Math.random()-.5)*sh*2));
+        R(-8,-8,W+16,H+16,red?'#3c0000':'#c86000');rays(CX,110,24,u*.012,red?'#d82800':'#f8b800',red?'#7c0000':'#fcd858');glow(CX,110,150,red?'rgba(255,180,160,.9)':'rgba(255,255,230,.95)');
+        if(u>50){const ry=Math.max(18,120-(u-50)*1.6);glow(CX,ry+28,46,red?'rgba(255,220,200,.9)':'rgba(255,255,255,.9)');drawChar('godkami',CX-24,ry,(t>>4)&1,3);}
+        const s=u<14?1.25-u/14*.25:1+Math.sin(u*.07)*.015,sw=u>=34&&u<70?(u-34)*9-40:u>=114&&u<150?(u-114)*9-40:null;
+        ctx.drawImage(godEmblem(red,sw),CX-120*s,110-60*s,240*s,120*s);
+        for(let i=0;i<14;i++){const a=i*2.39996,rr=70+(i*29)%60,x=CX+Math.cos(a)*rr*1.25,y=110+Math.sin(a)*rr*.8,tw=(u*3+i*17)%60;if(tw<24){const l=tw<12?tw/2:(24-tw)/2,c=red?'#fcd8d0':'#fcfcd8';R(x-l,y,l*2+1,1,c);R(x,y-l,1,l*2+1,c);R(x-1,y-1,3,3,'#fff');}}
+        if(u<8)R(-8,-8,W+16,H+16,`rgba(255,255,255,${1-u/8})`);
+        if(u>60)txt('Aで つぎへ',248,228,(frame>>4)%2?'#fcfcfc':'#7c7c7c','right');}
+      ctx.restore();if(t>45&&t<176)txt('Aで スキップ',248,4,'#3c3c3c','right');region(0,0,W,H,()=>{vA=true;});}});}
 function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='idle',msg='Aで スタート！',res=null,t=0,fx=0;
   const reels=[0,1,2].map(i=>({pos:i*48*3,v:0,target:null,stop:true}));const n=GOD_STRIP.length,LEN=n*48;
   const add=R_=>{for(const k in R_)BAG[k]=(BAG[k]||0)+R_[k];};
@@ -5222,7 +5277,7 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
   const startSpin=()=>{res=decide();ph='spin';t=0;msg=K.spins>1?`${spin}回目 回転中…（Aで 止める）`:'回転中…（Aで 止める）';reels.forEach(r=>{r.v=10;r.stop=false;r.target=null;});sfx('ok');};
   const stopNext=()=>{const i=reels.findIndex(r=>!r.stop&&r.target===null);if(i<0)return;const r=reels[i],ix=idxOf(res.syms[i]);let tp=ix*48;while(tp<r.pos+48)tp+=LEN;r.target=tp;};
   const judge=()=>{ph='res';t=0;
-    if(res.god){hits++;add(K.win);fx=90;sfx('g5');msg=`GOD！！！ ${K.spins>1?`（${hits}回目）`:''}大当たり！`;}
+    if(res.god){hits++;add(K.win);ph='frz';godFreeze(red,()=>{ph='res';t=0;fx=90;sfx('g5');msg=`GOD！！！ ${K.spins>1?`（${hits}回目）`:''}大当たり！`;});}
     else if(res.lose){const L=GOD_LOSE[res.lose];add(L[1]);sfx('g3');msg=`${L[0]}が そろった！`;}
     else{sfx('g0');msg=K.spins>1?`はずれ（のこり ${K.spins-spin}回）`:'はずれ';}};
   const finish=()=>{pop();scrGive(BAG);if(hits&&K.wp){for(let i=0;i<K.wp;i++)lv100W('w_godshintai');}if(hits&&K.ch)lv100C('godkami');if(hits&&K.lg)lv100C('legend_itsuku');save();
