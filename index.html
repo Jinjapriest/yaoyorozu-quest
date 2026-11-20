@@ -5226,7 +5226,7 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
     else if(res.lose){const L=GOD_LOSE[res.lose];add(L[1]);sfx('g3');msg=`${L[0]}が そろった！`;}
     else{sfx('g0');msg=K.spins>1?`はずれ（のこり ${K.spins-spin}回）`:'はずれ';}};
   const finish=()=>{pop();scrGive(BAG);if(hits&&K.wp){for(let i=0;i<K.wp;i++)lv100W('w_godshintai');}if(hits&&K.ch)lv100C('godkami');if(hits&&K.lg)lv100C('legend_itsuku');save();
-    const L=scrLines(BAG),pg=[hits?(K.spins>1?`GOD ${hits}回！ おめでとう！！`:'神々への 挑戦… 大当たり！！'):'ミリオソゴッド 終了！'];
+    const L=scrLines(BAG),pg=[hits?(K.spins>1?`GOD ${hits}回！ おめでとう！！`:(K.ura?'神々からの 挑戦… 大当たり！！！':`${K.n}… 大当たり！！`)):'ミリオソゴッド 終了！'];
     for(let i=0;i<L.length;i+=3)pg.push((i?'':'手に入れた！\n')+L.slice(i,i+3).join('\n'));
     if(hits&&K.wp)pg.push(`XR武器「GODの御神体」（基礎Lv100）${K.wp>1?'×'+K.wp:''}を 手に入れた！`);if(hits&&K.ch)pg.push('XXR「八百万の主神 ゴッド」（基礎Lv100）が 仲間に なった！！');if(hits&&K.lg)pg.push('…まばゆい 光の 中から だれかが 現れた。','レアリティ ？？？\n「伝説の開発者 タムライツク」（基礎Lv100）が 仲間に なった！！！\n（全キャラの 技を どれでも MP100で 使える）');
     pg.push('今年も よい 一年に なりますように。');dialog(pg);};
