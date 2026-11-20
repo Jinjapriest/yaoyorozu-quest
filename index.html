@@ -5277,7 +5277,7 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
   const startSpin=()=>{res=decide();ph='spin';t=0;msg=K.spins>1?`${spin}回目 回転中…（Aで 止める）`:'回転中…（Aで 止める）';reels.forEach(r=>{r.v=10;r.stop=false;r.target=null;});sfx('ok');};
   const stopNext=()=>{const i=reels.findIndex(r=>!r.stop&&r.target===null);if(i<0)return;const r=reels[i],ix=idxOf(res.syms[i]);let tp=ix*48;while(tp<r.pos+48)tp+=LEN;r.target=tp;};
   const judge=()=>{ph='res';t=0;
-    if(res.god){hits++;add(K.win);ph='frz';godFreeze(red,()=>{ph='res';t=0;fx=90;sfx('g5');msg=`GOD！！！ ${K.spins>1?`（${hits}回目）`:''}大当たり！`;});}
+    if(res.god){hits++;add(K.win);ph='align';t=0;sfx('lg_tick');msg='GOD… ！？';}
     else if(res.lose){const L=GOD_LOSE[res.lose];add(L[1]);sfx('g3');msg=`${L[0]}が そろった！`;}
     else{sfx('g0');msg=K.spins>1?`はずれ（のこり ${K.spins-spin}回）`:'はずれ';}};
   const finish=()=>{pop();scrGive(BAG);if(hits&&K.wp){for(let i=0;i<K.wp;i++)lv100W('w_godshintai');}if(hits&&K.ch)lv100C('godkami');if(hits&&K.lg)lv100C('legend_itsuku');save();
@@ -5289,6 +5289,7 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
       if(ph==='idle'){if(go)startSpin();return;}
       if(ph==='spin'){for(const r of reels){if(r.stop)continue;if(r.target!==null){r.pos=Math.min(r.pos+r.v,r.target);if(r.pos>=r.target){r.stop=true;r.pos=r.target%LEN;sfx('cur');}}else r.pos+=r.v;}
         if(go&&t>10)stopNext();if(t>200&&t%20===0)stopNext();if(reels.every(r=>r.stop))judge();return;}
+      if(ph==='align'){if(t>=80){ph='frz';godFreeze(red,()=>{ph='res';t=0;fx=90;sfx('g5');msg=`GOD！！！ ${K.spins>1?`（${hits}回目）`:''}大当たり！`;});}return;}
       if(ph==='res'){if(t>(fx?80:30)&&(go||(K.spins>1&&!res.god&&!res.lose&&t>60))){if(spin<K.spins){ph='idle';startSpin();}else finish();}}},
     drw(){R(0,0,W,H,red?'#1c0000':'#000');if(fx>0&&fx%10<5)R(0,0,W,H,red?'#5c0000':'#5c3c00');
       win(4,4,248,32,red?'#d82800':'#f8b800');big(K.n,128,8,red?'#fc7460':'#f8b800','center',12);txt(`大当たり ${K.od}　GOD:${K.wt}`,128,24,'#fcfcfc','center',240);
@@ -5296,6 +5297,7 @@ function godSlot(K){const red=!!K.ura,BAG={};let spin=0,hits=0,click=null,ph='id
       reels.forEach((r,i)=>{const x=X0+i*(CW+4);R(x,Y0,CW,144,red?'#f8d8c8':'#f8e8c8');ctx.save();ctx.beginPath();ctx.rect(x,Y0,CW,144);ctx.clip();
         const k=Math.floor(r.pos/48),fr=r.pos-k*48;for(let j=-2;j<=2;j++){const si=((k-j)%n+n)%n,yy=Y0+48+j*48+fr;godSym(GOD_STRIP[si],x+4,yy,red);}ctx.restore();});
       R(X0-6,Y0+70,4,4,'#d82800');R(X0+CW*3+8+2,Y0+70,4,4,'#d82800');R(X0,Y0+47,CW*3+8,1,'#d82800');R(X0,Y0+96,CW*3+8,1,'#d82800');
+      if(ph==='align'&&t%16<8){R(X0,Y0+47,CW*3+8,2,'#fcfcfc');R(X0,Y0+95,CW*3+8,2,'#fcfcfc');R(X0-6,Y0+68,4,8,'#fcfcfc');R(X0+CW*3+8+2,Y0+68,4,8,'#fcfcfc');}
       if(fx>0)big('GOD!!',128,Y0+60+(fx%6<3?0:2),red?'#fcfcfc':'#d82800','center',22);
       win(4,198,248,40);txt(msg,128,206,fx?'#f8d878':'#fcfcfc','center',240);txt(K.spins>1?`回転 ${spin}/${K.spins}　GOD ${hits}回`:'1回 勝負',128,220,'#bcbcbc','center');
       region(0,40,W,198,()=>{click=1;});}});}
