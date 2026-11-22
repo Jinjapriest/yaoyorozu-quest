@@ -4833,19 +4833,20 @@ const SLX={
 };
 /* SLX-END */
 
-/* 機種の 並び（1店 24台・過疎店 8台） */
-const HALL_L=[...Array(5).fill('piero'),...Array(5).fill('hana'),...Array(3).fill('biscus'),...Array(4).fill('crimson'),...Array(4).fill('brave'),...Array(3).fill('pearl')],KASO_L=['piero','hana','hana','biscus','biscus','pearl','crimson','brave'];
+/* 機種の 並び（1店 60台・過疎店 20台） */
+const HALL_N=60,KASO_N=20;
+const HALL_L=[...Array(12).fill('piero'),...Array(12).fill('hana'),...Array(8).fill('biscus'),...Array(10).fill('crimson'),...Array(10).fill('brave'),...Array(8).fill('pearl')],KASO_L=[...Array(4).fill('piero'),...Array(4).fill('hana'),...Array(3).fill('biscus'),...Array(3).fill('pearl'),...Array(3).fill('crimson'),...Array(3).fill('brave')];
 const mTypeOf=(vi,n)=>(isKaso(vi)?KASO_L:HALL_L)[n]||'piero';
 const MSHORT={piero:'ピエロ',hana:'ハイビスカス',biscus:'スーパービスカス',crimson:'紅夜',brave:'バーブレイバー',pearl:'パールラグーン',yami:'闇王'};
 const taHs=()=>{const A=G&&G.ta;if(!A)return[];if(!A.halls){A.halls=A.hall&&A.hall.vi!=null?[A.hall]:[];A.hall={vi:null};}return A.halls;};
 const taHallName=h=>h.name||`TAホール ${VIL[h.vi].name.replace(/^.* /,'')}店`;
 const taHallOf=vi=>taHs().find(h=>h.vi===vi)||null;
-const taSetFix=H=>{if(H&&H.vi!=null&&H.set){const n=isKaso(H.vi)?8:24;while(H.set.length<n)H.set.push(3);}};
+const taSetFix=H=>{if(H&&H.vi!=null&&H.set){const n=isKaso(H.vi)?KASO_N:HALL_N;while(H.set.length<n)H.set.push(3);}};
 function machinesFor(vi){
-  const key=vi+'_'+G.day+'_b';if(G.pachi.mkey===key&&G.pachi.mach)return G.pachi.mach;
+  const key=vi+'_'+G.day+'_c';if(G.pachi.mkey===key&&G.pachi.mach)return G.pachi.mach;
   const dt=hallDay(vi),r=lcg(vi*1009+G.day*31+7),W6=dt?SETW[dt]:isKaso(vi)?KASOW:SETW[0],list=[];
   taSetFix(taHallOf(vi));
-  for(let n=0;n<(isKaso(vi)?8:24);n++){let x=r()*100,s=0;for(;s<5;s++){x-=W6[s];if(x<0)break;}{const H=taHallOf(vi);if(H&&H.set&&H.set[n])s=H.set[n]-1;}
+  for(let n=0;n<(isKaso(vi)?KASO_N:HALL_N);n++){let x=r()*100,s=0;for(;s<5;s++){x-=W6[s];if(x<0)break;}{const H=taHallOf(vi);if(H&&H.set&&H.set[n])s=H.set[n]-1;}
     const type=mTypeOf(vi,n),E=SLX[type],SB=E?E.hist[0]:type==='hana'?HANA_B:SET_B,SR=E?E.hist[1]:type==='hana'?HANA_R:SET_R;
     const spins=300+Math.floor(r()*5000),big=Math.round(spins/SB[s]*(0.5+r())),reg=Math.round(spins/SR[s]*(0.5+r()));
     list.push({no:101+n,s,type,spins,big,reg,diff:0});}
@@ -8226,7 +8227,7 @@ function tiTaInit(){if(!G.ta)G.ta={cash:1e9,fin:{out:0,rate:0,susp:0,last:null},
 const TA_RN=['法定金利（年15%）','グレーゾーン（年29.2%）','帝愛式（10日で4割）'],TA_DR=[.00041,.0008,.034],TA_DEF=[.00006,.00018,.012],TA_DEM=[1,.75,.45];
 const TA_PAY=[.90,.93,.96,.99,1.03,1.08];
 const kpachiOK=vi=>{const v=VIL[vi];if(!v||v.tokoyo||v.depop||v.gm)return false;return FAC_SIZE[Math.min(3,v.size)].includes('kpachi');};
-const taHallN=vi=>isKaso(vi)?8:24;
+const taHallN=vi=>isKaso(vi)?KASO_N:HALL_N;
 function taDaily(){const A=G.ta;if(!A)return[];const msgs=[],F=A.fin;
   /* 消費者金融 */
   if(F.susp>0){F.susp--;if(!F.susp)msgs.push('TAファイナンスの 営業停止が 明けた。');}
@@ -8264,7 +8265,7 @@ function taHall(){const A=G.ta,HL=taHs();
 function taHallOpen(){const A=G.ta,HL=taHs();const L=VIL.map((v,i)=>i).filter(i=>(kpachiOK(i)||taBuyOK(i))&&!taHallOf(i)).sort((a,b)=>(VIL[b].size||0)-(VIL[a].size||0));
   const cost0=vi=>taBuyOK(vi)?TA_OPEN(vi):HL.length?TA_OPEN(vi):0;
   if(!L.length){dialog('出店できる 町が もう ない。\n（パチンコ店の ある 町は すべて TAホールだ）',taHall);return;}
-  listPick('出店・買収する 町（パチンコ店の ある 町）',L.map(i=>({t:(taBuyOK(i)?'【買収】':'')+VIL[i].name,r:`${isKaso(i)?'8台':'24台'}${cost0(i)?'　'+fmt(cost0(i)):'　無料'}`,col:taBuyOK(i)?'#f8b800':null})),k=>{const vi=L[k],cost=cost0(vi),buy=taBuyOK(vi);
+  listPick('出店・買収する 町（パチンコ店の ある 町）',L.map(i=>({t:(taBuyOK(i)?'【買収】':'')+VIL[i].name,r:`${isKaso(i)?KASO_N+'台':HALL_N+'台'}${cost0(i)?'　'+fmt(cost0(i)):'　無料'}`,col:taBuyOK(i)?'#f8b800':null})),k=>{const vi=L[k],cost=cost0(vi),buy=taBuyOK(vi);
     if(cost>A.cash){toast('TAの 資金が たりない');taHallOpen();return;}
     choice(buy?`${VIL[vi].name}の 大型店「パーラー 八百万」を\n買収しますか？\n（買収額 ${fmt(cost)}イェソ）`:`${VIL[vi].name}の パチンコ店を 引き継ぎますか？${cost?`\n（出店費 ${fmt(cost)}イェソ）`:''}`,[buy?'買収する':'引き継ぐ','やめる'],r=>{if(r!==0){taHallOpen();return;}
       A.cash-=cost;const H={vi,set:Array(taHallN(vi)).fill(3),rep:1,ev:0,last:null};HL.push(H);G.pachi.mkey=null;save();sfx('g5');
