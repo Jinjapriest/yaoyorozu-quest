@@ -4782,14 +4782,14 @@ const SLX={
       const inST=st.m==='ST'||st.m==='SB';
       const chanceP=st.navi>0?1/6.6:st.m==='ST'?1/7.7:1/12.5;
       const role=()=>{const r=R();let a=0;if(r<(a+=chanceP)){const k=SLX_PICK(R,[100/32,100/36.5,100/64.1]);return['beni','tessin','kuroe'][k];}if(r<(a+=1/26))return'cbell';if(r<(a+=1/7.3))return'replay';if(r<(a+=1/1.6))return'bell';return'lose';};
-      const rl=role(),ch=rl==='beni'||rl==='tessin'||rl==='kuroe',chN={beni:'紅羽目',tessin:'鉄心目',kuroe:'黒衣目'}[rl];
+      const rl=role(),ch=rl==='beni'||rl==='tessin'||rl==='kuroe',chN={beni:'紅羽目',tessin:'鉄心目',kuroe:'黒衣目'}[rl];st.me=ch?chN:'';
       const navi=st.navi>0||st.m==='SB'||st.m==='BON'||st.m==='EP';
       const basic=()=>rl==='bell'?(navi?{d:'bell',pay:10,msg:`押し順 ${nv}`}:{d:'lose',pay:1}):rl==='cbell'?{d:'cbell',pay:6,msg:'共通ベル'}:rl==='replay'?{d:'replay',pay:0,rep:1}:ch?{d:rl,pay:1,msg:chN+'！'}:{d:'lose',pay:0};
       const toST=(res,type,txt)=>{st.m='ST';st.stT=type||'n';st.stG=type==='kuro'?30:25;st.set=(st.set||0)+1;st.g=0;st.zen=0;res.cnt='b';res.snd='win';res.fan=150;res.ev='stin';res.msg=(res.msg?res.msg+'\n':'')+(txt||'シビトST 突入！！');};
       const toBonus=(res,kind)=>{st.zen=0;res.cnt='r';res.fan=120;res.snd='win';if(st.miss>=4)kind='EP';
         if(kind==='EP'){st.m='EP';st.eg=18;st.ep=SLX_RI(R,1,3);res.ev='epin';res.msg=(res.msg?res.msg+'\n':'')+'エピソードボーナス！！';st.miss=0;}
         else{st.m='BON';st.bg=20;st.bpt=0;st.bOk=R()<.2;res.ev='bonin';res.msg=(res.msg?res.msg+'\n':'')+'鉄鋼艦ボーナス！！';}};
-      const toN=(res,c650)=>{st.m='N';st.g=0;st.pt=0;st.tot=0;st.kaiso=0;st.set=0;st.ceil=c650?650:1000;st.stg='港';res.ev=res.ev||'nback';};
+      const toN=(res,c650)=>{st.last=st.tot;st.lastSet=st.set;st.m='N';st.g=0;st.pt=0;st.tot=0;st.kaiso=0;st.set=0;st.ceil=c650?650:1000;st.stg='港';res.ev=res.ev||'nback';};
       const hazard=()=>{const G=st.stT==='kuro'?30:25,cont=st.stT==='ura'?.95:st.stT==='kuro'?.8:C.STC[s];return 1-Math.pow(1-cont,1/G);};
       /* ---- シビトボーナス（ST中のボーナス：6枚/G で 規定枚数まで） ---- */
       if(st.m==='SB'){const res={d:'bell',pay:9,msg:`押し順 ${nv}`,ev:'sb',bonus:1};st.sb-=6;st.tot+=6;
@@ -4807,7 +4807,10 @@ const SLX={
         if(R()<hazard()){const a=SLX_PICK(R,[625,3,360,12]),base=[[50,110],[140,240],[90,170],[130,240]][a];
           st.att=['テッシン','覚醒テッシン','ベニハ','ヨル'][a];st.sb=Math.round(SLX_RI(R,base[0],base[1])/10)*10;st.sbAll=st.sb;if(R()<.1){st.sb=150;st.att='エピソード';}
           st.m='SB';res.cnt='r';res.ev='sbin';res.snd='win';res.fan=120;res.msg=`シビトアタック！ ${st.att}… ${st.sb}枚！`;res.add=st.sb;}
-        else if(st.stG<=0){toN(res,1);res.ev='stend';res.msg='シビトST 終了…';}
+        else if(st.stG<=0){const tb=[[.5,.5,0],[.575,.425,0],[.415,.585,0],[.585,.41,.005],[.399,.596,.005],[.6,.3925,.0075]][s],r=R();st.endc=r<tb[2]?'kuroe':r<tb[2]+tb[0]?'beni':'tessin';
+          st.tro=null;if(R()<[0,.03,.04,.05,.06,.08][s]){const ok=['銅',s>=2?'銀':null,s>=3?'金':null].filter(Boolean);st.tro=ok[SLX_RI(R,0,ok.length-1)];}
+          toN(res,1);res.ev='stend';res.msg='シビトST 終了…';}
+        if(st.m==='ST'&&ch&&!res.ev)res.ev='chance';
         if(st.m==='ST')res.info=`${st.stT==='ura'?'裏黒衣':st.stT==='kuro'?'黒衣':'シビト'}ST　${sec}　残り ${st.stG}G`;return res;}
       /* ---- 鉄鋼艦ボーナス（20G・ポイントで 最終判定）／エピソードボーナス ---- */
       if(st.m==='BON'){const res=basic();res.d=res.d==='lose'?'bell':res.d;res.pay=Math.max(res.pay,5);res.ev='bon';st.bg--;st.bpt+=ch?SLX_RI(R,10,30):rl==='replay'?3:1;if(ch&&R()<.08)st.bOk=1;
@@ -4816,23 +4819,24 @@ const SLX={
       if(st.m==='EP'){const res={d:'bell',pay:9,msg:`押し順 ${nv}`,ev:'ep',bonus:1};st.eg--;if(st.eg<=0)toST(res,'n','シビトST 突入！！');res.info=st.m==='EP'?`エピソードボーナス　残り ${st.eg}G`:'';return res;}
       /* ---- CZ ---- */
       if(st.m==='CZ'){const res=basic();st.cz--;st.czN++;res.ev='cz';
-        if(st.czT==='beni'){if(ch||rl==='cbell')st.combo=Math.min(5,st.combo+1);}
+        if(st.czT==='beni'||st.czT==='kou'){if(ch||rl==='cbell')st.combo=Math.min(5,st.combo+1);}
         else if(st.czT==='tessin'){if(rl==='lose'&&R()<.25)st.life--;}
         if(ch&&R()<.3)st.czOk=1;
         const done=st.czT==='tessin'?(st.life<=0||st.cz<=0):st.cz<=0;
         if(done){if(st.czOk){toBonus(res,R()<.5?'EP':'BON');res.msg='CZ 成功！！\n'+res.msg;}else{st.m='N';res.ev='czfail';res.msg='CZ 失敗…';}}
-        res.info=st.m==='CZ'?`${{beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ'}[st.czT]}　残り ${st.cz}G`:'';return res;}
+        res.info=st.m==='CZ'?`${{beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ',kou:'鋼鉄CZ'}[st.czT]}　残り ${st.cz}G`:'';return res;}
       /* ---- 通常時 ---- */
       st.g++;const res=basic();if(st.navi>0)st.navi--;if(st.g%100===0){st.navi=10;res.ev='navi';res.msg=(res.msg?res.msg+'\n':'')+'ナビ高確！';}
       if(st.hk>0)st.hk--;
       if(ch){st.pt+=15*SLX_RI(R,1,10);if(!st.hk&&R()<.125){st.hk=20;}res.ev=res.ev||'chance';}
       if(st.zen>0){st.zen--;if(st.zen<=0){const k=st.zk;if(k.b){toBonus(res,k.kind);return res;}st.m='CZ';st.czT=k.t;st.cz=k.t==='tessin'?20:10;st.czN=0;st.life=3;st.combo=0;
-          st.czOk=R()<({beni:.35,tessin:.41,kuroe:.77}[k.t]);res.ev='czin';res.snd='g3';res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+{beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ'}[k.t]+' 突入！';}
+          st.czOk=R()<({beni:.35,tessin:.41,kuroe:.77,kou:.65}[k.t]);res.ev='czin';res.snd='g3';res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+{beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ',kou:'鋼鉄CZ'}[k.t]+' 突入！';}
+        else if(ch&&st.zk&&st.zk.t&&st.zk.t!=='kou'&&st.zk.t!=='kuroe'&&rl!=='kuroe'&&rl!==st.zk.t&&R()<.5){st.zk.t='kou';res.ev='czup';res.msg=(res.msg?res.msg+'\n':'')+'CZ 昇格！？';}
         res.info=`${st.g}G`;return res;}
       const zone=[100,250,450,650].indexOf(st.g);
       if(st.g+Math.floor(st.pt/10)>=st.ceil){st.zen=SLX_RI(R,3,6);st.zk={b:1,kind:R()<.5?'EP':'BON'};st.stg='灯籠';res.ev='zen';}
       else if(zone>=0&&R()<C.ZB[s][zone]*.18){st.zen=SLX_RI(R,3,6);st.zk={b:1,kind:R()<.5?'EP':'BON'};st.stg='灯籠';res.ev='zen';}
-      else if(ch&&R()<C.CZR[s]*12.5*(st.hk?2:1)*.6){const t=rl==='kuroe'?'kuroe':rl==='tessin'?'tessin':'beni';st.zen=SLX_RI(R,4,8);st.zk={t};st.stg=t==='kuroe'?'要塞':'港の灯';res.ev='zen';}
+      else if(ch&&R()<C.CZR[s]*12.5*(st.hk?2:1)*.55){const t=rl==='kuroe'?'kuroe':rl==='tessin'?'tessin':'beni';st.zen=SLX_RI(R,4,8);st.zk={t};st.stg=t==='kuroe'?'要塞':'港の灯';res.ev='zen';}
       else st.stg=st.navi?'夜の海':'港';
       res.info=`${st.g}G　PT ${st.pt}`;return res;}},
   /* ---------- PEARL LAGOON CRYSTAL（A+連荘モード） ---------- */
@@ -5188,9 +5192,6 @@ function sbRule(o,V,hits,L){const lt=V(0,1),lc=V(0,0),lb=V(0,-1),one=s=>hits.len
   if(o==='replay')return one(6);if(o==='bell')return one(4)&&hits[0]!==3&&hits[0]!==4;if(o==='cbell')return one(4)&&(hits[0]===3||hits[0]===4);
   if(o==='beni')return !hits.length&&lt===7&&V(1,1)===7;if(o==='tessin')return !hits.length&&lc===1&&V(1,0)===5;if(o==='kuroe')return !hits.length&&lb===0&&V(1,-1)===0;
   return !hits.length&&!(lt===7&&V(1,1)===7)&&!(lc===1&&V(1,0)===5)&&!(lb===0&&V(1,-1)===0);}
-function sbShip(x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c),bob=Math.round(Math.sin(t/12));
-  P(0,10+bob,44,6,'#5c5c6c');P(2,16+bob,40,3,'#3c3c4c');P(8,5+bob,24,5,'#7c7c8c');P(14,1+bob,10,4,'#9c9cac');P(24,-4+bob,3,9,'#3c3c3c');P(30,-2+bob,2,7,'#3c3c3c');
-  for(let i=0;i<6;i++)P(4+i*6,12+bob,2,2,'#f8d878');P(36,7+bob,8,2,'#3c3c3c');if((t>>3)&1)P(23,-8+bob,5,3,'#bcbcbc88');}
 function sbZombie(x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c),sw=(t>>3)&1;
   P(4,0,7,7,'#7c8c7c');P(5,2,2,1,'#f8f800');P(8,2,2,1,'#f8f800');P(5,5,5,1,'#3c0000');P(3,7,9,9,'#3c4c3c');P(6,9,3,3,'#d82800');if(sw)P(7,10,1,1,'#fc7460');
   P(0,8+sw,3,6,'#7c8c7c');P(12,8-sw,3,6,'#7c8c7c');P(4,16,3,7,'#2c3c2c');P(8,16,3,7,'#2c3c2c');}
@@ -5198,41 +5199,131 @@ function sbBeni(x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c);
   P(3,0,10,4,'#d82800');P(2,3,3,14,'#d82800');P(11,3,3,10,'#d82800');P(5,3,6,7,'#fcd8a8');P(6,5,1,1,'#3c1c1c');P(9,5,1,1,'#3c1c1c');P(4,10,8,10,'#fcfcfc');P(4,14,8,2,'#d82800');P(5,20,2,4,'#3c3c3c');P(9,20,2,4,'#3c3c3c');P(13,8,1,12,'#bcbcbc');}
 function sbKuroe(x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c);
   P(4,0,8,4,'#e8e8e8');P(5,3,6,6,'#fcd8a8');P(6,5,1,1,'#7c0000');P(9,5,1,1,'#7c0000');P(2,9,12,14,'#141414');P(7,9,2,10,'#7c0000');P(4,23,3,2,'#000');P(9,23,3,2,'#000');P(14,6,1,16,'#d8d8d8');}
+/* 鉄鋼艦（装甲蒸気機関車）・背景・心臓 など（すべて オリジナル） */
+function sbBg(k,x0,y0,w,h,t,spd=1){
+  const P={day:['#3cbcfc','#6cccfc','#a4e4fc','#5c94fc','#00a844','#7c5c3c'],
+    eve:['#7c1000','#d84800','#fca044','#5c2c3c','#3c1c24','#3c2418'],
+    night:['#00001c','#0c0c3c','#1c1c5c','#1c1c3c','#0c0c20','#1c1410'],
+    red:['#2c0000','#5c0000','#a81000','#2c0808','#140000','#1c0808'],
+    black:['#000000','#0c0c0c','#242424','#3c3c3c','#1c1c1c','#0c0c0c'],
+    ura:['#14001c','#3c0048','#7c0068','#2c0034','#14001c','#1c0818'],
+    sepia:['#4c341c','#6c4c2c','#a07848','#7c5c3c','#5c4024','#3c2c18']}[k]||[];
+  const bh=h-12;for(let i=0;i<3;i++)R(x0,y0+Math.floor(bh*i/3),w,Math.ceil(bh/3)+1,P[i]);
+  if(k==='day')pc(x0+w-30,y0+22,6,'#fcfcb8');
+  else if(k==='eve'){pc(x0+w-44,y0+bh-12,11,'#fc7800');pc(x0+w-44,y0+bh-12,9,'#fca044');}
+  else if(k==='red'){pc(x0+w-34,y0+24,9,'#a81000');pc(x0+w-34,y0+24,7,'#fc3c3c');}
+  else if(k!=='sepia'){for(let i=0;i<16;i++)if(((t>>4)+i)%5)R(x0+(i*37)%w,y0+12+(i*13)%26,1,1,'#fcfcfc');
+    pc(x0+w-30,y0+24,7,k==='ura'?'#fc74b4':'#fcfcd8');if(k!=='ura')pc(x0+w-27,y0+22,6,P[0]);}
+  for(let i=0;i<w;i+=2){const u=i+t*.15*spd,hh=Math.round(12+5*Math.sin(u/19)+3*Math.sin(u/7));R(x0+i,y0+bh-hh,2,hh,P[3]);}
+  for(let i=0;i<w;i+=2){const u=i+t*.5*spd,hh=Math.round(6+3*Math.sin(u/11)+2*Math.sin(u/5));R(x0+i,y0+bh-hh,2,hh,P[4]);}
+  if(spd)for(let i=0;i<3;i++){const px=Math.round(x0+w-((t*2*spd+i*70)%(w+20)));R(px,y0+bh-24,1,24,'#2c2c2c');R(px-3,y0+bh-22,7,1,'#2c2c2c');}
+  R(x0,y0+bh,w,12,P[5]);R(x0,y0+bh+2,w,1,'#8c8c8c');for(let i=0;i<w+8;i+=8)R(x0+i-Math.floor((t*3*spd)%8),y0+bh+3,3,2,'#3c2c1c');R(x0,y0+bh+5,w,1,'#5c5c5c');
+  return y0+bh;}
+function sbTrain(x,y,t,k=0,beam){/* y = 車両の 屋根。k 0:通常 1:黒 2:赤 */
+  const bo=(t>>2)&1,B=['#5c5c6c','#2c2c34','#5c3c3c'][k],D=['#34343c','#141418','#3c1c1c'][k],L=['#8c8c9c','#4c4c54','#8c5c5c'][k],Wn=k===2?'#fc3c3c':'#f8d878';
+  const wheel=(cx,cy)=>{pc(cx,cy,2,'#1c1c1c');const a=(t>>1)&3;R(cx-1+(a&1),cy-1+(a>>1),1,1,'#8c8c8c');};
+  for(let c=0;c<2;c++){const cx=x+c*36,yy=y+(c?0:bo);R(cx,yy,32,12,B);R(cx,yy,32,2,L);R(cx,yy+10,32,2,D);
+    for(let i=0;i<3;i++)R(cx+3+i*10,yy+4,6,4,((t>>4)+i+c)%4?Wn:'#7c5c1c');for(let i=0;i<6;i++)R(cx+2+i*6,yy+2,1,1,'#bcbcbc');
+    wheel(cx+6,yy+14);wheel(cx+26,yy+14);R(cx+32,yy+8,4,2,'#1c1c1c');}
+  const lx=x+72,ly=y+(bo^1);
+  R(lx,ly-2,14,14,B);R(lx,ly-3,15,2,L);R(lx+3,ly,5,4,Wn);/* 運転台 */
+  R(lx+14,ly+2,16,10,D);for(let i=0;i<3;i++)R(lx+15,ly+3+i*3,15,1,L);/* 装甲 ボイラー */
+  R(lx+21,ly-6,4,8,'#2c2c2c');R(lx+20,ly-7,6,2,'#4c4c4c');/* 煙突 */
+  R(lx+30,ly+4,3,3,(t&8)?'#fcfcd8':'#f8d878');R(lx+30,ly+9,2,4,'#7c7c8c');R(lx+32,ly+11,2,2,'#7c7c8c');/* 前照灯・排障器 */
+  if(beam){ctx.fillStyle='rgba(252,252,200,.18)';ctx.beginPath();ctx.moveTo(lx+33,ly+5);ctx.lineTo(lx+80,ly-6);ctx.lineTo(lx+80,ly+16);ctx.fill();}
+  R(lx,ly+12,30,2,D);wheel(lx+5,ly+14);wheel(lx+15,ly+14);wheel(lx+25,ly+14);
+  for(let i=0;i<6;i++){const p=(t*.6+i*10)%60,r=1+Math.floor(p/14);pc(Math.round(lx+23-p*.9),Math.round(ly-8-p*.3),r,`rgba(220,220,220,${(.8-p/75).toFixed(2)})`);}
+  return lx;}
+function sbHeart(cx,cy,s,t,col='#c80000'){const b=s+((t>>2)%4===0?1:0);
+  pc(cx-b,cy,b,col);pc(cx+b,cy,b,col);for(let i=0;i<=b*2;i++)R(cx-b*2+i,cy+i,(b*2-i)*2+1,1,col);
+  pc(cx-b,cy-1,Math.max(1,b>>1),'#fc7460');for(let i=-1;i<=1;i++)R(cx-b*2,cy+i*b,b*4,1,'#3c0000');R(cx,cy-b,1,b*3,'#3c0000');}
+function sbTesshin(x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c);
+  P(4,0,8,3,'#3c2c1c');P(3,2,10,2,'#fcfcfc');P(4,4,8,6,'#e8b088');P(6,6,1,1,'#000');P(9,6,1,1,'#000');P(6,8,4,1,'#a05030');
+  P(2,10,12,10,'#1c3c7c');P(6,10,4,10,'#d8d8d8');P(0,11,3,8,'#1c3c7c');P(13,11,3,8,'#1c3c7c');P(4,20,3,5,'#2c2c2c');P(9,20,3,5,'#2c2c2c');
+  P(12,14,10,2,'#5c5c5c');P(20,13,3,1,'#7c7c7c');}
 function sbLCD(st,A,x0,y0,w,h){const lead=(G.party&&G.party[0])||Object.keys(G.chars)[0],m=st.m,t=frame,e=A.evt;
   ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
+  /* 告知時の 揺れ */
+  const shake=(A.ev==='sbin'||A.ev==='bonin'||A.ev==='epin'||A.ev==='urain')&&e<14;if(shake)ctx.translate(((t*7)%5)-2,((t*3)%3)-1);
   const hud=(l,r,lc,rc)=>{R(x0,y0,w,11,'#000a');txt(l,x0+3,y0+2,lc||'#fcfcfc','left',w*.6);txt(r,x0+w-3,y0+2,rc||'#f8d878','right',w*.4);};
-  const band=(s,col,bg='#000c')=>{R(x0,y0+h/2-12,w,24,bg);big(s,x0+w/2,y0+h/2-8,col,'center',12);};
-  const sea=(sky,wat)=>{R(x0,y0,w,h,sky);R(x0,y0+h-22,w,22,wat);for(let i=0;i<10;i++)R(x0+((i*23+t)%w),y0+h-18+(i%3)*5,8,1,'#fcfcfc66');};
-  const cut=()=>{if(A.ev==='chance'&&e<30&&st.me){const c={紅羽目:'#d82800',鉄心目:'#0058f8',黒衣目:'#3c3c3c'}[st.me]||'#d82800';R(x0,y0+14,w,14,c);txt(st.me+'！',x0+w/2,y0+17,'#fcfcfc','center');}};
-  if(m==='N'){const night=st.stg==='夜の海'||st.stg==='要塞';sea(night?'#0c0c2c':st.stg==='灯籠'?'#3c1c0c':'#3cbcfc',night?'#0c1c4c':'#0058a8');
-    if(st.stg==='要塞'){R(x0+w-60,y0+12,56,h-34,'#3c3c3c');for(let i=0;i<4;i++)R(x0+w-56+i*13,y0+16,8,8,'#f8d878');}
-    if(st.stg==='灯籠')for(let i=0;i<8;i++){R(x0+8+i*22,y0+16,6,10,(t+i*4)&8?'#f87800':'#d82800');R(x0+10+i*22,y0+26,2,h-48,'#7c4c10');}
-    sbShip(x0+12,y0+h-46,t,2);drawChar(lead,x0+52,y0+h-58,0,1);
-    hud(st.navi?`ナビ高確 ${st.navi}G`:st.hk?'シビト高確':st.stg,`${st.g}G`,st.navi?'#f8f800':st.hk?'#fc3c3c':null);
-    txt(`PT ${st.pt}`,x0+3,y0+h-10,'#fcfcfc');cut();
-    if(A.ev==='czfail'&&e<50)band('CZ 失敗…','#7c7c7c');if(A.ev==='bonfail'&&e<60)band('最終判定… 失敗','#7c7c7c');if(A.ev==='stend'&&e<60)band('ST 終了','#bcbcbc');}
-  else if(m==='CZ'){R(x0,y0,w,h,'#1c140c');R(x0,y0+h-16,w,16,'#3c2c1c');
-    if(st.czT==='beni'){sbBeni(x0+20,y0+h-64,t,2);for(let i=0;i<3;i++)sbZombie(x0+90+i*28,y0+h-62+(i%2)*4,t+i*7,2);big(`${st.combo} HIT`,x0+w-30,y0+h-14,st.combo>=3?'#fc3c3c':'#f8d878','center',14);}
-    else if(st.czT==='tessin'){drawChar(lead,x0+20,y0+h-48,(t>>3)&1,2);for(let i=0;i<4;i++)sbZombie(x0+80+i*26,y0+h-62,t+i*5,2);for(let i=0;i<3;i++)pc(x0+10+i*14,y0+18,5,i<st.life?'#d82800':'#3c3c3c');}
-    else{drawChar(lead,x0+20,y0+h-48,0,2);sbKuroe(x0+w-60,y0+h-66,t,2);big('VS 黒衣',x0+w/2,y0+16,'#fcfcfc','center',12);}
-    cut();hud({beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ'}[st.czT],`残り ${st.cz}G`,'#fc7460','#fcfcfc');}
-  else if(m==='BON'){sea('#3c0c0c','#1c0c3c');sbShip(x0+12,y0+h-46,t,2);for(let i=0;i<3;i++)sbZombie(x0+110+i*22,y0+h-66,t+i*9,1.5);
-    const f=Math.min(1,st.bpt/200);R(x0+4,y0+h-10,100,5,'#000');R(x0+4,y0+h-10,100*f,5,'#f8b800');txt('PT',x0+108,y0+h-12,'#fcfcfc');cut();hud('鉄鋼艦ボーナス',`残り ${st.bg}G`,'#f8b800','#fcfcfc');}
-  else if(m==='EP'){R(x0,y0,w,h,'#1c1c2c');R(x0+4,y0+14,w-8,h-24,'#2c2c4c');sbBeni(x0+w-56,y0+h-60,t,2);drawChar(lead,x0+24,y0+h-48,0,2);
-    txt(['','第一話 港を 出る 日','第二話 黒煙の 向こう','第三話 心臓の 鼓動'][st.ep||1],x0+w/2,y0+18,'#f8d878','center');hud('エピソードボーナス',`残り ${st.eg}G`,'#fc74b4','#fcfcfc');}
-  else if(m==='ST'||m==='SB'){const ura=st.stT==='ura',kuro=st.stT==='kuro';sea(ura?'#2c0024':kuro?'#141414':'#1c0c2c',ura?'#5c0048':kuro?'#2c2c2c':'#0c1c4c');
-    sbShip(x0+8,y0+h-46,t,2);for(let i=0;i<3;i++)sbZombie(x0+110+i*22,y0+h-66+(i%2)*4,t+i*9,1.5);
-    if(m==='ST'){const sec=st.g<=8?'前半':st.g<=16?'中盤':'後半';big(`${st.stG}`,x0+w-28,y0+16,'#fcfcfc','center',16);txt('G',x0+w-12,y0+24,'#fcfcfc');txt(sec,x0+4,y0+16,sec==='後半'?'#fc3c3c':'#fcfcfc');
-      cut();hud(ura?'裏黒衣ST':kuro?'黒衣ST':'シビトST',`SET ${st.set}`,ura?'#fc74b4':kuro?'#bcbcbc':'#fc3c3c','#fcfcfc');}
-    else{R(x0,y0+12,w,30,'#000a');big(`${Math.max(0,st.sb)}枚`,x0+w/2,y0+16,'#f8d878','center',16);txt(st.att,x0+w/2,y0+34,'#fcfcfc','center');hud('シビトボーナス',`獲得 ${st.tot}`,'#f8b800','#fcfcfc');}
-    if(A.ev==='sbin'&&e<70){R(x0,y0,w,h,(t&4)?'#d82800':'#000');big('シビトアタック！',x0+w/2,y0+14,'#fcfcfc','center',12);if(st.att==='ベニハ')sbBeni(x0+w/2-16,y0+28,t,2);else drawChar(lead,x0+w/2-16,y0+30,0,2);}
-    if(A.ev==='stin'&&e<70){R(x0,y0,w,h,(t&4)?(ura?'#a800a8':'#d82800'):'#000');big(ura?'裏黒衣ST':kuro?'黒衣ST':'シビトST',x0+w/2,y0+h/2-10,'#fcfcfc','center',16);}}
-  else if(m==='KA'){R(x0,y0,w,h,'#3c2c1c');R(x0+6,y0+14,w-12,h-20,'#a07848');sbBeni(x0+w/2-16,y0+h-60,t,2);const f=st.kp/100;R(x0+20,y0+h-12,w-40,5,'#000');R(x0+20,y0+h-12,(w-40)*f,5,'#fc74b4');
-    hud('紅羽回想',`第${Math.max(1,5-st.ka)}話`,'#fc74b4','#fcfcfc');}
-  if(A.ev==='bonin'&&e<60){R(x0,y0,w,h,(t&4)?'#5c5c6c':'#000');big('鉄鋼艦ボーナス',x0+w/2,y0+h/2-8,'#f8d878','center',14);}
-  if(A.ev==='epin'&&e<60){R(x0,y0,w,h,(t&4)?'#a80058':'#000');big('エピソードボーナス',x0+w/2,y0+h/2-8,'#fcfcfc','center',14);}
-  if(A.ev==='czin'&&e<50){R(x0,y0,w,h,'#3c1c0c');big({beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ'}[st.czT]||'CZ',x0+w/2,y0+h/2-8,'#fc7460','center',14);}
-  if(A.ev==='navi'&&e<40)band('ナビ高確 10G！','#f8f800');if(A.ev==='kain'&&e<60)band('燃える命… 紅羽回想','#fc74b4');if(A.ev==='kaep'&&e<40)band('一話 クリア！','#fc74b4');
+  const band=(s,col,bg='#000c',sub)=>{R(x0,y0+h/2-13,w,sub?30:24,bg);R(x0,y0+h/2-13,w,1,col);R(x0,y0+h/2+(sub?16:10),w,1,col);big(s,x0+w/2,y0+h/2-9,col,'center',12);if(sub)txt(sub,x0+w/2,y0+h/2+6,'#fcfcfc','center');};
+  const CZN={beni:'紅羽CZ',tessin:'鉄心CZ',kuroe:'黒衣CZ',kou:'鋼鉄CZ'};
+  const chaser=(gy,n,sp=1)=>{for(let i=0;i<n;i++){const zx=Math.round(x0+4+i*14+Math.sin((t+i*20)/9)*3-(n>3?0:0));sbZombie(zx,gy-23+((t>>3)+i&1),t+i*5,1);}};
+  const cut=()=>{if(st.me&&e<36&&!/in$|fail|end|up$/.test(A.ev||'')){const c={紅羽目:'#d82800',鉄心目:'#0058f8',黒衣目:'#3c3c3c'}[st.me]||'#d82800',sl=Math.min(w,e*16);
+      R(x0+w-sl,y0+13,sl,18,c);R(x0+w-sl,y0+13,sl,1,'#fcfcfc');R(x0+w-sl,y0+30,sl,1,'#fcfcfc');
+      if(e>4){if(st.me==='紅羽目')sbBeni(x0+6,y0+12,t,.8);else if(st.me==='鉄心目')sbTesshin(x0+6,y0+12,t,.8);else sbKuroe(x0+6,y0+12,t,.8);big(st.me+'！',x0+w/2+10,y0+16,'#fcfcfc','center',12);}}};
+  const kokuchi=(title,col,sub)=>{if(e<10){R(x0,y0,w,h,e&2?'#fcfcfc':'#000');return true;}
+    if(e<34){R(x0,y0,w,h,'#000');for(let i=0;i<12;i++){const a=i/12*6.283+t/20;R(Math.round(x0+w/2+Math.cos(a)*(e*3)),Math.round(y0+h/2+Math.sin(a)*(e*2)),3,3,'#7c0000');}
+      sbHeart(x0+w/2,y0+h/2-6,6+Math.min(6,(e-10)>>1),t);if((e>>2)&1)big('ドクン',x0+w/2,y0+h-16,'#fc3c3c','center',10);return true;}
+    R(x0,y0,w,h,(t&4)?col:'#000');band(title,'#fcfcfc','#000c',sub);return true;};
+  const seg=st.g<100?0:st.g<250?1:st.g<450?2:st.g<650?3:4,cyc=[0,100,250,450,650,1000],cf=Math.min(1,(st.g-cyc[seg])/(cyc[seg+1]-cyc[seg]));
+  if(m==='N'){
+    if(A.ev==='stend'&&st.g<1){/* ST 終了画面（キャラで 設定示唆） */
+      R(x0,y0,w,h,'#140c0c');for(let i=0;i<w;i+=4)R(x0+i,y0+h-14,2,14,'#2c1c1c');
+      const c=st.endc||'tessin';if(c==='beni')sbBeni(x0+14,y0+16,t,2.2);else if(c==='kuroe')sbKuroe(x0+12,y0+14,t,2.2);else sbTesshin(x0+8,y0+16,t,2.2);
+      big('ST 終了',x0+w-52,y0+16,'#fcfcfc','center',12);txt(`SET ${st.lastSet||0}`,x0+w-52,y0+34,'#f8d878','center');
+      big(`${fmt(st.last||0)}枚`,x0+w-52,y0+46,'#f8b800','center',12);
+      if(st.tro){const tc={銅:'#c87c3c',銀:'#d8d8e8',金:'#f8d800'}[st.tro];R(x0+w-16,y0+h-20,8,6,tc);R(x0+w-14,y0+h-14,4,3,tc);R(x0+w-17,y0+h-11,10,2,tc);}
+      hud('おつかれさま','',null,null);}
+    else{const zen=st.zen>0,stg=zen?'red':st.hk?'night':cf<.5?'day':cf<.85?'eve':'night';
+      const gy=sbBg(stg,x0,y0,w,h,t,1);const tx=x0+w-118;sbTrain(tx,gy-17,t,0,stg==='night'||stg==='red');drawChar(lead,tx+44,gy-33,(t>>3)&1,1);
+      if(zen){const n=Math.min(4,7-st.zen);chaser(gy,Math.max(1,n));}else if(st.hk)chaser(gy,1);
+      hud(zen?(st.zk&&st.zk.b?'甲鉄の 鼓動が…':'シビト 接近中…'):st.navi?`ナビ高確 ${st.navi}G`:st.hk?'シビト高確':['昼','夕暮れ','夜'][stg==='day'?0:stg==='eve'?1:2],`${st.g}G`,zen?'#fc3c3c':st.navi?'#f8f800':st.hk?'#fc7460':null);
+      R(x0,y0+h-9,w,9,'#000a');txt(`第${seg+1}周期`,x0+3,y0+h-9,'#f8d878');R(x0+44,y0+h-6,80,3,'#3c3c3c');R(x0+44,y0+h-6,Math.round(80*cf),3,cf>.85?'#fc3c3c':'#f8b800');txt(`PT ${st.pt}`,x0+w-3,y0+h-9,'#fcfcfc','right');
+      cut();
+      if(A.ev==='czfail'&&e<50)band('CZ 失敗…','#7c7c7c');if(A.ev==='bonfail'&&e<60)band('最終判定… 失敗','#7c7c7c','#000c','シビトに 押し切られた');
+      if(A.ev==='czup'&&e<40)band('CZ 昇格！？','#f8d800');}}
+  else if(m==='CZ'){const kz=st.czT;const gy=sbBg(kz==='kuroe'?'black':kz==='kou'?'eve':'red',x0,y0,w,h,t,kz==='kuroe'?0:.4);
+    if(kz==='beni'||kz==='kou'){sbBeni(x0+14,gy-40,t,1.7);const n=Math.max(1,5-st.combo);for(let i=0;i<n;i++)sbZombie(x0+86+i*20,gy-34+((t>>3)+i&1)*2,t+i*7,1.5);
+      if((A.ev==='chance'||A.ev==='cz')&&e<12&&st.combo){for(let i=0;i<4;i++)R(x0+70+i*2+e*4,y0+14+i*12,26,2,'#fcfcfc');}
+      R(x0+w-54,y0+13,52,20,'#000a');txt('撃破',x0+w-50,y0+15,'#fcfcfc');big(`${st.combo}`,x0+w-14,y0+15,st.combo>=3?'#fc3c3c':'#f8d878','center',14);}
+    if(kz==='tessin'||kz==='kou'){sbTesshin(x0+(kz==='kou'?48:16),gy-50,t,2);if(kz==='tessin')for(let i=0;i<5;i++)sbZombie(x0+76+i*20,gy-34+((t>>3)+i&1)*2,t+i*5,1.5);
+      if(kz==='tessin'){for(let i=0;i<3;i++)sbHeart(x0+w-44+i*14,y0+20,2,i<st.life?t:0,i<st.life?'#c80000':'#3c3c3c');if(A.ev==='chance'&&e<10)R(x0+60,y0+h-34,w,2,'#f8f800');}}
+    if(kz==='kuroe'){drawChar(lead,x0+18,gy-32,0,2);sbKuroe(x0+w-56,gy-52,t,2);big('VS',x0+w/2,y0+24,'#fc3c3c','center',14);
+      const hp=Math.max(0,1-st.czN/10);R(x0+w-70,y0+14,64,4,'#3c3c3c');R(x0+w-70,y0+14,Math.round(64*hp),4,'#d82800');txt('黒衣',x0+w-72,y0+12,'#bcbcbc','right');}
+    if(kz==='kou'){R(x0,y0,w,2,'#f8d800');R(x0,y0+h-2,w,2,'#f8d800');}
+    if(st.cz===1&&(t&8))big('LAST',x0+w/2,y0+h-18,'#fc3c3c','center',12);
+    cut();hud(CZN[kz],`残り ${st.cz}G`,kz==='kou'?'#f8d800':'#fc7460','#fcfcfc');}
+  else if(m==='BON'){const last=st.bg<=3;const gy=sbBg(last?'red':'night',x0,y0,w,h,t,last?.3:1.4);const tx=x0+w-118;sbTrain(tx,gy-17,t,0,1);drawChar(lead,tx+44,gy-33,(t>>3)&1,1);
+    chaser(gy,last?4:2);
+    const lv=Math.min(5,1+Math.floor(st.bpt/40));R(x0,y0+h-9,w,9,'#000a');txt('ST期待度',x0+3,y0+h-9,'#fcfcfc');for(let i=0;i<5;i++)txt('★',x0+52+i*10,y0+h-9,i<lv?(lv>=4?'#fc3c3c':'#f8d800'):'#3c3c3c');txt(`PT ${st.bpt}`,x0+w-3,y0+h-9,'#fcfcfc','right');
+    if(last){R(x0,y0+12,w,22,'#000a');sbHeart(x0+18,y0+20,3,t);big('最終判定',x0+w/2+8,y0+15,(t&8)?'#fc3c3c':'#fcfcfc','center',12);}
+    cut();hud('鉄鋼艦ボーナス',`残り ${st.bg}G`,'#f8b800','#fcfcfc');}
+  else if(m==='EP'){const gy=sbBg('eve',x0,y0,w,h,t,.6);const tx=x0+w-118;sbTrain(tx,gy-17,t);sbBeni(tx+40,gy-41,t,1);drawChar(lead,tx+56,gy-33,0,1);
+    const ep=st.ep||1;R(x0,y0+12,w,18,'#000a');big(`第${['','一','二','三'][ep]}話`,x0+28,y0+14,'#fc74b4','center',12);txt(['','港を 出る 日','黒煙の 向こう','心臓の 鼓動'][ep],x0+56,y0+18,'#fcfcfc','left');
+    R(x0,y0+h-9,w,9,'#000a');txt('ST 確定',x0+w/2,y0+h-9,(t&8)?'#fc3c3c':'#f8d878','center');hud('エピソードボーナス',`残り ${st.eg}G`,'#fc74b4','#fcfcfc');}
+  else if(m==='ST'){const ura=st.stT==='ura',kuro=st.stT==='kuro',last=st.stG<=3;const gy=sbBg(ura?'ura':kuro?'black':'red',x0,y0,w,h,t,1.6);
+    const tx=x0+w-118;sbTrain(tx,gy-17,t,kuro?1:ura?2:0,1);drawChar(lead,tx+44,gy-33,(t>>3)&1,1);if(kuro||ura)sbKuroe(tx+20,gy-41,t,1);
+    const sec=st.g<=8?'前半':st.g<=16?'中盤':'後半';chaser(gy,sec==='前半'?1:sec==='中盤'?2:4);
+    if(A.ev==='chance'&&e<16){for(let i=0;i<3;i++)R(x0+20+i*10,y0+h-30+i,40,1,'#f8f800');pc(x0+12,gy-12,4+(e>>2),'#fca044');}
+    R(x0+w-38,y0+13,36,24,'#000a');R(x0+w-38,y0+13,36,1,last?'#fc3c3c':'#7c7c7c');big(`${st.stG}`,x0+w-22,y0+15,last&&(t&8)?'#fc3c3c':'#fcfcfc','center',16);txt('G',x0+w-7,y0+26,'#bcbcbc');
+    txt(sec,x0+4,y0+14,sec==='後半'?'#fc3c3c':'#fcfcfc');if(last&&(t&8))big('ラスト',x0+w/2-10,y0+14,'#fc3c3c','center',10);
+    R(x0,y0+h-9,w,9,'#000a');txt(`獲得 ${fmt(st.tot||0)}枚`,x0+3,y0+h-9,'#f8d878');txt(ura?'継続 95%':kuro?'継続 80%':'',x0+w-3,y0+h-9,ura?'#fc74b4':'#bcbcbc','right');
+    cut();hud(ura?'裏黒衣ST':kuro?'黒衣ST':'シビトST',`SET ${st.set}`,ura?'#fc74b4':kuro?'#bcbcbc':'#fc3c3c','#fcfcfc');}
+  else if(m==='SB'){const ura=st.stT==='ura',kuro=st.stT==='kuro';const gy=sbBg(ura?'ura':kuro?'black':'red',x0,y0,w,h,t,1.2);const tx=x0+w-118;sbTrain(tx,gy-17,t,kuro?1:ura?2:0,1);
+    const ax=tx+40,ay=gy-41;if(st.att==='ベニハ')sbBeni(ax,ay,t,1);else if(/テッシン/.test(st.att))sbTesshin(ax-2,ay-1,t,1);else if(st.att==='ヨル')sbKuroe(ax,ay,t,1);else drawChar(lead,ax,ay+8,0,1);
+    const hit=(A.ev==='sb'||A.ev==='sbadd')&&e<14,zx=x0+10;sbZombie(zx,gy-23,t,1);
+    if(hit){if(e<6){ctx.strokeStyle='#f8f800';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ax,ay+8);ctx.lineTo(zx+8,gy-14);ctx.stroke();}pc(zx+8,gy-14,2+e,e&2?'#fcfcfc':'#fca044');}
+    ctx.strokeStyle='#fc3c3c';ctx.lineWidth=1;ctx.strokeRect(zx+2,gy-22,12,12);
+    R(x0,y0+12,w,24,'#000a');big(`${fmt(Math.max(0,st.sb))}`,x0+w/2-8,y0+14,'#f8d878','center',16);txt('枚',x0+w/2+24,y0+22,'#f8d878');txt(st.att==='エピソード'?'エピソードアタック':`${st.att} アタック`,x0+4,y0+14,'#fcfcfc');
+    R(x0,y0+h-9,w,9,'#000a');txt(`獲得 ${fmt(st.tot||0)}枚`,x0+3,y0+h-9,'#f8d878');txt(`SET ${st.set}`,x0+w-3,y0+h-9,'#fcfcfc','right');
+    if(A.ev==='sbadd'&&e<30&&(t&4))R(x0,y0,w,h,'#fcfcfc33');hud('シビトボーナス','',ura?'#fc74b4':'#f8b800');}
+  else if(m==='KA'){sbBg('sepia',x0,y0,w,h,t,0);const ep=Math.max(1,5-st.ka);sbBeni(x0+w/2-12,y0+h-50,t,1.7);drawChar(lead,x0+w/2-44,y0+h-44,0,2);
+    R(x0,y0,10,h,'#000');R(x0+w-10,y0,10,h,'#000');for(let i=0;i<8;i++){const yy=y0+((i*12+t)%(h+12))-12;R(x0+3,yy,4,5,'#a07848');R(x0+w-7,yy,4,5,'#a07848');}
+    R(x0+10,y0+12,w-20,12,'#000a');txt(`第${ep}話「${['','燃える 港','紅い 誓い','鉄の 心臓','約束の 夜'][Math.min(4,ep)]}」`,x0+w/2,y0+14,'#f8d878','center');
+    R(x0+14,y0+h-8,w-28,4,'#000');R(x0+14,y0+h-8,Math.round((w-28)*Math.min(1,st.kp/100)),4,'#fc74b4');hud('紅羽回想',`${st.kp}/100`,'#fc74b4','#fcfcfc');}
+  /* 告知・突入 */
+  if(A.ev==='sbin'&&e<80)kokuchi('シビトボーナス','#a81000',`${st.att}アタック ${fmt(st.sbAll||st.sb)}枚`);
+  if(A.ev==='bonin'&&e<70)kokuchi('鉄鋼艦ボーナス','#5c5c6c','ST期待度 約20%');
+  if(A.ev==='epin'&&e<70)kokuchi('エピソードボーナス','#a80058','ST 確定！！');
+  if(A.ev==='czin'&&e<50){const gy=sbBg('red',x0,y0,w,h,t,2);chaser(gy,5);band(CZN[st.czT]||'CZ','#fc7460','#000c','シビトの 群れを 退けろ！');}
+  if(A.ev==='stin'&&e<70){R(x0,y0,w,h,(t&4)?'#d82800':'#000');const gy=sbBg('red',x0,y0+20,w,h-20,t,3);sbTrain(x0+w-118-Math.max(0,60-e*3),gy-17,t,0,1);band('シビトST','#fcfcfc','#000c',`${st.stG}G＋α`);}
+  if(A.ev==='urain'&&e<90){R(x0,y0,w,h,`hsl(${(t*12)%360},90%,40%)`);sbKuroe(x0+w/2-12,y0+16,t,2);band('裏黒衣ST','#fcfcfc','#000a','継続率 約95%');}
+  if(A.ev==='kuroin'&&e<70){R(x0,y0,w,h,'#000');sbKuroe(x0+w/2-12,y0+14,t,2);band('黒衣ST','#bcbcbc','#000a','継続率 約80%');}
+  if(A.ev==='stre'&&e<40)band('ST 再開！','#fc3c3c','#000c',`残り ${st.stG}G`);
+  if(A.ev==='navi'&&e<40)band('ナビ高確 10G！','#f8f800');
+  if(A.ev==='kain'&&e<60){sbBg('sepia',x0,y0,w,h,t,0);band('燃える命… 紅羽回想','#fc74b4','#000c','全4話 完結で 上位ST');}
+  if(A.ev==='kaep'&&e<40)band(`第${Math.max(1,4-st.ka)}話 クリア！`,'#fc74b4');
   A.pop.forEach(p=>{const n=p.n,u=p.u||'枚',col=n>=500?`hsl(${(t*12)%360},100%,60%)`:n>=300?'#fc3c3c':n>=100?'#f8d878':'#fcfcfc',sz=n>=500?20:n>=300?16:13,yy=y0+h/2+8-Math.min(20,p.t);
     R(x0+w/2-46,yy-2,92,sz+6,'#000a');big(`+${fmt(n)}${u}`,x0+w/2,yy,col,'center',sz);});
   ctx.restore();R(x0,y0,w,1,'#7c7c7c');R(x0,y0+h-1,w,1,'#7c7c7c');R(x0,y0,1,h,'#7c7c7c');R(x0+w-1,y0,1,h,'#7c7c7c');}
