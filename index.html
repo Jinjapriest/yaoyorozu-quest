@@ -357,6 +357,34 @@ const SONG={
   gacha:{sp:.13,l:[79,0,76,79,81,79,76,0,74,76,79,0,76,74,72,0,74,0,76,79,81,84,81,79,76,0,79,0,74,0,0,0],b:[48,0,55,0,48,0,55,0,45,0,52,0,45,0,52,0,50,0,57,0,50,0,57,0,43,0,50,0,43,0,55,0]},
   title:THEME,
 };
+/* ===== 紅夜 CRIMSON NIGHT の BGM（オリジナル曲） ===== */
+const R4=(a,n)=>Array(n).fill(a).flat();
+Object.assign(SONG,{
+  cr_n:{sp:.16,lv:.055,l:[76,0,74,72,71,-1,69,0,72,-1,71,69,67,-1,64,0,69,0,72,76,77,-1,76,74,76,-1,-1,0,0,0,0,0],
+    b:[...R4([45,0,57,0],2),...R4([41,0,53,0],2),...R4([43,0,55,0],2),...R4([40,0,52,0],2)],d:R4([1,0,3,0,2,0,3,0],4)},
+  cr_night:{sp:.14,lv:.05,l:[69,0,0,69,72,0,71,0,69,0,0,69,75,0,74,0,69,0,0,69,72,0,71,0,68,-1,-1,-1,0,0,0,0],
+    b:[...R4([45,0,45,0],4),...R4([44,0,44,0],4)],d:R4([1,0,0,3,0,0,2,0],4)},
+  cr_cz1:{sp:.22,lv:.06,l:[74,-1,72,-1,69,-1,-1,0,70,-1,69,-1,67,-1,-1,0,65,-1,67,-1,69,-1,72,-1,69,-1,-1,-1,0,0,0,0],
+    b:[...R4([50,0,57,0],2),...R4([46,0,53,0],2),...R4([43,0,50,0],2),...R4([45,0,52,0],2)],d:R4([3,0,0,0,3,0,0,0],4)},
+  cr_cz2:{sp:.15,lv:.055,l:[76,0,0,75,0,0,76,0,0,81,-1,-1,79,0,0,78,0,0,79,0,0,84,-1,-1,76,75,76,72,71,69,68,-1,-1,0,0,0],
+    b:[...R4([45,0,57],4),...R4([47,0,59],4),...R4([45,0,57],2),...R4([44,0,56],2)],d:R4([1,3,3],12)},
+  cr_at:{sp:.1,lv:.06,l:[76,0,76,79,0,76,74,72,74,0,74,76,0,74,72,71,72,0,72,74,76,79,81,79,76,-1,-1,0,74,-1,71,0],
+    b:[...R4([40,52],4),...R4([36,48],4),...R4([38,50],4),...R4([35,47],4)],d:R4([1,3,2,3,1,1,2,3],4)},
+  cr_duel:{sp:.085,lv:.06,l:[69,72,76,72,69,72,76,72,70,74,77,74,70,74,77,74,69,72,76,81,80,76,72,69,68,71,74,77,76,-1,-1,0],
+    b:[...R4([45,45,57,45],2),...R4([46,46,58,46],2),...R4([45,45,57,45],2),...R4([40,40,52,40],2)],d:R4([1,2,1,2,1,2,2,2],4)},
+  cr_bites:{sp:.08,lv:.06,l:[64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,72,0,72,74,0,76,0,77,0,76,0,74,0,72,0],
+    b:[...R4([40,40,52,40],4),...R4([45,45,57,45],2),...R4([44,44,56,44],2)],d:R4([1,2,1,2],8)},
+  cr_eb:{sp:.2,lv:.06,l:[72,-1,74,76,79,-1,76,74,72,-1,71,69,71,-1,-1,0,69,-1,72,76,77,-1,76,74,72,-1,-1,-1,0,0,0,0],
+    b:[48,0,55,0,43,0,50,0,45,0,52,0,40,0,47,0,41,0,48,0,43,0,50,0,48,0,55,0,48,0,55,0],d:R4([1,0,3,0],8)},
+  cr_jd:{sp:.13,lv:.06,tr:-2,l:[69,0,0,69,70,0,69,0,76,-1,74,0,72,-1,70,0,69,0,0,69,70,0,72,0,74,-1,-1,-1,0,0,0,0],
+    b:[...R4([45,45,45,45],4),...R4([46,46,46,46],2),...R4([44,44,44,44],2)],d:R4([1,0,1,0,2,0,1,2],4)},
+  cr_zone:{sp:.09,lv:.06,l:[76,79,84,79,76,79,84,88,86,84,83,81,83,-1,0,0,76,79,84,79,76,79,84,88,91,-1,88,-1,84,-1,-1,0],
+    b:[...R4([48,60],4),...R4([43,55],4),...R4([48,60],4),...R4([43,55],4)],d:R4([1,3,2,3],8)},
+});
+/* 状態から 曲を えらぶ（フリーズ中は 無音） */
+function crBgm(st,A){if(A.ev==='freeze'&&A.evt<30)return null;const m=st.m;
+  if(m==='N')return st.stg==='夜'?'cr_night':'cr_n';if(m==='CZ')return st.czUp?'cr_cz2':'cr_cz1';if(m==='EB')return 'cr_eb';if(m==='JD')return 'cr_jd';
+  if(m==='AT'){if(st.bt)return 'cr_bites';if(st.muk||(A.ev==='kure'&&A.evt<120))return 'cr_zone';if(st.duel||st.dpre)return 'cr_duel';return 'cr_at';}return 'cr_n';}
 let bgm=null,bnext=0,bstep=0;
 function playBGM(n){if(bgm===n)return;bgm=n;bstep=0;if(AC)bnext=AC.currentTime+.08;}
 function stopBGM(){bgm=null;}
@@ -4914,7 +4942,7 @@ function crLCD(st,A,x0,y0,w,h){const C=SLX.crimson,EN=C.EN,lead=(G.party&&G.part
 function slxScr(vi,mc){
   const P=G.pachi,card=mc.yami?null:P.cards['v'+vi],E=SLX[mc.type],ty=mc.type;if(!mc.x)mc.x=E.init();
   let ph='idle',pos=[0,7,14],stopped=[true,true,true],target=[0,0,0],res=null,lamp=!!mc.x.lamp,free=false,t=0,auto=false,fan=0,msg='レバーを たたいてね（A）',sd=0,info='';
-  const SP=ty==='crimson'?STRIP_CR:STRIP;
+  const SP=ty==='crimson'?STRIP_CR:STRIP,prevB=bgm;
   const sym=(i,p)=>SP[i][((p%21)+21)%21];
   const findPos=(i,s)=>{const c=[];SP[i].forEach((v,p)=>{if(v===s)c.push(p);});return c[Math.floor(rnd()*c.length)];};
   const setDisplay=o=>{
@@ -4927,7 +4955,7 @@ function slxScr(vi,mc){
   };
   const busy=()=>!!(mc.x.bn||mc.x.h||(mc.x.m&&mc.x.m!=='N'&&mc.x.m!=='A'&&mc.x.m!=='B'&&mc.x.m!=='SU'));
   const lever=()=>{
-    if(!busy()&&!(mc.yami?kanOpen('yami'):pachiOpen())){auto=false;sfx('ng');pop();dialog(mc.yami?['黒服「…夜明けだ。 今日は ここまでだ」','（遊技を 終了した）']:['♪ 蛍の光が 流れてきた…','店内放送「本日は ご来店 まことに\nありがとう ございました。\n22時45分を もちまして 閉店です」','（遊技を 終了した）']);return;}
+    if(!busy()&&!(mc.yami?kanOpen('yami'):pachiOpen())){auto=false;sfx('ng');pop();if(ty==='crimson')playBGM(prevB||'village');dialog(mc.yami?['黒服「…夜明けだ。 今日は ここまでだ」','（遊技を 終了した）']:['♪ 蛍の光が 流れてきた…','店内放送「本日は ご来店 まことに\nありがとう ございました。\n22時45分を もちまして 閉店です」','（遊技を 終了した）']);return;}
     if(!free){if(P.medals<3){msg='メダルが ありません';auto=false;sfx('ng');return;}P.medals-=3;mc.diff-=3;sd-=3;}
     const fr=free;free=false;mc.spins++;G.pachi.sc=(G.pachi.sc||0)+1;if(G.pachi.sc%12===0)timeAdd(1);if(card){card.pt=(card.pt||0)+(mc.spins%10===0?1:0);}
     res=E.step(mc.x,mc.s,rnd,fr);free=!!res.rep;if(ty==='crimson')setDisplay5(res.d);else setDisplay(res.d);ph='spin';stopped=[false,false,false];t=0;msg='';sfx('cur');
@@ -4964,8 +4992,8 @@ function slxScr(vi,mc){
   push({full:true,canBack:true,
     upd(){
       t++;if(fan>0)fan--;
-      if(ty==='crimson'){A.evt++;A.pop.forEach(p=>p.t++);A.pop=A.pop.filter(p=>p.t<80);if(winT>0)winT--;const tg=mc.x.at||0;A.disp+=(tg-A.disp)*.12;if(Math.abs(tg-A.disp)<1)A.disp=tg;}
-      if(ph==='idle'){if(I.B){pop();save();return;}if(I.A||(auto&&t>14))lever();return;}
+      if(ty==='crimson'){const bk=crBgm(mc.x,A);if(bk===null){if(bgm)stopBGM();}else if(bgm!==bk)playBGM(bk);A.evt++;A.pop.forEach(p=>p.t++);A.pop=A.pop.filter(p=>p.t<80);if(winT>0)winT--;const tg=mc.x.at||0;A.disp+=(tg-A.disp)*.12;if(Math.abs(tg-A.disp)<1)A.disp=tg;}
+      if(ph==='idle'){if(I.B){pop();save();if(ty==='crimson')playBGM(prevB||'village');return;}if(I.A||(auto&&t>14))lever();return;}
       if(ph==='spin'){for(let i=0;i<3;i++)if(!stopped[i])pos[i]=(pos[i]+0.55)%21;
         const nx=stopped.indexOf(false);if(nx>=0&&((I.A&&t>6)||(auto&&t>10+nx*7)||(t>150))){stopped[nx]=true;pos[nx]=target[nx];sfx('cur');if(nx===2)settle();}}
     },
