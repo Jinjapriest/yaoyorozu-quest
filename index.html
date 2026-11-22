@@ -4595,52 +4595,74 @@ const SLX={
       res.info=hi?`ハイビスカス チャンス　残り ${st.hk}G`:`${st.g}G`;return res;}},
   /* ---------- 紅夜 CRIMSON NIGHT（AT機・CZ→差枚管理AT）　液晶演出つき ---------- */
   crimson:{name:'紅夜 CRIMSON NIGHT',short:'紅夜',lb:['AT','CZ'],hist:[[401,379,355,334,307,285],[316,304,291,273,251,240]],
-    UK:1,CZB:[1/1800,1/1600,1/1400,1/1200,1/1000,1/900],CZS:[.33,.38,.44,.5,.56,.61],
-    BL:[50,80,100,150,200,300,400,500,700,1000,1500,2000],
-    init:()=>({m:'N',g:0,ag:0,cz:0,czUp:0,czOk:0,czN:0,at:0,adv:0,eb:0,boss:0,jd:0,zen:0,zk:null,fk:0,stg:'昼',duel:0,dWin:0,en:0,bt:null,meal:0,iw:0,frz:0,tot:0,ep:0}),
+    UK:1,CZB:[1/1800,1/1600,1/1400,1/1200,1/1000,1/900],CZS:[.34,.38,.43,.5,.58,.67],
+    /* 追憶チャンス：押し順ベルの フリーズ率（設定差） */
+    TBP:[.01,.02,.035,.06,.09,.13],DUEL:170,
+    /* 対戦相手（決闘レベル A〜D）。審判者は 最終審判の 権利 */
+    EN:[{n:'仮面の喰い手',lv:0},{n:'鎌の執行者',lv:0},{n:'百足の怪人',lv:1},{n:'双子の捜査官',lv:2},{n:'鉄の捜査官',lv:3},{n:'白き審判者',lv:2,boss:1}],
+    ENW:[30,26,22,12,6],
+    /* BITES 報酬テーブル（5段階） */
+    BT:{A:[50,100,200,300,500],B:[50,50,500,500,1000],C:[100,200,300,500,1000],D:[100,100,500,1000,2000],E:[200,300,500,1000,2000],S:[300,500,1000,2000,3000],X:[2000]},
+    init:()=>({m:'N',g:0,ag:0,cz:0,czUp:0,czOk:0,czN:0,at:0,adv:0,eb:0,boss:0,jd:0,zen:0,zk:null,fk:0,stg:'昼',sel:0,en:0,dpre:0,duel:0,dWin:0,dKk:0,dAct:'',bt:null,muk:0,meal:0,nav:'',frz:0,tot:0,ep:0}),
     step(st,s,R,free){const C=SLX.crimson;const nv=['①②③','①③②','②①③','②③①','③①②','③②①'][SLX_RI(R,0,5)];
       const role=()=>{const r=R();let a=0;if(r<(a+=1/2048))return'kurenai';if(r<(a+=1/356.2))return'scherry';if(r<(a+=1/292.5))return'chance';if(r<(a+=1/100.5))return'suika';if(r<(a+=1/70.3))return'wcherry';if(r<(a+=1/7.3))return'replay';if(r<(a+=1/1.54))return'bell';return'lose';};
-      const rl=role(),rare=rl==='scherry'||rl==='chance'||rl==='suika'||rl==='wcherry';
-      const basic=(navi)=>rl==='bell'?(navi||R()<1/6?{d:'bell',pay:10,msg:navi?`押し順 ${nv}`:null}:{d:'lose',pay:0}):rl==='replay'?{d:'replay',pay:0,rep:1}:rl==='wcherry'?{d:'cherry',pay:2,msg:'弱チェリー'}:rl==='scherry'?{d:'cherry',pay:2,msg:'強チェリー！'}:rl==='suika'?{d:'grape',pay:5,msg:'スイカ'}:rl==='chance'?{d:'lose',pay:0,msg:'チャンス目！'}:rl==='kurenai'?{d:'pierrot',pay:0,msg:'紅図柄 揃い！！'}:{d:'lose',pay:0};
-      const toAT=(base,res,txt)=>{st.m='AT';st.at=base;st.adv=0;st.ag=0;st.tot=0;st.en=SLX_RI(R,0,2);st.duel=0;st.bt=null;res.cnt='b';res.fan=150;res.snd='win';res.ev='atin';res.msg=(res.msg?res.msg+'\n':'')+txt;};
+      const rl=role(),rare=rl==='scherry'||rl==='chance'||rl==='suika'||rl==='wcherry',srare=rl==='scherry'||rl==='chance';
+      const basic=(navi)=>rl==='bell'?(navi||R()<1/6?{d:'bell',pay:10,msg:navi?`押し順 ${nv}`:null}:{d:'lose',pay:1,msg:'ベル こぼし（1枚）'}):rl==='replay'?{d:'replay',pay:0,rep:1}:rl==='wcherry'?{d:'wcherry',pay:2,msg:'弱チェリー'}:rl==='scherry'?{d:'scherry',pay:2,msg:'強チェリー！'}:rl==='suika'?{d:'suika',pay:5,msg:'スイカ'}:rl==='chance'?{d:'chance',pay:1,msg:'チャンス目！'}:rl==='kurenai'?(st.m==='AT'?{d:'kure',pay:0,msg:'紅図柄 揃い！！'}:{d:'white7',pay:0,msg:'白7 揃い！！'}):{d:'lose',pay:0};
+      const pickEn=()=>R()<.08?5:SLX_PICK(R,C.ENW);
+      const toAT=(base,res,txt)=>{st.m='AT';st.at=base;st.adv=0;st.ag=0;st.tot=0;st.sel=5;st.en=pickEn();st.duel=0;st.dpre=0;st.bt=null;st.muk=0;res.cnt='b';res.fan=150;res.snd='win';res.ev='atin';res.msg=(res.msg?res.msg+'\n':'')+txt;};
       const addAT=(res,add)=>{if(!add)return;st.at+=add;st.tot+=add;res.add=(res.add||0)+add;res.msg=(res.msg?res.msg+'\n':'')+`+${add}枚 上乗せ！`;};
+      const nextBt=()=>{const B=st.bt;return B?C.BT[B.tb]:null;};
       if(st.m==='AT'){const res=basic(true);let add=0;
-        if(st.bt){const B=st.bt;B.g++;B.pinch=0;let up=0;
-          if(rl==='kurenai')up=4;else if(rare)up=2;else if(rl==='replay'||(rl==='bell'&&R()<.5))up=1;
-          if(up){B.lv=Math.min(C.BL.length-1,B.lv+up);res.ev='bup';res.msg=`BITES 報酬UP！ ${C.BL[B.lv]}枚`;res.snd='g3';}
-          else if(rl==='lose'||rl==='bell'){if(R()<.55){B.pinch=1;res.ev='bpinch';res.msg='PINCH！ …耐えた！';}else{const v=C.BL[B.lv];st.bt=null;res.ev='bend';res.msg=`BLOOD BITES 終了`;addAT(res,v);res.snd='g5';}}
-          if(st.bt&&B.lv>=C.BL.length-1){const v=C.BL[B.lv];st.bt=null;res.ev='bend';res.msg='BITES 最高報酬 到達！！';addAT(res,v);res.snd='g5';}}
-        else if(st.duel>0){st.duel--;res.ev='duel';
-          if(st.duel<=0){if(st.dWin){res.ev='dwin';res.snd='g5';res.msg=`決闘に 勝利！！${st.en===3?'（白き審判者を 退けた）':''}\nBLOOD BITES 突入！`;if(st.en===3)st.boss=1;st.bt={lv:0,g:0,pinch:0};st.en=SLX_RI(R,0,2);}
-            else{res.ev='dlose';res.msg='決闘… 敗北';}}}
+        if(st.sel>0){/* 導入エピソード：対戦相手を 選ぶ */st.sel--;res.ev='sel';if(st.sel===0){res.ev='selok';res.msg=`対戦相手 決定！ VS ${C.EN[st.en].n}`+(C.EN[st.en].boss?'\n（白き審判者が 乱入した…！）':'');}
+          if(rare)addAT(res,SLX_RI(R,1,5)*10);}
+        else if(st.muk>0){/* 紅百足覚醒：5回 保証の 上乗せ */st.muk--;const v=SLX_PICK(R,[40,30,18,9,3]);addAT(res,[20,30,50,100,200][v]*(srare?2:1));res.ev='muk';if(st.muk===0&&R()<.25){st.muk=3;res.msg+='\n百足が 再び 牙を むく！（継続）';}}
+        else if(st.bt){const B=st.bt,T=C.BT[B.tb];B.g++;let up=0;
+          if(rl==='kurenai')up=9;else if(srare)up=2;else if(rl==='wcherry'||rl==='suika')up=R()<.5?2:1;else if(rl==='replay'||(rl==='bell'&&R()<.47))up=1;
+          if(up){B.st=Math.min(T.length-1,B.st+up);res.ev='bup';res.snd='g3';res.msg=`BITES 報酬UP！ ${T[B.st]}枚`;B.retry=0;
+            if(B.st>=T.length-1){const v=T[B.st];st.bt=null;res.ev='bend';res.msg=(T===C.BT.X?'極BITES！！ ':'')+'最高報酬 到達！！';addAT(res,v);res.snd='g5';}}
+          else{if(R()<.2){B.retry=1;res.ev='bretry';res.msg='ハズレ… 再チャレンジ！！';}else{const v=T[B.st];st.bt=null;res.ev='bend';res.msg='BITES 終了';addAT(res,v);res.snd='g5';}}
+          if(!st.bt){st.sel=3;st.en=pickEn();}}
+        else if(st.dpre>0){/* 決闘 前兆 */st.dpre--;res.ev='dpre';if(srare&&!st.dKk&&R()<.3)st.dKk=1;if(st.dpre===0){st.duel=4;res.ev='dstart';res.snd='g3';res.msg=st.dKk?'決闘 開始！（モノクロ…！？）':`決闘 開始！ VS ${C.EN[st.en].n}`;}}
+        else if(st.duel>0){st.duel--;const lv=C.EN[st.en].lv;
+          const tb=rl==='replay'?[.4063,.6002,.8438,1]:(rl==='wcherry'||rl==='suika')?[.625,1,1,1]:srare?[1,1,1,1]:[0,.0234,.0977,.2344];
+          if(!st.dWin&&(st.dKk||R()<tb[lv]))st.dWin=1;
+          st.dAct=['敵の 攻撃！… 耐えた！','反撃！','激突！'][SLX_RI(R,0,2)];res.ev='duel';
+          if(st.duel<=0){if(st.dWin){res.ev='dwin';res.snd='g5';const E=C.EN[st.en];if(E.boss)st.boss=1;
+              const tb2=st.dKk&&R()<.3?'S':['A','B','C','D','E'][SLX_PICK(R,[719,109,94,47,31])];st.bt={tb:R()<.01?'X':tb2,st:0,g:0,retry:0};
+              res.msg=`決闘に 勝利！！${E.boss?'（審判者を 退けた）':''}\n${st.bt.tb==='X'?'極BITES':st.bt.tb==='S'?'超BITES':'BITES'} 突入！`;}
+            else{res.ev='dlose';res.msg='決闘… 敗北';}
+            st.dWin=0;st.dKk=0;}}
         else{
-          if(rl==='wcherry')add=10;else if(rl==='suika')add=SLX_RI(R,1,3)*10;else if(rl==='scherry'||rl==='chance')add=SLX_RI(R,3,10)*10;
-          else if(rl==='kurenai'){add=[300,500,1000,2000][SLX_PICK(R,[50,30,15,5])];res.msg='紅図柄 揃い！ 一撃ゾーン！！';res.fan=150;res.ev='kure';}
+          if(rl==='wcherry')add=10;else if(rl==='suika')add=SLX_RI(R,1,3)*10;else if(srare)add=SLX_RI(R,3,10)*10;
+          else if(rl==='kurenai'){if(R()<.5){st.muk=5;res.ev='mukin';res.msg='紅図柄 揃い！ 紅百足覚醒！！';}else{add=[300,500,1000,2000][SLX_PICK(R,[50,30,15,5])];res.msg='紅図柄 揃い！ 隻眼の夜鴉！！';res.ev='kure';}res.fan=150;}
           addAT(res,Math.round(add*C.UK));
-          if(R()<1/49||((rl==='scherry'||rl==='chance')&&R()<.3)){st.duel=3;const boss=R()<.15;st.en=boss?3:SLX_RI(R,0,2);st.dWin=R()<(boss?.3:.45);res.ev='dstart';res.msg=(res.msg?res.msg+'\n':'')+(boss?'白き審判者が 現れた…！ 決闘 開始！':'決闘 開始！');res.snd='g3';}}
+          if(!st.muk&&(R()<1/C.DUEL||(srare&&R()<.15))){st.dpre=SLX_RI(R,1,3);st.dKk=R()<.09;res.ev='dzen';res.msg=(res.msg?res.msg+'\n':'')+'…敵の 気配！';}}
         const net=res.pay-(free?0:3);st.at-=net;st.adv+=net;
-        if(!st.duel&&!st.bt&&(st.at<=0||st.adv>=2400)){const comp=st.adv>=2400;st.m='N';st.g=0;st.ag=0;st.at=0;res.ev='atend';res.msg=(res.msg?res.msg+'\n':'')+(comp?'CRIMSON RUSH 完走！ 2400枚！':'CRIMSON RUSH 終了');
+        const busyZ=st.sel||st.dpre||st.duel||st.bt||st.muk;
+        if(!busyZ&&(st.at<=0||st.adv>=2400)){const comp=st.adv>=2400;st.m='N';st.g=0;st.ag=0;st.at=0;res.ev='atend';res.msg=(res.msg?res.msg+'\n':'')+(comp?'CRIMSON RUSH 完走！ 2400枚！':'CRIMSON RUSH 終了');
           if(st.boss&&!comp){st.boss=0;st.m='JD';st.jd=5;st.czOk=R()<.61;res.msg+='\n最終審判 へ…！';res.ev='jdin';}}
         else if(st.at<=0)st.at=0;
-        res.info=st.m==='AT'?(st.bt?`BLOOD BITES　報酬 ${C.BL[st.bt.lv]}枚`:st.duel?`決闘中　残り ${st.duel}G`:`CRIMSON RUSH　残り ${Math.max(0,st.at)}枚`):'';return res;}
+        res.info=st.m==='AT'?(st.sel?`導入エピソード　対戦相手 選択中`:st.bt?`${st.bt.tb==='S'?'超':st.bt.tb==='X'?'極':''}BITES　報酬 ${C.BT[st.bt.tb][st.bt.st]}枚`:st.muk?`紅百足覚醒　残り ${st.muk}回`:st.duel?`決闘中　残り ${st.duel}G`:`CRIMSON RUSH　残り ${Math.max(0,st.at)}枚`):'';return res;}
       if(st.m==='JD'){const res=basic(true);st.jd--;res.ev='jd';res.info=`最終審判　残り ${st.jd}G`;if(st.jd<=0){if(st.czOk)toAT(150+SLX_RI(R,10,50)*10,res,'審判の 一撃！！ CRIMSON RUSH 再突入！');else{st.m='N';res.msg='最終審判… 失敗';res.ev='czfail';}}return res;}
-      if(st.m==='EB'){const res={d:'bell',pay:8,msg:`押し順 ${nv}`,ev:'eb'};let add=0;if(rl==='wcherry'||rl==='suika')add=50;if(rl==='scherry'||rl==='chance')add=100;st.eb-=5;st.ebA=(st.ebA||0)+add;
+      if(st.m==='EB'){const res={d:'bell',pay:8,msg:`押し順 ${nv}`,ev:'eb'};let add=0;if(rl==='wcherry'||rl==='suika')add=50;if(srare)add=100;st.eb-=5;st.ebA=(st.ebA||0)+add;
         if(add){res.msg+=`\nAT 初期枚数 +${add}枚`;res.add=add;}res.info=`EPISODE BONUS　残り ${Math.max(0,st.eb)}枚`;if(st.eb<=0){toAT(150+(st.ebA||0),res,'CRIMSON RUSH 突入！！');st.ebA=0;}return res;}
-      if(st.m==='CZ'){const res=basic(true);st.cz--;st.czN++;const nm=st.czUp?'饗宴チャンス':'追憶チャンス';res.info=`${nm}　残り ${st.cz}G`;
-        if(st.czUp){/* 饗宴：レバーで 食事演出（弱・中・強）。成功は 完食フリーズ */
-          if(st.czOk&&st.czN===st.frz){st.meal=3;res.ev='freeze';toAT(150+SLX_RI(R,0,10)*10,res,'完食！！ CRIMSON RUSH 突入！！');return res;}
-          st.meal=SLX_PICK(R,rare?[1,3,3]:st.czOk?[4,3,1]:[6,3,1]);res.ev='meal';}
-        else{/* 追憶：違和感が 出れば チャンス */st.iw=st.czOk?(R()<.3?1:0):(R()<.05?1:0);res.ev=st.iw?'iw':'mem';}
-        if(st.cz<=0){if(st.czOk)toAT(150+SLX_RI(R,0,10)*10,res,'覚醒！！ CRIMSON RUSH 突入！！');else{st.m='N';res.msg='CZ 失敗…';res.ev='czfail';}}return res;}
+      if(st.m==='CZ'){const res=basic(true);st.cz--;st.czN++;const last=st.cz<=0;
+        let p;if(st.czUp){/* 饗宴：レア役は フリーズ濃厚、最終G は リプレイでも */p=rare?1:rl==='replay'?(last?1:.266):rl==='bell'?.109:0;st.meal=p>=1?3:SLX_PICK(R,p>0?[3,4,3]:[6,3,1]);}
+        else{/* 追憶：帯電ナビは フリーズの チャンス */p=srare?1:(rl==='wcherry'||rl==='suika')?.6:rl==='replay'?.08:rl==='bell'?C.TBP[s]:0;}
+        if(st.czOk==='force'&&last)p=1;
+        const fz=R()<p;st.nav=!st.czUp&&rl==='bell'?(fz||R()<.15?'帯電':'通常'):'';
+        if(fz){res.ev='freeze';toAT(150+SLX_RI(R,0,10)*10,res,st.czUp?'完食！！ CRIMSON RUSH 突入！！':'覚醒！！ CRIMSON RUSH 突入！！');res.ev='freeze';return res;}
+        res.ev=st.czUp?'meal':(st.czN===1?'voice':'mem');res.info=`${st.czUp?'饗宴チャンス':'追憶チャンス'}　残り ${st.cz}G`;
+        if(last){st.m='N';res.msg='CZ 失敗…';res.ev='czfail';}return res;}
       /* 通常時：昼 → 夕方 → 夜（夜は CZ 前兆） */
       st.g++;st.ag++;const res=basic(false);
-      if(rl==='kurenai'){st.m='EB';st.eb=100;st.ebA=0;st.ep=SLX_RI(R,1,6);st.zen=0;res.cnt='b';res.fan=150;res.snd='win';res.ev='ebin';res.msg='紅図柄 揃い！！ EPISODE BONUS！';res.info='EPISODE BONUS';return res;}
+      if(rl==='kurenai'){st.m='EB';st.eb=100;st.ebA=0;st.ep=SLX_RI(R,1,6);st.zen=0;res.cnt='b';res.fan=150;res.snd='win';res.ev='ebin';res.msg='白7 揃い！！ EPISODE BONUS！';res.info='EPISODE BONUS';return res;}
       if(st.zen>0){st.zen--;st.stg=st.zen>=2?'夕方':'夜';
-        if(st.zen<=0){const k=st.zk;st.m='CZ';st.cz=8;st.czN=0;st.czUp=k.up;st.czOk=k.ok;st.frz=k.ok&&k.up?SLX_RI(R,1,8):0;st.g=0;st.meal=0;st.iw=0;res.cnt='r';res.snd='g3';res.ev='czin';res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+(k.up?'饗宴チャンス 突入！':'追憶チャンス 突入！');}
+        if(st.zen<=0){const k=st.zk;st.m='CZ';st.cz=8;st.czN=0;st.czUp=k.up;st.czOk=k.force?'force':0;st.g=0;st.meal=0;st.nav='';res.cnt='r';res.snd='g3';res.ev='czin';res.lamp=1;res.msg=(res.msg?res.msg+'\n':'')+(k.up?'饗宴チャンス 突入！':'追憶チャンス 突入！');}
         res.info=st.m==='CZ'?`${st.czUp?'饗宴チャンス':'追憶チャンス'}　8G`:`${st.g}G`;return res;}
       let p=C.CZB[s];if(rl==='wcherry')p=.04;else if(rl==='suika')p=.08;else if(rl==='scherry')p=.3;else if(rl==='chance')p=.2;
       if(st.g%100===0)p=Math.max(p,.06);
-      if(R()<p||st.g>=600||st.ag>=1200){const up=R()<.2||st.ag>=1200;st.zk={up,ok:st.ag>=1200||R()<(up?.75:C.CZS[s])};st.zen=SLX_RI(R,2,6);st.stg='夕方';st.fk=0;res.ev='zen';}
+      if(R()<p||st.g>=600||st.ag>=1200){const up=R()<.2||st.ag>=1200;st.zk={up,force:st.ag>=1200};st.zen=SLX_RI(R,2,6);st.stg='夕方';st.fk=0;res.ev='zen';}
       else{if(st.fk>0){st.fk--;if(!st.fk)st.stg='昼';}else if(rare&&R()<.4||R()<1/60){st.fk=SLX_RI(R,2,4);st.stg=R()<.1?'夜':'夕方';}else st.stg='昼';}
       res.info=`${st.g}G`;return res;}},
   /* ---------- PEARL LAGOON CRYSTAL（A+連荘モード） ---------- */
@@ -4793,8 +4815,20 @@ function slotScr(vi,mc){
       region(44,44,168,74,()=>{vA=true;});
     }});
 }
-/* ===== 紅夜：液晶演出（通常＝先頭キャラが 歩く、CZ、AT＝敵と 対戦、BITES、上乗せ） ===== */
-const CR_ENM=['仮面の喰い手','鎌の執行者','百足の怪人','白き審判者'];
+/* ===== 紅夜：リール配列（本家の 停止形に ならった 配列）と 図柄 ===== */
+/* 0 白7　1 黒BAR　2 スイカ　3 チェリー　4 ベル　5 紅（喰図柄）　6 リプレイ　7 赫子 */
+const STRIP_CR=[[1,4,6,3,2,6,4,0,6,4,2,7,6,4,5,3,6,4,2,1,6],[4,6,2,1,4,6,0,4,6,2,5,4,6,7,4,6,2,4,6,1,6],[6,4,1,2,6,4,7,6,4,2,0,6,4,5,6,4,2,1,6,4,2]];
+function drawSymCr(k,x,y){
+  switch(k){
+    case 0:big('7',x+17,y+3,'#000','center',17);big('7',x+16,y+2,'#fcfcfc','center',16);R(x+10,y+17,13,1,'#bcbcbc');break;
+    case 1:R(x+4,y+4,24,12,'#000');R(x+5,y+5,22,10,'#1c1c1c');txt('BAR',x+16,y+6,'#fcfcfc','center');break;
+    case 2:pc(x+16,y+10,8,'#00a800');for(let i=-6;i<=6;i+=3)R(x+16+i,y+3,1,14,'#005800');R(x+13,y+1,6,2,'#a05000');break;
+    case 3:pc(x+11,y+13,3,'#d82800');pc(x+20,y+13,3,'#d82800');R(x+12,y+4,1,7,'#00a800');R(x+19,y+4,1,7,'#00a800');R(x+12,y+3,8,1,'#00a800');break;
+    case 4:R(x+12,y+4,8,2,'#f8b800');R(x+10,y+6,12,6,'#f8b800');R(x+8,y+12,16,2,'#f8b800');R(x+15,y+14,2,2,'#a05000');break;
+    case 5:pc(x+16,y+10,9,'#7c0000');pc(x+16,y+10,8,'#d82800');big('紅',x+16,y+3,'#fcfcfc','center',13);break;
+    case 6:txt('Re',x+16,y+6,'#0058f8','center');R(x+6,y+4,20,1,'#0058f8');R(x+6,y+15,20,1,'#0058f8');break;
+    case 7:for(let i=0;i<4;i++){R(x+8+i*4,y+16-i*3,4,3,'#a81000');R(x+20-i*2,y+4+i*3,3,3,'#d82800');}pc(x+16,y+9,2,'#fc3c3c');break;}}
+/* ===== 紅夜：液晶演出 ===== */
 function crEnemy(k,x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c),bob=(t>>4)&1;
   if(k===0){for(let i=0;i<4;i++){const a=(t/12+i)%6;P(-6+i*2,6+i*2-a*.3,3,8,'#d82800');P(14-i*2,5+i*2+a*.3,3,8,'#a81000');}
     P(4,0,8,8,'#1c1c1c');P(5,1,6,6,'#fcfcfc');P(6,3,1,1,'#d82800');P(9,3,1,1,'#000');P(6,5,4,1,'#000');P(7,5,1,1,'#fcfcfc');P(9,5,1,1,'#fcfcfc');P(3,8,10,10,'#1c1c1c');P(4,18,3,6+bob,'#141414');P(9,18,3,6-bob,'#141414');}
@@ -4802,6 +4836,9 @@ function crEnemy(k,x,y,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c),bob=
     P(13,-2,1,26,'#7c4c10');for(let i=0;i<8;i++)P(14+i,-4+Math.round(i*i/10),2,2,'#d8d8d8');P(14,-4,3,2,'#fcfcfc');}
   else if(k===2){for(let i=0;i<7;i++){const yy=20-i*3+Math.round(Math.sin(t/10+i)*2);P(-4-i*2,yy,4,3,i%2?'#5c0058':'#a800a8');P(-3-i*2,yy+3,1,2,'#000');}
     P(4,0,8,8,'#fcfcfc');P(5,2,2,2,'#000');P(9,2,2,2,'#d82800');P(5,6,6,1,'#000');P(3,8,10,10,'#24183c');P(4,18,3,6,'#000');P(9,18,3,6,'#000');}
+  else if(k===3){for(const [dx,hc] of [[-2,'#f8d878'],[9,'#3c3c3c']]){P(dx+1,2,6,6,'#fcd8a8');P(dx,0,8,3,hc);P(dx+2,4,1,1,'#000');P(dx+5,4,1,1,'#000');P(dx,8,8,10,'#24288c');P(dx+1,18,2,6,'#000');P(dx+5,18,2,6,'#000');}P(17,6,2,14,'#d8d8d8');P(-5,10,3,3,'#fcfcfc');}
+  else if(k===4){P(3,0,10,8,'#3c2c1c');P(4,2,8,6,'#e8b890');P(5,4,2,1,'#000');P(9,4,2,1,'#000');P(5,6,6,1,'#7c4c10');P(1,8,14,14,'#3c3c4c');P(2,22,4,4,'#000');P(10,22,4,4,'#000');
+    P(15,0,3,22,'#7c7c7c');P(14,-4,5,6,'#bcbcbc');}
   else{P(4,0,8,7,'#d8d8d8');P(5,2,6,5,'#fcd8a8');P(6,4,1,1,'#3c3c3c');P(9,4,1,1,'#3c3c3c');P(2,7,12,15,'#fcfcfc');P(7,7,2,8,'#1c1c1c');P(3,22,4,3,'#bcbcbc');P(9,22,4,3,'#bcbcbc');
     P(14,-6,2,26,'#fcfcfc');P(13,-8,4,2,'#d8d8d8');P(14,18,2,4,'#7c7c7c');if((t>>3)&1)P(15,-6,1,24,'#a8e4fc');}}
 function crWoman(x,y,lv,t,s=2){const P=(a,b,w,h,c)=>R(x+a*s,y+b*s,w*s,h*s,c),open=lv>0&&((t>>(lv>=2?2:3))&1);
@@ -4815,44 +4852,60 @@ function crStage(stg,x0,y0,w,h,sc){const sky=stg==='夜'?['#0c0c2c','#1c0c3c']:s
   const bc=stg==='夜'?'#000':stg==='夕方'?'#5c1c1c':'#58a858';
   for(let i=-1;i<9;i++){const bx=Math.round(x0+i*28-(sc*.5)%28),bh=14+((i*13+Math.floor(sc*.5/28)*7)%5+5)%5*5;R(bx,y0+h-18-bh,22,bh,bc);if(stg==='夜')for(let k=0;k<3;k++)R(bx+4+k*6,y0+h-14-bh+((i+k)%3)*5,2,2,(i+k)%2?'#f8d878':'#3c3c1c');}
   R(x0,y0+h-18,w,18,stg==='夜'?'#1c1c1c':'#7c7c7c');for(let i=-1;i<10;i++)R(Math.round(x0+i*24-(sc*1.5)%24),y0+h-10,12,2,'#fcfcfc');}
-function crLCD(st,A,x0,y0,w,h){const C=SLX.crimson,lead=(G.party&&G.party[0])||Object.keys(G.chars)[0],m=st.m,t=frame,e=A.evt;
+function crLCD(st,A,x0,y0,w,h){const C=SLX.crimson,EN=C.EN,lead=(G.party&&G.party[0])||Object.keys(G.chars)[0],m=st.m,t=frame,e=A.evt;
   ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
   const hud=(l,r,lc,rc)=>{R(x0,y0,w,11,'#000a');txt(l,x0+3,y0+2,lc||'#fcfcfc','left',w*.6);txt(r,x0+w-3,y0+2,rc||'#f8d878','right',w*.4);};
+  const band=(s,col,bg='#000c')=>{R(x0,y0+h/2-12,w,24,bg);big(s,x0+w/2,y0+h/2-8,col,'center',12);};
   if(m==='N'){crStage(st.stg,x0,y0,w,h,t);drawChar(lead,x0+46,y0+h-48,(t>>3)&1,2);
     hud(st.stg==='夜'?'夜　…ただならぬ 気配':st.stg==='夕方'?'夕方':'昼',`${st.g}G`,st.stg==='夜'?'#fc3c3c':null);
     if(A.ev==='czfail'&&e<50){R(x0,y0,w,h,'#000a');big('CZ 失敗…',x0+w/2,y0+h/2-8,'#7c7c7c','center',12);}
     if(A.ev==='atend'&&e<60){R(x0,y0,w,h,'#000a');big('RUSH 終了',x0+w/2,y0+h/2-8,'#bcbcbc','center',12);}}
-  else if(m==='CZ'&&!st.czUp){R(x0,y0,w,h,'#5c3c24');R(x0+6,y0+6,w-12,h-12,'#a07848');for(let i=0;i<6;i++){const fx=x0+((i*41+t)%w),fy=y0+12+((i*19)%(h-30));R(fx,fy,8,6,'#e8d0a0');R(fx+1,fy+1,6,4,'#7c5c3c');}
+  else if(m==='CZ'&&!st.czUp){/* 追憶チャンス：記憶の 世界。帯電ナビ・主の声・最後 */
+    R(x0,y0,w,h,'#3c2c1c');R(x0+6,y0+14,w-12,h-20,'#a07848');for(let i=0;i<6;i++){const fx=x0+((i*41+t)%w),fy=y0+16+((i*19)%(h-30));R(fx,fy,8,6,'#e8d0a0');R(fx+1,fy+1,6,4,'#7c5c3c');}
     drawChar(lead,x0+w/2-16,y0+h-44,0,2);
-    if(st.iw&&(A.ev==='iw')&&e<70){for(let i=0;i<5;i++)R(x0,y0+((t*3+i*17)%h),w,2,'#d82800');big('…違和感？',x0+w/2,y0+18,'#fc3c3c','center',12);}
+    if(st.nav&&e<70){const elec=st.nav==='帯電';R(x0+w/2-40,y0+16,80,16,'#000c');txt(elec?'押し順 ⚡ナビ⚡':'押し順 ナビ',x0+w/2,y0+20,elec?'#f8f800':'#fcfcfc','center');if(elec&&(t&4))for(let i=0;i<4;i++)R(x0+w/2-40+i*24,y0+14+(i%2)*18,10,2,'#f8f800');}
+    if(A.ev==='voice'&&e<80){const c=A.vc||'#fcfcfc';R(x0+8,y0+h-26,w-16,16,'#000c');txt('「…主よ、 この 記憶を 喰らえ」',x0+w/2,y0+h-22,c,'center',w-20);}
+    if(st.cz===1&&(t&8))big('最後',x0+30,y0+16,'#fcfcfc','center',12);
     hud('追憶チャンス',`残り ${st.cz}G`,'#f8d878','#fcfcfc');}
-  else if(m==='CZ'){R(x0,y0,w,h,'#2c0008');for(let i=0;i<6;i++)R(x0+i*34,y0+h-14,30,4,'#5c1c1c');crWoman(x0+w/2+10,y0+h-56,A.ev==='freeze'?3:st.meal,t,2);drawChar(lead,x0+18,y0+h-40,0,2);
+  else if(m==='CZ'){/* 饗宴チャンス：レバーで リールロック → 食事演出 */
+    R(x0,y0,w,h,'#2c0008');for(let i=0;i<6;i++)R(x0+i*34,y0+h-14,30,4,'#5c1c1c');crWoman(x0+w/2+10,y0+h-56,st.meal,t,2);drawChar(lead,x0+18,y0+h-40,0,2);
     const lv=st.meal;if(A.ev==='meal'&&e<60&&lv)big(['','食事 弱','食事 中','食事 強！'][lv],x0+w/2-30,y0+16,['','#fcfcfc','#f8b800','#fc3c3c'][lv],'center',12);
+    if(st.cz===0&&(t&8))big('LAST',x0+30,y0+16,'#fc3c3c','center',12);
     hud('饗宴チャンス',`残り ${st.cz}G`,'#fc74b4','#fcfcfc');}
-  else if(m==='AT'||m==='JD'){const en=m==='JD'?3:st.en;R(x0,y0,w,h,'#1c0008');pc(x0+w-34,y0+22,12,'#a81000');pc(x0+w-30,y0+20,10,'#1c0008');R(x0,y0+h-14,w,14,'#2c1c1c');
+  else if(m==='AT'||m==='JD'){const en=m==='JD'?5:st.en,mono=st.dKk&&(st.dpre||st.duel);R(x0,y0,w,h,mono?'#1c1c1c':'#1c0008');pc(x0+w-34,y0+22,12,mono?'#7c7c7c':'#a81000');pc(x0+w-30,y0+20,10,mono?'#1c1c1c':'#1c0008');R(x0,y0+h-14,w,14,mono?'#3c3c3c':'#2c1c1c');
     const shake=(A.ev==='duel'||A.ev==='dstart')&&e<20?((t&2)?2:-2):0;
-    drawChar(lead,x0+20+shake,y0+h-46,(t>>4)&1,2);crEnemy(en,x0+w-60-shake,y0+h-62,t,2);
+    if(st.sel>0&&m==='AT'){/* 導入エピソード：対戦相手 ルーレット */const k=Math.floor(t/6)%6;R(x0,y0,w,h,'#140008');for(let i=0;i<6;i++){const xx=x0+8+i*30,on=i===k;R(xx,y0+20,26,40,on?'#5c0000':'#2c0c14');crEnemy(i,xx+5,y0+30,t,1);}
+      txt('導入エピソード　対戦相手を 選択中…',x0+w/2,y0+h-12,'#fcfcfc','center',w-8);}
+    else{drawChar(lead,x0+20+shake,y0+h-46,(t>>4)&1,2);crEnemy(en,x0+w-60-shake,y0+h-62,t,2);}
     if((A.ev==='duel'||A.ev==='dwin')&&e<16){for(let i=0;i<6;i++)R(x0+w/2-10+((i*7)%20),y0+30+((i*11)%30),3,3,i%2?'#fcfcfc':'#f8b800');}
-    if(st.duel||A.ev==='dwin'||A.ev==='dlose'){const eh=A.ev==='dwin'?0:Math.max(0,st.duel)/3,ph=A.ev==='dlose'?0:1;R(x0+4,y0+14,60,4,'#3c3c3c');R(x0+4,y0+14,60*ph,4,'#3cb83c');R(x0+w-64,y0+14,60,4,'#3c3c3c');R(x0+w-64+60*(1-eh),y0+14,60*eh,4,'#d82800');txt(CR_ENM[en],x0+w-4,y0+20,'#fcfcfc','right');}
+    if(st.duel||A.ev==='dwin'||A.ev==='dlose'){const eh=A.ev==='dwin'?0:Math.max(.15,st.duel/4),ph=A.ev==='dlose'?0:1;R(x0+4,y0+14,60,4,'#3c3c3c');R(x0+4,y0+14,60*ph,4,'#3cb83c');R(x0+w-64,y0+14,60,4,'#3c3c3c');R(x0+w-64+60*(1-eh),y0+14,60*eh,4,'#d82800');txt(EN[en].n,x0+w-4,y0+20,'#fcfcfc','right');}
     if(m==='JD')hud('最終審判',`残り ${st.jd}G`,'#fcfcfc','#fcfcfc');
-    else if(st.bt){const B=st.bt;R(x0,y0,w,h,'#3c0008cc');for(let i=0;i<10;i++){const jaw=A.ev==='bup'&&e<12?6-e/2:0;R(x0+i*20,y0+11+jaw,10,8,'#fcfcfc');R(x0+i*20+10,y0+h-8-jaw,10,8,'#fcfcfc');}
-      big('BLOOD BITES',x0+w/2-12,y0+20,'#fc3c3c','center',12);txt('報酬',x0+w/2-12,y0+35,'#bcbcbc','center');big(`${C.BL[B.lv]}枚`,x0+w/2-12,y0+43,B.lv>=8?`hsl(${t*10%360},100%,60%)`:'#f8d878','center',16);
-      for(let i=0;i<C.BL.length;i++){const yy=y0+h-12-i*5;R(x0+w-22,yy,18,4,i===B.lv?'#fc3c3c':i<B.lv?'#7c1c1c':'#3c3c3c');}
-      if(B.pinch&&(t&8))big('PINCH!!',x0+w/2-12,y0+h-26,'#fcfcfc','center',12);
-      hud('BLOOD BITES',`${B.g}G目`,'#fc3c3c','#fcfcfc');}
-    else{hud('CRIMSON RUSH',`残り ${Math.max(0,A.disp|0)}枚`,'#fc3c3c','#f8d878');txt(`獲得 +${fmt(Math.max(0,st.adv))}`,x0+3,y0+h-10,'#fcfcfc');
-      if(st.duel)big('決闘！',x0+w/2,y0+24,'#fc3c3c','center',12);}
-    if(A.ev==='atin'&&e<70){R(x0,y0,w,h,(t&4)?'#d82800':'#000');big('CRIMSON RUSH',x0+w/2,y0+h/2-14,'#fcfcfc','center',14);txt(`VS ${CR_ENM[st.en]}`,x0+w/2,y0+h/2+6,'#f8d878','center');}
-    if(A.ev==='dstart'&&e<50){R(x0,y0+h/2-12,w,24,'#000c');big(st.en===3?'VS 白き審判者':'決闘 開始！',x0+w/2,y0+h/2-8,st.en===3?'#fcfcfc':'#fc3c3c','center',12);}
-    if(A.ev==='dwin'&&e<50){R(x0,y0+h/2-12,w,24,'#000c');big('勝利！！ BITES 突入',x0+w/2,y0+h/2-8,'#f8d878','center',12);}
-    if(A.ev==='dlose'&&e<40){R(x0,y0+h/2-12,w,24,'#000c');big('敗北…',x0+w/2,y0+h/2-8,'#7c7c7c','center',12);}
+    else if(st.bt){const B=st.bt,T=C.BT[B.tb],nm=B.tb==='S'?'超BITES':B.tb==='X'?'極BITES':'BITES';R(x0,y0,w,h,B.tb==='S'?'#3c0028dd':B.tb==='X'?'#000d':'#3c0008cc');
+      for(let i=0;i<10;i++){const jaw=A.ev==='bup'&&e<12?6-e/2:0;R(x0+i*20,y0+11+jaw,10,8,'#fcfcfc');R(x0+i*20+10,y0+h-8-jaw,10,8,'#fcfcfc');}
+      if(A.ev==='bup'&&e<10&&(t&2))R(x0,y0,w,h,'#fcfcfc88');
+      big(nm,x0+100,y0+20,B.tb==='X'?`hsl(${t*10%360},100%,60%)`:'#fc3c3c','center',12);
+      /* 左下：報酬パネル（5段階） */R(x0+4,y0+h-48,66,32,'#000c');txt('報酬',x0+8,y0+h-46,'#bcbcbc');big(`${T[B.st]}枚`,x0+37,y0+h-36,B.st>=3?'#fc3c3c':'#f8d878','center',14);
+      for(let i=0;i<T.length;i++){const xx=x0+80+i*19,on=i<=B.st;R(xx,y0+h-28,16,10,on?'#d82800':'#3c3c3c');txt(`${i+1}`,xx+8,y0+h-27,on?'#fcfcfc':'#7c7c7c','center');}
+      if(A.ev==='bretry'&&e<60&&(t&8))big('再チャレンジ！！',x0+128,y0+34,'#f8f800','center',11);
+      hud(nm,`${B.g}G目`,'#fc3c3c','#fcfcfc');}
+    else if(st.muk>0||A.ev==='muk'||A.ev==='mukin'){R(x0,y0,w,h,'#2c0028cc');for(let i=0;i<9;i++){const yy=y0+20+Math.round(Math.sin(t/8+i)*6);R(x0+10+i*18,yy,14,10,i%2?'#5c0058':'#a800a8');}big('紅百足覚醒',x0+w/2,y0+34,'#fc74b4','center',14);hud('紅百足覚醒',`残り ${st.muk}回`,'#fc74b4','#fcfcfc');}
+    else if(m==='AT'&&!st.sel){hud('CRIMSON RUSH',`残り ${Math.max(0,A.disp|0)}枚`,'#fc3c3c','#f8d878');txt(`獲得 +${fmt(Math.max(0,st.adv))}`,x0+3,y0+h-10,'#fcfcfc');
+      if(st.dpre>0&&(t&16))txt(st.dKk?'……（色が 消えていく）':'…敵の 気配',x0+w/2,y0+14,st.dKk?'#bcbcbc':'#fc3c3c','center');
+      if(st.duel){const cut=st.dKk?`hsl(${t*10%360},100%,60%)`:st.dWin?'#d82800':'#0058f8';if(A.ev==='duel'&&e<40){R(x0,y0+26,w,14,cut);txt(st.dAct,x0+w/2,y0+29,'#fcfcfc','center');}big(`決闘 ${4-st.duel}/4`,x0+w/2,y0+44,'#fcfcfc','center',10);}}
+    else if(m==='AT')hud('導入エピソード',`VS ???`,'#fcfcfc','#bcbcbc');
+    if(A.ev==='atin'&&e<70){R(x0,y0,w,h,(t&4)?'#d82800':'#000');big('CRIMSON RUSH',x0+w/2,y0+h/2-14,'#fcfcfc','center',14);txt('初期枚数 150枚＋α',x0+w/2,y0+h/2+6,'#f8d878','center');}
+    if(A.ev==='selok'&&e<60)band(`VS ${EN[st.en].n}`,EN[st.en].boss?'#fcfcfc':'#fc3c3c',EN[st.en].boss?'#3c3c3cee':'#000c');
+    if(A.ev==='dstart'&&e<50)band(st.dKk?'決闘 開始！！（モノクロ）':'決闘 開始！',st.dKk?'#fcfcfc':'#fc3c3c');
+    if(A.ev==='dwin'&&e<60)band('勝利！！ BITES 突入','#f8d878');
+    if(A.ev==='dlose'&&e<40)band('敗北…','#7c7c7c');
+    if(A.ev==='bend'&&e<50)band('BITES 終了','#f8d878');
     if(A.ev==='jdin'&&e<60){R(x0,y0,w,h,'#fcfcfc');big('最終審判',x0+w/2,y0+h/2-8,'#000','center',14);}}
   else if(m==='EB'){R(x0,y0,w,h,'#1c0c1c');R(x0+4,y0+14,w-8,h-30,'#3c1c2c');drawChar(lead,x0+30,y0+h-50,0,2);crWoman(x0+w-70,y0+h-66,0,t,2);
     txt(`EPISODE ${st.ep||1}`,x0+w/2,y0+18,'#f8d878','center');txt(['紅い 夜の はじまり','仮面の 下の 素顔','百足の 夢','饗宴の あと','審判の 足音','夜明けを 待つ'][(st.ep||1)-1],x0+w/2,y0+30,'#fcfcfc','center');
     hud('EPISODE BONUS',`残り ${Math.max(0,st.eb)}枚`,'#fc74b4','#fcfcfc');if(A.ev==='ebin'&&e<60){R(x0,y0,w,h,(t&4)?'#a81000':'#000');big('EPISODE BONUS',x0+w/2,y0+h/2-8,'#fcfcfc','center',14);}}
-  if(A.ev==='czin'&&e<50){R(x0,y0,w,h,st.czUp?'#5c0024':'#5c3c24');big(st.czUp?'饗宴チャンス':'追憶チャンス',x0+w/2,y0+h/2-10,'#fcfcfc','center',14);txt('8G',x0+w/2,y0+h/2+8,'#f8d878','center');}
-  if(A.ev==='freeze'&&e<90){R(x0,y0,w,h,e<30?'#000':(t&4)?'#fcfcfc':'#d82800');if(e>=30)big('完食！！',x0+w/2,y0+h/2-10,'#000','center',18);}
-  if(A.ev==='kure'&&e<60){for(let i=0;i<8;i++)R(x0,y0+i*(h/8),w,h/16,`hsl(${(t*8+i*30)%360},100%,40%)`);big('一撃ゾーン！',x0+w/2,y0+12,'#fcfcfc','center',12);}
+  if(A.ev==='czin'&&e<50){R(x0,y0,w,h,st.czUp?'#5c0024':'#5c3c24');big(st.czUp?'饗宴チャンス':'追憶チャンス',x0+w/2,y0+h/2-10,'#fcfcfc','center',14);txt('8G　フリーズで 成功',x0+w/2,y0+h/2+8,'#f8d878','center');}
+  if(A.ev==='freeze'&&e<90){R(x0,y0,w,h,e<30?'#000':(t&4)?'#fcfcfc':'#d82800');if(e>=30)big(A.fz||'覚醒！！',x0+w/2,y0+h/2-10,'#000','center',18);}
+  if(A.ev==='kure'&&e<60){for(let i=0;i<8;i++)R(x0,y0+i*(h/8),w,h/16,`hsl(${(t*8+i*30)%360},100%,40%)`);big('隻眼の夜鴉！',x0+w/2,y0+12,'#fcfcfc','center',12);}
   /* 上乗せ演出 */
   A.pop.forEach(p=>{const n=p.n,col=n>=1000?`hsl(${(t*12)%360},100%,60%)`:n>=300?'#fc3c3c':n>=100?'#f8d878':'#fcfcfc',sz=n>=1000?22:n>=300?18:n>=100?16:13,yy=y0+h/2+6-Math.min(20,p.t);
     if(n>=300&&p.t<20&&(t&2))R(x0,y0,w,h,'#fcfcfc66');R(x0+w/2-50,yy-2,100,sz+6,'#000a');big(`+${fmt(n)}枚`,x0+w/2,yy,col,'center',sz);});
@@ -4861,8 +4914,9 @@ function crLCD(st,A,x0,y0,w,h){const C=SLX.crimson,lead=(G.party&&G.party[0])||O
 function slxScr(vi,mc){
   const P=G.pachi,card=mc.yami?null:P.cards['v'+vi],E=SLX[mc.type],ty=mc.type;if(!mc.x)mc.x=E.init();
   let ph='idle',pos=[0,7,14],stopped=[true,true,true],target=[0,0,0],res=null,lamp=!!mc.x.lamp,free=false,t=0,auto=false,fan=0,msg='レバーを たたいてね（A）',sd=0,info='';
-  const sym=(i,p)=>STRIP[i][((p%21)+21)%21];
-  const findPos=(i,s)=>{const c=[];STRIP[i].forEach((v,p)=>{if(v===s)c.push(p);});return c[Math.floor(rnd()*c.length)];};
+  const SP=ty==='crimson'?STRIP_CR:STRIP;
+  const sym=(i,p)=>SP[i][((p%21)+21)%21];
+  const findPos=(i,s)=>{const c=[];SP[i].forEach((v,p)=>{if(v===s)c.push(p);});return c[Math.floor(rnd()*c.length)];};
   const setDisplay=o=>{
     const tri={grape:2,bell:4,pierrot:5,replay:6}[o];
     if(tri!=null)target=[0,1,2].map(i=>findPos(i,tri));
@@ -4882,7 +4936,7 @@ function slxScr(vi,mc){
     ph='idle';const pay=res.pay||0;if(pay){P.medals+=pay;mc.diff+=pay;sd+=pay;}
     if(res.cnt==='b')mc.big++;if(res.cnt==='r')mc.reg++;
     lamp=!!res.lamp;if(res.fan)fan=res.fan;info=res.info||'';
-    if(ty==='crimson'){if(res.ev){A.ev=res.ev;A.evt=0;}if(res.add)A.pop.push({n:res.add,t:0});winT=winL>=0?60:0;}
+    if(ty==='crimson'){if(res.ev){A.ev=res.ev;A.evt=0;if(res.ev==='voice')A.vc=rnd()<.1?'#fc3c3c':rnd()<.3?'#3cbcfc':'#fcfcfc';if(res.ev==='freeze')A.fz=mc.x.czUp?'完食！！':'覚醒！！';}if(res.add)A.pop.push({n:res.add,t:0});winT=winL>=0?60:0;}
     msg=(res.msg||(pay>1?`${pay}枚`:res.rep?'リプレイ':'')).replace(/\n/g,'　');
     if(res.snd)sfx(res.snd);else if(pay>1)sfx('coin');
   };
@@ -4890,10 +4944,22 @@ function slxScr(vi,mc){
   const A={pop:[],ev:null,evt:99,disp:mc.x.at||0};let winL=-1,winT=0;
   const LINES=[[0,0,0],[1,1,1],[-1,-1,-1],[1,0,-1],[-1,0,1]],vis=(i,p,o)=>sym(i,p+o);
   const lineHits=tg=>LINES.map((L,li)=>{const a=vis(0,tg[0],L[0]);return a===vis(1,tg[1],L[1])&&a===vis(2,tg[2],L[2])?li:-1;}).filter(x=>x>=0);
-  const setDisplay5=o=>{winL=-1;const tri={grape:2,bell:4,pierrot:5,replay:6}[o];
-    if(tri!=null){for(let g=0;g<40;g++){const li=Math.floor(rnd()*5),L=LINES[li];target=[0,1,2].map(i=>((findPos(i,tri)-L[i])%21+21)%21);const h=lineHits(target);if(h.length===1&&h[0]===li){winL=li;break;}}return;}
-    if(o==='cherry'){const row=[1,0,-1][Math.floor(rnd()*3)];for(let g=0;g<60;g++){target[0]=((findPos(0,3)-row)%21+21)%21;target[1]=Math.floor(rnd()*21);target[2]=Math.floor(rnd()*21);if(!lineHits(target).length)break;}return;}
-    for(let g=0;g<80;g++){target=[0,1,2].map(()=>Math.floor(rnd()*21));if(!lineHits(target).length&&![1,0,-1].some(o2=>vis(0,target[0],o2)===3))break;}};
+  /* 紅夜：本家の 停止形に ならった 5ライン制御（左リール BAR狙いで 小役を フォロー） */
+  const setDisplay5=o=>{winL=-1;const V=(tg,i,r)=>sym(i,tg[i]+r);const ok=[];const tg=[0,0,0];
+    for(tg[0]=0;tg[0]<21;tg[0]++)for(tg[1]=0;tg[1]<21;tg[1]++)for(tg[2]=0;tg[2]<21;tg[2]++){
+      const hits=lineHits(tg),lt=V(tg,0,1),lc=V(tg,0,0),lb=V(tg,0,-1),cher=lt===3||lc===3||lb===3,rc=V(tg,2,0);let g=false;
+      if(o==='wcherry'||o==='scherry'){g=(lt===3||lb===3)&&!hits.length&&(o==='scherry'?rc===1:rc!==1);}
+      else if(cher)g=false;
+      else if(o==='lose')g=lb===1&&!hits.length;
+      else if(o==='replay'||o==='bell')g=lb===1&&hits.length===1&&V(tg,0,LINES[hits[0]][0])===(o==='bell'?4:6);
+      else if(o==='suika')g=lt===2&&hits.length===1&&V(tg,0,LINES[hits[0]][0])===2;
+      else if(o==='chance')g=!hits.length&&(lt===2?[1,3].some(li=>V(tg,1,LINES[li][1])===2):lb===1&&rnd()<.5);
+      else if(o==='white7')g=hits.length===1&&hits[0]===0&&lc===0;
+      else if(o==='kure')g=hits.length===1&&V(tg,0,LINES[hits[0]][0])===5;
+      else g=lb===1&&!hits.length;
+      if(g)ok.push(tg.slice());}
+    if(!ok.length){target=[0,1,2].map(()=>Math.floor(rnd()*21));return;}
+    target=ok[Math.floor(rnd()*ok.length)];const h=lineHits(target);if(h.length)winL=h[0];};
   const TH={biscus:{bg:'#005858',fl:'#fc7460',tc:'#fc7460'},crimson:{bg:'#2c0008',fl:'#d82800',tc:'#fc3c3c'},pearl:{bg:'#0c1c4c',fl:'#a8e4fc',tc:'#e8f0f8'},yami:{bg:'#0c0008',fl:'#a81000',tc:'#f8b800'}}[ty];
   push({full:true,canBack:true,
     upd(){
@@ -4910,7 +4976,7 @@ function slxScr(vi,mc){
         crLCD(mc.x,A,36,17,184,76);
         R(44,96,168,68,'#000');
         for(let i=0;i<3;i++){const x=48+i*54;R(x,97,50,66,'#fcfcfc');const p=pos[i],base=Math.floor(p),fr=p-base;ctx.save();ctx.beginPath();ctx.rect(x,97,50,66);ctx.clip();
-          for(let k=-2;k<=2;k++){const yy=Math.round(119+(fr-k)*22);drawSym(sym(i,base+k),x+9,yy);}ctx.restore();}
+          for(let k=-2;k<=2;k++){const yy=Math.round(119+(fr-k)*22);drawSymCr(sym(i,base+k),x+9,yy);}ctx.restore();}
         [108,130,152].forEach(yy=>{R(40,yy,3,1,'#d82800');R(213,yy,3,1,'#d82800');});
         if(winT>0&&winL>=0&&(frame&8)){const L=LINES[winL];ctx.strokeStyle='#d82800';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(44,130-L[0]*22);for(let i=0;i<3;i++)ctx.lineTo(73+i*54,130-L[i]*22);ctx.lineTo(212,130-L[2]*22);ctx.stroke();}
         win(36,166,184,26);txt('持ち',42,171,'#bcbcbc');txt(fmt(P.medals)+'枚',120,171,'#f8b800','right');txt('差枚',128,171,'#bcbcbc');txt((sd>=0?'+':'')+fmt(sd),214,171,sd>=0?'#7ee07e':'#fc7460','right');
@@ -7507,10 +7573,10 @@ const SLA=(()=>{const st=(a,f)=>[0,1,2].map(i=>f(i,a[i])).join('\n'),st2=(a,f)=>
     '設定差・攻略':['設定差は 通常時の 初当りと\nハイビスカスチャンスへの 移行率。','ボーナス後 「ハイビスカスが ゆらめく」\nメッセージが 出たら ハイビ 突入。\nやめずに 32G 回そう。','天井は 1299G。 深い ハマリ台を\n拾うのも 一つの 手。']}},
   crimson:{type:'AT機（差枚管理）',sec:{
     'スペック':[`【${MNAME.crimson}】\nAT機　1G＝3枚\nCZ → CRIMSON RUSH（差枚管理）\n有利区間 上限 2400枚`,
-      `設定　CZ成功率　AT初当り　機械割\n`+st(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[440,424,400,383,363,356][i]}　${[98,100.9,102.9,106.3,110.8,113.1][i]}%`),
-      st2(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[440,424,400,383,363,356][i]}　${[98,100.9,102.9,106.3,110.8,113.1][i]}%`),'CZ 初当り 約1/310\n※AT初当りと 機械割は\n　300万G シミュレーションの 目安'],
-    'ゲームフロー':['【通常時】\nレア役で CZ 抽選。100Gごとに\nCZ当選率 アップ。 600Gで CZ 天井。','【CZ】8G\n追憶チャンス：成功率 33〜61%（設定差）\n饗宴チャンス：成功率 75%','成功で CRIMSON RUSH 突入！\n初期枚数 150〜250枚。\n1200G ハマると CZ成功 確定。','【CRIMSON RUSH】差枚管理型AT\n押し順ナビで 純増。 残り枚数が\n0で 終了、2400枚で 完走。','AT中は レア役で 上乗せ。\n1/49か 強レア役で 決闘（3G）\n→ 勝てば BLOOD BITES へ。','【BLOOD BITES】\n小役で 報酬UP（約1/2）\nハズレは PINCH… 耐えれば 続行\n50枚 → 最大 2000枚','【液晶】通常時は 昼→夕方→夜\n夜は CZ 前兆の チャンス！\n5ライン（中段・上段・下段・斜め2本）','ボスを 倒して 終了したら\n最終審判（5G）へ。\n成功で AT 再突入！','【紅図柄】1/2048\n通常時：EPISODE BONUS → AT 確定\nAT中：300〜2000枚 一撃 上乗せ'],
-    '小役・配当':['押し順ベル　10枚　約1/1.54\n（ナビなしは 1/6で 取れる）\nリプレイ　約1/7.3','弱チェリー　2枚　1/70.3\nスイカ　5枚　1/100.5\nチャンス目　1/292.5','強チェリー　2枚　1/356.2\n紅図柄　1/2048'],
+      `設定　CZ成功率　AT初当り　機械割\n`+st(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[463,440,414,385,355,327][i]}　${[99.4,101,102.6,105.5,108.8,112.4][i]}%`),
+      st2(SLX.crimson.CZS,(i)=>`設定${i+1}　${Math.round(SLX.crimson.CZS[i]*100)}%　1/${[463,440,414,385,355,327][i]}　${[99.4,101,102.6,105.5,108.8,112.4][i]}%`),'CZ 初当り 約1/310\n※AT初当りと 機械割は\n　300万G シミュレーションの 目安'],
+    'ゲームフロー':['【通常時】\nレア役で CZ 抽選。100Gごとに\nCZ当選率 アップ。 600Gで CZ 天井。','【CZ】8G　フリーズで 成功\n追憶チャンス：成功率 34〜67%（設定差）\n押し順ベル・リプレイ・レア役で フリーズ抽選\n帯電ナビは チャンス！','【饗宴チャンス】成功率 約75%\nレバーで 食事演出（弱・中・強）\nレア役は フリーズ濃厚\n最終Gは リプレイでも 濃厚','成功で CRIMSON RUSH 突入！\n初期枚数 150〜250枚。\n1200G ハマると CZ成功 確定。','【CRIMSON RUSH】差枚管理型AT\n押し順ナビで 純増。 残り枚数が\n0で 終了、2400枚で 完走。','【CRIMSON RUSH】導入エピソードで\n対戦相手を 選ぶ（6人）。相手ごとに\n決闘の 勝ちやすさが ちがう','決闘（4G）：勝利で BITES へ\nモノクロなら 確定対決！\n白き審判者に 勝つと 最終審判の 権利','【BITES】小役（約1/2.2）で 報酬UP\n5段階 50〜2000枚（テーブル A〜E）\nハズレは 約20%で 再チャレンジ\n超BITES 300〜3000枚／極BITES 2000枚','【紅図柄】AT中\n紅百足覚醒（5回 上乗せ）か\n隻眼の夜鴉（1G で 一撃）','【液晶】通常時は 昼→夕方→夜\n夜は CZ 前兆の チャンス！','【リール】5ライン　左リールに BAR狙い\n左 角チェリー＋右中段BAR＝強チェリー\n左上段スイカ → スイカ・チャンス目\n白7揃い＝EPISODE BONUS','ボスを 倒して 終了したら\n最終審判（5G）へ。\n成功で AT 再突入！','【紅図柄】1/2048\n通常時：EPISODE BONUS → AT 確定\nAT中：300〜2000枚 一撃 上乗せ'],
+    '小役・配当':['押し順ベル　10枚　約1/1.54\n（ナビなしは 1/6で 取れる）\nリプレイ　約1/7.3','弱チェリー　2枚　1/70.3\nスイカ　5枚　1/100.5\nチャンス目　1/292.5','強チェリー　2枚　1/356.2\n白7（通常時）・紅図柄（AT中）　1/2048'],
     '設定差・攻略':['設定差は 通常時の CZ当選率と\n追憶チャンスの 成功率。','饗宴チャンスは 設定に 関係なく 75%。\n出たら 大チャンス！','有利区間 2400枚で 完走すると\nAT 終了。 狙うなら 早めの 一撃を。']}},
   yami:{type:'裏モノ（闇スロ）',sec:{
     'スペック':['【裏 闇王 -YAMIOH-】（裏情報）\nA＋爆裂モード　1G＝3枚\nBIG 60G×13枚／REG 10G×13枚\n1枚 100イェソ・天井なし',
