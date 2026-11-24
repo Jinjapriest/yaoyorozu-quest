@@ -1228,10 +1228,7 @@ function genMap(){
     for(let r=3;r<=9&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=v.x+dx,y=v.y+dy,t=tileAt(x,y);
       if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||TUNS.some(o=>o.x===x&&o.y===y)||SHURAS.some(o=>Math.abs(o.x-x)+Math.abs(o.y-y)<3))continue;
       setT(x,y,T.SHURA);SHURAS.push({x,y,ci,id:'s'+ci+'_'+k,n:`修羅の洞窟（${tn}）`});done=true;}}));
-    /* 真賭郎の 賭場：修羅の洞窟の すぐ そばに 立つ */
-    SHINS.length=0;SHURAS.forEach(o=>{let done=false;for(let r=1;r<=3&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=o.x+dx,y=o.y+dy,t=tileAt(x,y);
-      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(q=>q.x===x&&q.y===y)||STADS.some(q=>q.x===x&&q.y===y)||AIDI_H.some(q=>q.x===x&&q.y===y)||TUNS.some(q=>q.x===x&&q.y===y)||SHURAS.some(q=>q.x===x&&q.y===y))continue;
-      setT(x,y,T.SHIN);SHINS.push({x,y,ci:o.ci,n:o.n.replace('修羅の洞窟','真賭郎の 賭場')});done=true;}});}
+  }
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1794,7 +1791,6 @@ function onStep(pv){const DV=carDrive(tileAt(G.pos.x,G.pos.y));timeAdd(DV?(DV.hw
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(t===T.TUN){const o=TUNS.find(q=>q.x===x&&q.y===y);if(o){tunnelEnter(o);return;}}
   if(t===T.SHURA){const o=SHURAS.find(q=>q.x===x&&q.y===y);if(o){shuraEnter(o);return;}}
-  if(t===T.SHIN){const o=SHINS.find(q=>q.x===x&&q.y===y);if(o){shinTalk(o);return;}}
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
   {const n=namidaPos();if(n.x===x&&n.y===y){namidaEv();return;}}
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
@@ -3253,7 +3249,7 @@ function buildTown(vi){
     npcs.push({x,y,col:cols[Math.floor(r()*cols.length)],hair:ruin?'#d8d8d8':['#000000','#503000','#7c7c7c'][Math.floor(r()*3)],line:LN[npcs.length%LN.length]});}
   if(ruin)for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const c=C[y][x];if(c.t==='g'&&r()<.12)C[y][x]={t:'flower',weed:1};}
   if(fac.includes('pachi')&&gamblerToday(vi)){for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=C[y][x];if(c.t==='door'&&c.b.kind==='pachi'){const gx=Math.min(w-2,x+2),gy=y+1;
-    for(let i=npcs.length-1;i>=0;i--)if(npcs[i].x===gx&&npcs[i].y===gy)npcs.splice(i,1);npcs.push({x:gx,y:gy,col:'#3c3c3c',hair:'#000000',gambler:true,ura:uraToday(vi),line:''});}}}
+    for(let i=npcs.length-1;i>=0;i--)if(npcs[i].x===gx&&npcs[i].y===gy)npcs.splice(i,1);npcs.push({x:gx,y:gy,col:'#3c3c3c',hair:'#000000',gambler:true,shin:shinToday(vi),ura:!shinToday(vi)&&uraToday(vi),line:''});}}}
   let top=0,H2=h;
   if(v.colo){/* 魔物コロシアム：町の 奥に そびえる 巨大な 円形闘技場 */
     const P=12,Z=[];for(let y=0;y<P;y++){Z.push([]);for(let x=0;x<w;x++)Z[y].push({t:'pz'});}
@@ -3589,7 +3585,7 @@ function drawCell(c,sx,sy,city){
     case 'torii':ground();R(sx+2,sy+4,2,12,'#d82800');R(sx+12,sy+4,2,12,'#d82800');R(sx,sy+1,16,3,'#d82800');R(sx,sy,16,1,'#000');R(sx+2,sy+6,12,2,'#d82800');break;
   }
 }
-function drawNPC(n,x,y,f){if(n.zan!=null){const b=f?1:0;pe(x+8,y+11-b,6,5,'#3c0c14');pc(x+8,y+5-b,4,'#3c0c14');R(x+4,y+4-b,8,2,'#d82800');R(x+6,y+4-b,4,1,'#fce0e0');R(x+3,y+14,2,2,'#5c0c1c');R(x+11,y+14,2,2,'#5c0c1c');if((frame>>4)&1)R(x+4,y+6-b,1,4,'#b01020');return;}if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
+function drawNPC(n,x,y,f){if(n.zan!=null){const b=f?1:0;pe(x+8,y+11-b,6,5,'#3c0c14');pc(x+8,y+5-b,4,'#3c0c14');R(x+4,y+4-b,8,2,'#d82800');R(x+6,y+4-b,4,1,'#fce0e0');R(x+3,y+14,2,2,'#5c0c1c');R(x+11,y+14,2,2,'#5c0c1c');if((frame>>4)&1)R(x+4,y+6-b,1,4,'#b01020');return;}if(n.gambler&&n.shin){drawShin(x,y,f);if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
   R(x+5,y+13+(f?0:1),2,3-(f?0:1),'#3c3c3c');R(x+9,y+13+(f?1:0),2,3-(f?1:0),'#3c3c3c');}
 const townScr={full:true,mv:null,bt:0,
   upd(){
@@ -3604,7 +3600,7 @@ const townScr={full:true,mv:null,bt:0,
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.sp){spTalk(npc);return;}if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
+    if(npc){if(fresh){if(npc.sp){spTalk(npc);return;}if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.shin)shinTalk();else if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
       /* 方向キーを 押しつづけると 通行人と 入れかわって 通りぬける（道を ふさがれない ように） */
       if(!(npc.debtor||npc.loser||npc.trial||npc.kan||npc.yoso||npc.gambler||npc.fix||npc.zan!=null)&&c&&TPASS.has(c.t)){npc.x=TW.px;npc.y=TW.py;this.mv={x1:nx,y1:ny,dx,dy,t:0};}return;}
     if(!c)return;
@@ -3950,18 +3946,19 @@ function drawKorogi(x,y,f,sc=1){ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);c
 function drawRocket(x,y,fl){R(x-6,y-40,12,40,'#fcfcfc');R(x-4,y-48,8,8,'#fcfcfc');R(x-2,y-52,4,4,'#d82800');R(x-3,y-30,6,6,'#3cbcfc');R(x-2,y-29,4,4,'#0058f8');
   R(x-12,y-12,6,12,'#d82800');R(x+6,y-12,6,12,'#d82800');R(x-6,y-6,12,2,'#d82800');txtS('真',x,y-22,'#d82800','center');
   if(fl){const h=10+((frame>>1)%6);R(x-5,y,10,h,'#f87800');R(x-3,y,6,h+4,'#f8d800');R(x-1,y,2,h+7,'#fcfcfc');}}
-function shinTalk(o){
-  if(shinAway()){dialog(['賭場の 中は からっぽだ…',`黒服「真賭郎さまは ただいま\n宇宙へ 出稼ぎに 出ております」`,`「お戻りは ${G.shinGone-G.day}日後の 予定です」`]);return;}
+const shinToday=vi=>!shinAway()&&lcg(vi*733+(G?G.day:1)*41+29)()<.1;
+function shinTalk(){
+  if(shinAway()){dialog(['…白スーツの 男は いない。',`黒服「真賭郎さまは ただいま\n宇宙へ 出稼ぎに 出ております」`,`「お戻りは ${G.shinGone-G.day}日後の 予定です」`]);return;}
   if(shocked()){dialog('真賭郎「…その 顔で 勝負か？\nショックが 抜けてから 来い」');return;}
   const sav=G.bank?G.bank.sav:0;
-  dialog([`${o.n}`,'黒塗りの 天幕の 奥に\n白スーツの 男が 座っていた。','真賭郎「…待っていたぞ。\n賭郎の 名を 継ぐ 最後の 一人… それが おれだ」',
+  dialog(['パチ屋の 横に\n白スーツの 男が 立っていた。','真賭郎「…待っていたぞ。\n賭郎の 名を 継ぐ 最後の 一人… それが おれだ」',
     'ルール：チンチロリン 一発勝負。\n真賭郎が 親で 先に 振る。 おたがい 3回まで 振れる。\n役の 強い ほうの 勝ち。 同じなら 振り直し。',
     '役の 強さ：ピンゾロ＞ゾロ目＞シゴロ（4・5・6）\n＞ 6の目〜1の目 ＞ 目なし ＞ ヒフミ（1・2・3）',
     `真賭郎「勝てば ${fmt(SHIN_WIN)}イェソ… 100億を くれてやる」`,
     `真賭郎「負けたら 財布の 中身は 全額、\n銀行の 口座は 半分 いただく。\nそして 地下で 1年 働いて もらう」`,
     `（いまの 財布：${fmt(G.coins)}イェソ）\n（いまの 口座：${fmt(sav)}イェソ）`],()=>{
-    choice('真賭郎と チンチロで 勝負しますか？\n負けると 財布 全額・口座 半額\n＋ 地下労働 1年',['勝負する','やめる'],k=>{if(k===0)shinChin(o);else dialog('真賭郎「…賢明だな。 臆病とも 言うが」');},110);});}
-function shinChin(o){const roll=()=>[1,2,3].map(()=>1+Math.floor(rnd()*6)),H=h=>h||{n:'目なし',sc:0};
+    choice('真賭郎と チンチロで 勝負しますか？\n負けると 財布 全額・口座 半額\n＋ 地下労働 1年',['勝負する','やめる'],k=>{if(k===0)shinChin();else dialog('真賭郎「…賢明だな。 臆病とも 言うが」');},110);});}
+function shinChin(){G.gambDone=G.gambDone||{};if(typeof curVil==='number')G.gambDone['v'+curVil]=G.day;const roll=()=>[1,2,3].map(()=>1+Math.floor(rnd()*6)),H=h=>h||{n:'目なし',sc:0};
   let ph='oya',t=0,oD=[1,1,1],pD=[1,1,1],oH=null,pH=null,oT=0,pT=0,pR=false,res='',msg='真賭郎が サイコロを 握った…',game=1;
   const judge=()=>{const a=H(pH).sc,b=H(oH).sc;if(a>b){res='win';msg=`あなたの 勝ち！！\nあなた：${H(pH).n}　真賭郎：${H(oH).n}`;sfx('g5');}else if(a<b){res='lose';msg=`真賭郎の 勝ち…\nあなた：${H(pH).n}　真賭郎：${H(oH).n}`;sfx('cancel');}else{msg=`${H(pH).n} 同士… 引き分け！ 振り直しだ`;res='';sfx('cur');}ph='res';t=0;};
   push({full:true,upd(){t++;
