@@ -1097,7 +1097,7 @@ const STADS=[],BB_TEAMS=[
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
 const AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
-const TUNS=[],TUN_LINES=[{n:'山陰 地下線',c:'#3cbcfc',st:['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト']},{n:'九州 地下線',c:'#f87800',st:['タク','イマリ','サガ','ヨシノガリ']}];
+const TUNS=[],TUN_LINES=[{n:'山陰 地下線',c:'#3cbcfc',st:['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト']},{n:'九州 地下線',c:'#f87800',st:['タク','イマリ','サガ','ヨシノガリ']},{n:'八百万 環状線',c:'#f8d800',ring:1,st:['イズモ','八雲市','ヨナゴ','マホロバ','グンマー','ナメガワマチ','コクラ','ヨシノガリ','サガ']}];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
@@ -1216,12 +1216,12 @@ function genMap(){
       if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y))continue;AIDI_H.push({x,y,k});done=true;}});
   /* 11/24：地下道路の 入口（大きな 都市の そばに トンネルの 口を 置く。 地下は 海の 下も 通れる） */
   {const byN=n=>VIL.findIndex(v=>v.name===n||v.name.replace(/^.* /,'')===n);TUNS.length=0;
-    TUN_LINES.forEach((L,li)=>L.st.forEach(n=>{const vi=byN(n);if(vi<0)return;const v=VIL[vi];let done=false;
+    TUN_LINES.forEach((L,li)=>L.st.forEach(n=>{const vi=byN(n);if(vi<0)return;const v=VIL[vi];let done=false;const ex=TUNS.find(o=>o.vi===vi);if(ex){if(!ex.lis.includes(li))ex.lis.push(li);return;}
       const OFS=[];for(let r=2;r<=6;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(Math.max(Math.abs(dx),Math.abs(dy))===r)OFS.push([dx,dy]);
       for(const [dx,dy] of OFS){if(done)break;const x=v.x+dx,y=v.y+dy,t=tileAt(x,y);
         if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||TUNS.some(o=>o.x===x&&o.y===y))continue;
         if(t===T.ROAD&&![[1,0],[-1,0],[0,1],[0,-1]].some(([ex,ey])=>{const u=tileAt(x+ex,y+ey);return u===T.GRASS||u===T.FOREST||u===T.SAND;}))continue;if(t===T.ROAD)continue;
-        setT(x,y,T.TUN);TUNS.push({x,y,vi,li,n});done=true;}}));}
+        setT(x,y,T.TUN);TUNS.push({x,y,vi,li,lis:[li],n});done=true;}}));}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -3873,15 +3873,25 @@ function carFac(){const S=carS();
       listPick('乗る車を えらぶ',L.map(c=>c?(S.use===c.id?'▶ ':'')+c.n:'歩く（車に 乗らない）'),i=>{S.use=L[i]?L[i].id:null;save();toast(L[i]?`${L[i].n}に 乗った`:'車を 降りた');});}
     else if(k===2){if(!S.own.length){dialog('車を 持っていない。');return;}const L=S.own.map(id=>CARS.find(c=>c.id===id));
       listPick('車を 売る（買値の 半額）',L.map(c=>`${c.n}　${fmt(c.p/2)}イェソ`),i=>{const c=L[i];choice(`${c.n}を ${fmt(c.p/2)}イェソで 売る？`,['売る','やめる'],r=>{if(r!==0)return;S.own=S.own.filter(x=>x!==c.id);if(S.use===c.id)S.use=null;G.coins+=c.p/2;save();sfx('coin');toast('車を 売った');},96);});}
-    else if(k===3)dialog(['地下道路は 大きな 都市の そばの トンネルの 口から 入る 道。','行き先を えらぶと 地下を 通って 別の 都市の トンネルに 出る。\n海の 下も 通れる。','車なら あっという間で 魔物にも ほぼ 出会わない。\n歩くと 時間が かかり、 魔物に 出会う ことも ある。',TUN_LINES.map(L=>L.n+'：'+L.st.join('〜')).join('\n')]);},96);
+    else if(k===3)dialog(['地下道路は 大きな 都市の そばの トンネルの 口から 入る 道。','行き先を えらぶと 地下を 通って 別の 都市の トンネルに 出る。\n海の 下も 通れる。','車なら あっという間で 魔物にも ほぼ 出会わない。\n歩くと 時間が かかり、 魔物に 出会う ことも ある。',...TUN_LINES.map(L=>L.n+(L.ring?'（ぐるっと 一周）':'')+'\n'+L.st.join('〜')+(L.ring?'〜'+L.st[0]:''))]);},96);
   go();}
 /* 地下道路：トンネルの 口から 行き先を えらんで 地下を 走る */
 const tunMin=m=>m>=60?`${Math.floor(m/60)}時間${m%60?m%60+'分':''}`:`${m}分`;
-function tunnelEnter(o){const L=TUN_LINES[o.li],dests=TUNS.filter(q=>q.li===o.li&&q!==o),c=curCar();
-  const mins=q=>{const d=Math.abs(q.x-o.x)+Math.abs(q.y-o.y);return c?Math.max(5,Math.round(d*16/(c.hw||8))):d*4;};
-  listPick(`${L.n}　${o.n} 入口`,dests.map(q=>`${q.n} 方面　約${tunMin(mins(q))}`),i=>tunnelRide(o,dests[i],mins(dests[i])),
-    ()=>c?`愛車：${c.n}\n車なら あっという間。 魔物にも ほぼ 出会わない`:'徒歩で 地下を 歩く\n（車が あれば ずっと 速く 安全）');}
-function tunnelRide(o,q,mins){const c=curCar(),L=TUN_LINES[o.li],N=c?110:190,d=Math.abs(q.x-o.x)+Math.abs(q.y-o.y),enc=c?.03:Math.min(.6,d*.012);let t=0;sfx(c?'buff':'ok');
+/* 路線に 沿った 距離（環状線は 内回り・外回りの 近い方） */
+function tunPath(li,o,q){const L=TUN_LINES[li],S=L.st.map(n=>TUNS.find(t=>t.n===n&&t.lis.includes(li))).filter(Boolean),i=S.indexOf(o),j=S.indexOf(q);if(i<0||j<0)return null;
+  const seg=k=>{const a=S[k],b=S[(k+1)%S.length];return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);};let f=0;for(let k=i;k!==j;k=(k+1)%S.length)f+=seg(k);
+  if(!L.ring){let d=0;const lo=Math.min(i,j),hi=Math.max(i,j);for(let k=lo;k<hi;k++)d+=seg(k);return{d,dir:''};}
+  let tot=0;for(let k=0;k<S.length;k++)tot+=seg(k);const r=tot-f;return f<=r?{d:f,dir:'外回り'}:{d:r,dir:'内回り'};}
+const tunOK=vi=>(G.seen['v'+vi]||G.warps.includes(vi)||vi===0)&&(!gmTrap()||VIL[vi].gm);
+function tunnelEnter(o){const c=curCar(),M={};
+  o.lis.forEach(li=>TUNS.forEach(q=>{if(q===o||!q.lis.includes(li))return;const p=tunPath(li,o,q);if(!p)return;if(!M[q.vi]||p.d<M[q.vi].d)M[q.vi]={q,li,d:p.d,dir:p.dir};}));
+  const all=Object.values(M).sort((a,b)=>a.li-b.li||a.d-b.d),dests=all.filter(e=>tunOK(e.q.vi)),hid=all.length-dests.length;
+  const mins=e=>{const k=TUN_LINES[e.li].ring?.6:1;return c?Math.max(5,Math.round(e.d*k*16/(c.hw||8))):Math.round(e.d*k*4);};
+  const ttl=o.lis.map(li=>TUN_LINES[li].n).join('・')+`　${o.n} 入口`;
+  if(!dests.length){dialog(`${ttl}\nまだ 訪れた 町が ない ため 行き先が ない。\n（訪れた 都市の 駅だけ えらべる）`);return;}
+  listPick(ttl,dests.map(e=>({t:`${e.q.n} 方面`,r:`約${tunMin(mins(e))}`,col:TUN_LINES[e.li].c})),i=>tunnelRide(o,dests[i].q,mins(dests[i]),dests[i]),
+    i=>{const e=dests[i];return e?`${TUN_LINES[e.li].n}${e.dir?'（'+e.dir+'）':''}　${VIL[e.q.vi].name}\n`+(c?`愛車：${c.n}　魔物にも ほぼ 出会わない`:'徒歩（車が あれば ずっと 速く 安全）')+(hid?`\n未訪問の 駅 ${hid}か所は まだ えらべない`:''):'';});}
+function tunnelRide(o,q,mins,e){const c=curCar(),L=TUN_LINES[e?e.li:o.li],N=c?110:190,d=e?e.d:Math.abs(q.x-o.x)+Math.abs(q.y-o.y),enc=c?.03:Math.min(.6,d*.012);let t=0;sfx(c?'buff':'ok');
   push({full:true,upd(){t++;if((I.A&&t>15)||t>=N){pop();G.pos={x:q.x,y:q.y};timeAdd(mins);save();
       if(rnd()<enc){toast('地下で 魔物が 現れた！');startBattle(false);}else toast(`${q.n}の 近くに 出た`);}},
     drw(){const sp=c?(c.hw||8)/2:1,ph=(t*sp)%32;R(0,0,W,H,'#0c0c10');
