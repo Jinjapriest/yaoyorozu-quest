@@ -3889,14 +3889,63 @@ function vgBuyPack(){const S=vgS();listPick('ブースターパック（1パッ�
   ()=>'スクロールで 選ぶ。 レア度：C／R／RR／RRR／SP（金枠）');}
 function vgPull(pk){const DB=vgDB(),L=VGL.filter(c=>c.pack===pk),by=r=>L.filter(c=>c.rar===r),out=[];
   for(let s=0;s<5;s++){const x=rnd();let r=x<.012?'SP':x<.06?'RRR':x<.18?'RR':x<.45?'R':'C';if(s===4&&r==='C')r='R';let P=by(r);if(!P.length)P=by('RR').length?by('RR'):L;out.push(P[Math.floor(rnd()*P.length)]);}return out;}
-function vgOpenScr(got,packs){let t=0;const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5};const best=got.slice().sort((a,b)=>RS[b.rar]-RS[a.rar]);const show=packs===1?got:best.slice(0,5);let sel=0;
-  if(best[0]&&RS[best[0].rar]>=3)setTimeout(()=>sfx('g3'),300);
-  push({full:true,upd(){t++;if(I.pl||I.pr){sel=(sel+(I.pr?1:show.length-1))%show.length;sfx('cur');}if(t>20&&(I.A||I.B)){pop();sfx('ok');}},
-    drw(){R(0,0,W,H,'#14001c');for(let i=0;i<30;i++)R((i*53)%W,(i*37+frame)%H,2,2,'#f8d878');big(packs===1?'パック 開封！':`${packs}パック 開封！ いいカード`,W/2,4,'#f8d878','center',12);
-      show.forEach((c,i)=>{const x=6+i*50,y=26,op=Math.min(1,(t-i*8)/10);if(op<=0){vgCard(null,x,y,46,66,{back:1});return;}if(RS[c.rar]>=3)pc(x+23,y+33,30,'#f8d80033');vgCard(c,x,y,46,66,{hi:i===sel});
-        R(x+10,y+68,26,10,c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':c.rar==='RR'?'#fcfcfc':'#5c5c5c');txt(c.rar,x+23,y+69,'#000','center');region(x,y,46,66,()=>{sel=i;});});
-      const c=show[sel];win(6,112,W-12,124,'#f8d878');vgInfo(c).forEach((l,i)=>txt(l,14,120+i*13,i?'#fcfcfc':'#f8d878','left',W-28));
-      if(packs>1)txt(`合計 ${got.length}枚：`+['SP','RRR','RR','R','C'].map(r=>`${r}${got.filter(x=>x.rar===r).length}`).join(' '),14,214,'#bcbcbc','left',W-28);txt('Aで とじる',W-14,224,'#7c7c7c','right');}});}
+/* パック開封：パックを 破る → 裏向きで 配る → 1枚ずつ めくる（レア度で 演出が 変わる） */
+function vgOpenScr(got,packs){const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5},pk=got[0]?got[0].pack:0,PK=VG_PACKS[pk]||VG_PACKS[0],cl=VG_CL[PK.cl]||VG_CL.bou;
+  const best=got.slice().sort((a,b)=>RS[b.rar]-RS[a.rar]);const show=(packs===1?got.slice():best.slice(0,5)).sort((a,b)=>RS[a.rar]-RS[b.rar]);
+  const feat=VGL.filter(c=>c.pack===pk&&c.g===3).sort((a,b)=>RS[b.rar]-RS[a.rar])[0];
+  let st='pack',t=0,k=0,ft=0,sel=show.length-1,shake=0;const flipped=show.map(()=>false),fx=[];
+  const top=show[show.length-1],topR=RS[top.rar];
+  const rarCol=r=>r==='SP'||r==='PR'?'#f8d800':r==='RRR'?'#fc74b4':r==='RR'?'#a8e4fc':'#fcfcfc';
+  const flip=()=>{const c=show[k],r=RS[c.rar];flipped[k]=true;ft=0;
+    if(r>=4){sfx('g5');shake=24;fx.push({k:'sp',t:0,i:k});}else if(r===3){sfx('g3');shake=10;fx.push({k:'rrr',t:0,i:k});}else if(r===2){sfx('lvup');fx.push({k:'rr',t:0,i:k});}else sfx('ok');};
+  const wait=i=>{const r=RS[show[i].rar];return r>=4?80:r===3?55:r===2?34:20;};
+  push({full:true,upd(){t++;ft++;if(shake>0)shake--;fx.forEach(f=>f.t++);
+      if(st==='pack'){if(I.A&&t>8){st='tear';t=0;sfx('hit');}if(I.B){st='done';show.forEach((_,i)=>flipped[i]=true);}return;}
+      if(st==='tear'){if(t>=34){st='deal';t=0;}return;}
+      if(st==='deal'){if(t>=26){st='flip';t=0;k=0;ft=99;}return;}
+      if(st==='flip'){if(I.B){show.forEach((_,i)=>flipped[i]=true);st='done';t=0;return;}
+        if(!flipped[k]){if(ft>12||I.A)flip();return;}
+        if(ft>=wait(k)||(I.A&&ft>10)){k++;ft=0;if(k>=show.length){st='done';t=0;}}return;}
+      if(st==='done'){if(I.pl||I.pr){sel=(sel+(I.pr?1:show.length-1))%show.length;sfx('cur');}if(t>16&&(I.A||I.B)){pop();sfx('ok');}}},
+    drw(){const sx=shake?((frame*7)%5)-2:0,sy=shake?((frame*3)%3)-1:0;ctx.save();ctx.translate(sx,sy);
+      /* 背景：パックの 色と 光の 筋 */R(-4,-4,W+8,H+8,'#0c0018');const hot=st==='flip'&&k<show.length&&!flipped[k]&&RS[show[k].rar]>=3;
+      ctx.fillStyle=hot?(RS[show[k].rar]>=4?'rgba(248,216,0,.12)':'rgba(252,116,180,.12)'):'rgba(255,255,255,.05)';for(let i=0;i<14;i++){const a=i/14*6.283+frame/90;ctx.beginPath();ctx.moveTo(W/2,96);ctx.lineTo(W/2+Math.cos(a)*300,96+Math.sin(a)*300);ctx.lineTo(W/2+Math.cos(a+.12)*300,96+Math.sin(a+.12)*300);ctx.fill();}
+      for(let i=0;i<36;i++){const x=(i*53+frame*(1+i%3))%W,y=(i*37+frame*(.5+i%2))%H;R(x,y,i%5?1:2,i%5?1:2,i%7?'#5c5c8c':'#f8d878');}
+      if(st==='pack'||st==='tear'){/* パック本体 */const px=W/2-40,py=34+Math.round(Math.sin(frame/12)*3),tear=st==='tear'?t:0;
+        if(st==='pack'){ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(W/2,py+60,60+((frame>>2)&3),76,0,0,6.283);ctx.fill();}
+        const body=()=>{R(px,py+14,80,108,'#000');R(px+1,py+15,78,106,cl.d);R(px+3,py+17,74,102,cl.c);for(let i=0;i<74;i+=6)R(px+3+i,py+17,2,102,'#ffffff18');
+          R(px+3,py+20,74,14,'#000a');txt(pk===6?'第7弾':`第${pk+1}弾`,W/2,py+23,'#f8d878','center',70);
+          if(feat){ctx.save();ctx.beginPath();ctx.rect(px+8,py+38,64,56);ctx.clip();vgArtBg(feat,px+8,py+38,64,56);if(feat.art){ctx.drawImage(vgArt(feat.art,feat.map),px+10,py+36,60,60);}else if(VG_SPR[feat.ch])ctx.drawImage(VG_SPR[feat.ch],px+13,py+40,54,54);ctx.restore();R(px+7,py+37,66,1,'#000');R(px+7,py+94,66,1,'#000');}
+          R(px+3,py+98,74,16,'#000c');txt(PK.n,W/2,py+102,'#fcfcfc','center',70);txt('カードファイト!! ヴァンガルド',W/2,py+113,cl.l,'center',74);
+          if(packs>1){R(px+54,py+14,26,12,'#d82800');txt('×'+packs,px+67,py+16,'#fcfcfc','center');}};
+        body();/* 上の 切り口（破れて 飛んでいく） */const ty=py+2-tear*3,tr=tear*.08;ctx.save();ctx.translate(px+40+tear*4,ty+6);ctx.rotate(tr);R(-40,-6,80,14,'#000');R(-39,-5,78,12,cl.d);for(let i=0;i<78;i+=4)R(-39+i,6,2,2,'#000');txt('ここから 開けてね ✂',0,-3,'#fcfcfc','center',76);ctx.restore();
+        if(st==='tear'){const a=Math.min(1,t/12);ctx.fillStyle=`rgba(255,255,220,${(.7*a).toFixed(2)})`;ctx.beginPath();ctx.moveTo(px,py+15);ctx.lineTo(px+80,py+15);ctx.lineTo(px+120+t*2,-10);ctx.lineTo(px-40-t*2,-10);ctx.fill();
+          for(let i=0;i<10;i++){const a2=-1.57+(i-5)*.25,d=t*3;R(Math.round(W/2+Math.cos(a2)*d),Math.round(py+15+Math.sin(a2)*d),2,2,topR>=3&&i%2?rarCol(top.rar):'#fcfcfc');}
+          if(t>24){ctx.globalAlpha=(t-24)/10;R(-4,-4,W+8,H+8,'#fcfcfc');ctx.globalAlpha=1;}}
+        if(st==='pack'&&(frame>>4)&1)txt('A：パックを 開ける　B：スキップ',W/2,H-20,'#fcfcfc','center');}
+      else{/* カード */const n=show.length,cw=46,ch=66,gap=(W-12-n*cw)/Math.max(1,n-1),y0=30;
+        show.forEach((c,i)=>{let x=6+i*(cw+gap),y=y0;if(st==='deal'){const p=Math.min(1,Math.max(0,(t-i*4)/12));x=W/2-cw/2+(x-(W/2-cw/2))*p;y=H+10+(y0-H-10)*p;}
+          const fl=flipped[i],p=fl&&st==='flip'&&i===k?Math.min(1,ft/8):fl?1:0,sx2=Math.abs(Math.cos(p*Math.PI)),face=p>=.5;
+          const nextHot=st==='flip'&&i===k&&!fl&&RS[c.rar]>=2;
+          if(nextHot){const col=RS[c.rar]>=4?'#f8d800':RS[c.rar]===3?'#fc74b4':'#a8e4fc',g=2+((frame>>2)&3);R(x-g,y-g,cw+g*2,ch+g*2,col);}
+          if(face&&RS[c.rar]>=3)pc(x+cw/2,y+ch/2,36+((frame>>2)&3),RS[c.rar]>=4?'#f8d80044':'#fc74b444');
+          ctx.save();ctx.translate(x+cw/2,y);ctx.scale(Math.max(.04,sx2),1);if(face)vgCard(c,-cw/2,0,cw,ch,{hi:st==='done'&&i===sel});else vgCard(null,-cw/2,0,cw,ch,{back:1});ctx.restore();
+          if(face&&p>=1){R(x+10,y+ch+2,26,10,rarCol(c.rar));txt(c.rar,x+cw/2,y+ch+3,'#000','center');}
+          if(st==='done')region(x,y,cw,ch,()=>{sel=i;});
+          if(st==='flip'&&i===k&&!fl&&(frame>>3)&1)txtS('▼',x+cw/2,y-12,'#f8f800','center');});
+        /* レア演出 */fx.forEach(f=>{const x=6+f.i*(cw+gap)+cw/2,y=y0+ch/2;
+          if(f.k==='rr'&&f.t<30){for(let j=0;j<8;j++){const a=j/8*6.283+f.t/10,d=20+f.t;R(Math.round(x+Math.cos(a)*d),Math.round(y+Math.sin(a)*d),2,2,'#fcfcfc');}}
+          if(f.k==='rrr'&&f.t<50){for(let j=0;j<16;j++){const a=j/16*6.283,d=f.t*3;R(Math.round(x+Math.cos(a)*d),Math.round(y+Math.sin(a)*d),3,3,`hsl(${j*22+f.t*8},100%,60%)`);}
+            if(f.t<40)big('RRR!',x,y-52+Math.max(0,10-f.t),'#fc74b4','center',16);}
+          if(f.k==='sp'&&f.t<80){if(f.t<8){ctx.globalAlpha=1-f.t/8;R(-4,-4,W+8,H+8,'#fcfcb8');ctx.globalAlpha=1;}
+            ctx.fillStyle='rgba(248,216,0,.25)';for(let j=0;j<12;j++){const a=j/12*6.283+f.t/20;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*240,y+Math.sin(a)*240);ctx.lineTo(x+Math.cos(a+.13)*240,y+Math.sin(a+.13)*240);ctx.fill();}
+            for(let j=0;j<20;j++){const a=j/20*6.283,d=f.t*2.5;R(Math.round(x+Math.cos(a)*d),Math.round(y+Math.sin(a)*d),2,2,j%2?'#f8d800':'#fcfcfc');}
+            if(f.t<70)big(show[f.i].rar==='PR'?'PR!!!':'SP!!',x,y-56+Math.max(0,14-f.t),`hsl(${(frame*12)%360},100%,60%)`,'center',20);}});
+        big(packs===1?'パック 開封！':`${packs}パック 開封！ いいカード`,W/2,4,'#f8d878','center',12);
+        if(st==='flip'){const c=show[k]||top;txt(flipped[k]?'':'A：めくる　B：ぜんぶ めくる',W/2,H-14,'#bcbcbc','center');if(k<show.length&&flipped[k]&&ft>8){win(16,120,W-32,40,rarCol(show[k].rar));txt(`${show[k].rar}　${show[k].n}`,W/2,128,rarCol(show[k].rar),'center',W-48);txt(`${VG_CL[show[k].cl].n}　G${show[k].g}　パワー${show[k].pw}`,W/2,142,'#fcfcfc','center',W-48);}}
+        if(st==='done'){const c=show[sel];win(6,112,W-12,124,rarCol(c.rar));vgInfo(c).forEach((l,i)=>txt(l,14,120+i*13,i?'#fcfcfc':'#f8d878','left',W-28));
+          if(packs>1)txt(`合計 ${got.length}枚：`+['SP','RRR','RR','R','C'].map(r=>`${r}${got.filter(x=>x.rar===r).length}`).join(' '),14,208,'#bcbcbc','left',W-28);txt('◀▶ 見る　A：とじる',W-14,222,'#7c7c7c','right');}}
+      ctx.restore();}});}
 function vgTrial(){const S=vgS();const TL=[...VG_PACKS.slice(0,6).map((p,i)=>({lab:`第${i+1}弾 ${p.n}（${VG_CL[p.cl].n}）`,cl:p.cl,pk:i,n:p.n})),...VG_OCL.map(cl=>({lab:`オリジナル ${VG_CL[cl].n}`,cl,pk:6,n:VG_CL[cl].n}))];
   listPick('トライアルデッキ（50枚）　1500イェソ',TL.map(x=>x.lab),i=>{const T=TL[i];
   if(G.coins<1500){dialog('お金が 足りない…');return;}G.coins-=1500;sfx('coin');const {d}=vgAutoDeck(null,T.cl,T.pk);Object.keys(d).forEach(k=>S.col[k]=(S.col[k]||0)+d[k]);
