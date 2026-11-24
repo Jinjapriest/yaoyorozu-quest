@@ -930,8 +930,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=200,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -1097,6 +1097,7 @@ const STADS=[],BB_TEAMS=[
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
 const AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
+const HWYS=[];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
@@ -1213,6 +1214,13 @@ function genMap(){
   AIDI_H.length=0;[[146,176,'teba'],[157,177,'miso'],[167,176,'ebi'],[176,178,'shachi'],[185,176,'sign']].forEach(([tx,ty,k])=>{let done=false;
     for(let r=0;r<=6&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=tx+dx,y=ty+dy,t=tileAt(x,y);
       if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y))continue;AIDI_H.push({x,y,k});done=true;}});
+  /* 11/24：高速道路（大きな 都市を むすぶ。 道・町・施設は 上書きしない。 海を またぐ 区間は つくらない） */
+  {const byN=n=>VIL.find(v=>v.name===n||v.name.replace(/^.* /,'')===n),keep=new Set([T.ROAD,T.BRIDGE,T.YAMA,T.SHR,T.CAVE,T.KEIBAJO,T.STAD,T.CONV,T.LOVEH,T.GGATE,T.GSEAL,T.KQSPOT,T.WALL,T.DICT,T.MINE,T.OIL,T.COAL,T.AIDI,T.HWYH,T.HWYV]);
+    const occ=(x,y)=>ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||(typeof RES!=='undefined'&&RES.some(o=>o.x===x&&o.y===y));
+    HWYS.length=0;[['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト'],['タク','イマリ','サガ','ヨシノガリ']].forEach((ch,ci)=>{for(let i=0;i<ch.length-1;i++){const a=byN(ch[i]),b=byN(ch[i+1]);if(!a||!b)continue;
+      const path=[];let x=a.x,y=a.y;const sx=Math.sign(b.x-a.x),sy=Math.sign(b.y-a.y);while(x!==b.x){x+=sx;path.push([x,y,0]);}while(y!==b.y){y+=sy;path.push([x,y,1]);}
+      if(path.some(([px,py])=>tileAt(px,py)===T.SEA))continue;
+      for(const [px,py,v] of path){const t=tileAt(px,py);if(isTownT(t)||keep.has(t)||occ(px,py))continue;setT(px,py,v?T.HWYV:T.HWYH);}HWYS.push([ch[i],ch[i+1]]);}});}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1254,6 +1262,8 @@ TILES[T.OIL]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#fce0a8');P(2,13,12,2,'#3c3c3c
 TILES[T.COAL]=[mkTile(P=>{P(0,0,16,16,'#5c5c5c');for(let r=0;r<6;r++)P(8-(2+r),r,(2+r)*2,1,'#3c3c3c');P(3,5,10,11,'#3c3c3c');P(5,7,6,9,'#000000');P(4,6,8,2,'#7c4c10');P(4,6,2,10,'#7c4c10');P(10,6,2,10,'#7c4c10');P(0,13,5,3,'#000');P(1,12,3,1,'#3c3c3c');})];
 TILES[T.SHR]=[mkTile(P=>{grassBase(P);P(6,7,4,4,'#a05000');P(5,6,6,1,'#503000');P(3,5,2,10,'#d82800');P(11,5,2,10,'#d82800');P(1,3,14,2,'#d82800');P(1,2,14,1,'#000000');P(3,7,10,1,'#d82800');})];
 TILES[T.CAVE]=[mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=1+r;P(8-Math.ceil(w/2),2+r,w,1,'#7c7c7c');}P(5,9,6,6,'#000000');P(6,8,4,1,'#000000');P(4,14,8,1,'#d82800');})];
+TILES[T.HWYH]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(0,1,16,1,'#fcfcfc');P(0,14,16,1,'#fcfcfc');P(0,0,16,1,'#7c7c7c');P(0,15,16,1,'#7c7c7c');P(2,7,5,2,'#f8d800');P(10,7,5,2,'#f8d800');P(4,4,1,1,'#5c5c64');P(12,11,1,1,'#5c5c64');})];
+TILES[T.HWYV]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(1,0,1,16,'#fcfcfc');P(14,0,1,16,'#fcfcfc');P(0,0,1,16,'#7c7c7c');P(15,0,1,16,'#7c7c7c');P(7,2,2,5,'#f8d800');P(7,10,2,5,'#f8d800');P(4,4,1,1,'#5c5c64');P(11,12,1,1,'#5c5c64');})];
 TILES[T.AIDI]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let y=0;y<16;y+=2)for(let x=(y/2+f)%2;x<16;x+=2)P(x,y,1,1,'#9cb894');P(3,4,3,1,'#d8e0d0');P(10,11,4,1,'#d8e0d0');}));
 TILES[T.WALL]=[mkTile(P=>{P(0,0,16,16,'#5c5c64');for(let y=0;y<16;y+=4){P(0,y,16,1,'#3c3c44');for(let x=(y/4)%2?0:4;x<16;x+=8)P(x,y,1,4,'#3c3c44');}P(0,0,16,2,'#8c8c94');P(2,0,3,1,'#f8b800');P(10,0,3,1,'#f8b800');})];
 TILES[T.GGATE]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c44');P(0,0,16,3,'#8c8c94');P(2,3,12,13,'#000');P(3,4,10,12,'#24188c');P(7,4,2,12,'#f8b800');P(1,0,2,16,'#5c5c64');P(13,0,2,16,'#5c5c64');P(f?2:12,1,2,2,'#d82800');}));
@@ -1733,11 +1743,13 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
   upd(){
     if(this.bt>0)this.bt--;
     if(!this.mv&&dayQShow())return;
-    if(this.mv){this.mv.t+=2;if(this.mv.t>=16){const pv={x:G.pos.x,y:G.pos.y};G.pos.x=this.mv.x1;G.pos.y=this.mv.y1;this.mv=null;onStep(pv);}return;}
+    if(this.mv){this.mv.t+=this.mv.sp||2;if(this.mv.t>=16){const pv={x:G.pos.x,y:G.pos.y};G.pos.x=this.mv.x1;G.pos.y=this.mv.y1;this.mv=null;onStep(pv);}return;}
     if(I.A||I.menu||I.B){openMenu();return;}
     let dx=0,dy=0;if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
     if(!dx&&!dy&&fieldPtr){const px=fieldPtr.x-128,py=fieldPtr.y-120;if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
-    if(dx||dy){this.idle=0;const nx=G.pos.x+dx,ny=G.pos.y+dy;if(PASS[tileAt(nx,ny)])this.mv={x1:nx,y1:ny,dx,dy,t:0};else if(!this.bt){sfx('bump');this.bt=14;if(tileAt(nx,ny)===T.AIDI)toast('この先は アイヂの 国… 霧が 深くて まだ 進めない');}}
+    if(dx||dy){this.idle=0;const nx=G.pos.x+dx,ny=G.pos.y+dy,ntt=tileAt(nx,ny);if(dx)this.dir=dx;
+      if(PASS[ntt]){const dv=carDrive(ntt);if(dv&&dv.hw&&!G.onHwy){if(G.coins<hwyToll()){if(!this.bt){toast('高速道路の 通行料（1,000イェソ）が 足りない');sfx('bump');this.bt=20;}return;}G.coins-=hwyToll();G.onHwy=1;sfx('coin');toast('料金所：通行料 1,000イェソ');}
+        if(!dv||!dv.hw){if(!(ntt===T.ROAD||ntt===T.BRIDGE||ntt===T.YAMA))G.onHwy=0;}if(isHwy(ntt)&&!dv&&!G.hwyHint){G.hwyHint=1;toast('高速道路だ。 車が あれば 速く 走れる');}this.mv={x1:nx,y1:ny,dx,dy,t:0,sp:dv?dv.sp:2};}else if(!this.bt){sfx('bump');this.bt=14;if(tileAt(nx,ny)===T.AIDI)toast('この先は アイヂの 国… 霧が 深くて まだ 進めない');}}
     else this.idle++;
   },
   drw(a){
@@ -1751,7 +1763,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     for(const o of ROADSIDE){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawRoadside(o,sx,sy);}
     for(const o of AIDI_H){const sx=o.x*16-camX,sy=o.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAidiH(o,sx,sy);}
     if(G.ajito&&G.ajito.x!=null&&ajOK()){const sx=G.ajito.x*16-camX,sy=G.ajito.y*16-camY;if(sx>-16&&sy>-16&&sx<W&&sy<H)drawAjHouse(sx,sy);}
-    drawChar(G.party[0],120,112,(frame>>3)&1);nightShade();clockBadge();fkHeatBadge();
+    {const dv=carDrive(tileAt(G.pos.x,G.pos.y))||(this.mv&&carDrive(tileAt(this.mv.x1,this.mv.y1)));if(dv)drawCar(curCar(),120,114,this.dir||1,frame);else drawChar(G.party[0],120,112,(frame>>3)&1);}nightShade();clockBadge();fkHeatBadge();
     const vi=nearestVil(G.pos.x,G.pos.y),v=VIL[vi],t=v.tier;
     const bl=G.bless&&G.bless.left>0;win(4,4,128,bl?56:44);
     txt(`${v.name} 周辺`,12,10,'#fcfcfc','left',112);
@@ -1761,8 +1773,8 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
   }
 };
 function startField(){if(!window._goalShown&&G&&G.day>1){window._goalShown=1;setTimeout(()=>{try{toast('目的：'+goalInfo().t+'（メニュー→目的）');}catch(e){}},1500);}setBase(fieldScr);fieldScr.mv=null;playBGM('field');}
-function onStep(pv){timeAdd(5);dqHit('step');fkHeatStep();
-  const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
+function onStep(pv){const DV=carDrive(tileAt(G.pos.x,G.pos.y));timeAdd(DV?(DV.hw?1:Math.max(1,Math.round(10/DV.sp))):5);dqHit('step');fkHeatStep();
+  const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);if(isTownT(t))G.onHwy=0;
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
   {const n=namidaPos();if(n.x===x&&n.y===y){namidaEv();return;}}
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
@@ -1780,7 +1792,7 @@ function onStep(pv){timeAdd(5);dqHit('step');fkHeatStep();
   if(t===T.CAVE){choice(`八岐大蛇が 棲む 洞窟だ。（Lv${G.boss+1}/${OROCHI_MAX}）\n挑みますか？（目安Lv${G.boss>=14?'19999以上':Math.min(19999,Math.round(820*Math.pow(1.5,G.boss)))}）`,['はい','いいえ'],r=>{if(r===0)startBattle(true);});return;}
   const rf=G.rifts.findIndex(q=>q.x===x&&q.y===y);
   if(rf>=0){choice('魔界の烈穴だ！ まがまがしい 気配が する…\n塞ぎに いきますか？（強い魔物が 出ます）',['塞ぐ','やめる'],r=>{if(r===0)startBattle(false,rf);},72);return;}
-  G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length)*(isNight()?1.25:1);
+  G.steps++;const rate=(t===T.FOREST||t===T.YAMA?.09:(t===T.ROAD||t===T.BRIDGE)?.025:.055)*(1+.25*G.rifts.length)*(isNight()?1.25:1)*(DV?DV.enc:1);
   if(G.steps>3&&rnd()<rate){G.steps=0;if(G.ura>0&&rnd()<GIMW_RATE){gimWildIntro();return;}startBattle(false);}
 }
 
@@ -3164,8 +3176,8 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={lotto:{n:'宝くじ売り場',s:'籤',c:'#d82800'},inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
-const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank','card'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan','card']];
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},cardeal:{n:'カーディーラー',s:'車',c:'#3cbcfc'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank','card'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan','card','cardeal']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase','bgr','bdirt','bpath','bline','bwarn','bdug','bplate','bmound','bbase','bconc']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
@@ -3423,7 +3435,7 @@ function drawCell(c,sx,sy,city){
       else for(let k=0;k<4;k++)R(sx+5,sy+1+k*4,6,2,cs[(f+k)%4]);break;}
     case 'kanann':{R(sx,sy,16,16,'#18182c');if(c.part===0){R(sx,sy+3,16,10,'#f8d878');if(c.dx===2)txt('無料案内所',sx-8,sy+4,'#d82800','center',46);}else{R(sx,sy,16,16,'#3c3c5c');R(sx+2,sy+2,12,12,c.dx===1?'#f8d878':'#24242c');}break;}
     case 'kanarch':{R(sx,sy,16,16,'#18182c');const f=(frame>>4)&1;R(sx,sy+2,16,2,f?'#f878f8':'#7ee0fc');R(sx,sy+12,16,2,f?'#7ee0fc':'#f878f8');if(c.x===18)txt('八百万 歓楽街',sx-40,sy+4,'#f8d878','center',100);break;}
-    case 'rfl':case 'rtat':case 'rwall':case 'rcnt':case 'rshelf':case 'ratm':case 'rgacha':case 'rbed':case 'rtable':case 'rboard':case 'rpanel':case 'rposter':case 'rplant':case 'rgrass':case 'rdirt':case 'rbase':case 'rstand':case 'rscore':case 'rvpack':case 'rvtab':case 'rvboard':case 'rvcase':roomDraw(c,sx,sy);break;
+    case 'rfl':case 'rtat':case 'rwall':case 'rcnt':case 'rshelf':case 'ratm':case 'rgacha':case 'rbed':case 'rtable':case 'rboard':case 'rpanel':case 'rposter':case 'rplant':case 'rgrass':case 'rdirt':case 'rbase':case 'rstand':case 'rscore':case 'rvpack':case 'rvtab':case 'rvboard':case 'rvcase':case 'rcar':case 'rposter2':roomDraw(c,sx,sy);break;
     case 'bgr':case 'bdirt':case 'bpath':case 'bline':case 'bwarn':case 'bfence':case 'bstand':case 'bback':case 'bdug':case 'bplate':case 'bmound':case 'bbase':case 'bpole':case 'blight':case 'bscore':case 'bconc':case 'bshop':stadCell(c,sx,sy);break;
     case 'kanfl':case 'kiwall':case 'kchand':case 'ksofa':case 'ktable':case 'kbar':case 'kroom':case 'koffice':kanShopDraw(c,sx,sy);break;
     case 'trift':R(sx,sy,16,16,'#1c0010');{const f=(frame>>3)%4;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,5,f&1?'#a80020':'#6800a8');pc(sx+8,sy+8,3,'#d82800');pc(sx+8,sy+8,1+(f>>1),'#fcfcfc');}break;
@@ -3639,6 +3651,7 @@ function openFac(kind){
   if(kind==='kagu'){kaguFac();return;}if(kind==='dspara'){kaguFac('Dスパラ');return;}if(kind==='arkun'){kaguFac('アークン');return;}if(kind.startsWith('fk')){fkFac(kind);return;}if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   if(kind==='lotto'){lottoFac();return;}
   if(kind==='card'){vgShop();return;}
+  if(kind==='cardeal'){carFac();return;}
   switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
@@ -3823,6 +3836,43 @@ const VG_ORIG=(()=>{const L=[],A=(id,n,cl,g,t,map,tr,rar)=>L.push({id,n,cl,g,t,m
   A('o_kirikaze','霧風の忍 キリカゼ','tuki',2,'ninja',{'#24188c':'#005800','#3c3c9c':'#00a800','#a81000':'#fcfcfc','#d82800':'#d8d8d8'},0,'R');A('o_karasu','闇鴉 ヤタ','tuki',1,'beast',{'#bcbcbc':'#1c1c1c','#9c9c9c':'#000000','#e8e8e8':'#3c3c3c'},0,'C');
   A('o_kanon','聖歌の天使 カノン','yu',2,'angel',{'#f878f8':'#f8b800','#fcd8fc':'#fcfcb8','#940084':'#a85000'},0,'R');A('o_puppy','天使犬 モモ','yu',1,'beast',{'#bcbcbc':'#fcd8fc','#9c9c9c':'#f878f8','#e8e8e8':'#fcfcfc'},0,'C');
   return L;})();
+/* ===================== 11/24：カーディーラーと 高速道路 ===================== */
+const CARS=[{id:'kei',n:'軽トラ「ハコノリ」',p:300000,sp:3,enc:.7,c:'#fcfcfc',t:'kei',d:'荷台つきの 軽トラ。 安くて 丈夫。'},
+  {id:'compact',n:'コンパクトカー「チョコマ」',p:1500000,sp:4,enc:.6,c:'#f878f8',t:'car',d:'小回りの きく 町乗りの 車。'},
+  {id:'wagon',n:'ワゴン「ヤオヨロ号」',p:5000000,sp:4,enc:.5,c:'#0058f8',t:'van',d:'パーティー 全員で 乗れる 大きな ワゴン。'},
+  {id:'4wd',n:'四駆「イワクダキ」',p:20000000,sp:4,enc:.5,c:'#00a800',t:'4wd',off:1,d:'森や 山道も 走れる 四輪駆動。'},
+  {id:'gt',n:'スポーツカー「シップウGT」',p:80000000,sp:6,enc:.6,c:'#d82800',t:'gt',hw:12,d:'高速道路で 本領を 発揮する 速さ。'},
+  {id:'lux',n:'高級車「ゴショグルマ」',p:300000000,sp:5,enc:.3,c:'#1c1c1c',t:'lux',d:'魔物も 近寄りがたい 威厳の 黒塗り。'},
+  {id:'miko',n:'神輿カー「ミコシ・ターボ」',p:10000000000,sp:8,enc:.1,c:'#f8b800',t:'miko',off:1,hw:16,d:'八百万の 神々の 加護つき。 どこでも 走る。'}];
+const carS=()=>G.cars||(G.cars={own:[],use:null}),curCar=()=>{const S=carS();return S.use?CARS.find(c=>c.id===S.use):null;};
+const isHwy=t=>t===T.HWYH||t===T.HWYV;
+function carDrive(t){const c=curCar();if(!c)return null;if(isHwy(t))return{sp:c.hw||8,enc:.04,hw:1};
+  if(t===T.ROAD||t===T.BRIDGE||t===T.GRASS||t===T.SAND||t===T.KEIBAJO||(c.off&&(t===T.FOREST||t===T.YAMA)))return{sp:c.sp,enc:c.enc};return null;}
+const hwyToll=()=>1000;
+function drawCar(c,x,y,dir,f){const fl=dir<0,P=(a,b,w,h,col)=>R(fl?x+16-a-w:x+a,y+b,w,h,col),bob=(f>>2)&1,col=c.c;
+  if(c.t==='miko'){P(1,8+bob,14,5,'#a05000');P(2,4+bob,12,4,'#d82800');P(1,3+bob,14,1,'#f8b800');P(3,1+bob,10,2,'#f8b800');P(7,-1+bob,2,2,'#f8d878');P(4,5+bob,2,2,'#f8d878');P(10,5+bob,2,2,'#f8d878');
+    P(0,9+bob,16,1,'#f8b800');}
+  else if(c.t==='kei'){P(1,8+bob,14,5,col);P(9,4+bob,6,5,col);P(10,5+bob,4,3,'#a8e4fc');P(1,7+bob,8,1,'#7c7c7c');P(1,8+bob,8,1,'#bcbcbc');}
+  else if(c.t==='van'){P(1,4+bob,14,9,col);P(2,5+bob,4,3,'#a8e4fc');P(7,5+bob,4,3,'#a8e4fc');P(12,5+bob,3,3,'#a8e4fc');P(1,10+bob,14,1,'#fcfcfc');}
+  else if(c.t==='gt'){P(0,8+bob,16,4,col);P(4,5+bob,7,3,col);P(5,6+bob,5,2,'#a8e4fc');P(0,7+bob,2,1,'#1c1c1c');P(14,9+bob,2,1,'#f8f800');}
+  else if(c.t==='lux'){P(0,7+bob,16,6,col);P(3,3+bob,10,4,col);P(4,4+bob,3,3,'#5c5c74');P(8,4+bob,4,3,'#5c5c74');P(0,9+bob,16,1,'#bcbcbc');P(15,8+bob,1,2,'#f8f800');}
+  else if(c.t==='4wd'){P(1,5+bob,14,8,col);P(3,2+bob,9,4,col);P(4,3+bob,3,2,'#a8e4fc');P(8,3+bob,3,2,'#a8e4fc');P(0,10+bob,16,1,'#3c3c3c');P(14,6+bob,2,2,'#f8f800');}
+  else{P(1,7+bob,14,6,col);P(4,3+bob,8,4,col);P(5,4+bob,3,3,'#a8e4fc');P(9,4+bob,2,3,'#a8e4fc');P(14,9+bob,2,1,'#f8f800');}
+  const wr=c.t==='4wd'||c.t==='miko'?3:2;pc(x+4,y+13,wr,'#1c1c1c');pc(x+12,y+13,wr,'#1c1c1c');R(x+4,y+13,1,1,'#bcbcbc');R(x+12,y+13,1,1,'#bcbcbc');
+  if(c.t==='miko'&&(f>>3)&1){R(x-3,y+2,1,1,'#f8d878');R(x+18,y+4,1,1,'#f8d878');}}
+function carFac(){const S=carS();
+  const go=()=>choice(`店員「カーディーラーへ ようこそ！」\n愛車：${curCar()?curCar().n:'なし（徒歩）'}`,['車を 買う','乗る車を えらぶ','車を 売る','高速道路の 案内','やめる'],k=>{
+    if(k===0)listPick('新車 販売（高速道路は 1回 1,000イェソ）',CARS.map(c=>`${S.own.includes(c.id)?'【所有】':''}${c.n}　${fmt(c.p)}イェソ`),i=>{const c=CARS[i];
+      if(S.own.includes(c.id)){dialog('もう 持っている 車だ。');return;}
+      choice(`${c.n}\n${fmt(c.p)}イェソ（財布 ${fmt(G.coins)}イェソ）\n買いますか？`,['買う','やめる'],r=>{if(r!==0)return;if(G.coins<c.p){dialog('お金が 足りない…');return;}
+        G.coins-=c.p;S.own.push(c.id);S.use=c.id;save();sfx('lvup');dialog([`${c.n}を 買った！`,'店員「さっそく 乗って いって ください！」\n（道・草原では 車で 速く 走れる。 魔物にも 出会いにくい）']);},96);},
+      k2=>{const c=CARS[k2];return c?`${c.d}\n速さ ×${c.sp/2}${c.hw?`（高速 ×${c.hw/2}）`:''}　魔物との 遭遇 ${Math.round(c.enc*100)}%${c.off?'\n森・山道も 走れる':''}`:'';});
+    else if(k===1){if(!S.own.length){dialog('車を 持っていない。');return;}const L=[...S.own.map(id=>CARS.find(c=>c.id===id)),null];
+      listPick('乗る車を えらぶ',L.map(c=>c?(S.use===c.id?'▶ ':'')+c.n:'歩く（車に 乗らない）'),i=>{S.use=L[i]?L[i].id:null;save();toast(L[i]?`${L[i].n}に 乗った`:'車を 降りた');});}
+    else if(k===2){if(!S.own.length){dialog('車を 持っていない。');return;}const L=S.own.map(id=>CARS.find(c=>c.id===id));
+      listPick('車を 売る（買値の 半額）',L.map(c=>`${c.n}　${fmt(c.p/2)}イェソ`),i=>{const c=L[i];choice(`${c.n}を ${fmt(c.p/2)}イェソで 売る？`,['売る','やめる'],r=>{if(r!==0)return;S.own=S.own.filter(x=>x!==c.id);if(S.use===c.id)S.use=null;G.coins+=c.p/2;save();sfx('coin');toast('車を 売った');},96);});}
+    else if(k===3)dialog(['高速道路は 大きな 都市を むすぶ 灰色の 道。','車で 入ると 1回 1,000イェソの 通行料。\nとても 速く 走れて、 魔物とは ほとんど 出会わない。','山陰道：イズモ〜八雲市〜ヤスギ〜ヨナゴ〜サカイミナト\n九州道：タク〜イマリ〜サガ〜ヨシノガリ','徒歩でも 歩けるが、 速くは ならない。']);},96);
+  go();}
 /* ===================== 11/24：カードショップ 先導堂（カードファイト!! ヴァンガルド） =====================
    旧ルール〜Gシリーズ（ストライド）まで。カードは ゲームの 既存キャラ（ドット絵・名前）から 作る。 */
 const VG_CL={bou:{n:'冒険者ギルド',c:'#0058f8',d:'#00287c',l:'#a8e4fc',bg:['#3c7cfc','#a8e4fc','#fcfcfc']},taka:{n:'高天原',c:'#f8b800',d:'#7c5000',l:'#fcfcb8',bg:['#f87800','#f8d878','#fcfcfc']},
@@ -4288,13 +4338,14 @@ function vgDrawBoard(F){const q=F.req||{},U=F.ui,CW=28,CHh=38,t=frame;
     const it=q.items[U.c];if(it&&it.c){vgCard(it.c,204,4,46,66);}}
   if(q.k==='end'){R(0,70,W,50,'#000d');big(F.win===0?'WIN!!':'LOSE…',W/2,78,F.win===0?'#f8d800':'#7c7c7c','center',20);txt('Aで もどる',W/2,104,'#bcbcbc','center');}}
 /* ===================== 11/19：施設の 中（部屋） ===================== */
-const ROOM_OK=new Set(['card','inn','shop','gacha','rest','job','dojo','bank','kinyu','yakusho','lotto','stock','kokan']);
+const ROOM_OK=new Set(['cardeal','card','inn','shop','gacha','rest','job','dojo','bank','kinyu','yakusho','lotto','stock','kokan']);
 const ROOM_T={inn:{fl:['#c8a050','#b89040'],wall:'#7c4c10',clerk:['#fcfcfc','#000000'],hi:'僧侶「ようこそ お参りくださいました」'},shop:{fl:['#c8b090','#b8a080'],wall:'#3c5c8c',clerk:['#0058f8','#7c4c10'],hi:'店主「いらっしゃい！」'},
   gacha:{fl:['#f8d8e8','#f8c8d8'],wall:'#a80040',clerk:['#d82800','#f8b800'],hi:'巫女「ガチャ堂へ ようこそ♪」'},rest:{fl:['#e4c890','#d4b880'],wall:'#a05000',clerk:['#fcfcfc','#000000'],hi:'店員「いらっしゃいませ！ お席へ どうぞ」'},
   job:{fl:['#bcbcbc','#acacac'],wall:'#3c3c5c',clerk:['#24188c','#000000'],hi:'職員「お仕事を お探しですか？」'},dojo:{fl:['#a87c40','#986c30'],wall:'#503000',clerk:['#fcfcfc','#000000'],hi:'師範「鍛えに 来たか！」'},
   bank:{fl:['#d8d8e0','#c8c8d0'],wall:'#24386c',clerk:['#24188c','#000000'],hi:'行員「いらっしゃいませ。 窓口へ どうぞ」'},kinyu:{fl:['#d8d8e0','#c8c8d0'],wall:'#1c2c4c',clerk:['#000000','#000000'],hi:'担当者「金融プラザへ ようこそ」'},
   yakusho:{fl:['#c8c8c8','#b8b8b8'],wall:'#5c5c5c',clerk:['#3c3c3c','#000000'],hi:'職員「ご用件を どうぞ」'},lotto:{fl:['#f8e8a8','#f0d898'],wall:'#d82800',clerk:['#d82800','#7c4c10'],hi:'販売員「夢を 買って いきませんか！」'},
   stock:{fl:['#1c2c3c','#24343c'],wall:'#0c1c2c',clerk:['#24188c','#000000'],hi:'証券マン「本日の 相場は こちらです」'},kokan:{fl:['#bcbcbc','#acacac'],wall:'#5c5c5c',clerk:['#3c3c3c','#7c7c7c'],hi:'（小窓の 向こうに 手だけが 見える）'},
+  cardeal:{fl:['#e8e8f0','#d8d8e0'],wall:'#3cbcfc',clerk:['#24188c','#000000'],hi:'店員「いらっしゃいませ！ 新車 入ってます！」'},
   card:{fl:['#c89058','#b88048'],wall:'#e45c10',clerk:['#e45c10','#503000'],hi:'店長「いらっしゃい！ 先導堂へ ようこそ」'},
   conv:{fl:['#fcfcfc','#ececec'],wall:'#3cbcfc',clerk:['#3cbcfc','#000000'],hi:'店員「いらっしゃいませ〜」'},love:{fl:['#5c2c5c','#4c1c4c'],wall:'#a8287c',clerk:['#000000','#000000'],hi:'（無人の フロント。 部屋の パネルが 光っている）'}};
 let roomPrev=null;
@@ -4310,6 +4361,7 @@ function enterRoom(kind,opt={}){const w=11,h=8,C=[],RT=ROOM_T[kind]||ROOM_T.shop
   if(kind==='rest'){put(2,4,'rtable');put(5,5,'rtable');put(8,4,'rtable');npcs.push({x:2,y:5,col:'#0058f8',hair:'#000000',line:'客「ここの 料理は うまいぞ」'});}
   if(kind==='job'||kind==='yakusho'){put(1,3,'rboard');put(9,3,'rboard');}
   if(kind==='lotto'){put(1,3,'rposter');put(9,3,'rposter');put(1,5,'rposter');}
+  if(kind==='cardeal'){put(2,4,'rcar');put(5,4,'rcar');put(8,4,'rcar');put(1,3,'rplant');put(9,3,'rposter2');}
   if(kind==='card'){put(1,3,'rvpack');put(1,4,'rvpack');put(9,3,'rvboard');put(9,5,'rvcase');put(3,4,'rvtab');put(7,4,'rvtab');vgDB();const VN=vgNpcs(opt.o?opt.o.vi:curVil),PS=[[2,4,'#0058f8','#000000'],[8,4,'#d82800','#503000'],[3,5,'#00a800','#7c7c7c']];
     VN.forEach((o,i)=>npcs.push({x:PS[i][0],y:PS[i][1],col:PS[i][2],hair:PS[i][3],sp:'vg',vg:o,vgi:i,fix:true,line:''}));}
   if(kind==='love'){put(5,2,'rpanel');put(4,2,'rplant');put(6,2,'rplant');}
@@ -4327,7 +4379,9 @@ function roomBump(c){if(c.t==='rcnt'||c.t==='rpanel'){roomUse();return true;}
   if(c.t==='rgacha'){openGacha();return true;}if(c.t==='rbed')return dialog('ふかふかの 布団だ。\n（受付で 泊まれる）'),true;if(c.t==='rtable')return dialog('ていねいに ふかれた テーブルだ。'),true;
   if(c.t==='rboard')return dialog('掲示板に 求人や お知らせが はってある。'),true;if(c.t==='rposter')return dialog(['ポスター「年末ジャンボ 1等 7億イェソ！」','「当たるも 八卦… 買わなきゃ 当たらない！」']),true;
   if(c.t==='rplant')return dialog('観葉植物だ。'),true;
-  if(c.t==='rvpack'){if(vgOpen())vgBuyPack();else dialog('閉店中だ。');return true;}if(c.t==='rvcase'){if(vgOpen())vgUsed();else dialog('閉店中だ。');return true;}if(c.t==='rvtab')return dialog('ファイトテーブルだ。\n（ファイターに 話しかけると 対戦できる）'),true;
+  if(c.t==='rvpack'){if(vgOpen())vgBuyPack();else dialog('閉店中だ。');return true;}if(c.t==='rcar'){const C=CARS[(c.x||0)%CARS.length];dialog([`展示車：${C.n}`,`${C.d}
+${fmt(C.p)}イェソ（カウンターで 買える）`]);return true;}if(c.t==='rposter2')return dialog('ポスター「高速道路で 都市から 都市へ！ 通行料 1,000イェソ」'),true;
+  if(c.t==='rvcase'){if(vgOpen())vgUsed();else dialog('閉店中だ。');return true;}if(c.t==='rvtab')return dialog('ファイトテーブルだ。\n（ファイターに 話しかけると 対戦できる）'),true;
   if(c.t==='rvboard'){const S=vgS();dialog(['掲示板「ショップ大会 毎週 日曜 13時〜17時」','「優勝賞品：プロモカード（Gユニット）」',`あなたの 戦績：${S.w}勝 ${S.l}敗　${S.pt}pt`,...(S.q?[`【目指せ！全国No.1】${VG_QN[S.q.st]}`+(S.q.st>=2&&S.q.st<5?'\n'+vgQInfo():'')]:[])]);return true;}if(c.t==='rstand'||c.t==='bstand')return dialog('観客席だ。 応援の 声が ひびいている！'),true;if(c.t==='bfence')return dialog('外野フェンスだ。 ここを 越えれば ホームラン！'),true;if(c.t==='bpole')return dialog('ファウルポールだ。'),true;if(c.t==='blight')return dialog('照明塔だ。 ナイターでは 球場を 明るく 照らす。'),true;if(c.t==='bback')return dialog('バックネットだ。'),true;if(c.t==='bscore'){bbStandings();return true;}if(c.t==='bshop'){stadTalk(c.n==='グッズ'?'stad_goods':'stad_food');return true;}if(c.t==='rscore'){bbStandings();return true;}if(c.t==='rwall')return true;return false;}
 function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
   const fl=()=>{if(c.t==='rtat'||c.k==='inn'){R(sx,sy,16,16,'#c8b878');R(sx,sy,16,1,'#8c7c3c');R(sx,sy+8,16,1,'#a89858');}else{R(sx,sy,16,16,F[0]);if(((c.x||0)+(c.y||0))&1)R(sx+1,sy+1,14,14,F[1]);}};
@@ -4350,6 +4404,8 @@ function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
     case 'rplant':fl();R(sx+6,sy+10,4,5,'#a05000');pc(sx+8,sy+7,5,'#00a800');pc(sx+6,sy+5,3,'#00c800');break;
     case 'rvpack':fl();R(sx+1,sy+1,14,15,'#7c4c10');for(let k=0;k<2;k++)for(let j=0;j<3;j++)R(sx+2+j*4,sy+2+k*7,3,6,['#0058f8','#f8b800','#d800cc','#00a800','#f87800','#7c7c7c'][(j+k*3)%6]);break;
     case 'rvtab':fl();R(sx+1,sy+3,14,10,'#00683c');R(sx+2,sy+4,12,8,'#008848');R(sx+3,sy+5,3,4,'#fcfcfc');R(sx+10,sy+7,3,4,'#24188c');R(sx+7,sy+6,2,3,'#f8d878');break;
+    case 'rcar':{fl();const C=CARS[(c.x||0)%CARS.length];R(sx,sy+14,16,2,'#bcbcbc');drawCar(C,sx,sy,1,frame);break;}
+    case 'rposter2':fl();R(sx+2,sy+1,12,14,'#3cbcfc');R(sx+3,sy+2,10,12,'#fcfcfc');R(sx+4,sy+8,8,3,'#d82800');pc(sx+6,sy+11,1,'#000');pc(sx+10,sy+11,1,'#000');txt('新車',sx+8,sy+2,'#0058f8','center',12);break;
     case 'rvcase':fl();R(sx+1,sy+2,14,13,'#7c4c10');R(sx+2,sy+3,12,8,'#a8e4fc');for(let j=0;j<3;j++)R(sx+3+j*4,sy+4,3,5,['#f8d800','#fc74b4','#fcfcfc'][j]);R(sx+2,sy+3,12,1,'#fcfcfc');break;
     case 'rvboard':fl();R(sx+1,sy+1,14,12,'#503000');R(sx+2,sy+2,12,10,'#e8d8b0');R(sx+3,sy+3,10,2,'#d82800');R(sx+3,sy+6,8,1,'#3c3c3c');R(sx+3,sy+8,6,1,'#3c3c3c');break;}}
 /* アイヂの 手がかり（フィールドの 小物） */
@@ -5163,7 +5219,7 @@ function warpScr(){
 /* 11/19：マップから えらぶ ワープ（町・競馬場・球場・オロチの山） */
 let WARP_IMG=null;
 function warpImg(){if(WARP_IMG)return WARP_IMG;const c=document.createElement('canvas');c.width=MW;c.height=MH;const g=c.getContext('2d'),im=g.createImageData(MW,MH);
-  const COL={[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
+  const COL={[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tileAt(x,y),q=COL[t]||(isTownT(t)?[252,252,252]:t===T.SHR?[216,40,0]:[88,200,84]),i=(y*MW+x)*4;im.data[i]=q[0];im.data[i+1]=q[1];im.data[i+2]=q[2];im.data[i+3]=255;}
   g.putImageData(im,0,0);return WARP_IMG=c;}
 function warpMap(seen,goTown){const trap=gmTrap(),P=[];
