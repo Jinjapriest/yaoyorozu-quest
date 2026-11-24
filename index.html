@@ -3110,16 +3110,16 @@ function winBattle(){
     if(e.boss){const s=orochiGrow(G.boss,1.5,1.12);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
     else{const sb=Math.min(30,Math.sqrt(e.sc||1));coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4)*sb;ex+=30*Math.pow(2.3,e.t)*sb;ore+=20*Math.pow(2.3,e.t)*sb;if(rnd()<.08)herb++;}
   }
-  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.sp&&BT.sp.kind==='gunma'?12:BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:BT.sp&&BT.sp.kind==='tunrich'?15:1;
+  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.sp&&BT.sp.kind==='gunma'?12:BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:BT.sp&&BT.sp.kind==='tunrich'?50:1;
   /* 高難易度コンテンツは 経験値書・鍛錬鉱が 10倍 */
   const HX=BT.sp&&(['kaiho','doiri','ukaiho','udoiri','uorochi','tokoyo','colo','ura','gimwild','gimrift','gunma','tunrich'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
   const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(isNight()&&!BT.sp&&!BT.boss&&BT.rift==null?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*(G.ukaiho&&G.ukaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
-  let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}if(BT.sp&&BT.sp.kind==='tunrich'){const k2=ri(2,4);tk+=k2;G.items.tk+=k2;herb+=5;}
+  let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}let rich=null;if(BT.sp&&BT.sp.kind==='tunrich'){const k2=ri(5,10);tk+=k2;G.items.tk+=k2;herb+=10;rich={sr:1+(rnd()<.3?1:0),ur:rnd()<.2?1:0};G.items.srtk=(G.items.srtk||0)+rich.sr;G.items.urtk=(G.items.urtk||0)+rich.ur;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);const nkb=G.party.some(id=>hasSkW(id,'w_koban'));if(nkb)coin*=5;G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
   bk.forEach((n,k)=>G.items.b[k]+=n);ok.forEach((n,k)=>G.items.o[k]+=n);
   const got=[...bk.map((n,k)=>n?`経験値書（${BN[k]}）×${fmt(n)}`:null),...ok.map((n,k)=>n?`鍛錬鉱（${BN[k]}）×${fmt(n)}`:null),herb?`やくそう ×${herb}`:null].filter(Boolean);
   const pages=[`${BT.boss?'八岐大蛇を しずめた！':BT.rift!=null?'魔界の烈穴を 塞いだ！':BT.sp&&BT.sp.kind==='dict'?'親衛隊を うちやぶった！':BT.sp&&BT.sp.kind==='tunrich'?'黄金の まものを やっつけた！ 大もうけだ！':'まものたちを やっつけた！'}\n${fmt(coin)}イェソを てにいれた！${nkb?'\n（猫の小判で イェソ 5倍）':''}`];
-  if(tk)got.unshift(`ガチャチケット ×${tk}`);
+  if(tk)got.unshift(`ガチャチケット ×${tk}`);if(rich){if(rich.ur){got.unshift(`UR確定チケット ×${rich.ur}`);sfx('lvup');}got.unshift(`SR以上確定チケット ×${rich.sr}`);}
   for(let k=0;k<got.length;k+=3)pages.push((k?'':'てにいれた もの：\n')+got.slice(k,k+3).join('\n'));
   if(BT.rift!=null){G.rifts.splice(BT.rift,1);pages.push(...jobProgress('seal'));}
   plvGain(pages);
