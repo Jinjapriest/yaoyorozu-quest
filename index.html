@@ -3774,7 +3774,7 @@ function vgAddEnemies(){const ENP=[['mono',7,VG_EN.mono],['gun',8,VG_EN.gun1],['
     else{g=VG_EN.g4.includes(x[0])?4:3;rar=g===4?'SP':'RRR';}
     const pw=g===4?15000:g===3?11000:g===2?(x[1]==='oni'||x[1]==='beast'?10000:9000):g===1?(x[1]==='oni'?8000:7000):5000;
     const c={id,ch:null,en:x,n:x[0],cl:'mono',ek:cl,g,pw,sh:g===0?10000:g<3?5000:0,tr:null,pg:0,rar,pack:pk,root:VG_EN.root[x[0]]||id,def:x[1]==='bones'?9:0,enemy:1};
-    const nz=VG_EN.nz[x[0]];if(nz!=null){Object.assign(c,{nz,g:nz,pw:[5000,8000,10000,11000,15000][nz],sh:[5000,5000,5000,0,0][nz],rar:['RR','RR','RRR','SP','SP'][nz]});if(nz===4){c.main=1;c.cr=2;}}
+    const nz=VG_EN.nz[x[0]];if(nz!=null){Object.assign(c,{nz,g:nz,pw:[5000,8000,10000,11000,15000][nz],sh:[5000,5000,5000,0,0][nz],rar:['RR','RR','RRR','SP','SP'][nz]});}
     VGC[id]=c;VGL.push(c);}));}
 /* ----- オリジナルカードの 絵（64×64：形を 塗って 輪郭を つける。 色は 差しかえ 表で 変える） ----- */
 const VG_ARTC={};
@@ -3909,7 +3909,7 @@ function vgCard(c,x,y,w,h,o={}){if(o.back||!c){R(x,y,w,h,'#000');R(x+1,y+1,w-2,h
   const fc=c.rar==='PR'||c.rar==='？？？'?`hsl(${(frame*6)%360},90%,60%)`:c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':null;if(fc){R(x,y,w,1,fc);R(x,y+h-1,w,1,fc);R(x,y,1,h,fc);R(x+w-1,y,1,h,fc);if(c.rar!=='RRR'&&bg2&&((frame>>3)%8)<2){R(x+w-6,y+4,1,3,'#fcfcfc');R(x+w-7,y+5,3,1,'#fcfcfc');}}}
 function vgInfo(c){if(!c)return[];const L=[`${c.n}`,`${VG_CL[c.cl].n}　G${c.g}　パワー${c.pw}`,c.g<3&&c.g!==4?`シールド ${c.sh}${c.g===2?'　インターセプト':''}${c.g<=1?'　ブースト':''}`:c.g===3?'ツインドライブ!!':c.main?'トリプルドライブ!!!（メインデッキの G4・G3に ライド）':'トリプルドライブ!!!　ストライド'];
   if(c.tr)L.push(`${VG_TR[c.tr][2]}トリガー（パワー＋5000${c.tr==='crit'?'・★＋1':''}）`);if(c.pg)L.push('完全ガード：手札を 1枚 捨てて ヒットされない');
-  const sk=c.main&&c.cl==='none'?VG_SKILL.none:c.nz!=null?null:c.g===4?(VG_SKILL[c.id]||(c.enemy?VG_SKILL.bossg:null)):c.g===3?VG_SKILL[c.cl]:null;if(sk)L.push(`【${sk[0]}】${sk[1]}`);if(c.nz!=null)L.push(c.nz===0?'【自】スタンドアップ時：山札から G1の ニズゥーイッツァイを 手札へ':c.nz<4?`【自】ライド時：山札から G${c.nz+1}の ニズゥーイッツァイを 手札へ`:'【自】ライド時：相手の リアガードを すべて 退却（G3の ニズゥーイッツァイに ライド）',c.nz?'【永】ソウルの ニズゥーイッツァイ 1枚につき パワー＋2000':'');if(c.enemy&&c.g===4&&VG_EN.root[c.n]&&c.nz==null)L.push('同じ キャラの 上に ストライドで 最終形態 解放（パワー＋5000・★＋1）');L.push(`レア度 ${c.rar}`);return L;}
+  const sk=c.main&&c.cl==='none'?VG_SKILL.none:c.nz!=null?null:c.g===4?(VG_SKILL[c.id]||(c.enemy?VG_SKILL.bossg:null)):c.g===3?VG_SKILL[c.cl]:null;if(sk)L.push(`【${sk[0]}】${sk[1]}`);if(c.nz!=null)L.push(c.nz===0?'【自】スタンドアップ時：山札から G1の ニズゥーイッツァイを 手札へ':c.nz<3?`【自】ライド時：山札から G${c.nz+1}の ニズゥーイッツァイを 手札へ`:c.nz===3?'【自】ライド時：ダメージを 1枚 表に・1枚 引く':'ストライド（ハーツが ニズゥーイッツァイ）：最終形態 解放・相手の リアガードを すべて 退却',c.nz&&c.nz<4?'【永】ソウルの ニズゥーイッツァイ 1枚につき パワー＋2000':'');if(c.enemy&&c.g===4&&VG_EN.root[c.n]&&c.nz==null)L.push('同じ キャラの 上に ストライドで 最終形態 解放（パワー＋5000・★＋1）');L.push(`レア度 ${c.rar}`);return L;}
 /* ----- デッキ ----- */
 function vgCheckDeck(d,gz){const DB=vgDB(),ids=Object.keys(d).filter(k=>d[k]>0&&DB[k]),n=vgCnt(d),tr=ids.reduce((a,k)=>a+(DB[k].tr?d[k]:0),0),he=ids.reduce((a,k)=>a+(DB[k].tr==='heal'?d[k]:0),0),g0=ids.some(k=>DB[k].g===0);
   const e=[];if(n!==50)e.push(`デッキは 50枚（いま ${n}枚）`);if(tr>16)e.push(`トリガーは 16枚まで（いま ${tr}枚）`);if(he>4)e.push(`ヒールは 4枚まで（いま ${he}枚）`);if(!g0)e.push('グレード0が 1枚 必要');
@@ -3921,7 +3921,7 @@ function vgAutoDeck(pool,cl,pk){/* pool：{id:枚数} または null（無限）
   if(!cl||cl==='mono')take(c=>c.nz!=null,20);
   let tr=0;tr+=take(c=>c.tr==='heal',4);tr+=take(c=>c.tr==='crit',16-tr-4>0?8:16-tr);tr+=take(c=>c.tr&&c.tr!=='heal',16-tr);
   take(c=>c.pg,4);take(c=>c.g===3,8);take(c=>c.g===2,11);take(c=>c.g===1&&!c.pg,50-n-0);take(c=>c.g===2||c.g===3,50-n);take(c=>c.g===1,50-n);take(c=>!c.tr&&c.g===0,50-n);
-  const gz={};const gs=VGL.filter(c=>c.g===4&&!c.main&&own(c)>0).sort((a,b)=>(b.cl===cl)-(a.cl===cl));let k=0;gs.forEach(c=>{const m=Math.min(4,own(c),8-k);if(m>0){gz[c.id]=m;k+=m;}});return {d,gz};}
+  const gz={};const gs=VGL.filter(c=>c.g===4&&!c.main&&own(c)>0).sort((a,b)=>(b.nz!=null)-(a.nz!=null)||(b.cl===cl)-(a.cl===cl));let k=0;gs.forEach(c=>{const m=Math.min(4,own(c),8-k);if(m>0){gz[c.id]=m;k+=m;}});return {d,gz};}
 /* ===== ショップ ===== */
 const vgOpen=()=>{const h=nowMin()/60;return h>=10&&h<21;};
 const vgTourOK=()=>dow()===0&&nowMin()>=780&&nowMin()<1020;
@@ -4129,11 +4129,11 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
   function* doRide(P,c){P.hand.splice(P.hand.indexOf(c),1);const old=P.V.c;P.soul.push(old);P.V={c,rest:P.V.rest,bp:P.V.bp,bc:P.V.bc};sfx('buff');
     yield msg(`${P.name}：ライド！ ${c.n}`,40);
     if(c.nz!=null){const k=P.soul.filter(x=>x.nz!=null).length;P.V.nzb=2000*k;F.fx.push({k:'trig',tr:'crit',t:0});yield msg(`進化！ ソウルの ニズゥーイッツァイ ${k}枚 → パワー＋${2000*k}`,40);
-      if(c.nz<4)yield* nzSearch(P,c.nz+1);else{const O=F.p[F.p.indexOf(P)^1];[0,1,2,3,4].forEach(i=>retire(O,i));sfx('g5');yield msg('「ワタシハ カミニ ナッタ」 相手の リアガードを すべて 退却！',60);}return;}
+      if(c.nz<3)yield* nzSearch(P,c.nz+1);else{const d=P.dmg.find(x=>!x.up);if(d)d.up=true;draw(P);sfx('heal');yield msg('生体の 鼓動… ダメージを 1枚 表に・1枚 引く',40);}return;}
     if(old.root===c.root&&c.g>0){draw(P);yield msg('同じ キャラに ライド！ 1枚 引く',30);}}
   function* turn(){const me=F.cur===0,P=F.p[F.cur],O=F.p[F.cur^1];F.tn++;
     F.ph='スタンド';[P.V,...P.R].forEach(u=>u&&(u.rest=false));F.ph='ドロー';draw(P);if(lost())return;yield msg(`${P.name}の ターン（${Math.ceil(F.tn/2)}ターン目）`,me?30:40);
-    /* ライド */F.ph='ライド';const rideOK=c=>(c.g<=3||(c.main&&P.V.c.g===3&&(c.nz!==4||P.V.c.nz===3)))&&(c.g===P.V.c.g||c.g===P.V.c.g+1)&&!P.V.heart;
+    /* ライド */F.ph='ライド';const rideOK=c=>(c.g<=3||(c.main&&P.V.c.g===3))&&(c.g===P.V.c.g||c.g===P.V.c.g+1)&&!P.V.heart;
     if(P.hand.some(rideOK)){if(me){const k=yield {k:'hand',title:'ライドする カードを えらぶ（Bで ライドしない）',ok:rideOK,cancel:1};if(k>=0)yield* doRide(P,P.hand[k]);}
       else{const L=P.hand.filter(rideOK).sort((a,b)=>b.g-a.g||(b.root===P.V.c.root)-(a.root===P.V.c.root));if(L.length&&(L[0].g>P.V.c.g||P.V.c.g<3))yield* doRide(P,L[0]);}}
     /* ストライド */F.ph='ストライド';const gsum=()=>P.hand.reduce((a,c)=>a+Math.min(3,c.g),0);
@@ -4143,9 +4143,10 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
           if(t>=0){gi=fd.find(i=>P.gz[i].c.id===types[t]);const r=yield {k:'multi',title:'捨てる カード（グレード合計3以上）',items:P.hand.map(c=>({c,lab:`G${c.g} ${c.n}`})),info:s=>{const g=s.reduce((a,i)=>a+P.hand[i].g,0);return [`グレード合計 ${g}／3`,g>=3];},cancel:1};
             if(r){cost=r;ok=true;}}}}
       else{const H=P.hand.map((c,i)=>({c,i}));const g3=H.filter(x=>x.c.g>=3);if(g3.length&&(g3.length>=2||P.hand.length>=5)){cost=[g3[0].i];}else{const g21=H.filter(x=>x.c.g>=1&&!x.c.pg).sort((a,b)=>b.c.g-a.c.g);let s=0;const pick=[];for(const x of g21){if(s>=3)break;pick.push(x.i);s+=x.c.g;}if(s>=3&&P.hand.length-pick.length>=2)cost=pick;}
-        if(cost){ok=true;gi=fd[Math.floor(rnd()*fd.length)];}}
+        if(cost){ok=true;const mt=fd.find(i=>P.gz[i].c.root===P.V.c.root);gi=mt!=null?mt:fd[Math.floor(rnd()*fd.length)];}}
       if(ok){cost.sort((a,b)=>b-a).forEach(i=>P.drop.push(P.hand.splice(i,1)[0]));const gc=P.gz.splice(gi,1)[0].c;P.V={c:gc,heart:P.V.c,rest:P.V.rest,bp:P.V.bp,bc:P.V.bc};sfx('g5');F.fx.push({k:'stride',c:gc,t:0});
-        yield msg(`ストライド・ジェネレーション!! ${gc.n}`,70);if(gc.root===P.V.heart.root&&gc.enemy){P.V.bc++;P.V.bp+=5000;F.fx.push({k:'trig',tr:'crit',t:0});yield msg('最終形態 解放！！ パワー＋5000・★＋1',60);}}}
+        yield msg(`ストライド・ジェネレーション!! ${gc.n}`,70);if(gc.root===P.V.heart.root&&gc.enemy){P.V.bc++;P.V.bp+=5000;F.fx.push({k:'trig',tr:'crit',t:0});yield msg('最終形態 解放！！ パワー＋5000・★＋1',60);
+          if(gc.nz===4){[0,1,2,3,4].forEach(i=>retire(O,i));sfx('g5');yield msg('「ワタシハ カミニ ナッタ」 相手の リアガードを すべて 退却！',60);}}}}
     /* メイン */F.ph='メイン';
     if(me){for(;;){const k=yield {k:'menu',title:'メインフェイズ',opts:['コール','移動','バトルへ'],cancel:0};
         if(k===0){const ci=yield {k:'hand',title:'コールする カード',ok:c=>c.g<=vgG(P)&&c.g<4,cancel:1};if(ci<0)continue;const sl=yield {k:'slot',title:'どこに コール？',slots:[0,1,2,3,4].map(i=>({s:0,i})),cancel:1};if(sl<0)continue;
