@@ -930,8 +930,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=200,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31,SHURA:32};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -1097,6 +1097,7 @@ const STADS=[],BB_TEAMS=[
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
 const AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
+const SHURAS=[],SHURA_CONT=[{n:'出雲の 大陸',at:['ヒノミサキ','オクイズモ','ウンナン']},{n:'新大陸',at:['ムロト','フクベ','クラヨシ']},{n:'九州',at:['タラ','ヨブコ','カラツ']},{n:'マホロバの 大陸',at:['イイヤマ','アブ','セタ']},{n:'サキタマ',at:['チチブ','ギョウダ','ソウカ']}];
 const TUNS=[],TUN_LINES=[{n:'山陰 地下線',c:'#3cbcfc',st:['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト']},{n:'九州 地下線',c:'#f87800',st:['タク','イマリ','サガ','ヨシノガリ']},{n:'八百万 環状線',c:'#f8d800',ring:1,st:['イズモ','八雲市','ヨナゴ','マホロバ','グンマー','ナメガワマチ','コクラ','ヨシノガリ','サガ']}];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
@@ -1222,6 +1223,11 @@ function genMap(){
         if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||TUNS.some(o=>o.x===x&&o.y===y))continue;
         if(t===T.ROAD&&![[1,0],[-1,0],[0,1],[0,-1]].some(([ex,ey])=>{const u=tileAt(x+ex,y+ey);return u===T.GRASS||u===T.FOREST||u===T.SAND;}))continue;if(t===T.ROAD)continue;
         setT(x,y,T.TUN);TUNS.push({x,y,vi,li,lis:[li],n});done=true;}}));}
+  /* 11/24：修羅の洞窟（各大陸に 3か所） */
+  {SHURAS.length=0;SHURA_CONT.forEach((C,ci)=>C.at.forEach((tn,k)=>{const v=VIL.find(q=>q.name.replace(/^.* /,'')===tn||q.name===tn);if(!v)return;let done=false;
+    for(let r=3;r<=9&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=v.x+dx,y=v.y+dy,t=tileAt(x,y);
+      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||TUNS.some(o=>o.x===x&&o.y===y)||SHURAS.some(o=>Math.abs(o.x-x)+Math.abs(o.y-y)<3))continue;
+      setT(x,y,T.SHURA);SHURAS.push({x,y,ci,id:'s'+ci+'_'+k,n:`修羅の洞窟（${tn}）`});done=true;}}));}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1266,6 +1272,9 @@ TILES[T.CAVE]=[mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=1+r;P(8-Mat
 TILES[T.HWYH]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(0,1,16,1,'#fcfcfc');P(0,14,16,1,'#fcfcfc');P(0,0,16,1,'#7c7c7c');P(0,15,16,1,'#7c7c7c');P(2,7,5,2,'#f8d800');P(10,7,5,2,'#f8d800');P(4,4,1,1,'#5c5c64');P(12,11,1,1,'#5c5c64');})];
 TILES[T.HWYV]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(1,0,1,16,'#fcfcfc');P(14,0,1,16,'#fcfcfc');P(0,0,1,16,'#7c7c7c');P(15,0,1,16,'#7c7c7c');P(7,2,2,5,'#f8d800');P(7,10,2,5,'#f8d800');P(4,4,1,1,'#5c5c64');P(11,12,1,1,'#5c5c64');})];
 TILES[T.TUN]=[mkTile(P=>{grassBase(P);P(1,5,14,11,'#8c7c6c');P(2,4,12,1,'#8c7c6c');P(0,9,1,7,'#7c6c5c');P(15,9,1,7,'#7c6c5c');P(4,8,8,8,'#000');P(5,7,6,1,'#000');P(3,7,1,9,'#bcbcbc');P(12,7,1,9,'#bcbcbc');P(4,6,8,1,'#bcbcbc');P(6,1,4,3,'#f8b800');P(7,2,2,1,'#000');P(6,13,1,1,'#f8d800');P(9,11,1,1,'#f8d800');})];
+TILES[T.SHURA]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=4+r,x=8-Math.ceil(w/2);P(x,3+r,w,1,r%4===1?'#4c3c3c':'#3c2c2c');}
+  P(4,9,8,7,'#000');P(5,8,6,1,'#000');P(6,7,4,1,'#000');P(5,13,6,3,f?'#d82800':'#a81000');P(6,11,4,2,f?'#a81000':'#580000');P(7,10,2,1,'#fc7460');
+  P(3,4,1,1,'#d82800');P(12,5,1,1,'#d82800');P(7,1,2,2,'#d82800');P(6,2,1,1,'#fcfcfc');P(9,2,1,1,'#fcfcfc');}));
 TILES[T.AIDI]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let y=0;y<16;y+=2)for(let x=(y/2+f)%2;x<16;x+=2)P(x,y,1,1,'#9cb894');P(3,4,3,1,'#d8e0d0');P(10,11,4,1,'#d8e0d0');}));
 TILES[T.WALL]=[mkTile(P=>{P(0,0,16,16,'#5c5c64');for(let y=0;y<16;y+=4){P(0,y,16,1,'#3c3c44');for(let x=(y/4)%2?0:4;x<16;x+=8)P(x,y,1,4,'#3c3c44');}P(0,0,16,2,'#8c8c94');P(2,0,3,1,'#f8b800');P(10,0,3,1,'#f8b800');})];
 TILES[T.GGATE]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c44');P(0,0,16,3,'#8c8c94');P(2,3,12,13,'#000');P(3,4,10,12,'#24188c');P(7,4,2,12,'#f8b800');P(1,0,2,16,'#5c5c64');P(13,0,2,16,'#5c5c64');P(f?2:12,1,2,2,'#d82800');}));
@@ -1570,6 +1579,7 @@ function drawWIcon(id,x,y,sc=1){
   ctx.restore();
 }
 function drawEnemy(e,x,y,t){
+  if(e.chId){const S=3;ctx.save();ctx.globalAlpha=.3+.15*Math.sin(t/8);pe(x,y-22,22,26,'#d82800');ctx.restore();drawChar(e.chId,x-8*S,y-16*S,(t>>4)&1,S);return;}
   const c1=e.c1,c2=e.c2,K='#000000',Wt='#fcfcfc';
   switch(e.shape){
     case 'kendo':drawKendo(x,y,t);break;
@@ -1777,6 +1787,7 @@ function startField(){if(!window._goalShown&&G&&G.day>1){window._goalShown=1;set
 function onStep(pv){const DV=carDrive(tileAt(G.pos.x,G.pos.y));timeAdd(DV?(DV.hw?1:Math.max(1,Math.round(10/DV.sp))):5);dqHit('step');fkHeatStep();
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(t===T.TUN){const o=TUNS.find(q=>q.x===x&&q.y===y);if(o){tunnelEnter(o);return;}}
+  if(t===T.SHURA){const o=SHURAS.find(q=>q.x===x&&q.y===y);if(o){shuraEnter(o);return;}}
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
   {const n=namidaPos();if(n.x===x&&n.y===y){namidaEv();return;}}
   if(t===T.GGATE){gateStep(pv||{x:x-1,y});return;}
@@ -2733,6 +2744,7 @@ function startBattle(boss,rift=null,sp=null){
     for(let k=0;k<2;k++){const e=mkEnemy(12,['共白の 親衛隊','bones','#3c3c3c','#d82800']);for(const q of ['maxhp','hp','atk','def'])e[q]=Math.round(e[q]*UK_F*.3);en.push(e);}}
   else if(sp&&sp.kind==='yakuza'){const N=['鬼瓦組 組員','鬼瓦組 若頭','鬼瓦組 組長'];for(let k=0;k<3;k++){const e=mkEnemy(Math.max(9,tierAt(G.pos.x,G.pos.y)),['ヤクザ','oni','#000000',k===2?'#f8b800':'#d82800']);e.name=N[k];const m=k===2?3:k===1?1.8:1.2;for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*m*1.5);for(const q of ['atk','def'])e[q]=Math.round(e[q]*m);en.push(e);}}
   else if(sp&&sp.kind==='bouei'){const N=['防衛団員 リーダー','防衛団員 おにぎり','防衛団員 メガネ'];for(let k=0;k<3;k++){const e=mkEnemy(9,ETIER[9][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*(k?1:1.6));en.push(e);}}
+  else if(sp&&sp.kind==='shura'){shuraEnemies(sp,en,ta);}
   else if(sp&&sp.kind==='tunrich'){const P=[['黄金の 地底モグラ','beast','#ac7c00','#fcfc00'],['金脈 ナマズ','snake','#f8b800','#fcfcfc'],['宝珠の 鬼火','spirit','#f87800','#fcfc00']],n=ri(1,3);
     for(let k=0;k<n;k++){const e=mkEnemy(ta,P[ri(0,2)]);e.rich=1;en.push(e);}fitEnemies(en);
     en.forEach(e=>{for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*1.3);e.atk=Math.round(e.atk*.7);if(e.mag)e.mag=Math.round(e.mag*.7);});}
@@ -2753,9 +2765,10 @@ function startBattle(boss,rift=null,sp=null){
   const bt=tileAt(G.pos.x,G.pos.y);
   /* 11/19：ボスが 弱いと 言われたので 強化（HP 1.8倍・攻撃/魔力 1.3倍・守備 1.15倍） */
   en.forEach(e=>{if(e.boss||e.dboss||boss){for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*1.8);for(const q of ['atk','mag'])e[q]=Math.round(e[q]*1.3);e.def=Math.round(e.def*1.15);}});
-  BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:sp&&sp.kind==='tunrich'?['#0c0c10','#3c3c44']:BGC[bt]||BGC[T.GRASS]};ngClamp();;
+  BT={boss,rift,sp,t,en,pt:G.party.map(id=>({id,ab:0,av:0,db:0,dv:0,guard:false})),ph:'intro',log:[],pend:[],q:[],wait:0,ai:0,cmds:[],shake:0,cm:null,sub:null,fled:false,bg:sp&&sp.kind==='shura'?['#140000','#3c1414']:sp&&sp.kind==='tunrich'?['#0c0c10','#3c3c44']:BGC[bt]||BGC[T.GRASS]};ngClamp();;
   if(sp&&sp.guests)sp.guests.forEach(id=>{if(G.chars[id]&&!G.party.includes(id))BT.pt.push({id,ab:0,av:0,db:0,dv:0,guard:false,guest:1});});
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
+  if(sp&&sp.kind==='shura')BT.pend.push(...shuraIntro(sp,en));
   if(sp&&sp.kind==='tunrich')BT.pend.push('地下の 暗がりで 何かが 金色に 光った！','黄金の まものが あらわれた！\n（倒せば 大もうけ！）');
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
@@ -2934,7 +2947,7 @@ function eAct(i){
 }
 function fleeAct(){
   BT.pend.push('\f');P_('みんなは にげだした！');
-  P_(()=>{if(BT.boss||(BT.sp&&(BT.sp.kind==='gimwild'||BT.sp.kind==='uorochi'||BT.sp.kind==='trial')))return 'しかし 総書記の残滓からは にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
+  P_(()=>{if(BT.sp&&BT.sp.kind==='shura'&&BT.sp.fl===11)return 'しかし 修羅の 主からは にげられない！';if(BT.boss||(BT.sp&&(BT.sp.kind==='gimwild'||BT.sp.kind==='uorochi'||BT.sp.kind==='trial')))return 'しかし 総書記の残滓からは にげられない！';if(rnd()<.65){BT.fled=true;BT.q=[];return null;}return 'しかし まわりこまれて しまった！';});
 }
 const canCmd=m=>isAlive(m)&&!(m.stun>0);
 const nextAlive=i=>{for(let k=i+1;k<BT.pt.length;k++)if(canCmd(BT.pt[k]))return k;return -1;};
@@ -3110,15 +3123,15 @@ function winBattle(){
     if(e.boss){const s=orochiGrow(G.boss,1.5,1.12);coin+=60000*s;ex+=5e6*s;ore+=3e6*s;herb+=5;}
     else{const sb=Math.min(30,Math.sqrt(e.sc||1));coin+=3*Math.pow(1.85,e.t)*(.8+rnd()*.4)*sb;ex+=30*Math.pow(2.3,e.t)*sb;ore+=20*Math.pow(2.3,e.t)*sb;if(rnd()<.08)herb++;}
   }
-  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.sp&&BT.sp.kind==='gunma'?12:BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:BT.sp&&BT.sp.kind==='tunrich'?50:1;
+  const ml=G.meal&&G.meal.left>0?G.meal:null,rw=BT.sp&&BT.sp.kind==='gunma'?12:BT.rift!=null?5:BT.sp&&BT.sp.kind==='kaiho'?2+BT.sp.mult*2:BT.sp&&BT.sp.kind==='ukaiho'?6+BT.sp.mult*4:BT.sp&&BT.sp.kind==='udoiri'?20:BT.sp&&BT.sp.kind==='uorochi'?40:BT.sp&&BT.sp.kind==='doiri'?8:BT.sp&&BT.sp.kind==='mine'?4:BT.sp&&BT.sp.kind==='dict'?6:BT.sp&&BT.sp.kind==='tokoyo'?10:BT.sp&&BT.sp.kind==='colo'?6:BT.sp&&BT.sp.kind==='ura'?12:BT.sp&&BT.sp.kind==='gimwild'?20:BT.sp&&BT.sp.kind==='gimrift'?9:BT.sp&&BT.sp.kind==='tunrich'?50:BT.sp&&BT.sp.kind==='shura'?4+BT.sp.fl*2:1;
   /* 高難易度コンテンツは 経験値書・鍛錬鉱が 10倍 */
-  const HX=BT.sp&&(['kaiho','doiri','ukaiho','udoiri','uorochi','tokoyo','colo','ura','gimwild','gimrift','gunma','tunrich'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
+  const HX=BT.sp&&(['kaiho','doiri','ukaiho','udoiri','uorochi','tokoyo','colo','ura','gimwild','gimrift','gunma','tunrich','shura'].includes(BT.sp.kind)||(BT.sp.kind==='dict'&&VIL[BT.sp.vi]&&VIL[BT.sp.vi].tier>=11))?HIGH_X:1;
   const hm=G.party.filter(id=>CH[id]&&CH[id].special==='hostess').map(id=>1.2+.05*CH[id].rar);coin=Math.round(coin*mul*rw*(hm.length?Math.max(...hm):1));ex=Math.round(ex*mul*rw*(1+(ml?ml.exp:0))*(G.morning>0?1.2:1)*(isNight()&&!BT.sp&&!BT.boss&&BT.rift==null?1.2:1)*(G.taki>0?1.3:1)*(G.kaiho&&G.kaiho.rank===2?1.5:1)*(G.ukaiho&&G.ukaiho.rank===2?1.5:1)*HX);ore=Math.round(ore*mul*rw*HX);
   let tk=0;if(BT.rift!=null){tk=1+(rnd()<.4?1:0);G.items.tk+=tk;herb+=3;}let rich=null;if(BT.sp&&BT.sp.kind==='tunrich'){const k2=ri(5,10);tk+=k2;G.items.tk+=k2;herb+=10;rich={sr:1+(rnd()<.3?1:0),ur:rnd()<.2?1:0};G.items.srtk=(G.items.srtk||0)+rich.sr;G.items.urtk=(G.items.urtk||0)+rich.ur;}
   if(cardPerk('vesa',3))coin*=2;if(cardPerk('teiai',1))coin=Math.round(coin*1.5);const nkb=G.party.some(id=>hasSkW(id,'w_koban'));if(nkb)coin*=5;G.coins+=coin;G.items.herb+=herb;const bk=toBooks(ex),ok=toBooks(ore);
   bk.forEach((n,k)=>G.items.b[k]+=n);ok.forEach((n,k)=>G.items.o[k]+=n);
   const got=[...bk.map((n,k)=>n?`経験値書（${BN[k]}）×${fmt(n)}`:null),...ok.map((n,k)=>n?`鍛錬鉱（${BN[k]}）×${fmt(n)}`:null),herb?`やくそう ×${herb}`:null].filter(Boolean);
-  const pages=[`${BT.boss?'八岐大蛇を しずめた！':BT.rift!=null?'魔界の烈穴を 塞いだ！':BT.sp&&BT.sp.kind==='dict'?'親衛隊を うちやぶった！':BT.sp&&BT.sp.kind==='tunrich'?'黄金の まものを やっつけた！ 大もうけだ！':'まものたちを やっつけた！'}\n${fmt(coin)}イェソを てにいれた！${nkb?'\n（猫の小判で イェソ 5倍）':''}`];
+  const pages=[`${BT.boss?'八岐大蛇を しずめた！':BT.rift!=null?'魔界の烈穴を 塞いだ！':BT.sp&&BT.sp.kind==='dict'?'親衛隊を うちやぶった！':BT.sp&&BT.sp.kind==='tunrich'?'黄金の まものを やっつけた！ 大もうけだ！':BT.sp&&BT.sp.kind==='shura'?(BT.sp.fl===11?'修羅の 主を うちたおした！！':`第${BT.sp.fl}階層を 突破した！`):'まものたちを やっつけた！'}\n${fmt(coin)}イェソを てにいれた！${nkb?'\n（猫の小判で イェソ 5倍）':''}`];
   if(tk)got.unshift(`ガチャチケット ×${tk}`);if(rich){if(rich.ur){got.unshift(`UR確定チケット ×${rich.ur}`);sfx('lvup');}got.unshift(`SR以上確定チケット ×${rich.sr}`);}
   for(let k=0;k<got.length;k+=3)pages.push((k?'':'てにいれた もの：\n')+got.slice(k,k+3).join('\n'));
   if(BT.rift!=null){G.rifts.splice(BT.rift,1);pages.push(...jobProgress('seal'));}
@@ -3161,6 +3174,7 @@ function winBattle(){
   if(BT.sp&&BT.sp.kind==='colo'){const r=BT.sp.round;if(r<5){pages.push(`${COLO_ROUNDS[r-1]}を 勝ち抜いた！\nHPと MPが 回復した。`,`次は ${COLO_ROUNDS[r]}だ！`);dialog(pages,()=>{BT=null;fullHeal();startBattle(false,null,{kind:'colo',round:r+1});});return;}
     dialog(pages,()=>{BT=null;startField();coloClear();});return;}
   if(BT.sp&&BT.sp.kind==='gunma'){gmWin(pages);return;}
+  if(BT.sp&&BT.sp.kind==='shura'){shuraWin(pages);return;}
   if(BT.sp&&BT.sp.kind==='tokoyo'){const w=BT.sp.wave;if(w<4){pages.push(`第${w}の試練を 突破した！\n（HP・MPは 回復しない）`,'つぎの 試練が はじまる…');dialog(pages,()=>{BT=null;startBattle(false,null,{kind:'tokoyo',wave:w+1});});return;}
     dialog(pages,()=>{BT=null;startField();tokoyoClear();});return;}
   dialog(pages,returnField);
@@ -3173,6 +3187,7 @@ function loseBattle(){
   if(BT.sp&&BT.sp.kind==='bouei'){dialog(['ぜんめつ してしまった…','防衛団員「へへーん！ 出直してこーい！」','（防衛団の 勝負では イェソは 減らない）'],()=>{fullHeal();returnField();});return;}
   G.townBack=null;
   if(BT.sp&&BT.sp.kind==='gimwild'){gimWildLose();return;}
+  if(BT.sp&&BT.sp.kind==='shura'){const f=BT.sp.fl,o=SHURAS.find(q=>q.id===BT.sp.cv);dialog(['ぜんめつ してしまった…',`修羅の洞窟 第${f}階層で 力つきた…`,'（イェソが 半分に なる）'],()=>{noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();BT=null;if(o)G.pos={x:o.x,y:o.y+1};startField();save();});return;}
   dialog(['ぜんめつ してしまった…'],()=>{if(G.sk)skGuestOff();noCount(()=>{G.coins=Math.floor(G.coins/2);});fullHeal();const v=VIL[G.home];G.pos={x:v.x,y:v.y+1};save();BT=null;
     enterVillage(G.home,true);dialog(`…${v.shrine}の 御神徳により\nめを さました。\nイェソが はんぶんに なった。`);});
 }
@@ -3880,6 +3895,38 @@ function carFac(){const S=carS();
     else if(k===3)dialog(['地下道路は 大きな 都市の そばの トンネルの 口から 入る 道。','行き先を えらぶと 地下を 通って 別の 都市の トンネルに 出る。\n海の 下も 通れる。','車なら あっという間で 魔物にも ほぼ 出会わない。\n歩くと 時間が かかり、 魔物に 出会う ことも ある。',...TUN_LINES.map(L=>L.n+(L.ring?'（ぐるっと 一周）':'')+'\n'+L.st.join('〜')+(L.ring?'〜'+L.st[0]:''))]);},96);
   go();}
 /* 地下道路：トンネルの 口から 行き先を えらんで 地下を 走る */
+/* ===================== 修羅の洞窟：0〜11階層。 深いほど 強い。 11階層の 主は ガチャの XRキャラ（倒すと 仲間に） ===================== */
+const SHURA_FL=['入口の 間','苔むす 回廊','骨の 坂','鬼火の 淵','血の 池','修羅の 門（中ボス）','逆さ柱の 間','奈落の 吊り橋','業火の 間','無間の 回廊','阿修羅の 門（中ボス）','修羅の 玉座'];
+const SHURA_P=[['修羅の 亡者','bones','#3c3c3c','#d82800'],['血まみれ鬼','oni','#880000','#fc7460'],['奈落の 獣','beast','#140000','#d82800'],['業火の 霊','spirit','#580000','#f87800'],['修羅蛇','snake','#3c0000','#d82800'],['血だまり','blob','#880000','#fc7460']];
+const shuraS=()=>G.shura||(G.shura={best:{},clr:{},n:0});
+const shuraPool=()=>chList().filter(p=>p.rar===6&&!noGachaC(p.id));
+function shuraEnemies(sp,en,ta){const fl=sp.fl,t=Math.min(12,ta+Math.floor(fl/4));
+  if(fl===11){const id=sp.boss,g=mkEnemy(t,[CH[id].name,'oni','#000','#d82800']);g.chId=id;g.w=60;g.h=70;g.magic=true;g.dboss=true;en.push(g);
+    for(let k=0;k<2;k++){const e=mkEnemy(t,SHURA_P[k?1:3]);e.name='修羅の 近衛';en.push(e);}}
+  else if(fl===5||fl===10){const g=mkEnemy(t,fl===5?['修羅の 門番','oni','#3c0000','#f8b800']:['阿修羅','oni','#580058','#d82800']);g.dboss=true;g.magic=true;en.push(g);
+    const e=mkEnemy(t,SHURA_P[fl%6]);en.push(e);}
+  else{const n=Math.min(4,2+Math.floor(fl/4)+(rnd()<.35?1:0));for(let k=0;k<n;k++)en.push(mkEnemy(t,SHURA_P[(fl+k+ri(0,2))%SHURA_P.length]));}
+  fitEnemies(en);
+  /* 深いほど 強く（難しめ）： HP 最大 ×3.2、攻撃 最大 ×1.75 */
+  const hm=1.1+fl*.19,am=1.05+fl*.065;
+  en.forEach(e=>{for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm);for(const q of ['atk','mag'])if(e[q])e[q]=Math.round(e[q]*am);e.def=Math.round(e.def*(1+fl*.03));});
+  en.forEach(e=>{if(!e.dboss)return;const B=fl===11?{h:6,a:1.25,m:2}:{h:3,a:1.15,m:fl===10?2:1};for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*B.h);for(const q of ['atk','mag'])e[q]=Math.round(e[q]*B.a);e.multi=B.m;});}
+function shuraIntro(sp,en){const fl=sp.fl;
+  if(fl===11)return['玉座に 座る 者が ゆっくりと 立ち上がった…',`XR「${CH[sp.boss].name}」\n「…ここまで 来たか。 力を 見せてみよ」`,'修羅の 主が あらわれた！（1ターンに 2回 行動）'];
+  return[`第${fl}階層「${SHURA_FL[fl]}」`,fl===5||fl===10?'巨大な 気配が 道を ふさいでいる…！':'修羅の まものたちが おそいかかってきた！'];}
+function shuraEnter(o){const S=shuraS(),best=S.best[o.id]==null?-1:S.best[o.id],c=S.clr[o.id]||0,pool=shuraPool();
+  dialog(['赤黒い 岩の 裂け目から\n血の 匂いが する 風が 吹いてくる…',`${o.n}\n${SHURA_CONT[o.ci].n}の 修羅の洞窟`,'0階層から 11階層まで 続けて 戦う。\n深く 潜るほど まものは 強くなる。','階層の 間で HPと MPは 少ししか 回復しない。\n（第3・第7・第10階層の あとは 泉で 全回復）',`11階層の 主は ガチャの XRキャラ。\n倒せば その キャラが 仲間に なる！\n（難易度：高い）`],()=>{
+    choice(`修羅の洞窟に 挑みますか？\n最深記録 ${best<0?'なし':'第'+best+'階層'}　踏破 ${c}回\n（全滅すると イェソが 半分）`,['挑む','やめる'],k=>{if(k!==0)return;if(!pool.length){dialog('…洞窟の 奥は 静まりかえっている。');return;}
+      fullHeal();const sp={kind:'shura',cv:o.id,fl:0,boss:pool[ri(0,pool.length-1)].id};while(stack.length>1)pop();startBattle(false,null,sp);},110);});}
+function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.id===sp.cv);S.best[sp.cv]=Math.max(S.best[sp.cv]==null?-1:S.best[sp.cv],fl);save();
+  const out=()=>{BT=null;if(o)G.pos={x:o.x,y:o.y+1};startField();save();};
+  if(fl===11){const id=sp.boss,nw=addChar(id);S.clr[sp.cv]=(S.clr[sp.cv]||0)+1;S.n++;sfx('g5');G.items.found=(G.items.found||0)+1;fullHeal();save();
+    pages.push(`${CH[id].name}「…見事だ。 おまえに ついていこう」`,`XR「${CH[id].name}」が 仲間に なった！！`+(nw?'':`\n（かぶり：基礎Lv${G.chars[id].dup+1}に アップ）`),'修羅の洞窟を 踏破した！');dialog(pages,out);return;}
+  const nx=fl+1,full=fl===3||fl===7||fl===10;
+  G.party.forEach(id=>{const st=cstat(id),c=G.chars[id];if(full){c.hp=st.hp;c.mp=st.mp;}else if(c.hp>0){c.hp=Math.min(st.hp,c.hp+Math.round(st.hp*.15));c.mp=Math.min(st.mp,c.mp+Math.round(st.mp*.15));}});
+  pages.push(full?(fl===10?'決戦の 前の 泉が わいている…\nHPと MPが 全回復した！':'澄んだ 泉を 見つけた。\nHPと MPが 全回復した！'):'少し 息を ととのえた。\n（HP・MP 15% 回復）');
+  dialog(pages,()=>{choice(`つぎは 第${nx}階層「${SHURA_FL[nx]}」\n${nx===11?`XR「${CH[sp.boss].name}」が 待つ…`:'さらに 深く 潜りますか？'}`,['先へ 進む','地上へ もどる'],k=>{
+    if(k===0){BT=null;while(stack.length>1)pop();startBattle(false,null,Object.assign({},sp,{fl:nx}));}else{dialog('修羅の洞窟を 脱出した。',out);}},120);});}
 const TUN_RICH=.08;/* 地下線の 高報酬モンスター 出現率（車でも 徒歩でも 同じ） */
 const tunMin=m=>m>=60?`${Math.floor(m/60)}時間${m%60?m%60+'分':''}`:`${m}分`;
 /* 路線に 沿った 距離（環状線は 内回り・外回りの 近い方） */
@@ -5256,7 +5303,7 @@ function warpScr(){
 /* 11/19：マップから えらぶ ワープ（町・競馬場・球場・オロチの山） */
 let WARP_IMG=null;
 function warpImg(){if(WARP_IMG)return WARP_IMG;const c=document.createElement('canvas');c.width=MW;c.height=MH;const g=c.getContext('2d'),im=g.createImageData(MW,MH);
-  const COL={[T.TUN]:[40,40,40],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
+  const COL={[T.TUN]:[40,40,40],[T.SHURA]:[200,0,0],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tileAt(x,y),q=COL[t]||(isTownT(t)?[252,252,252]:t===T.SHR?[216,40,0]:[88,200,84]),i=(y*MW+x)*4;im.data[i]=q[0];im.data[i+1]=q[1];im.data[i+2]=q[2];im.data[i+3]=255;}
   g.putImageData(im,0,0);return WARP_IMG=c;}
 function warpMap(seen,goTown){const trap=gmTrap(),P=[];
