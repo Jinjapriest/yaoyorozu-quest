@@ -3744,7 +3744,7 @@ VG_ART_T.beast=P=>{/* 聖獣（四つ足） */P.poly([12,32,0,18,4,30,10,40],'#b
   P.rc(54,21,3,3,'#f8d800');P.rc(55,22,1,1,'#000');P.ln([57,30,62,30],'#3c3c3c',1);P.poly([20,30,28,28,26,34],'#e8e8e8');};
 /* イマジナリーメサイア */
 VG_ART_T.messiah=P=>{/* 創造超越神（オリジナル）：光の 輪・虹の 翼・星の 冠 */
-  for(let i=0;i<6;i++){const a=-2.6+i*.22,b=-.54-i*.22,c=['#fc7460','#f8b800','#f8f800','#3cfc7c','#3cbcfc','#b8b8f8'][i];P.poly([28,30,28+Math.cos(a)*30,30+Math.sin(a)*30,28+Math.cos(a+.16)*26,30+Math.sin(a+.16)*26],c);P.poly([36,30,36+Math.cos(b)*30,30+Math.sin(b)*30,36+Math.cos(b-.16)*26,30+Math.sin(b-.16)*26],c);}
+  for(let i=0;i<7;i++){const a=2.55+i*.24,b=.59-i*.24,c=['#fc7460','#f87800','#f8d800','#3cfc7c','#3cbcfc','#6844fc','#f878f8'][i];P.poly([26,32,26+Math.cos(a)*44,32+Math.sin(a)*44,26+Math.cos(a+.2)*38,32+Math.sin(a+.2)*38],c);P.poly([38,32,38+Math.cos(b)*44,32+Math.sin(b)*44,38+Math.cos(b-.2)*38,32+Math.sin(b-.2)*38],c);}
   P.el(32,24,22,22,'#f8d800');P.el(32,24,20,20,'#000018');P.el(32,24,17,17,'#f8d800');P.el(32,24,15,15,'#1c0848');
   P.poly([22,26,42,26,50,64,14,64],'#fcfcfc');P.poly([24,28,30,28,28,62,18,62],'#fcfcb8');P.rc(30,28,4,36,'#f8d800');P.rc(16,44,32,2,'#f8d800');P.rc(20,54,24,1,'#b8b8f8');
   P.poly([22,28,10,40,12,44,24,34],'#fcfcfc');P.el(10,43,3,3,'#fcd8c0');P.poly([42,28,54,40,52,44,40,34],'#fcfcfc');P.el(54,43,3,3,'#fcd8c0');P.el(10,39,2,2,'#3cfcfc');P.el(54,39,2,2,'#f878f8');
@@ -3805,7 +3805,7 @@ const VG_CL={bou:{n:'冒険者ギルド',c:'#0058f8',d:'#00287c',l:'#a8e4fc',bg:
   rei:{n:'英霊殿',c:'#7c7c7c',d:'#2c2c2c',l:'#e8e8e8',bg:['#2c2c3c','#5c5c74','#a8a8bc']},ent:{n:'エンタメ',c:'#f87800',d:'#5c2000',l:'#fcd8a8',bg:['#5c0058','#a8008c','#f878f8']},
   siro:{n:'白銀騎士団',c:'#0058f8',d:'#00287c',l:'#a8e4fc',bg:['#3c7cfc','#a8e4fc','#fcfcfc']},gure:{n:'紅蓮竜団',c:'#d82800',d:'#5c0800',l:'#fca044',bg:['#3c0000','#a81000','#f87800']},
   tuki:{n:'月影衆',c:'#6844fc',d:'#1c1050',l:'#b8b8f8',bg:['#000018','#1c1c5c','#3c3c9c']},yu:{n:'癒天使会',c:'#f878f8',d:'#7c0070',l:'#fcd8fc',bg:['#f8b8f8','#fcd8fc','#fcfcfc']},
-  none:{n:'クラン無',c:'#3c3c3c',d:'#000000',l:'#fcfcfc',bg:['#000018','#3c0068','#a8287c']},
+  none:{n:'クラン無',c:'#1c0848',d:'#000000',l:'#f8d800',bg:['#000018','#3c0068','#a8287c']},
   promo:{n:'Gユニット',c:'#f8d800',d:'#7c5000',l:'#fcfcfc',bg:['#f87800','#f8d800','#fcfcb8']}};
 const VG_SKILL={bou:['勇気の一撃','CB1：このユニット パワー＋5000'],taka:['神威','CB1：自分の リアガード 全員 パワー＋3000'],night:['ご指名','CB1：相手は 手札を 1枚 捨てる'],
   city:['人海戦術','CB1：カードを 1枚 引く'],rei:['英霊の誇り','LB4（ダメージ4枚以上）：パワー＋5000・★＋1'],ent:['炎上','CB1：相手の リアガード 1体を 退却'],
@@ -3870,7 +3870,7 @@ function vgCard(c,x,y,w,h,o={}){if(o.back||!c){R(x,y,w,h,'#000');R(x+1,y+1,w-2,h
   if(bg2)big(''+c.g,gx+1,gy-7,'#000','center',12);else if(w>=20)txt(''+c.g,gx+1,gy-4,'#000','center');
   if(c.tr){const T=VG_TR[c.tr],r=bg2?6:3,tx=x+w-(bg2?10:5),ty=y+(bg2?10:5);pc(tx,ty,r+1,'#000');pc(tx,ty,r,T[1]);if(bg2)big(T[0],tx,ty-6,'#000','center',10);}
   if(bg2){const ny=ay+ah+2;R(x+3,ny,w-6,11,'#000');R(x+3,ny,w-6,1,C.l);txt(c.n,x+w/2,ny+2,'#fcfcfc','center',w-8);
-    if(h>=100){txt(C.n,x+6,ny+14,'#000','left',w*.6);if(c.pg){R(x+w-34,ny+13,31,9,'#000');txt('完全ガード',x+w-18,ny+13,'#a8e4fc','center',30);}}
+    if(h>=100){txt(C.n,x+6,ny+14,c.cl==='none'?'#f8d800':'#000','left',w*.6);if(c.pg){R(x+w-34,ny+13,31,9,'#000');txt('完全ガード',x+w-18,ny+13,'#a8e4fc','center',30);}}
     R(x+3,y+h-14,Math.round(w*.58),11,'#000');big(''+(o.pw||c.pw),x+5,y+h-14,o.up?'#f8f800':'#fcfcfc','left',10);txt('★'+(o.cr||1),x+w-5,y+h-12,'#f8d800','right');}
   else if(h>=24){R(x+1,y+h-9,w-2,8,'#000');txt(vgK(o.pw||c.pw),x+w/2,y+h-9,o.up?'#f8f800':'#fcfcfc','center',w-2);}
   const fc=c.rar==='PR'||c.rar==='？？？'?`hsl(${(frame*6)%360},90%,60%)`:c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':null;if(fc){R(x,y,w,1,fc);R(x,y+h-1,w,1,fc);R(x,y,1,h,fc);R(x+w-1,y,1,h,fc);if(c.rar!=='RRR'&&bg2&&((frame>>3)%8)<2){R(x+w-6,y+4,1,3,'#fcfcfc');R(x+w-7,y+5,3,1,'#fcfcfc');}}}
