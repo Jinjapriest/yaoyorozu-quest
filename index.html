@@ -1564,7 +1564,8 @@ function drawEnemy(e,x,y,t){
     case 'itsuku':drawItsuku(x,y,t);break;
     case 'gim':drawGim(x,y,t,0);break;case 'gimz':drawGim(x,y,t,1);break;case 'josouso':drawJosouso(x,y,t,0);break;case 'josouso_p':drawJosouso(x,y,t,1);break;case 'tomoko':drawTomoko(x,y,t,0);break;case 'tomoko_p':drawTomoko(x,y,t,1);break;
     case 'kgod':drawKGod(x,y,t);break;
-    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;
+    case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;case 'gargos':drawGargos(x,y,t);break;case 'wadatsumi':drawWadatsumi(x,y,t,0);break;case 'wadatsumi_s':drawWadatsumi(x,y,t,1);break;
+    case 'shiro0':case 'shiro1':case 'shiro2':case 'shiro3':case 'shiro4':drawShirofuku(x,y,t,+e.shape.slice(5));break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -2730,7 +2731,7 @@ function startBattle(boss,rift=null,sp=null){
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   if(!boss&&!sp&&rift==null)en.forEach(e=>{for(const q of ['maxhp','hp','atk','mag'])e[q]=Math.max(1,Math.round(e[q]*.85));e.def=Math.max(1,Math.round(e.def*.9));});/* 野良の 敵：少し 弱く */
   en.forEach(e=>{if(/の 複製$/.test(e.name||'')&&sp&&sp.st==='sk_nizu2'){e.atk*=1.75;e.mag*=1.75;}});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90],gargos:[72,92],wadatsumi:[90,84],wadatsumi_s:[66,62],shiro4:[40,74]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   /* 11/19：ボスが 弱いと 言われたので 強化（HP 1.8倍・攻撃/魔力 1.3倍・守備 1.15倍） */
@@ -7060,7 +7061,50 @@ function drawMinusBG(x0,y0,w,h,t){const cl=[x0,y0,x0+w,y0+h],cx=x0+w/2,vy=y0+h*.
   for(let i=0;i<26;i++){const px=x0+((i*53+t*(1+i%3)*.2)%w),py=y0+((i*37)%h);R(px,py,1,1,i%4?'#6844a0':'#a4e4fc');}}
 /* 帝王 錨ケンドウ：白髪の 総髪・軍服と 和装の 礼装・錨の 紋・法典 */
 /* ===================== オリジナル キャラの 敵（ギム総書記・書記代 ジョソウソ・ギムトモコ） ===================== */
-const OC_OF=n=>/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+/* ===================== 11/24：オリキャラ化（闘魔王 ガルゴス・大海神 オオワダツミ／深海竜・白服） ===================== */
+/* 闘魔王 ガルゴス：獅子の 金兜・赤い 筋骨・鎖・巨大な 両刃の 斧・ぼろぼろの 外套 */
+function drawGargos(x,y,t){const sk='#c84028',sd='#8c2010',b=(t>>4)&1;
+  R(x-24,y-64,48,52,'#5c0000');for(let k=0;k<8;k++)R(x-24+k*6,y-12,4,3+(k%2)*4,'#5c0000');R(x-24,y-64,48,3,'#3c0000');
+  R(x+23,y-84,3,72,'#7c4c10');R(x+24,y-84,1,72,'#a87038');pe(x+33,y-76,9,11,'#d8d8d8');pe(x+15,y-76,9,11,'#d8d8d8');R(x+22,y-80,5,8,'#5c5c5c');pe(x+34,y-76,6,9,'#fcfcfc');pe(x+14,y-76,6,9,'#fcfcfc');R(x+20,y-77,9,2,'#d82800');
+  R(x-17,y-26,12,22,sk);R(x+5,y-26,12,22,sk);R(x-18,y-14,14,11,'#7c7c7c');R(x+4,y-14,14,11,'#7c7c7c');R(x-18,y-14,14,2,'#bcbcbc');R(x+4,y-14,14,2,'#bcbcbc');R(x-19,y-4,16,4,'#2c2c2c');R(x+3,y-4,16,4,'#2c2c2c');
+  R(x-15,y-34,30,10,'#3c2410');R(x-10,y-26,8,6,'#3c2410');R(x+2,y-26,8,6,'#3c2410');R(x-17,y-38,34,5,'#f8b800');pc(x,y-36,3,'#fcfcfc');R(x-1,y-36,1,1,'#000');R(x+1,y-36,1,1,'#000');
+  pe(x,y-50+b,19,15,sk);R(x-1,y-56+b,2,16,sd);R(x-13,y-58+b,11,2,sd);R(x+2,y-58+b,11,2,sd);R(x-7,y-48+b,5,1,sd);R(x+2,y-48+b,5,1,sd);R(x-7,y-44+b,5,1,sd);R(x+2,y-44+b,5,1,sd);
+  for(let k=0;k<10;k++)R(x-16+k*3,y-62+k*2+b,2,2,(k&1)?'#bcbcbc':'#7c7c7c');
+  R(x-30,y-58+b,9,24,sk);R(x+21,y-58+b,9,22,sk);R(x-30,y-50+b,9,3,'#f8b800');pc(x-26,y-33+b,5,sk);pc(x+25,y-35+b,5,sk);R(x+20,y-39+b,10,4,'#7c4c10');
+  pe(x-21,y-60+b,9,6,'#7c7c7c');pe(x+21,y-60+b,9,6,'#7c7c7c');pe(x-21,y-61+b,6,3,'#bcbcbc');pe(x+21,y-61+b,6,3,'#bcbcbc');R(x-27,y-70+b,2,7,'#fcfcfc');R(x-21,y-72+b,2,8,'#fcfcfc');R(x+20,y-72+b,2,8,'#fcfcfc');R(x+26,y-70+b,2,7,'#fcfcfc');
+  pe(x,y-74,15,12,'#f8b800');for(let k=0;k<9;k++)R(x-15+k*4,y-86+((k*3)%4),3,8,(k&1)?'#f8d878':'#c88c00');
+  R(x-8,y-76,16,15,sk);R(x-8,y-76,16,4,'#f8b800');R(x-1,y-80,2,8,'#f8d878');R(x-15,y-90,3,12,'#fcfcfc');R(x+12,y-90,3,12,'#fcfcfc');R(x-16,y-92,3,3,'#fcfcfc');R(x+13,y-92,3,3,'#fcfcfc');
+  R(x-6,y-70,4,2,(t>>3)&1?'#f8f800':'#fcfcfc');R(x+2,y-70,4,2,(t>>3)&1?'#f8f800':'#fcfcfc');R(x-7,y-71,5,1,sd);R(x+2,y-71,5,1,sd);R(x-4,y-65,8,2,'#000');R(x-4,y-65,1,3,'#fcfcfc');R(x+3,y-65,1,3,'#fcfcfc');R(x-2,y-62,4,2,sd);}
+/* 大海神 オオワダツミ／深海竜：波から 立ちのぼる 蒼い 竜（たてがみ・金の 角・宝珠） */
+function drawWadatsumi(x,y,t,small){ctx.save();ctx.translate(x,y);if(small)ctx.scale(.72,.72);
+  const c1=small?'#24188c':'#0058f8',c2=small?'#3c3c9c':'#3cbcfc',bl=small?'#8c8cfc':'#a8e4fc',ph=t/14;
+  const pts=[];for(let i=0;i<15;i++)pts.push([Math.round(30-i*4.2),Math.round(-10-i*4.6+Math.sin(i*.8+ph)*5)]);
+  for(let i=0;i<pts.length;i++){const [px,py]=pts[i],r=Math.max(4,9-Math.floor(i/3));pc(px,py,r+1,'#000c18');}
+  for(let i=0;i<pts.length;i++){const [px,py]=pts[i],r=Math.max(4,9-Math.floor(i/3));pc(px,py,r,c1);pc(px+1,py+2,Math.max(2,r-3),bl);if(i%2===0)R(px-1,py-r-3,3,4,'#f8b800');R(px-r+1,py-1,1,1,c2);}
+  const [hx,hy]=[pts[14][0]-6,pts[14][1]-6];pe(hx+2,hy+2,13,9,'#000c18');pe(hx+2,hy+2,12,8,c1);R(hx-12,hy+2,10,6,c1);R(hx-12,hy+6,10,2,bl);R(hx-13,hy+3,2,1,'#000');
+  R(hx-11,hy+8,1,2,'#fcfcfc');R(hx-8,hy+8,1,2,'#fcfcfc');R(hx-5,hy+8,1,2,'#fcfcfc');
+  R(hx,hy-12,2,10,'#f8b800');R(hx+6,hy-14,2,12,'#f8b800');R(hx-1,hy-13,1,2,'#f8d878');R(hx+5,hy-15,1,2,'#f8d878');
+  for(let k=0;k<5;k++)R(hx+8+k*2,hy-6+k,3,2,c2);R(hx-3,hy-1,4,3,(t>>3)&1?'#f8f800':'#fc3c3c');R(hx-2,hy,1,1,'#000');
+  const wv=Math.sin(t/10)*3;for(let k=0;k<12;k++)R(hx-12-k*2,hy+4+Math.round(Math.sin(k*.6+t/10)*2+wv*k/12),2,1,'#fcfcfc');for(let k=0;k<10;k++)R(hx-12-k*2,hy+8+Math.round(Math.cos(k*.6+t/10)*2),2,1,'#fcfcfc');
+  pc(hx-4,hy+20,4,'#fcfcfc');pc(hx-5,hy+19,2,'#a8e4fc');R(hx-2,hy+15,4,2,'#f8b800');
+  for(let k=-4;k<4;k++){const wx=k*12+((t>>1)%12);pe(wx,-3,8,3,'#0058f8');pe(wx,-5,5,2,'#3cbcfc');R(wx-2,-7,4,1,'#fcfcfc');}
+  ctx.restore();}
+/* 白服：白い フードと 黒い バイザーの 仮面・白い ロングコート・赤い 腕章（種類で 持ち物が かわる） */
+function drawShirofuku(x,y,t,v){const W2='#fcfcfc',Wd='#d8d8e0',b=(t>>4)&1;
+  if(v===1){R(x-13,y-42,26,34,'#a81000');R(x-13,y-42,26,2,'#5c0000');for(let k=0;k<4;k++)R(x-13+k*7,y-8,5,2+(k&1)*2,'#a81000');}
+  if(v===2){R(x-16,y-42,7,20,'#7c7c7c');R(x-16,y-42,7,2,'#bcbcbc');R(x-15,y-32,5,1,'#d82800');}
+  if(v===4){R(x+14,y-66,2,62,'#7c4c10');R(x+13,y-72,4,7,'#fcfcfc');R(x+14,y-74,2,2,'#fcfcfc');R(x+12,y-65,6,2,'#f8b800');}
+  R(x-6,y-14,5,14,'#e8e8e8');R(x+1,y-14,5,14,'#e8e8e8');R(x-7,y-3,6,3,'#1c1c1c');R(x+1,y-3,6,3,'#1c1c1c');
+  R(x-10,y-40,20,28,W2);R(x+6,y-40,4,28,Wd);R(x-12,y-16,24,4,W2);R(x-12,y-13,24,1,Wd);R(x,y-38,1,22,Wd);for(let k=0;k<3;k++)R(x+2,y-36+k*6,1,1,'#7c7c7c');
+  pc(x-4,y-32,3,'#000');pc(x-4,y-32,2,W2);R(x-4,y-32,1,1,'#000');
+  if(v===4){R(x-10,y-40,20,9,'#bcbcbc');R(x-10,y-40,20,1,'#fcfcfc');R(x-12,y-41,5,4,'#bcbcbc');R(x+7,y-41,5,4,'#bcbcbc');}
+  R(x-14,y-39+b,4,17,'#f0f0f0');R(x+10,y-39+b,4,17,'#f0f0f0');R(x-14,y-35+b,4,3,'#d82800');R(x-14,y-23+b,4,3,'#1c1c1c');R(x+10,y-23+b,4,3,'#1c1c1c');
+  pe(x,y-47,8,9,W2);pe(x+3,y-46,4,7,Wd);R(x-6,y-50,12,5,'#000');R(x-5,y-48,10,1,(t>>4)%3?'#d82800':'#fc7460');R(x-7,y-40,14,2,Wd);
+  if(v===0){R(x+11,y-29+b,7,9,'#fcfcb8');R(x+12,y-27+b,5,1,'#7c7c7c');R(x+12,y-25+b,5,1,'#7c7c7c');R(x+12,y-23+b,3,1,'#7c7c7c');}
+  if(v===1){R(x+12,y-40+b,2,16,'#000');R(x+11,y-41+b,4,2,'#f8b800');R(x-10,y-30,20,2,'#f8b800');R(x-6,y-58,12,2,'#d82800');}
+  if(v===2){R(x+12,y-28+b,10,3,'#5c5c5c');R(x+21,y-29+b,2,5,'#3c3c3c');const f=(t>>2)&1;pc(x+27,y-27+b,3+f,'#f87800');pc(x+31+f,y-27+b,2,'#f8f800');pc(x+24,y-27+b,2,'#d82800');}
+  if(v===3){R(x-21,y-44,11,30,'#5c7c9c');R(x-20,y-43,9,28,'#a8c8e8');R(x-20,y-43,9,2,'#fcfcfc');R(x-17,y-38,3,3,'#fcfcfc');R(x-21,y-30,11,1,'#3c5c7c');}}
+const OC_OF=n=>/闘魔王 ガルゴス/.test(n)?'gargos':/オオワダツミ/.test(n)?'wadatsumi':/深海竜/.test(n)?'wadatsumi_s':/白服/.test(n)?('shiro'+(/部隊長/.test(n)?1:/焼き払い|火炎放射/.test(n)?2:/護送/.test(n)?3:/親衛隊/.test(n)?4:0)):/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
 function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
 /* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
 function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
