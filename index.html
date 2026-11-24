@@ -3422,7 +3422,7 @@ function drawCell(c,sx,sy,city){
       else for(let k=0;k<4;k++)R(sx+5,sy+1+k*4,6,2,cs[(f+k)%4]);break;}
     case 'kanann':{R(sx,sy,16,16,'#18182c');if(c.part===0){R(sx,sy+3,16,10,'#f8d878');if(c.dx===2)txt('無料案内所',sx-8,sy+4,'#d82800','center',46);}else{R(sx,sy,16,16,'#3c3c5c');R(sx+2,sy+2,12,12,c.dx===1?'#f8d878':'#24242c');}break;}
     case 'kanarch':{R(sx,sy,16,16,'#18182c');const f=(frame>>4)&1;R(sx,sy+2,16,2,f?'#f878f8':'#7ee0fc');R(sx,sy+12,16,2,f?'#7ee0fc':'#f878f8');if(c.x===18)txt('八百万 歓楽街',sx-40,sy+4,'#f8d878','center',100);break;}
-    case 'rfl':case 'rtat':case 'rwall':case 'rcnt':case 'rshelf':case 'ratm':case 'rgacha':case 'rbed':case 'rtable':case 'rboard':case 'rpanel':case 'rposter':case 'rplant':case 'rgrass':case 'rdirt':case 'rbase':case 'rstand':case 'rscore':case 'rvpack':case 'rvtab':case 'rvboard':roomDraw(c,sx,sy);break;
+    case 'rfl':case 'rtat':case 'rwall':case 'rcnt':case 'rshelf':case 'ratm':case 'rgacha':case 'rbed':case 'rtable':case 'rboard':case 'rpanel':case 'rposter':case 'rplant':case 'rgrass':case 'rdirt':case 'rbase':case 'rstand':case 'rscore':case 'rvpack':case 'rvtab':case 'rvboard':case 'rvcase':roomDraw(c,sx,sy);break;
     case 'bgr':case 'bdirt':case 'bpath':case 'bline':case 'bwarn':case 'bfence':case 'bstand':case 'bback':case 'bdug':case 'bplate':case 'bmound':case 'bbase':case 'bpole':case 'blight':case 'bscore':case 'bconc':case 'bshop':stadCell(c,sx,sy);break;
     case 'kanfl':case 'kiwall':case 'kchand':case 'ksofa':case 'ktable':case 'kbar':case 'kroom':case 'koffice':kanShopDraw(c,sx,sy);break;
     case 'trift':R(sx,sy,16,16,'#1c0010');{const f=(frame>>3)%4;pc(sx+8,sy+8,7,'#24003c');pc(sx+8,sy+8,5,f&1?'#a80020':'#6800a8');pc(sx+8,sy+8,3,'#d82800');pc(sx+8,sy+8,1+(f>>1),'#fcfcfc');}break;
@@ -3742,6 +3742,16 @@ VG_ART_T.beast=P=>{/* 聖獣（四つ足） */P.poly([12,32,0,18,4,30,10,40],'#b
   P.rc(14,44,5,16,'#9c9c9c');P.rc(22,44,5,16,'#bcbcbc');P.rc(38,44,5,16,'#9c9c9c');P.rc(45,44,5,16,'#bcbcbc');P.rc(13,58,7,4,'#7c7c7c');P.rc(21,58,7,4,'#7c7c7c');P.rc(37,58,7,4,'#7c7c7c');P.rc(44,58,7,4,'#7c7c7c');
   P.el(52,24,9,8,'#bcbcbc');P.poly([56,22,64,25,63,31,56,31],'#bcbcbc');P.rc(62,25,2,2,'#3c3c3c');P.poly([46,17,48,6,53,16],'#bcbcbc');P.poly([53,16,57,6,59,18],'#bcbcbc');P.poly([48,15,49,9,51,15],'#e8e8e8');
   P.rc(54,21,3,3,'#f8d800');P.rc(55,22,1,1,'#000');P.ln([57,30,62,30],'#3c3c3c',1);P.poly([20,30,28,28,26,34],'#e8e8e8');};
+/* イマジナリーメサイア */
+VG_ART_T.messiah=P=>{/* 創造超越神（オリジナル）：光の 輪・虹の 翼・星の 冠 */
+  for(let i=0;i<6;i++){const a=-2.6+i*.22,b=-.54-i*.22,c=['#fc7460','#f8b800','#f8f800','#3cfc7c','#3cbcfc','#b8b8f8'][i];P.poly([28,30,28+Math.cos(a)*30,30+Math.sin(a)*30,28+Math.cos(a+.16)*26,30+Math.sin(a+.16)*26],c);P.poly([36,30,36+Math.cos(b)*30,30+Math.sin(b)*30,36+Math.cos(b-.16)*26,30+Math.sin(b-.16)*26],c);}
+  P.el(32,24,22,22,'#f8d800');P.el(32,24,20,20,'#000018');P.el(32,24,17,17,'#f8d800');P.el(32,24,15,15,'#1c0848');
+  P.poly([22,26,42,26,50,64,14,64],'#fcfcfc');P.poly([24,28,30,28,28,62,18,62],'#fcfcb8');P.rc(30,28,4,36,'#f8d800');P.rc(16,44,32,2,'#f8d800');P.rc(20,54,24,1,'#b8b8f8');
+  P.poly([22,28,10,40,12,44,24,34],'#fcfcfc');P.el(10,43,3,3,'#fcd8c0');P.poly([42,28,54,40,52,44,40,34],'#fcfcfc');P.el(54,43,3,3,'#fcd8c0');P.el(10,39,2,2,'#3cfcfc');P.el(54,39,2,2,'#f878f8');
+  P.el(32,18,7,8,'#fcd8c0');P.poly([24,18,24,8,32,5,40,8,40,18,36,11,28,11],'#fcfcfc');P.poly([25,16,22,30,26,28],'#fcfcfc');P.poly([39,16,42,30,38,28],'#fcfcfc');
+  P.rc(28,18,2,2,'#f8d800');P.rc(34,18,2,2,'#f8d800');P.rc(31,13,2,3,'#fc7460');
+  for(let i=0;i<5;i++){const x=20+i*6,y=4-(i===2?3:i%2?1:0);P.poly([x,y+3,x+2,y-1,x+4,y+3],'#f8d800');}
+  for(const [x,y] of [[6,8],[58,6],[4,56],[60,54],[12,20],[52,18]]){P.px(x,y,'#fcfcfc');P.px(x+1,y,'#f8f800');P.px(x,y+1,'#3cfcfc');}};
 /* ----- オリジナルカードの 絵（64×64：形を 塗って 輪郭を つける。 色は 差しかえ 表で 変える） ----- */
 const VG_ARTC={};
 function vgArt(t,map){const key=t+JSON.stringify(map||{});if(VG_ARTC[key])return VG_ARTC[key];const c=document.createElement('canvas');c.width=64;c.height=64;const g=c.getContext('2d'),M=map||{},col=x=>M[x]||x;
@@ -3795,11 +3805,13 @@ const VG_CL={bou:{n:'冒険者ギルド',c:'#0058f8',d:'#00287c',l:'#a8e4fc',bg:
   rei:{n:'英霊殿',c:'#7c7c7c',d:'#2c2c2c',l:'#e8e8e8',bg:['#2c2c3c','#5c5c74','#a8a8bc']},ent:{n:'エンタメ',c:'#f87800',d:'#5c2000',l:'#fcd8a8',bg:['#5c0058','#a8008c','#f878f8']},
   siro:{n:'白銀騎士団',c:'#0058f8',d:'#00287c',l:'#a8e4fc',bg:['#3c7cfc','#a8e4fc','#fcfcfc']},gure:{n:'紅蓮竜団',c:'#d82800',d:'#5c0800',l:'#fca044',bg:['#3c0000','#a81000','#f87800']},
   tuki:{n:'月影衆',c:'#6844fc',d:'#1c1050',l:'#b8b8f8',bg:['#000018','#1c1c5c','#3c3c9c']},yu:{n:'癒天使会',c:'#f878f8',d:'#7c0070',l:'#fcd8fc',bg:['#f8b8f8','#fcd8fc','#fcfcfc']},
+  none:{n:'クラン無',c:'#3c3c3c',d:'#000000',l:'#fcfcfc',bg:['#000018','#3c0068','#a8287c']},
   promo:{n:'Gユニット',c:'#f8d800',d:'#7c5000',l:'#fcfcfc',bg:['#f87800','#f8d800','#fcfcb8']}};
 const VG_SKILL={bou:['勇気の一撃','CB1：このユニット パワー＋5000'],taka:['神威','CB1：自分の リアガード 全員 パワー＋3000'],night:['ご指名','CB1：相手は 手札を 1枚 捨てる'],
   city:['人海戦術','CB1：カードを 1枚 引く'],rei:['英霊の誇り','LB4（ダメージ4枚以上）：パワー＋5000・★＋1'],ent:['炎上','CB1：相手の リアガード 1体を 退却'],
   siro:['光の導き','CB1：山札の 上を リアガードに コール（G2以下）'],gure:['紅蓮の咆哮','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],tuki:['影縫い','CB1：相手は 手札を 1枚 捨てる・1枚 引く'],yu:['癒しの祈り','CB1：ダメージを 1枚 回復・パワー＋3000'],
   o_amateru:['天穹の号令','GB1：自分の リアガード 全員 パワー＋5000'],o_tenen:['天焔の審判','GB1：相手の 前列リアガードを すべて 退却'],o_tsukuyo:['月詠の影','GB1：相手は 手札を 2枚 捨てる'],o_seraph:['救世の光','GB1：ダメージ 1枚 回復・★＋1'],
+  none:['創造超越','【永】ヴァンガードに いる間、 相手の トリガー効果を すべて 無効'],
   godkami:['神の一撃','GB1：パワー＋5000・★＋1'],itsuku:['開発者の閃き','GB1：パワー＋5000・カードを 1枚 引く'],legend_itsuku:['伝説の修正パッチ','GB1：★＋1・相手の リアガード 1体を 退却']};
 const VG5=id=>{if(!CH[id])return[];const r=['n','r','sr','ssr','ur'],b=RAR[CH[id].rar].n.toLowerCase();return r.map(x=>x===b?id:id+'_'+x).filter(i=>CH[i]);};
 const VG_PACKS=[{n:'八百万の旅立ち',cl:'bou',ids:()=>({bou:[...VG5('yusha1'),...VG5('yusha2'),...VG5('mage'),...VG5('archer'),...VG5('samurai'),'guard_n','tatekun']})},
@@ -3811,7 +3823,7 @@ const VG_PACKS=[{n:'八百万の旅立ち',cl:'bou',ids:()=>({bou:[...VG5('yusha
   {n:'先導者の伝説',cl:'siro',orig:1,ids:()=>({})}];
 const VG_OCL=['siro','gure','tuki','yu'];
 const VG_PROMO=['godkami','itsuku','legend_itsuku'];
-const VG_RMAP={N:'C',R:'R',SR:'RR',SSR:'RRR',UR:'RRR',XR:'SP',LR:'SP',XXR:'PR','？？？':'PR'},VG_RV={C:5,R:20,RR:80,RRR:300,SP:1500,PR:5000};
+const VG_RMAP={N:'C',R:'R',SR:'RR',SSR:'RRR',UR:'RRR',XR:'SP',LR:'SP',XXR:'PR','？？？':'PR'},VG_RV={C:5,R:20,RR:80,RRR:300,SP:1500,PR:5000,'？？？':99999};
 let VGC=null,VGL=null;
 const vgRoot=id=>id.replace(/_(n|r|sr|ssr|ur)$/,'');
 function vgDB(){if(VGC)return VGC;VGC={};VGL=[];
@@ -3823,7 +3835,8 @@ function vgDB(){if(VGC)return VGC;VGC={};VGL=[];
   VG_PROMO.forEach(id=>add(id,'promo',-1));
   VG_ORIG.forEach(o=>{const g=o.g,pw=g===4?15000:g===3?11000:g===2?(o.t==='beast'||o.t==='wyvern'?10000:9000):g===1?(o.pg?6000:o.t==='beast'?8000:7000):5000;
     const c={id:o.id,ch:null,art:o.t,map:o.map,n:o.n,cl:o.cl,g,pw,sh:g===0?10000:g===1?(o.pg?0:5000):g===2?5000:0,tr:o.tr||null,pg:o.pg,rar:o.rar,pack:6,root:o.id,def:0,orig:1};VGC[o.id]=c;VGL.push(c);});
-  Object.keys(VG_CL).forEach(cl=>{if(VG_OCL.includes(cl))return;const L=VGL.filter(c=>c.cl===cl);const TR=['crit','draw','heal','crit','stand','draw','crit'];L.filter(c=>c.g===0).forEach((c,i)=>c.tr=TR[i%TR.length]);
+  {const c={id:'o_messiah',ch:null,art:'messiah',map:{},n:'創造超越神 イマジナリーメサイア',cl:'none',g:3,pw:13000,sh:0,tr:null,pg:0,rar:'？？？',pack:-2,root:'o_messiah',def:0,orig:1};VGC[c.id]=c;VGL.push(c);}
+  Object.keys(VG_CL).forEach(cl=>{if(VG_OCL.includes(cl)||cl==='none')return;const L=VGL.filter(c=>c.cl===cl);const TR=['crit','draw','heal','crit','stand','draw','crit'];L.filter(c=>c.g===0).forEach((c,i)=>c.tr=TR[i%TR.length]);
     const g1=L.filter(c=>c.g===1);if(g1.length>=2){const b=g1.slice().sort((a,b)=>b.def-a.def)[0];b.pg=1;b.pw=6000;b.sh=0;}});
   VGL.forEach(c=>{if(c.ch)vgSpr(c.ch);});return VGC;}
 function vgS(){if(!G.vg)G.vg={col:{},deck:{},gz:{},pt:0,w:0,l:0,tour:-1,npc:{}};return G.vg;}
@@ -3839,7 +3852,8 @@ function vgArtBg(c,x,y,w,h){const C=VG_CL[c.cl],B=C.bg,cl=c.cl,t=frame;for(let i
     else if(cl==='night'){for(let i=0;i<w;i+=7){const bh=8+((i*13)%10);R(x+i,gy-bh,6,bh,'#14001c');if((i+t>>4)&1)R(x+i+2,gy-bh+2,1,1,'#fc74b4');}}
     else if(cl==='city'){for(let i=0;i<w;i+=8){const bh=10+((i*7)%9);R(x+i,gy-bh,7,bh,'#7c94b4');for(let k=gy-bh+2;k<gy-2;k+=3)R(x+i+2,k,1,1,'#fcfcfc');}}
     else if(cl==='ent'){ctx.fillStyle='rgba(255,255,180,.25)';ctx.beginPath();ctx.moveTo(x+4,y);ctx.lineTo(x+w/2-6,y+h);ctx.lineTo(x+w/2+6,y+h);ctx.fill();ctx.beginPath();ctx.moveTo(x+w-4,y);ctx.lineTo(x+w/2-6,y+h);ctx.lineTo(x+w/2+6,y+h);ctx.fill();}
-    else if(cl==='rei'){for(let i=0;i<3;i++)R(x,y+8+i*9+((t>>3)+i*5)%4,w,2,'#ffffff22');}}
+    else if(cl==='rei'){for(let i=0;i<3;i++)R(x,y+8+i*9+((t>>3)+i*5)%4,w,2,'#ffffff22');}
+    else if(cl==='none'){for(let i=0;i<14;i++)R(x+(i*29+t)%w,y+(i*17)%h,1,1,i%3?'#fcfcfc':'#f8d800');ctx.strokeStyle=`hsl(${(t*4)%360},90%,60%)`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(x+w/2,y+h*.45,w*.45,h*.2,0,0,6.283);ctx.stroke();}}
   if(c.g===4){ctx.fillStyle='rgba(255,255,255,.4)';for(let i=0;i<12;i++){const a=i/12*6.283+frame/40;ctx.beginPath();ctx.moveTo(x+w/2,y+h/2);ctx.lineTo(x+w/2+Math.cos(a)*w,y+h/2+Math.sin(a)*w);ctx.lineTo(x+w/2+Math.cos(a+.15)*w,y+h/2+Math.sin(a+.15)*w);ctx.fill();}}
   else{R(x,y+h-5,w,5,C.d);for(let i=0;i<5;i++)R(x+(i*23+frame)%w,y+3+(i*13)%Math.max(1,h-12),1,1,'#fcfcfc');}}
 const vgK=n=>n>=1000?(n/1000)+'k':''+n,VG_TR={crit:['☆','#f8d800','クリティカル'],draw:['引','#3cbcfc','ドロー'],heal:['治','#3cfc7c','ヒール'],stand:['前','#f87800','スタンド']};
@@ -3850,7 +3864,7 @@ function vgCard(c,x,y,w,h,o={}){if(o.back||!c){R(x,y,w,h,'#000');R(x+1,y+1,w-2,h
   if(c.art){const im=vgArt(c.art,c.map),s2=mn/64*(bg2?1.05:1.1),dw=Math.round(64*s2);ctx.imageSmoothingEnabled=!bg2&&dw<40;ctx.drawImage(im,Math.round(ax+(aw-dw)/2),Math.round(ay+ah-dw+(bg2?2:1)),dw,dw);ctx.imageSmoothingEnabled=false;}
   else{const sc=w>=50?Math.max(1,Math.floor(mn*.85/16)):w>=40?2:Math.max(1,Math.round(mn/16)),sp=VG_SPR[c.ch],bx=Math.round(ax+(aw-16*sc)/2),by=Math.round(ay+ah-16*sc-(bg2?3:1));pe(bx+8*sc,by+16*sc-1,Math.max(3,6*sc),Math.max(1,sc),'#00000055');
     if(sp){ctx.imageSmoothingEnabled=false;ctx.drawImage(sp,bx-sc,by-sc,18*sc,18*sc);}else drawChar(c.ch,bx,by,0,sc);}
-  if(c.rar==='RRR'||c.rar==='SP'||c.rar==='PR'){ctx.fillStyle='rgba(255,255,255,.28)';const k=(frame*2)%(aw*2);ctx.beginPath();ctx.moveTo(ax+k-aw,ay);ctx.lineTo(ax+k-aw+8,ay);ctx.lineTo(ax+k-aw+8-ah,ay+ah);ctx.lineTo(ax+k-aw-ah,ay+ah);ctx.fill();}
+  if(c.rar==='RRR'||c.rar==='SP'||c.rar==='PR'||c.rar==='？？？'){ctx.fillStyle='rgba(255,255,255,.28)';const k=(frame*2)%(aw*2);ctx.beginPath();ctx.moveTo(ax+k-aw,ay);ctx.lineTo(ax+k-aw+8,ay);ctx.lineTo(ax+k-aw+8-ah,ay+ah);ctx.lineTo(ax+k-aw-ah,ay+ah);ctx.fill();}
   ctx.restore();
   const gs=bg2?8:4,gx=x+(bg2?3:1)+gs,gy=y+(bg2?3:1)+gs;for(let i=-gs;i<=gs;i++){const ww=gs-Math.abs(i);R(gx-ww-1,gy+i,ww*2+3,1,'#000');}for(let i=-gs+1;i<gs;i++){const ww=gs-1-Math.abs(i);R(gx-ww,gy+i,ww*2+1,1,c.g===4?'#f8d800':'#fcfcfc');}
   if(bg2)big(''+c.g,gx+1,gy-7,'#000','center',12);else if(w>=20)txt(''+c.g,gx+1,gy-4,'#000','center');
@@ -3859,7 +3873,7 @@ function vgCard(c,x,y,w,h,o={}){if(o.back||!c){R(x,y,w,h,'#000');R(x+1,y+1,w-2,h
     if(h>=100){txt(C.n,x+6,ny+14,'#000','left',w*.6);if(c.pg){R(x+w-34,ny+13,31,9,'#000');txt('完全ガード',x+w-18,ny+13,'#a8e4fc','center',30);}}
     R(x+3,y+h-14,Math.round(w*.58),11,'#000');big(''+(o.pw||c.pw),x+5,y+h-14,o.up?'#f8f800':'#fcfcfc','left',10);txt('★'+(o.cr||1),x+w-5,y+h-12,'#f8d800','right');}
   else if(h>=24){R(x+1,y+h-9,w-2,8,'#000');txt(vgK(o.pw||c.pw),x+w/2,y+h-9,o.up?'#f8f800':'#fcfcfc','center',w-2);}
-  const fc=c.rar==='PR'?`hsl(${(frame*6)%360},90%,60%)`:c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':null;if(fc){R(x,y,w,1,fc);R(x,y+h-1,w,1,fc);R(x,y,1,h,fc);R(x+w-1,y,1,h,fc);if(c.rar!=='RRR'&&bg2&&((frame>>3)%8)<2){R(x+w-6,y+4,1,3,'#fcfcfc');R(x+w-7,y+5,3,1,'#fcfcfc');}}}
+  const fc=c.rar==='PR'||c.rar==='？？？'?`hsl(${(frame*6)%360},90%,60%)`:c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':null;if(fc){R(x,y,w,1,fc);R(x,y+h-1,w,1,fc);R(x,y,1,h,fc);R(x+w-1,y,1,h,fc);if(c.rar!=='RRR'&&bg2&&((frame>>3)%8)<2){R(x+w-6,y+4,1,3,'#fcfcfc');R(x+w-7,y+5,3,1,'#fcfcfc');}}}
 function vgInfo(c){if(!c)return[];const L=[`${c.n}`,`${VG_CL[c.cl].n}　G${c.g}　パワー${c.pw}`,c.g<3&&c.g!==4?`シールド ${c.sh}${c.g===2?'　インターセプト':''}${c.g<=1?'　ブースト':''}`:c.g===3?'ツインドライブ!!':'トリプルドライブ!!!　ストライド'];
   if(c.tr)L.push(`${VG_TR[c.tr][2]}トリガー（パワー＋5000${c.tr==='crit'?'・★＋1':''}）`);if(c.pg)L.push('完全ガード：手札を 1枚 捨てて ヒットされない');
   const sk=c.g===4?VG_SKILL[c.id]:c.g===3?VG_SKILL[c.cl]:null;if(sk)L.push(`【${sk[0]}】${sk[1]}`);L.push(`レア度 ${c.rar}`);return L;}
@@ -3868,8 +3882,8 @@ function vgCheckDeck(d,gz){const DB=vgDB(),ids=Object.keys(d).filter(k=>d[k]>0&&
   const e=[];if(n!==50)e.push(`デッキは 50枚（いま ${n}枚）`);if(tr>16)e.push(`トリガーは 16枚まで（いま ${tr}枚）`);if(he>4)e.push(`ヒールは 4枚まで（いま ${he}枚）`);if(!g0)e.push('グレード0が 1枚 必要');
   if(ids.some(k=>d[k]>4))e.push('同じ カードは 4枚まで');if(vgCnt(gz||{})>8)e.push('Gゾーンは 8枚まで');return e;}
 function vgAutoDeck(pool,cl,pk){/* pool：{id:枚数} または null（無限）。 クラン or パック 中心に 50枚 */const DB=vgDB();
-  const own=c=>pool?(pool[c.id]||0):4;let cand=VGL.filter(c=>c.g<4&&own(c)>0);const pri=c=>(cl&&c.cl===cl?0:pk!=null&&c.pack===pk?1:2);
-  const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5};cand.sort((a,b)=>pri(a)-pri(b)||RS[b.rar]-RS[a.rar]||b.pw-a.pw);
+  const own=c=>pool?(pool[c.id]||0):4;let cand=VGL.filter(c=>c.g<4&&own(c)>0&&(pool||c.id!=='o_messiah'));const pri=c=>(cl&&c.cl===cl?0:pk!=null&&c.pack===pk?1:2);
+  const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5,'？？？':6};cand.sort((a,b)=>pri(a)-pri(b)||RS[b.rar]-RS[a.rar]||b.pw-a.pw);
   const d={};let n=0;const take=(f,max)=>{let k=0;for(const c of cand){if(k>=max||n>=50)break;if(!f(c))continue;const m=Math.min(4,own(c),max-k,50-n)-(d[c.id]||0);if(m<=0)continue;d[c.id]=(d[c.id]||0)+m;k+=m;n+=m;}return k;};
   let tr=0;tr+=take(c=>c.tr==='heal',4);tr+=take(c=>c.tr==='crit',16-tr-4>0?8:16-tr);tr+=take(c=>c.tr&&c.tr!=='heal',16-tr);
   take(c=>c.pg,4);take(c=>c.g===3,8);take(c=>c.g===2,11);take(c=>c.g===1&&!c.pg,50-n-0);take(c=>c.g===2||c.g===3,50-n);take(c=>c.g===1,50-n);take(c=>!c.tr&&c.g===0,50-n);
@@ -3880,8 +3894,9 @@ const vgTourOK=()=>dow()===0&&nowMin()>=780&&nowMin()<1020;
 function vgShop(){vgDB();const S=vgS();
   if(!vgOpen()){dialog('店長「ごめんね！ 今は 閉店中なんだ。\n営業は 10時から 21時までだよ」');return;}
   const first=!S.met;S.met=1;
-  const go=()=>choice(`店長「なにに する？」\nショップポイント ${S.pt}pt　所持 ${vgCnt(S.col)}枚`,['パックを 買う','トライアルデッキ','デッキを 組む','カードを 売る','ショップ大会','ポイント交換','ルール説明'],k=>{
-    if(k===0)vgBuyPack();else if(k===1)vgTrial();else if(k===2)vgEdit();else if(k===3)vgSell();else if(k===4)vgTour();else if(k===5)vgExchange();else if(k===6)vgRules();},130);
+  const q=S.q,O=[['パックを 買う',vgBuyPack],['トライアルデッキ',vgTrial],['中古カード',vgUsed],['カード買取',vgBuy],['デッキを 組む',vgEdit],['ショップ大会',vgTour]];
+  if(q&&q.st===2&&TW&&TW.vi===q.dv)O.push(['★ 地区大会',vgDist]);if(q&&q.st===3&&TW&&TW.vi===q.cv)O.push(['★ 大陸大会',vgCont]);O.push([q&&q.st<5?'全国No.1（進行中）':'目指せ！全国No.1',vgQuest],['ポイント交換',vgExchange],['ルール説明',vgRules]);
+  const go=()=>choice(`店長「なにに する？」\n${S.pt}pt　所持 ${vgCnt(S.col)}枚${q&&q.st<5?'\n'+VG_QN[q.st]:''}`,O.map(x=>x[0]),k=>{if(k>=0)O[k][1]();},130);
   if(first)dialog(['店長「いらっしゃい！ ここは カードショップ 先導堂！」','店長「カードファイト!! ヴァンガルドを 遊ぶなら\nまずは トライアルデッキが おすすめだよ」','店長「ルールは 旧ルール。 ストライドも あるよ！\nわからなかったら ルール説明を 聞いてね」'],go);else go();}
 function vgBuyPack(){const S=vgS();listPick('ブースターパック（1パック 5枚）',VG_PACKS.map((p,i)=>`第${i+1}弾 ${p.n}　300イェソ`),i=>{
   choice(`第${i+1}弾「${VG_PACKS[i].n}」\n財布 ${fmt(G.coins)}イェソ`,['1パック 300','10パック 3000','1BOX 30パック 9000'],k=>{if(k<0)return;const n=[1,10,30][k],cost=n*300;
@@ -3965,7 +3980,7 @@ function vgRules(){dialog(['【勝ち方】相手の ダメージゾーンに\n�
   '【ストライド】ヴァンガードが G3以上なら、 手札から グレード合計3以上を 捨てて\nGゾーンの Gユニットに なれる（パワーは 15000＋元の ヴァンガード）。','【スキル】G3の ヴァンガードは アタック時に クランの スキル（CB1 など）。\nGユニットは ジェネレーションブレイク（GB1）で スキルが 使える。']);}
 /* ----- デッキ編集 ----- */
 function vgEdit(){const S=vgS(),DB=vgDB();let sel=0,top=0;
-  const list=()=>{const ids=Object.keys(S.col).filter(k=>DB[k]&&S.col[k]>0);const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5};return ids.map(k=>DB[k]).sort((a,b)=>b.g-a.g||a.cl.localeCompare(b.cl)||RS[b.rar]-RS[a.rar]||a.n.localeCompare(b.n));};
+  const list=()=>{const ids=Object.keys(S.col).filter(k=>DB[k]&&S.col[k]>0);const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5,'？？？':6};return ids.map(k=>DB[k]).sort((a,b)=>b.g-a.g||a.cl.localeCompare(b.cl)||RS[b.rar]-RS[a.rar]||a.n.localeCompare(b.n));};
   const ROWS=12;let L=list();
   const inD=c=>c.g===4?(S.gz[c.id]||0):(S.deck[c.id]||0),setD=(c,v)=>{const o=c.g===4?S.gz:S.deck;v=clamp(v,0,Math.min(4,S.col[c.id]||0));if(c.g===4&&vgCnt(S.gz)-(o[c.id]||0)+v>8)return;if(c.g!==4&&vgCnt(S.deck)-(o[c.id]||0)+v>50)return;if(v)o[c.id]=v;else delete o[c.id];};
   const head=2;
@@ -3998,8 +4013,49 @@ function vgTour(){const S=vgS();if(!vgTourOK()){dialog(['店長「ショップ�
   if(vgCheckDeck(S.deck,S.gz).length){dialog('デッキが 未完成だ…');return;}
   choice('ショップ大会に 出ますか？（参加費 300イェソ）\n3回 勝てば 優勝！ 優勝賞品は プロモカード',['出る','やめる'],k=>{if(k!==0)return;if(G.coins<300){dialog('お金が 足りない…');return;}G.coins-=300;S.tour=G.day;save();
     const ops=[0,1,2].map(i=>({n:['ナオキ','エミ','ユウト'][i]+['（1回戦）','（準決勝）','（決勝）'][i],pk:Math.floor(rnd()*VG_PACKS.length),lv:i+2}));
-    const round=i=>{if(i>=3){const pr=VG_PROMO[Math.floor(G.day/7)%3];S.col[pr]=(S.col[pr]||0)+1;S.pt+=50;save();sfx('g5');dialog(['優勝！！ おめでとう！！',`プロモカード「${vgDB()[pr].n}」を 手に入れた！\nショップポイント＋50pt`]);return;}
+    const round=i=>{if(i>=3){const pr=VG_PROMO[Math.floor(G.day/7)%3];S.col[pr]=(S.col[pr]||0)+1;S.pt+=50;const q=S.q,up=q&&q.st===1;if(up)q.st=2;save();sfx('g5');dialog(['優勝！！ おめでとう！！',`プロモカード「${vgDB()[pr].n}」を 手に入れた！\nショップポイント＋50pt`,...(up?['【目指せ！全国No.1】\n地区大会の 出場権を 手に入れた！',vgQInfo()]:[])]);return;}
       dialog(`${ops[i].n}　VS　あなた`,()=>vgFight(ops[i],won=>{timeAdd(30);if(won){S.pt+=10;S.w++;save();dialog(`${['1回戦','準決勝','決勝'][i]} 勝利！ ＋10pt`,()=>round(i+1));}else{S.l++;S.pt+=3;save();dialog(`${['1回戦','準決勝','決勝'][i]}で 敗退… 参加賞 ＋3pt`);}}));};round(0);},96);}
+/* ----- ミニシナリオ「目指せ！全国No.1」：ショップ大会 → 地区大会 → 大陸大会 → 全国大会（ヨシノガリの 闘技場） ----- */
+const VG_CONT={シマネ:'本州',トットリ:'本州',マホロバ:'本州',グンマー:'本州',サキタマ:'本州',コウチ:'四国',サガ:'九州',コクラ:'九州'};
+const VG_CONTV={本州:'商都 ヨナゴ',四国:'翠湖の町 サメウラ',九州:'金冠都市 サガ'};
+const vgVi=name=>VIL.findIndex(v=>v.name===name);
+function vgDistVi(reg){let b=-1;VIL.forEach((v,i)=>{if(hallRegion(v)!==reg||v.gm||v.kq||v.sk||v.depop||v.tokoyo||v.size<2)return;if(b<0||v.size>VIL[b].size)b=i;});return b;}
+const VG_QN=['','ショップ大会で 優勝しよう','地区大会で 優勝しよう','大陸大会で 優勝しよう','全国大会で 優勝しよう','全国No.1 達成！'];
+function vgQInfo(){const q=vgS().q;if(!q)return'';if(q.st===2)return`地区大会の 会場：${VIL[q.dv].name}（${q.reg}地区）`;if(q.st===3)return`大陸大会の 会場：${VIL[q.cv].name}（${q.cont}）`;if(q.st===4)return'全国大会の 会場：闘都 ヨシノガリの 闘技場';return VG_QN[q.st]||'';}
+function vgQuest(){const S=vgS(),q=S.q;
+  if(!q){dialog(['店長「おっ、 その目… 本気だね？」','店長「ヴァンガルドの 頂点を 決める\n全国大会が ヨシノガリの 闘技場で 開かれる」','店長「出場するには ショップ大会 → 地区大会\n→ 大陸大会 を 勝ち抜く 必要が ある」','店長「まずは うちの ショップ大会（毎週 日曜）で\n優勝して きなよ！」'],()=>choice('目指せ！全国No.1 を はじめますか？',['はじめる','やめる'],k=>{if(k!==0)return;
+    const reg=hallRegion(VIL[TW.vi]);S.q={st:1,home:TW.vi,reg,dv:vgDistVi(reg)>=0?vgDistVi(reg):TW.vi,cont:VG_CONT[reg]||'本州'};S.q.cv=vgVi(VG_CONTV[S.q.cont]);save();sfx('g3');dialog(['ミニシナリオ「目指せ！全国No.1」 開始！','目標：ショップ大会で 優勝しよう\n（毎週 日曜 13時〜17時）']);},96));return;}
+  if(q.st>=5){dialog(['店長「全国No.1 おめでとう！\nうちの 店の 誇りだよ！」']);return;}
+  dialog([`【目指せ！全国No.1】${VG_QN[q.st]}`,vgQInfo()]);}
+/* 大会（何回戦か 勝ち抜き） */
+function vgCup(title,fee,ops,onWin){const S=vgS();if(vgCheckDeck(S.deck,S.gz).length){dialog('デッキが 未完成だ…');return;}
+  choice(`${title}に 出ますか？（参加費 ${fmt(fee)}イェソ）\n${ops.length}回 勝てば 優勝！`,['出る','やめる'],k=>{if(k!==0)return;if(G.coins<fee){dialog('お金が 足りない…');return;}G.coins-=fee;save();
+    const RN=i=>i===ops.length-1?'決勝':i===ops.length-2?'準決勝':`${i+1}回戦`;
+    const round=i=>{if(i>=ops.length){onWin();return;}const o=ops[i];
+      dialog([`${title}　${RN(i)}`,`${o.n}　VS　あなた`,...(o.talk?[o.talk]:[])],()=>vgFight(o,won=>{timeAdd(30);if(won){S.w++;S.pt+=10;save();dialog(`${RN(i)} 勝利！ ＋10pt`,()=>round(i+1));}else{S.l++;save();dialog([`${RN(i)}で 敗退…`,'（また 挑戦できる）']);}}));};round(0);},96);}
+function vgDist(){const S=vgS(),q=S.q;const ops=[{n:'アキト（1回戦）',lv:3},{n:'マユ（2回戦）',lv:3},{n:'ゲンジ（準決勝）',lv:4},{n:`${q.reg}地区王者 タクミ`,lv:4,talk:'タクミ「地区の 頂点は 渡さない！」'}].map(o=>Object.assign(o,{pk:Math.floor(rnd()*VG_PACKS.length)}));
+  vgCup(`${q.reg}地区大会`,1000,ops,()=>{q.st=3;S.pt+=100;save();sfx('g5');dialog(['地区大会 優勝！！',`大陸大会（${q.cont}）の 出場権を 手に入れた！\n会場：${VIL[q.cv].name}`,'ショップポイント＋100pt']);});}
+function vgCont(){const S=vgS(),q=S.q;const ops=[{n:'シオン（1回戦）',lv:3},{n:'リク（2回戦）',lv:4},{n:'アヤネ（3回戦）',lv:4},{n:'ソウマ（準決勝）',lv:4},{n:`${q.cont}王者 レイ`,lv:5,talk:'レイ「全国へ 行くのは 俺だ。\nかかって こい！」'}].map(o=>Object.assign(o,{pk:Math.floor(rnd()*VG_PACKS.length)}));
+  vgCup(`${q.cont}大陸大会`,3000,ops,()=>{q.st=4;S.pt+=200;save();sfx('g5');dialog(['大陸大会 優勝！！','全国大会の 出場権を 手に入れた！\n会場：闘都 ヨシノガリの 闘技場','ショップポイント＋200pt']);});}
+function vgNation(){const S=vgS(),q=S.q;const ops=[{n:'北の 強豪 ユキ',lv:4},{n:'南の 天才 カイ',lv:4},{n:'東の 覇者 ジン',lv:5},{n:'西の 鬼才 ミコト',lv:5},{n:'全国王者 カイザー',lv:5,pk:6,talk:'カイザー「よく ここまで 来たな。\n頂点の 景色を 見せて やろう」'}].map(o=>Object.assign({pk:Math.floor(rnd()*VG_PACKS.length)},o));
+  vgCup('全国大会',10000,ops,()=>{q.st=5;S.col.o_messiah=(S.col.o_messiah||0)+1;S.pt+=500;save();sfx('g5');
+    dialog(['全国大会 優勝！！！','あなたは ヴァンガルド 全国No.1 だ！！','（闘技場が 大歓声に つつまれた）',`クリア報酬：？？？「創造超越神 イマジナリーメサイア」を 手に入れた！`,'クラン無し：どの デッキにも 入れられる。\n【永】ヴァンガードに いる間、 相手の トリガー効果を すべて 無効にする','ショップポイント＋500pt']);});}
+/* 中古カード・カード買取 */
+const VG_UP={C:20,R:80,RR:320,RRR:1200,SP:6000,PR:20000};
+function vgUsedStock(){const S=vgS(),key=`${TW?TW.vi:0}_${G.day}`;if(S.used&&S.used.key===key)return S.used.items;const r=lcg((TW?TW.vi:0)*977+G.day*131+5),L=VGL.filter(c=>c.pack>=-1&&c.id!=='o_messiah'),items=[];
+  for(let i=0;i<10;i++){const x=r();const R2=x<.04?['SP','PR']:x<.15?['RRR']:x<.4?['RR']:x<.7?['R']:['C'];const P=L.filter(c=>R2.includes(c.rar));if(!P.length)continue;const c=P[Math.floor(r()*P.length)];if(items.some(it=>it.id===c.id))continue;
+    items.push({id:c.id,q:1+Math.floor(r()*3),p:Math.round(VG_UP[c.rar]*(.8+r()*.5)/10)*10});}
+  S.used={key,items};return items;}
+function vgUsed(){const S=vgS(),DB=vgDB(),items=vgUsedStock();if(!items.some(it=>it.q>0)){dialog('中古カードは 売り切れだ…\n（入荷は 毎日 入れかわる）');return;}
+  listPick('中古カードコーナー（毎日 入れかわる）',items.map(it=>`${it.q>0?'':'【売切】'}${DB[it.id].rar} ${DB[it.id].n}　${fmt(it.p)}イェソ（残${it.q}）`),i=>{const it=items[i];if(it.q<=0){dialog('売り切れだ。');return;}
+    if(G.coins<it.p){dialog('お金が 足りない…');return;}G.coins-=it.p;it.q--;S.col[it.id]=(S.col[it.id]||0)+1;save();sfx('coin');dialog(`${DB[it.id].n} を 買った！（所持 ${S.col[it.id]}枚）`,vgUsed);},
+    k=>{const it=items[k];return it?vgInfo(DB[it.id]).join('\n'):'';});}
+function vgBuy(){const S=vgS(),DB=vgDB();const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5,'？？？':6};
+  choice('カード買取（店長「どんな カードでも 買うよ！」）',['1枚ずつ 売る','5枚目以降を まとめて 売る','やめる'],k=>{if(k===1){vgSell();return;}if(k!==0)return;
+    const L=Object.keys(S.col).filter(id=>DB[id]&&S.col[id]>0&&id!=='o_messiah').map(id=>DB[id]).sort((a,b)=>RS[b.rar]-RS[a.rar]||a.n.localeCompare(b.n));if(!L.length){dialog('売れる カードが ない。');return;}
+    listPick('売る カードを えらぶ（1枚ずつ）',L.map(c=>`${c.rar} ${c.n}　${fmt(VG_RV[c.rar]||5)}イェソ（所持${S.col[c.id]}）`),i=>{const c=L[i],v=VG_RV[c.rar]||5;
+      choice(`${c.n} を ${fmt(v)}イェソで 売る？`,['売る','やめる'],k2=>{if(k2!==0)return;S.col[c.id]--;const dk=c.g===4?S.gz:S.deck;if((dk[c.id]||0)>S.col[c.id]){dk[c.id]=S.col[c.id];if(!dk[c.id])delete dk[c.id];}if(!S.col[c.id])delete S.col[c.id];G.coins+=v;save();sfx('coin');toast(`${fmt(v)}イェソで 売った`);vgBuy();},96);},
+      k2=>L[k2]?vgInfo(L[k2]).join('\n'):'');},150);}
 /* ----- ファイト（ルール進行は ジェネレーターで 書く） ----- */
 function vgMkPlayer(name,list,gzl,ai){const DB=vgDB(),deck=[];Object.keys(list).forEach(k=>{for(let i=0;i<list[k];i++)if(DB[k])deck.push(DB[k]);});const gz=[];Object.keys(gzl||{}).forEach(k=>{for(let i=0;i<gzl[k];i++)if(DB[k])gz.push({c:DB[k],up:false});});
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
@@ -4018,7 +4074,8 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
   const faceUp=P=>P.dmg.filter(d=>d.up).length,cb1=P=>{const d=P.dmg.find(x=>x.up);if(d){d.up=false;return true;}return false;};
   const fronts=P=>['V',0,1].filter(i=>vgUnit(P,i));
   const retire=(P,i)=>{const u=P.R[i];if(u){P.drop.push(u.c);P.R[i]=null;}};
-  function* trig(P,O,c,drive,att){const T=c.tr;if(!T)return;F.fx.push({k:'trig',tr:T,t:0});sfx('magic');
+  function* trig(P,O,c,drive,att){const T=c.tr;if(!T)return;
+    if(O.V&&(O.V.c.id==='o_messiah'||(O.V.heart&&O.V.heart.id==='o_messiah'))){sfx('ng');yield msg(`${VG_TR[T][2]}トリガー… イマジナリーメサイアが 無効にした！`,40);return;}F.fx.push({k:'trig',tr:T,t:0});sfx('magic');
     let tgt='V';const fr=fronts(P);
     if(!P.ai&&fr.length>1){const k=yield {k:'slot',title:`${VG_TR[T][2]}トリガー！ パワー＋5000${T==='crit'?'・★＋1':''} を あたえる ユニット`,slots:fr.map(i=>({s:0,i}))};tgt=fr[Math.max(0,k)];}
     else if(P.ai){tgt=drive&&att!=null?att:'V';if(drive&&att==='V'){const st=[0,1].find(i=>P.R[i]&&!P.R[i].rest);if(st!=null&&F.curGuardOK)tgt=st;}}
@@ -4067,7 +4124,7 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
         if(ai==='V'){const vc=A.c;if(vc.g===4){const gb=P.gz.filter(x=>x.up).length+1;if(gb>=1){const gid=vc.id;if(gid==='godkami'){A.bp+=5000;A.bc++;}else if(gid==='itsuku'){A.bp+=5000;draw(P);}else if(gid==='o_amateru'){P.R.forEach(u=>u&&(u.bp+=5000));}else if(gid==='o_tenen'){[0,1].forEach(i=>retire(O,i));}
             else if(gid==='o_tsukuyo'){for(let k=0;k<2&&O.hand.length;k++)O.drop.push(O.hand.splice(Math.floor(rnd()*O.hand.length),1)[0]);}else if(gid==='o_seraph'){A.bc++;if(P.dmg.length)P.drop.push(P.dmg.pop().c);}else{A.bc++;const r=[0,1,2,3,4].filter(i=>O.R[i]);if(r.length)retire(O,r[0]);}yield msg(`GB1【${VG_SKILL[vc.id][0]}】！`,40);}}
           else if(vc.g===3){const sk=VG_SKILL[vc.cl];if(vc.cl==='rei'){if(P.dmg.length>=4){A.bp+=5000;A.bc++;yield msg(`LB4【${sk[0]}】！`,35);}}
-            else if(sk&&faceUp(P)>0){let use=true;if(me){const k=yield {k:'menu',title:`【${sk[0]}】${sk[1]}`,opts:['使う','使わない'],cancel:0};use=k===0;}
+            else if(sk&&vc.cl!=='none'&&faceUp(P)>0){let use=true;if(me){const k=yield {k:'menu',title:`【${sk[0]}】${sk[1]}`,opts:['使う','使わない'],cancel:0};use=k===0;}
               else use=vc.cl!=='night'||O.hand.length>0;
               if(use&&cb1(P)){if(vc.cl==='bou')A.bp+=5000;else if(vc.cl==='taka')P.R.forEach(u=>u&&(u.bp+=3000));else if(vc.cl==='night'){if(O.hand.length){let k=Math.floor(rnd()*O.hand.length);if(!O.ai){k=yield {k:'hand',title:'捨てる カードを えらぶ',ok:()=>true,cancel:0};}O.drop.push(O.hand.splice(k,1)[0]);}}
                 else if(vc.cl==='city')draw(P);
@@ -4086,7 +4143,7 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
               perfect=hs.some(h=>O.hand[h].pg);hs.forEach(h=>{const c=O.hand.splice(h,1)[0];gd.push(c);shield+=c.sh;});rs.forEach(i=>{gd.push(O.R[i].c);O.R[i]=null;shield+=5000;});
               if(perfect&&O.hand.length){const k=yield {k:'hand',title:'完全ガード：捨てる カードを えらぶ',ok:()=>true,cancel:0};O.drop.push(O.hand.splice(Math.max(0,k),1)[0]);}}}}
         else{const ap=atkP(),tp=vgPw(T);if(ap>=tp){const dm=O.dmg.length,isV=ti==='V',drives=isV&&ai==='V'?(A.c.g===4?3:A.c.g===3?2:1):0;
-            const want=isV&&(dm>=4||(dm>=3&&F.lv>=2)||(dm>=2&&F.lv>=3&&ai==='V'))||(!isV&&F.lv>=3&&T.c.g>=3);
+            const want=isV&&(dm>=4||(dm>=3&&F.lv>=2)||(dm>=2&&F.lv>=3&&ai==='V')||(dm>=1&&F.lv>=5))||(!isV&&F.lv>=3&&T.c.g>=3);
             if(want){let need=ap-tp+1+(isV&&ai==='V'&&dm>=4?5000*Math.min(drives,F.lv>=3?2:1):0);
               const H=O.hand.map((c,i)=>({c,i})).filter(x=>x.c.g<=2);const pg=H.find(x=>x.c.pg);
               if(pg&&isV&&(need>15000||dm>=5)&&O.hand.length>=2){perfect=true;O.hand.splice(pg.i,1);gd.push(pg.c);const k=O.hand.reduce((b,c,j)=>c.g>O.hand[b].g?j:b,0);O.drop.push(O.hand.splice(k,1)[0]);}
@@ -4199,7 +4256,7 @@ function enterRoom(kind,opt={}){const w=11,h=8,C=[],RT=ROOM_T[kind]||ROOM_T.shop
   if(kind==='rest'){put(2,4,'rtable');put(5,5,'rtable');put(8,4,'rtable');npcs.push({x:2,y:5,col:'#0058f8',hair:'#000000',line:'客「ここの 料理は うまいぞ」'});}
   if(kind==='job'||kind==='yakusho'){put(1,3,'rboard');put(9,3,'rboard');}
   if(kind==='lotto'){put(1,3,'rposter');put(9,3,'rposter');put(1,5,'rposter');}
-  if(kind==='card'){put(1,3,'rvpack');put(1,4,'rvpack');put(9,3,'rvboard');put(3,4,'rvtab');put(7,4,'rvtab');vgDB();const VN=vgNpcs(opt.o?opt.o.vi:curVil),PS=[[2,4,'#0058f8','#000000'],[8,4,'#d82800','#503000'],[3,5,'#00a800','#7c7c7c']];
+  if(kind==='card'){put(1,3,'rvpack');put(1,4,'rvpack');put(9,3,'rvboard');put(9,5,'rvcase');put(3,4,'rvtab');put(7,4,'rvtab');vgDB();const VN=vgNpcs(opt.o?opt.o.vi:curVil),PS=[[2,4,'#0058f8','#000000'],[8,4,'#d82800','#503000'],[3,5,'#00a800','#7c7c7c']];
     VN.forEach((o,i)=>npcs.push({x:PS[i][0],y:PS[i][1],col:PS[i][2],hair:PS[i][3],sp:'vg',vg:o,vgi:i,fix:true,line:''}));}
   if(kind==='love'){put(5,2,'rpanel');put(4,2,'rplant');put(6,2,'rplant');}
   if(kind!=='love'&&kind!=='kokan')npcs.push({x:5,y:1,col:RT.clerk[0],hair:RT.clerk[1],sp:'room',line:''});
@@ -4216,8 +4273,8 @@ function roomBump(c){if(c.t==='rcnt'||c.t==='rpanel'){roomUse();return true;}
   if(c.t==='rgacha'){openGacha();return true;}if(c.t==='rbed')return dialog('ふかふかの 布団だ。\n（受付で 泊まれる）'),true;if(c.t==='rtable')return dialog('ていねいに ふかれた テーブルだ。'),true;
   if(c.t==='rboard')return dialog('掲示板に 求人や お知らせが はってある。'),true;if(c.t==='rposter')return dialog(['ポスター「年末ジャンボ 1等 7億イェソ！」','「当たるも 八卦… 買わなきゃ 当たらない！」']),true;
   if(c.t==='rplant')return dialog('観葉植物だ。'),true;
-  if(c.t==='rvpack'){if(vgOpen())vgBuyPack();else dialog('閉店中だ。');return true;}if(c.t==='rvtab')return dialog('ファイトテーブルだ。\n（ファイターに 話しかけると 対戦できる）'),true;
-  if(c.t==='rvboard'){const S=vgS();dialog(['掲示板「ショップ大会 毎週 日曜 13時〜17時」','「優勝賞品：プロモカード（Gユニット）」',`あなたの 戦績：${S.w}勝 ${S.l}敗　${S.pt}pt`]);return true;}if(c.t==='rstand'||c.t==='bstand')return dialog('観客席だ。 応援の 声が ひびいている！'),true;if(c.t==='bfence')return dialog('外野フェンスだ。 ここを 越えれば ホームラン！'),true;if(c.t==='bpole')return dialog('ファウルポールだ。'),true;if(c.t==='blight')return dialog('照明塔だ。 ナイターでは 球場を 明るく 照らす。'),true;if(c.t==='bback')return dialog('バックネットだ。'),true;if(c.t==='bscore'){bbStandings();return true;}if(c.t==='bshop'){stadTalk(c.n==='グッズ'?'stad_goods':'stad_food');return true;}if(c.t==='rscore'){bbStandings();return true;}if(c.t==='rwall')return true;return false;}
+  if(c.t==='rvpack'){if(vgOpen())vgBuyPack();else dialog('閉店中だ。');return true;}if(c.t==='rvcase'){if(vgOpen())vgUsed();else dialog('閉店中だ。');return true;}if(c.t==='rvtab')return dialog('ファイトテーブルだ。\n（ファイターに 話しかけると 対戦できる）'),true;
+  if(c.t==='rvboard'){const S=vgS();dialog(['掲示板「ショップ大会 毎週 日曜 13時〜17時」','「優勝賞品：プロモカード（Gユニット）」',`あなたの 戦績：${S.w}勝 ${S.l}敗　${S.pt}pt`,...(S.q?[`【目指せ！全国No.1】${VG_QN[S.q.st]}`+(S.q.st>=2&&S.q.st<5?'\n'+vgQInfo():'')]:[])]);return true;}if(c.t==='rstand'||c.t==='bstand')return dialog('観客席だ。 応援の 声が ひびいている！'),true;if(c.t==='bfence')return dialog('外野フェンスだ。 ここを 越えれば ホームラン！'),true;if(c.t==='bpole')return dialog('ファウルポールだ。'),true;if(c.t==='blight')return dialog('照明塔だ。 ナイターでは 球場を 明るく 照らす。'),true;if(c.t==='bback')return dialog('バックネットだ。'),true;if(c.t==='bscore'){bbStandings();return true;}if(c.t==='bshop'){stadTalk(c.n==='グッズ'?'stad_goods':'stad_food');return true;}if(c.t==='rscore'){bbStandings();return true;}if(c.t==='rwall')return true;return false;}
 function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
   const fl=()=>{if(c.t==='rtat'||c.k==='inn'){R(sx,sy,16,16,'#c8b878');R(sx,sy,16,1,'#8c7c3c');R(sx,sy+8,16,1,'#a89858');}else{R(sx,sy,16,16,F[0]);if(((c.x||0)+(c.y||0))&1)R(sx+1,sy+1,14,14,F[1]);}};
   switch(c.t){case 'rfl':case 'rtat':fl();break;
@@ -4239,6 +4296,7 @@ function roomDraw(c,sx,sy){const RT=ROOM_T[c.k]||ROOM_T.shop,F=RT.fl;
     case 'rplant':fl();R(sx+6,sy+10,4,5,'#a05000');pc(sx+8,sy+7,5,'#00a800');pc(sx+6,sy+5,3,'#00c800');break;
     case 'rvpack':fl();R(sx+1,sy+1,14,15,'#7c4c10');for(let k=0;k<2;k++)for(let j=0;j<3;j++)R(sx+2+j*4,sy+2+k*7,3,6,['#0058f8','#f8b800','#d800cc','#00a800','#f87800','#7c7c7c'][(j+k*3)%6]);break;
     case 'rvtab':fl();R(sx+1,sy+3,14,10,'#00683c');R(sx+2,sy+4,12,8,'#008848');R(sx+3,sy+5,3,4,'#fcfcfc');R(sx+10,sy+7,3,4,'#24188c');R(sx+7,sy+6,2,3,'#f8d878');break;
+    case 'rvcase':fl();R(sx+1,sy+2,14,13,'#7c4c10');R(sx+2,sy+3,12,8,'#a8e4fc');for(let j=0;j<3;j++)R(sx+3+j*4,sy+4,3,5,['#f8d800','#fc74b4','#fcfcfc'][j]);R(sx+2,sy+3,12,1,'#fcfcfc');break;
     case 'rvboard':fl();R(sx+1,sy+1,14,12,'#503000');R(sx+2,sy+2,12,10,'#e8d8b0');R(sx+3,sy+3,10,2,'#d82800');R(sx+3,sy+6,8,1,'#3c3c3c');R(sx+3,sy+8,6,1,'#3c3c3c');break;}}
 /* アイヂの 手がかり（フィールドの 小物） */
 function drawAidiH(o,x,y){const P=(a,b,w,h,c)=>R(x+a,y+b,w,h,c);
@@ -4780,7 +4838,8 @@ function resIpo(id,back){
 }
 /* ===================== 魔物コロシアム（推奨Lv9100） ===================== */
 const COLO_ROUNDS=['予選','一回戦','準々決勝','準決勝','決勝'],COLO_FEE=200000;
-function coloFac(){
+function coloFac(){if(G.vg&&G.vg.q&&G.vg.q.st===4){choice('受付「ヴァンガルド 全国大会の 受付も こちらです！」',['全国大会に 出る','魔物コロシアム','やめる'],k=>{if(k===0)vgNation();else if(k===1)coloFac0();},130);return;}coloFac0();}
+function coloFac0(){
   dialog(['闘技場の 支配人「ようこそ 魔物コロシアムへ！」','「5連戦を 勝ち抜けば 優勝だ。\n試合の 合間に HPと MPは 回復する。\n決勝の 相手は 闘魔王 ガルゴス」',`「推奨レベルは 9100。\n優勝賞品は 経験値書（極）と\n鍛錬鉱（極）を どっさりだ！」`],()=>{
     choice(`挑戦料 ${fmt(COLO_FEE)}イェソ（所持 ${fmt(G.coins)}イェソ）\n優勝回数 ${G.colo||0}回`,['エントリーする','賞品を 見る','やめる'],k=>{
       if(k===1){dialog(['優勝賞品：\n経験値書（極） ×5,000\n鍛錬鉱（極） ×5,000\n3,000,000イェソ','初優勝の 記念に\nUR確定チケット ×10 と\n「コロシアム王者」の 称号']);return;}
