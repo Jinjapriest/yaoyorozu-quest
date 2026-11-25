@@ -4257,7 +4257,7 @@ function vgRules(){dialog(['【勝ち方】相手の ダメージゾーンに\n�
   '【ターン】スタンド → ドロー → ライド → ストライド → メイン → バトル → エンド。\n先攻の 1ターン目は アタック できない。','【ライド】ヴァンガードと 同じか 1つ上の グレードを 上に 重ねる（1ターン 1回）。\n同じ キャラの 進化版に ライドすると 1枚 引ける！',
   '【コール】ヴァンガードの グレード以下の ユニットを リアガードに 出す。\n後列の グレード0・1は 前の ユニットを ブースト できる。','【アタック】パワーが 相手以上なら ヒット。\nヴァンガードの アタックは ドライブチェック（G3は 2回・Gユニットは 3回）。',
   '【トリガー】☆クリティカル：パワー＋5000・★＋1\n引ドロー／前スタンド／治ヒール：パワー＋5000＋効果','【ガード】手札の シールドで 守る。 前列の G2は インターセプト。\n完全ガードは 手札を 1枚 捨てて 完全に 防ぐ。',
-  '【ストライド】ヴァンガードが G3以上なら、 手札から グレード合計3以上を 捨てて\nGゾーンの Gユニットに なれる（パワーは 15000＋元の ヴァンガード）。','【スキル】G3の ヴァンガードは アタック時に クランの スキル（CB1 など）。\nGユニットは ジェネレーションブレイク（GB1）で スキルが 使える。']);}
+  '【ストライド】自分の ヴァンガードが G3以上で、 相手の ヴァンガードも G3以上の とき、\n手札から グレード合計3以上を 捨てて Gゾーンの Gユニットに なれる\n（パワーは 15000＋元の ヴァンガード）。','【スキル】G3の ヴァンガードは アタック時に クランの スキル（CB1 など）。\nGユニットは ジェネレーションブレイク（GB1）で スキルが 使える。']);}
 /* ----- デッキ編集 ----- */
 function vgEdit(){const S=vgS(),DB=vgDB();let sel=0,top=0,fc=0;const RS={C:0,R:1,RR:2,RRR:3,SP:4,PR:5,'？？？':6};
   const CLO=['bou','taka','night','city','rei','ent','siro','gure','tuki','yu','mono','promo','none'];
@@ -4407,7 +4407,8 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
     if(P.hand.some(rideOK)){if(me){const k=yield {k:'hand',title:'ライドする カードを えらぶ（Bで ライドしない）',ok:rideOK,cancel:1};if(k>=0)yield* doRide(P,P.hand[k]);}
       else{const L=P.hand.filter(rideOK).sort((a,b)=>b.g-a.g||(b.root===P.V.c.root)-(a.root===P.V.c.root));if(L.length&&(L[0].g>P.V.c.g||P.V.c.g<3))yield* doRide(P,L[0]);}}
     /* ストライド */F.ph='ストライド';const gsum=()=>P.hand.reduce((a,c)=>a+Math.min(3,c.g),0);
-    if(P.V.c.g>=3&&P.gz.some(x=>!x.up)&&gsum()>=3){let ok=false,cost=null,gi=-1;const fd=P.gz.map((x,i)=>i).filter(i=>!P.gz[i].up);
+    if(P.V.c.g>=3&&P.gz.some(x=>!x.up)&&gsum()>=3&&vgG(O)<3){if(me)yield msg('相手の ヴァンガードが G3未満… まだ ストライドできない',35);}
+    else if(P.V.c.g>=3&&P.gz.some(x=>!x.up)&&gsum()>=3){let ok=false,cost=null,gi=-1;const fd=P.gz.map((x,i)=>i).filter(i=>!P.gz[i].up);
       if(me){const k=yield {k:'menu',title:'ストライドしますか？（手札から グレード合計3以上を 捨てる）',opts:['ストライドする','しない'],cancel:1};
         if(k===0){const types=[...new Set(fd.map(i=>P.gz[i].c.id))];let t=0;if(types.length>1){t=yield {k:'menu',title:'どの Gユニットに？',opts:types.map(id=>DB[id].n),cancel:1};}
           if(t>=0){gi=fd.find(i=>P.gz[i].c.id===types[t]);const r=yield {k:'multi',title:'捨てる カード（グレード合計3以上）',items:P.hand.map(c=>({c,lab:`G${c.g} ${c.n}`})),info:s=>{const g=s.reduce((a,i)=>a+P.hand[i].g,0);return [`グレード合計 ${g}／3`,g>=3];},cancel:1};
