@@ -429,7 +429,7 @@ addEventListener('gamepadconnected',e=>{try{const id=String(e.gamepad&&e.gamepad
   const ps=/054c|dualsense|dualshock|playstation|wireless controller/.test(id),xb=/045e|xbox|xinput/.test(id);
   toast(ps?'PSコントローラー：×決定 ○もどる OPTIONS/△メニュー':xb?'Xboxコントローラー：A決定 Bもどる ≡/Yメニュー':'コントローラーを つなぎました');const ar=innerWidth/innerHeight;if(ar>1.2&&ar<1.45&&!document.documentElement.classList.contains('hh'))setTimeout(()=>toast('4:3の 携帯機？ SELECTで 携帯機モード'),1800);}catch(err){}});
 const touch={u:0,d:0,l:0,r:0,a:0,b:0};
-let vA=false,vB=false,tA=false,tB=false,vU=false,vD=false,vMenu=false;
+let vX=false,vA=false,vB=false,tA=false,tB=false,vU=false,vD=false,vMenu=false;
 const I={u:0,d:0,l:0,r:0,pu:0,pd:0,pl:0,pr:0,A:false,B:false,holdA:false};
 const rcnt={u:0,d:0,l:0,r:0};
 function readInput(){
@@ -441,8 +441,8 @@ function readInput(){
   if(vU)I.pu=1;if(vD)I.pd=1;
   I.A=KA.some(c=>hit.has(c))||tA||vA;I.B=KB.some(c=>hit.has(c))||tB||vB;
   I.holdA=KA.some(c=>keys.has(c))||!!touch.a;
-  I.menu=vMenu;
-  hit.clear();tA=tB=vA=vB=vU=vD=vMenu=false;
+  I.menu=vMenu;I.X=['KeyC','KeyI','PadS'].some(c=>hit.has(c))||vX;
+  hit.clear();tA=tB=vA=vB=vU=vD=vMenu=vX=false;
 }
 
 /* 画面のクリック・タップ */
@@ -3813,7 +3813,10 @@ function vgAddEnemies(){const ENP=[['mono',7,VG_EN.mono],['gun',8,VG_EN.gun1],['
     const pw=g===4?15000:g===3?11000:g===2?(x[1]==='oni'||x[1]==='beast'?10000:9000):g===1?(x[1]==='oni'?8000:7000):5000;
     const c={id,ch:null,en:x,n:x[0],cl:'mono',ek:cl,g,pw,sh:g===0?10000:g<3?5000:0,tr:null,pg:0,rar,pack:pk,root:VG_EN.root[x[0]]||id,def:x[1]==='bones'?9:0,enemy:1};
     const nz=VG_EN.nz[x[0]];if(nz!=null){Object.assign(c,{nz,g:nz,pw:[5000,8000,10000,11000,15000][nz],sh:[5000,5000,5000,0,0][nz],rar:['RR','RR','RRR','SP','SP'][nz]});}
-    VGC[id]=c;VGL.push(c);}));}
+    VGC[id]=c;VGL.push(c);}));
+  /* 11/25：白服と 黒服（オリキャラ）… 魑魅魍魎の 切り札 */
+  [['白服','spirit','#fcfcfc','#d82800',''],['黒服','oni','#101010','#fcfcfc','']].forEach(x=>{const id='e_'+x[0];if(VGC[id])return;
+    const c={id,ch:null,en:x,n:x[0],cl:'mono',ek:'oc',g:3,pw:11000,sh:0,tr:null,pg:0,rar:'RRR',pack:9,root:id,def:0,enemy:1};VGC[id]=c;VGL.push(c);});}
 /* ----- オリジナルカードの 絵（64×64：形を 塗って 輪郭を つける。 色は 差しかえ 表で 変える） ----- */
 const VG_ARTC={};
 function vgArt(t,map){const key=t+JSON.stringify(map||{});if(VG_ARTC[key])return VG_ARTC[key];const c=document.createElement('canvas');c.width=64;c.height=64;const g=c.getContext('2d'),M=map||{},col=x=>M[x]||x;
@@ -4051,7 +4054,7 @@ const VG_SKILL={bou:['勇気の一撃','CB1：このユニット パワー＋500
   city:['人海戦術','CB1：カードを 1枚 引く'],rei:['英霊の誇り','LB4（ダメージ4枚以上）：パワー＋5000・★＋1'],ent:['炎上','CB1：相手の リアガード 1体を 退却'],
   siro:['光の導き','CB1：山札の 上を リアガードに コール（G2以下）'],gure:['紅蓮の咆哮','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],tuki:['影縫い','CB1：相手は 手札を 1枚 捨てる・1枚 引く'],yu:['癒しの祈り','CB1：ダメージを 1枚 回復・パワー＋3000'],
   o_amateru:['天穹の号令','GB1：自分の リアガード 全員 パワー＋5000'],o_tenen:['天焔の審判','GB1：相手の 前列リアガードを すべて 退却'],o_tsukuyo:['月詠の影','GB1：相手は 手札を 2枚 捨てる'],o_seraph:['救世の光','GB1：ダメージ 1枚 回復・★＋1'],
-  mono:['百鬼夜行','CB1：自分の リアガード 全員 パワー＋3000'],gun:['物量作戦','CB1：山札の 上を リアガードに コール（G2以下）'],boss:['宿敵の威圧','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],bossg:['魔王降臨','GB1：パワー＋10000・★＋1'],
+  mono:['百鬼夜行','CB1：自分の リアガード 全員 パワー＋3000'],e_白服:['白の 粛清','CB1：相手の リアガード 1体を 退却・カードを 1枚 引く'],e_黒服:['取り立て','CB1：相手は 手札を 1枚 捨てる・このユニット パワー＋5000'],gun:['物量作戦','CB1：山札の 上を リアガードに コール（G2以下）'],boss:['宿敵の威圧','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],bossg:['魔王降臨','GB1：パワー＋10000・★＋1'],
   none:['創造超越','【永】ヴァンガードに いる間、 相手の トリガー効果を すべて 無効'],
   godkami:['神の一撃','GB1：パワー＋5000・★＋1'],itsuku:['開発者の閃き','GB1：パワー＋5000・カードを 1枚 引く'],legend_itsuku:['伝説の修正パッチ','GB1：★＋1・相手の リアガード 1体を 退却']};
 const VG5=id=>{if(!CH[id])return[];const r=['n','r','sr','ssr','ur'],b=RAR[CH[id].rar].n.toLowerCase();return r.map(x=>x===b?id:id+'_'+x).filter(i=>CH[i]);};
@@ -4124,7 +4127,7 @@ function vgCard(c,x,y,w,h,o={}){if(o.back||!c){R(x,y,w,h,'#000');R(x+1,y+1,w-2,h
   const fc=c.rar==='PR'||c.rar==='？？？'?`hsl(${(frame*6)%360},90%,60%)`:c.rar==='SP'?'#f8d800':c.rar==='RRR'?'#fc74b4':null;if(fc){R(x,y,w,1,fc);R(x,y+h-1,w,1,fc);R(x,y,1,h,fc);R(x+w-1,y,1,h,fc);if(c.rar!=='RRR'&&bg2&&((frame>>3)%8)<2){R(x+w-6,y+4,1,3,'#fcfcfc');R(x+w-7,y+5,3,1,'#fcfcfc');}}}
 function vgInfo(c){if(!c)return[];const L=[`${c.n}`,`${VG_CL[c.cl].n}　G${c.g}　パワー${c.pw}`,c.g<3&&c.g!==4?`シールド ${c.sh}${c.g===2?'　インターセプト':''}${c.g<=1?'　ブースト':''}`:c.g===3?'ツインドライブ!!':c.main?'トリプルドライブ!!!（メインデッキの G4・G3に ライド）':'トリプルドライブ!!!　ストライド'];
   if(c.tr)L.push(`${VG_TR[c.tr][2]}トリガー（パワー＋5000${c.tr==='crit'?'・★＋1':''}）`);if(c.pg)L.push('完全ガード：手札を 1枚 捨てて ヒットされない');
-  const sk=c.main&&c.cl==='none'?VG_SKILL.none:c.nz!=null?null:c.g===4?(VG_SKILL[c.id]||(c.enemy?VG_SKILL.bossg:null)):c.g===3?VG_SKILL[c.cl]:null;if(sk)L.push(`【${sk[0]}】${sk[1]}`);if(c.root==='kobu')L.push(c.g===4?'【自】ストライド時：山札から ニズゥーイッツァイを 2枚 ソウルへ（SC）':'【自】登場時（ライド・コール）：山札から ニズゥーイッツァイを 1枚 ソウルへ（SC）');if(c.nz!=null)L.push(c.nz===0?'【自】スタンドアップ時：山札から G1の ニズゥーイッツァイを 手札へ':c.nz<3?`【自】ライド時：山札から G${c.nz+1}の ニズゥーイッツァイを 手札へ`:c.nz===3?'【自】ライド時：ダメージを 1枚 表に・1枚 引く':'ストライド（ハーツが ニズゥーイッツァイ）：最終形態 解放・相手の リアガードを すべて 退却',c.nz&&c.nz<4?'【永】ソウルの ニズゥーイッツァイ 1枚につき パワー＋2000':'');if(c.enemy&&c.g===4&&VG_EN.root[c.n]&&c.nz==null)L.push('同じ キャラの 上に ストライドで 最終形態 解放（パワー＋5000・★＋1）');L.push(`レア度 ${c.rar}`);return L;}
+  const sk=c.main&&c.cl==='none'?VG_SKILL.none:c.nz!=null?null:c.g===4?(VG_SKILL[c.id]||(c.enemy?VG_SKILL.bossg:null)):c.g===3?(VG_SKILL[c.id]||VG_SKILL[c.cl]):null;if(sk)L.push(`【${sk[0]}】${sk[1]}`);if(c.root==='kobu')L.push(c.g===4?'【自】ストライド時：山札から ニズゥーイッツァイを 2枚 ソウルへ（SC）':'【自】登場時（ライド・コール）：山札から ニズゥーイッツァイを 1枚 ソウルへ（SC）');if(c.nz!=null)L.push(c.nz===0?'【自】スタンドアップ時：山札から G1の ニズゥーイッツァイを 手札へ':c.nz<3?`【自】ライド時：山札から G${c.nz+1}の ニズゥーイッツァイを 手札へ`:c.nz===3?'【自】ライド時：ダメージを 1枚 表に・1枚 引く':'ストライド（ハーツが ニズゥーイッツァイ）：最終形態 解放・相手の リアガードを すべて 退却',c.nz&&c.nz<4?'【永】ソウルの ニズゥーイッツァイ 1枚につき パワー＋2000':'');if(c.enemy&&c.g===4&&VG_EN.root[c.n]&&c.nz==null)L.push('同じ キャラの 上に ストライドで 最終形態 解放（パワー＋5000・★＋1）');L.push(`レア度 ${c.rar}`);return L;}
 /* ----- デッキ ----- */
 function vgCheckDeck(d,gz){const DB=vgDB(),ids=Object.keys(d).filter(k=>d[k]>0&&DB[k]),n=vgCnt(d),tr=ids.reduce((a,k)=>a+(DB[k].tr?d[k]:0),0),he=ids.reduce((a,k)=>a+(DB[k].tr==='heal'?d[k]:0),0),g0=ids.some(k=>DB[k].g===0);
   const e=[];if(n!==50)e.push(`デッキは 50枚（いま ${n}枚）`);if(tr>16)e.push(`トリガーは 16枚まで（いま ${tr}枚）`);if(he>4)e.push(`ヒールは 4枚まで（いま ${he}枚）`);if(!g0)e.push('グレード0が 1枚 必要');
@@ -4390,11 +4393,13 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
         /* アタック時 スキル */
         if(ai==='V'){const vc=A.c;if(vc.g===4&&!vc.main){const gb=P.gz.filter(x=>x.up).length+1;if(gb>=1){const gid=vc.id;if(vc.enemy){A.bp+=10000;A.bc++;}else if(gid==='godkami'){A.bp+=5000;A.bc++;}else if(gid==='itsuku'){A.bp+=5000;draw(P);}else if(gid==='o_amateru'){P.R.forEach(u=>u&&(u.bp+=5000));}else if(gid==='o_tenen'){[0,1].forEach(i=>retire(O,i));}
             else if(gid==='o_tsukuyo'){for(let k=0;k<2&&O.hand.length;k++)O.drop.push(O.hand.splice(Math.floor(rnd()*O.hand.length),1)[0]);}else if(gid==='o_seraph'){A.bc++;if(P.dmg.length)P.drop.push(P.dmg.pop().c);}else{A.bc++;const r=[0,1,2,3,4].filter(i=>O.R[i]);if(r.length)retire(O,r[0]);}yield msg(`GB1【${(VG_SKILL[vc.id]||VG_SKILL.bossg)[0]}】！`,40);}}
-          else if(vc.g===3){const sk=VG_SKILL[vc.cl];if(vc.cl==='rei'){if(P.dmg.length>=4){A.bp+=5000;A.bc++;yield msg(`LB4【${sk[0]}】！`,35);}}
+          else if(vc.g===3){const sk=VG_SKILL[vc.id]||VG_SKILL[vc.cl];if(vc.cl==='rei'){if(P.dmg.length>=4){A.bp+=5000;A.bc++;yield msg(`LB4【${sk[0]}】！`,35);}}
             else if(sk&&vc.cl!=='none'&&faceUp(P)>0){let use=true;if(me){const k=yield {k:'menu',title:`【${sk[0]}】${sk[1]}`,opts:['使う','使わない'],cancel:0};use=k===0;}
               else use=vc.cl!=='night'||O.hand.length>0;
-              if(use&&cb1(P)){const fx=({mono:'taka',gun:'siro',boss:'gure'})[vc.cl]||vc.cl;if(fx==='bou')A.bp+=5000;else if(fx==='taka')P.R.forEach(u=>u&&(u.bp+=3000));else if(fx==='night'){if(O.hand.length){let k=Math.floor(rnd()*O.hand.length);if(!O.ai){k=yield {k:'hand',title:'捨てる カードを えらぶ',ok:()=>true,cancel:0};}O.drop.push(O.hand.splice(k,1)[0]);}}
+              if(use&&cb1(P)){const fx=({e_白服:'shirof',e_黒服:'kurof'})[vc.id]||({mono:'taka',gun:'siro',boss:'gure'})[vc.cl]||vc.cl;if(fx==='bou')A.bp+=5000;else if(fx==='taka')P.R.forEach(u=>u&&(u.bp+=3000));else if(fx==='night'){if(O.hand.length){let k=Math.floor(rnd()*O.hand.length);if(!O.ai){k=yield {k:'hand',title:'捨てる カードを えらぶ',ok:()=>true,cancel:0};}O.drop.push(O.hand.splice(k,1)[0]);}}
                 else if(fx==='city')draw(P);
+                else if(fx==='shirof'){const r=[0,1,2,3,4].filter(i=>O.R[i]);if(r.length){let k=0;if(me&&r.length>1){k=yield {k:'slot',title:'退却させる 相手の リアガード',slots:r.map(i=>({s:1,i}))};k=Math.max(0,k);}else k=r.reduce((b,i,j)=>vgPw(O.R[i])>vgPw(O.R[r[b]])?j:b,0);retire(O,r[k]);}draw(P);}
+                else if(fx==='kurof'){A.bp+=5000;if(O.hand.length){let k=Math.floor(rnd()*O.hand.length);if(!O.ai){k=yield {k:'hand',title:'捨てる カードを えらぶ',ok:()=>true,cancel:0};}O.drop.push(O.hand.splice(Math.max(0,k),1)[0]);}}
                 else if(fx==='siro'){const c=P.deck.pop();if(c){const e=[0,1,2,3,4].find(i=>!P.R[i]);if(c.g<=2&&e!=null)P.R[e]={c,rest:false,bp:0,bc:0};else P.hand.push(c);}}
                 else if(fx==='gure'){A.bp+=3000;const r=[0,1].filter(i=>O.R[i]);if(r.length){let k=0;if(me&&r.length>1){k=yield {k:'slot',title:'退却させる 相手の リアガード',slots:r.map(i=>({s:1,i}))};k=Math.max(0,k);}retire(O,r[k]);}}
                 else if(fx==='tuki'){if(O.hand.length){let k=Math.floor(rnd()*O.hand.length);if(!O.ai){k=yield {k:'hand',title:'捨てる カードを えらぶ',ok:()=>true,cancel:0};}O.drop.push(O.hand.splice(Math.max(0,k),1)[0]);}draw(P);}
@@ -4441,7 +4446,7 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
     for(let g=0;g<200;g++){yield* turn();if(lost()||F.win!=null)break;F.cur^=1;}}
   F.gen=main();const step=a=>{const r=F.gen.next(a);if(r.done){F.req={k:'end'};F.t=0;sfx(F.win===0?'win':'lose');}else{F.req=r.value;F.t=0;F.ui={c:0,sel:[],top:0};if(F.req.k==='slot'||F.req.k==='hand'){const ok=F.req.ok;if(F.req.k==='hand'){const P=F.p[0];const i=P.hand.findIndex(c=>!ok||ok(c));F.ui.c=Math.max(0,i);}}}};
   playBGM('vg');step();
-  push({full:true,upd(){F.t++;F.fx.forEach(f=>f.t++);F.fx=F.fx.filter(f=>f.t<60);const q=F.req;if(!q)return;const U=F.ui;
+  push({full:true,upd(){if(vgViewUpd(F))return;F.t++;F.fx.forEach(f=>f.t++);F.fx=F.fx.filter(f=>f.t<60);const q=F.req;if(!q)return;const U=F.ui;
       if(q.k==='msg'){if(F.t>=q.t||(I.A&&F.t>6)||(I.holdA&&F.t>4))step();return;}
       if(q.k==='end'){if(F.t>30&&(I.A||I.B)){pop();playBGM('village');cb(F.win===0);}return;}
       if(q.k==='menu'){const n=q.opts.length;if(I.pu||I.pd){U.c=(U.c+(I.pd?1:n-1))%n;sfx('cur');}if(I.A){sfx('ok');step(U.c);}else if(I.B&&q.cancel){sfx('cancel');step(-1);}return;}
@@ -4451,7 +4456,36 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
       if(q.k==='multi'){const n=q.items.length+1;if(I.pu||I.pd){U.c=(U.c+(I.pd?1:n-1))%n;sfx('cur');}
         if(I.A){if(U.c===q.items.length){const inf=q.info(U.sel);if(inf[1]){sfx('ok');step(U.sel.slice());}else sfx('ng');}else{const j=U.sel.indexOf(U.c);if(j>=0)U.sel.splice(j,1);else U.sel.push(U.c);sfx('cur');}}
         else if(I.B&&q.cancel){sfx('cancel');step(null);}return;}},
-    drw(){vgDrawBoard(F);}});}
+    drw(){vgDrawBoard(F);vgViewDrw(F);}});}
+/* ===== 対戦中の カード確認（C・I・Tabキー／コントローラーの セレクト／左の「確認」ボタン／カードを タップ） ===== */
+function vgViewList(F){const L=[],P0=F.p[0],P1=F.p[1],nm=i=>i==='V'?'V':['前列左','前列右','後列左','後列中','後列右'][i];
+  for(const [s,P,who] of [[1,P1,'相手'],[0,P0,'自分']])['V',0,1,2,3,4].forEach(i=>{const u=vgUnit(P,i);if(u){L.push({c:u.c,u,lab:`${who}の ${nm(i)}`,s,i});if(u.heart)L.push({c:u.heart,lab:`${who}の V（ハーツ）`,s,i:'H'});}});
+  P0.hand.forEach((c,k)=>L.push({c,lab:`手札 ${k+1}/${P0.hand.length}`,h:k}));
+  P0.gz.forEach((g,k)=>L.push({c:g.c||g,lab:`Gゾーン（${g.up?'表':'裏'}）`}));
+  for(const [P,who] of [[P0,'自分'],[P1,'相手']])P.dmg.forEach(d=>{if(d.up)L.push({c:d.c,lab:`${who}の ダメージ（表）`});});
+  return L.filter(e=>e.c&&e.c.n);}
+function vgViewOpen(F,match){const L=vgViewList(F);if(!L.length)return;let i=0;if(match){const j=L.findIndex(match);if(j>=0)i=j;}
+  else{const q=F.req||{},U=F.ui;if(q.k==='hand'){const j=L.findIndex(e=>e.h===U.c);if(j>=0)i=j;}else if(q.k==='slot'){const z=q.slots[U.c];const j=z?L.findIndex(e=>e.s===z.s&&e.i===z.i):-1;if(j>=0)i=j;}}
+  F.view={i};sfx('ok');}
+function vgViewUpd(F){if(!F.view){if(I.X&&F.req&&F.req.k!=='end'){vgViewOpen(F);return true;}return false;}
+  const L=vgViewList(F),n=L.length;if(!n){F.view=null;return true;}const V=F.view;V.i=Math.min(V.i,n-1);
+  if(I.pl||I.pu){V.i=(V.i+n-1)%n;sfx('cur');}if(I.pr||I.pd){V.i=(V.i+1)%n;sfx('cur');}
+  if(I.B||I.X||I.A){F.view=null;sfx('cancel');}return true;}
+function vgViewDrw(F){const q=F.req||{};
+  if(!F.view){if(q.k&&q.k!=='end'){R(1,80,33,15,'#24188c');ctx.strokeStyle='#f8d878';ctx.lineWidth=1;ctx.strokeRect(1.5,80.5,32,14);txt('確認',17,84,'#f8d878','center');region(0,78,35,19,()=>{vX=true;});
+      /* 盤面・手札の カードを タップしても 確認できる（選択中で ないとき） */
+      for(let s=0;s<2;s++)['V',0,1,2,3,4].forEach(i=>{const P=F.p[s];if(!vgUnit(P,i))return;if(q.k==='slot'&&q.slots.some(z=>z.s===s&&z.i===i))return;const p=vgSlotPos(s,i);region(p.x-2,p.y-2,32,42,()=>vgViewOpen(F,e=>e.s===s&&e.i===i));});}
+    return;}
+  const L=vgViewList(F),e=L[F.view.i];if(!e)return;const c=e.c;
+  R(0,0,W,H,'#000000e8');win(4,4,W-8,H-8,'#f8d878');big('カード確認',W/2,10,'#f8d878','center',12);txt(`${F.view.i+1}/${L.length}`,W-12,12,'#7c7c7c','right');
+  txt(e.lab,W/2,26,e.s===1||/相手/.test(e.lab)?'#fc7460':'#a8e4fc','center');
+  vgCard(c,12,40,78,108,e.u?{pw:vgPw(e.u),cr:vgCr(e.u),up:e.u.bp>0||!!e.u.heart}:{});
+  if(e.u){const base=c.pw+(e.u.heart?e.u.heart.pw:0),add=vgPw(e.u)-base;txt(`いまの パワー ${vgPw(e.u)}`,51,152,'#fcfcfc','center');if(add)txt(`（元 ${base}　${add>0?'＋':''}${add}）`,51,162,'#f8d800','center');txt(`★ ${vgCr(e.u)}${e.u.rest?'　レスト':''}`,51,172,'#bcbcbc','center');}
+  ctx.font='8px '+FONT;const wrapW=(str,mw)=>{const o=[];let cur='';for(const ch of str){if(ctx.measureText(cur+ch).width>mw&&cur){o.push(cur);cur=ch.trim()?ch:'';}else cur+=ch;}if(cur)o.push(cur);return o;};
+  let y=40;vgInfo(c).filter(Boolean).forEach((l,k)=>{wrapW(l,146).forEach(w=>{if(y<206){txt(w,98,y,k===0?'#f8d878':/^【/.test(l)?'#a8e4fc':'#fcfcfc','left',150);y+=11;}});if(k===0||k===2)y+=3;});
+  txt('◀▶ 切りかえ　B・確認キーで とじる',W/2,218,'#7c7c7c','center');
+  R(8,186,26,24,'#24188c');txt('◀',21,192,'#fcfcfc','center');region(6,184,30,28,()=>{vU=true;});R(W-34,186,26,24,'#24188c');txt('▶',W-21,192,'#fcfcfc','center');region(W-36,184,30,28,()=>{vD=true;});
+  R(W-50,8,38,14,'#880000');txt('とじる',W-31,10,'#fcfcfc','center');region(W-52,6,42,18,()=>{vB=true;});}
 function vgSlotPos(s,i){const fx={L:62,C:114,R:166},col=i==='V'||i===3?'C':(i===0||i===2)?(s?'R':'L'):(s?'L':'R'),row=i==='V'||i===0||i===1?'f':'b';
   return {x:fx[col],y:s?(row==='f'?46:4):(row==='f'?100:142)};}
 const VG_PHN={スタンド:'スタンド＆ドロー',ドロー:'スタンド＆ドロー',ライド:'ライドフェイズ',ストライド:'ストライドフェイズ',メイン:'メインフェイズ',バトル:'バトルフェイズ',ガード:'ガードステップ',エンド:'エンドフェイズ',準備:'ファイト 準備'};
