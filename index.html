@@ -3986,7 +3986,8 @@ function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.i
    サキタマ編 クリア後に 霧が 晴れて 解放。 ヲワリ（マスミダ）と ミカワ（トヨカワイナァリ）の どちらに つくかで 物語が 変わる。
    最後は アツタの森で 黒幕の 影（Tイトシロ）を 退け、 アツタノオオカミの 力で アイヂが 元に 戻る（国都は アツタ朝廷）。
    クリア報酬：クサナギの イヤホン ＋ ガチャに マスミダ・トヨカワイナァリ・スー君。 陣営は クリア後に 選び直せる。 */
-const aidiOpen=()=>!!(G&&G.sk&&G.sk.clear);
+const AI_LIVE=false;/* 配信スイッチ：true で アイヂ大戦編を 公開（11/25 いったん 停止） */
+const aidiOpen=()=>AI_LIVE&&!!(G&&G.sk&&G.sk.clear);
 const aiS=()=>G.ai||(G.ai={ch:0,side:null,clear:0,done:[]});
 const aiCh=()=>G&&G.ai?G.ai.ch:0;
 const aiPass=t=>(t===T.AIDI&&aidiOpen())||(t===T.ATSUTA&&aiCh()>=4);
