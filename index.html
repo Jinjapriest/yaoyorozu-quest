@@ -4164,14 +4164,23 @@ const vgTourOK=()=>dow()===0&&nowMin()>=780&&nowMin()<1020;
 function vgShop(){vgDB();const S=vgS();
   if(!vgOpen()){dialog('店長「ごめんね！ 今は 閉店中なんだ。\n営業は 10時から 21時までだよ」');return;}
   const first=!S.met;S.met=1;
-  const q=S.q,O=[['パックを 買う',vgBuyPack],['トライアルデッキ',vgTrial],['中古カード',vgUsed],['カード買取',vgBuy],['デッキを 組む',vgEdit],['ショップ大会',vgTour]];
+  const q=S.q,kn=vgKonin(),O=[['パックを 買う',vgBuyPack],...(kn?[['★スペシャルパック（公認店限定）',vgSpPack]]:[]),['トライアルデッキ',vgTrial],['中古カード',vgUsed],['カード買取',vgBuy],['デッキを 組む',vgEdit],['ショップ大会',vgTour]];
   if(q&&q.st===2&&TW&&TW.vi===q.dv)O.push(['★ 地区大会',vgDist]);if(q&&q.st===3&&TW&&TW.vi===q.cv)O.push(['★ 大陸大会',vgCont]);O.push([q&&q.st<5?'全国No.1（進行中）':'目指せ！全国No.1',vgQuest],['ポイント交換',vgExchange],['ルール説明',vgRules]);
-  const go=()=>choice(`店長「なにに する？」\n${S.pt}pt　所持 ${vgCnt(S.col)}枚${q&&q.st<5?'\n'+VG_QN[q.st]:''}`,O.map(x=>x[0]),k=>{if(k>=0)O[k][1]();},130);
+  const go=()=>choice(`店長「なにに する？」${kn?'　【公認ショップ】':''}\n${S.pt}pt　所持 ${vgCnt(S.col)}枚${q&&q.st<5?'\n'+VG_QN[q.st]:''}`,O.map(x=>x[0]),k=>{if(k>=0)O[k][1]();},130);
   if(first)dialog(['店長「いらっしゃい！ ここは カードショップ 先導堂！」','店長「カードファイト!! ヴァンガルドを 遊ぶなら\nまずは トライアルデッキが おすすめだよ」','店長「ルールは 旧ルール。 ストライドも あるよ！\nわからなかったら ルール説明を 聞いてね」'],go);else go();}
 function vgBuyPack(){const S=vgS();listPick('ブースターパック（1パック 5枚）',VG_PACKS.map((p,i)=>`第${i+1}弾 ${p.n}　300イェソ`),i=>{
   choice(`第${i+1}弾「${VG_PACKS[i].n}」\n財布 ${fmt(G.coins)}イェソ`,['1パック 300','10パック 3000','1BOX 30パック 9000'],k=>{if(k<0)return;const n=[1,10,30][k],cost=n*300;
     if(G.coins<cost){dialog('お金が 足りない…');return;}G.coins-=cost;sfx('coin');const got=[];for(let j=0;j<n;j++)got.push(...vgPull(i));got.forEach(c=>S.col[c.id]=(S.col[c.id]||0)+1);save();vgOpenScr(got,n);},120);},
   ()=>'スクロールで 選ぶ。 レア度：C／R／RR／RRR／SP（金枠）');}
+/* 都会以上の 町の 先導堂は 公認ショップ：SP以上 確定の スペシャルパックを 扱う */
+const VG_SPP=10000,vgKonin=()=>!!(TW&&VIL[TW.vi]&&VIL[TW.vi].size>=4);
+function vgSpPull(){const ok=c=>c.rar!=='？？？'&&c.rar!=='PR',A=VGL.filter(ok),by=r=>A.filter(c=>c.rar===r),out=[];
+  for(let s=0;s<4;s++){const x=rnd();const r=x<.06?'SP':x<.32?'RRR':'RR';const P=by(r);out.push(P[Math.floor(rnd()*P.length)]);}
+  const SP=by('SP');out.push(SP[Math.floor(rnd()*SP.length)]);return out;}
+function vgSpPack(){const S=vgS();
+  dialog(['店長「おっ、 お目が 高いね！」',`店長「公認ショップ 限定の スペシャルパック。\n1パック 5枚で、 最後の 1枚は SP 確定！\n残りの 4枚も RR以上 だよ」`,`店長「全弾の カードから 出るけど…\nお値段は 1パック ${fmt(VG_SPP)}イェソ だ」`],()=>
+  choice(`スペシャルパック（SP以上 確定）\n財布 ${fmt(G.coins)}イェソ`,[`1パック ${fmt(VG_SPP)}`,`5パック ${fmt(VG_SPP*5)}`,`10パック ${fmt(VG_SPP*10)}`],k=>{if(k<0)return;const n=[1,5,10][k],cost=n*VG_SPP;
+    if(G.coins<cost){dialog('お金が 足りない…');return;}G.coins-=cost;sfx('coin');const got=[];for(let j=0;j<n;j++)got.push(...vgSpPull());got.forEach(c=>S.col[c.id]=(S.col[c.id]||0)+1);S.spBought=(S.spBought||0)+n;save();vgOpenScr(got,n);},120));}
 function vgPull(pk){const DB=vgDB(),L=VGL.filter(c=>c.pack===pk),by=r=>L.filter(c=>c.rar===r),out=[];
   for(let s=0;s<5;s++){const x=rnd();let r=x<.012?'SP':x<.06?'RRR':x<.18?'RR':x<.45?'R':'C';if(s===4&&r==='C')r='R';let P=by(r);if(!P.length)P=by('RR').length?by('RR'):L;out.push(P[Math.floor(rnd()*P.length)]);}return out;}
 /* パック開封：パックを 破る → 裏向きで 配る → 1枚ずつ めくる（レア度で 演出が 変わる） */
