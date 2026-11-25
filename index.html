@@ -10181,7 +10181,7 @@ function keibaCard(vi){G.keiba=G.keiba||{};const no=keibaRaceNo()||12,r=lcg(vi*6
   const course=VIL[vi].capital?'マホロバ':'コクラ';
   return{no,horses,baba:bb[0],noise:bb[1],dist,top3,pair:k=>pair[k]||0,g1,sp,relay:RL?1:0,gname:RL?RELAY_NAME:sp?`G${sp.grade} ${sp.saikiCup?sp.name:sp.title||sp.name}`:'',course,rate:RL?.85:gr===1?.85:gr===2?.82:gr===3?.8:.78};}
 /* 特別競走：コクラ＝タムニィ杯、 マホロバ＝イツク杯・年末の アリウマ記念、 自分の 記念競走 */
-function keibaSpecial(vi,no){if(saikiDay()&&no===11)return Object.assign({},SAIKI_CUP,{dist:'芝2400m'});const K=G.kinen;if(K&&K.vi===vi)return{name:K.name,title:`第${((G.kinenN||{})[K.name]||0)+1}回 ${K.name}`,grade:K.grade,own:1,dist:['','芝2400m','芝2000m','芝1600m'][K.grade]};
+function keibaSpecial(vi,no){if(saikiDay())return Object.assign({},SAIKI_CUP,{dist:'芝2400m'});const K=G.kinen;if(K&&K.vi===vi)return{name:K.name,title:`第${((G.kinenN||{})[K.name]||0)+1}回 ${K.name}`,grade:K.grade,own:1,dist:['','芝2400m','芝2000m','芝1600m'][K.grade]};
   const wk=Math.floor((G.day-1)/7),main=no===11&&dow()===0;
   if(VIL[vi].capital){const yr=Math.floor(G.day/360);if(main&&G.day%360>=350&&!((G.arima||{})[yr]))return{name:'アリウマ記念',grade:1,arima:yr,dist:'芝2500m'};if(main&&wk%2===1)return{name:'イツク杯',grade:1,dist:'芝2000m'};return null;}
   return main&&wk%2===0?{name:'タムニィ杯',grade:1,dist:'芝2400m'}:null;}
@@ -10386,7 +10386,7 @@ function chihoCard(L){const no=chihoRaceNo(L)||12,r=lcg((L.vi+1)*7919+G.day*97+n
   if(L.harib&&r()<.06){const slot=Math.floor(r()*8),K=KRARE[0];horses[slot]={name:K.name,jk:horses[slot].jk,kg:430+Math.floor(r()*30),cd:1,w:K.w(r),rare:0};}
   if(L.banei&&r()<.1){const B=KRARE.map((K,i)=>i).filter(i=>KRARE[i].banei),k=B[Math.floor(r()*B.length)],K=KRARE[k],slot=Math.floor(r()*8);horses[slot]={name:K.name,jk:horses[slot].jk,kg:1000+Math.floor(r()*120),cd:1,w:K.w(r),rare:k};}
   let baba,nz;if(L.banei){const wm=Math.round((.5+r()*r()*8)*10)/10;baba=`水分${wm}%`;nz=.14+wm*.035;}else{const bb=BABA[Math.min(3,Math.floor(r()*r()*4.5))];baba=bb[0];nz=bb[1]+.03;}
-  let sp=null;if(saikiDay()&&no===11)sp=Object.assign({},SAIKI_CUP,{dist:L.dist[L.dist.length-1]});else if(L.chuo&&no===11){const wk=Math.floor((G.day-1)/7);if(dow()===0)sp=wk%2?{name:'八雲大障害',grade:1,dist:'障害4250m'}:{name:'八雲ダートカップ',grade:1,dist:'ダ2100m'};else if(dow()===6)sp={name:'出雲ジャンプステークス',grade:3,dist:'障害3300m'};}
+  let sp=null;if(saikiDay())sp=Object.assign({},SAIKI_CUP,{dist:L.dist[L.dist.length-1]});else if(L.chuo&&no===11){const wk=Math.floor((G.day-1)/7);if(dow()===0)sp=wk%2?{name:'八雲大障害',grade:1,dist:'障害4250m'}:{name:'八雲ダートカップ',grade:1,dist:'ダ2100m'};else if(dow()===6)sp={name:'出雲ジャンプステークス',grade:3,dist:'障害3300m'};}
   if(sp){horses.forEach(h=>{h.w*=sp.grade===1?1.6:1.15;});if(sp.grade===1){const ks=shufR([0,1,2,3],r).slice(0,2),sl=shufR([0,1,2,3,4,5,6,7],r);if(sp.saikiCup&&!ks.includes(3))ks[0]=3;ks.forEach((k,j)=>{const K=KRARE[k];horses[sl[j]]={name:K.name,jk:horses[sl[j]].jk,kg:470+Math.floor(r()*40),cd:1,w:K.w(r)*(k===0?1:1.6),rare:k,saiki:K.saiki};});}}
   else if(L.chuo&&r()<.06){const k=kRarePick(r),K=KRARE[k],slot=Math.floor(r()*8);horses[slot]={name:K.name,jk:horses[slot].jk,kg:470+Math.floor(r()*40),cd:1,w:K.w(r),rare:k,saiki:K.saiki};}
   let dist;if(sp)dist=sp.dist;else if(L.dw){const T_=L.dw.reduce((a,x)=>a+x,0);let x=r()*T_,k=0;for(;k<L.dw.length-1;k++){x-=L.dw[k];if(x<0)break;}dist=L.dist[k];}else dist=L.dist[Math.floor(r()*L.dist.length)];
