@@ -1591,6 +1591,7 @@ function drawEnemy(e,x,y,t){
     case 'kgod':drawKGod(x,y,t);break;
     case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;case 'gargos':drawGargos(x,y,t);break;case 'wadatsumi':drawWadatsumi(x,y,t,0);break;case 'wadatsumi_s':drawWadatsumi(x,y,t,1);break;
     case 'shiro0':case 'shiro1':case 'shiro2':case 'shiro3':case 'shiro4':drawShirofuku(x,y,t,+e.shape.slice(5));break;
+    case 'fknight':drawFallenKnight(x,y,t,0);break;case 'fknight4':drawFallenKnight(x,y,t,1);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
     case 'bat':{const f=(t>>3)&1;for(let k=0;k<13;k++){const h=f?10-Math.floor(k*.6):4+Math.floor(k*.3),oy=f?-24:-18;R(x+5+k,y+oy+(f?k*.4|0:0),1,h,c1);R(x-6-k,y+oy+(f?k*.4|0:0),1,h,c1);}
@@ -2763,7 +2764,7 @@ function startBattle(boss,rift=null,sp=null){
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   if(!boss&&!sp&&rift==null)en.forEach(e=>{for(const q of ['maxhp','hp','atk','mag'])e[q]=Math.max(1,Math.round(e[q]*.85));e.def=Math.max(1,Math.round(e.def*.9));});/* 野良の 敵：少し 弱く */
   en.forEach(e=>{if(/の 複製$/.test(e.name||'')&&sp&&sp.st==='sk_nizu2'){e.atk*=1.75;e.mag*=1.75;}});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90],gargos:[72,92],wadatsumi:[90,84],wadatsumi_s:[66,62],shiro4:[40,74]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={fknight:[44,64],fknight4:[84,88],kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90],gargos:[72,92],wadatsumi:[90,84],wadatsumi_s:[66,62],shiro4:[40,74]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   /* 11/19：ボスが 弱いと 言われたので 強化（HP 1.8倍・攻撃/魔力 1.3倍・守備 1.15倍） */
@@ -3816,7 +3817,11 @@ function vgAddEnemies(){const ENP=[['mono',7,VG_EN.mono],['gun',8,VG_EN.gun1],['
     VGC[id]=c;VGL.push(c);}));
   /* 11/25：白服と 黒服（オリキャラ）… 魑魅魍魎の 切り札 */
   [['白服','spirit','#fcfcfc','#d82800',''],['黒服','oni','#101010','#fcfcfc','']].forEach(x=>{const id='e_'+x[0];if(VGC[id])return;
-    const c={id,ch:null,en:x,n:x[0],cl:'mono',ek:'oc',g:3,pw:11000,sh:0,tr:null,pg:0,rar:'RRR',pack:9,root:id,def:0,enemy:1};VGC[id]=c;VGL.push(c);});}
+    const c={id,ch:null,en:x,n:x[0],cl:'mono',ek:'oc',g:3,pw:11000,sh:0,tr:null,pg:0,rar:'RRR',pack:9,root:id,def:0,enemy:1};VGC[id]=c;VGL.push(c);});
+  /* 11/25：闇に 堕ちた 聖騎士（オリジナル）… 退却と ドロップゾーンからの 蘇生 */
+  [[VG_KUROU[0],3,11000,'RRR','fknight'],[VG_KUROU[1],4,15000,'SP','fknight4']].forEach(([n,g,pw,rar,sh])=>{const id='e_'+n;if(VGC[id])return;VG_EN.root[n]='kurou';
+    const c={id,ch:null,en:[n,sh,'#24203c','#a800a8',sh],n,cl:'mono',ek:'oc',g,pw,sh:0,tr:null,pg:0,rar,pack:10,root:'kurou',def:0,enemy:1};VGC[id]=c;VGL.push(c);});}
+const VG_KUROU=['闇堕ちの聖騎士 クロウバネ','冥府騎士 黄泉還りのクロウバネ'];
 /* ----- オリジナルカードの 絵（64×64：形を 塗って 輪郭を つける。 色は 差しかえ 表で 変える） ----- */
 const VG_ARTC={};
 function vgArt(t,map){const key=t+JSON.stringify(map||{});if(VG_ARTC[key])return VG_ARTC[key];const c=document.createElement('canvas');c.width=64;c.height=64;const g=c.getContext('2d'),M=map||{},col=x=>M[x]||x;
@@ -4054,7 +4059,7 @@ const VG_SKILL={bou:['勇気の一撃','CB1：このユニット パワー＋500
   city:['人海戦術','CB1：カードを 1枚 引く'],rei:['英霊の誇り','LB4（ダメージ4枚以上）：パワー＋5000・★＋1'],ent:['炎上','CB1：相手の リアガード 1体を 退却'],
   siro:['光の導き','CB1：山札の 上を リアガードに コール（G2以下）'],gure:['紅蓮の咆哮','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],tuki:['影縫い','CB1：相手は 手札を 1枚 捨てる・1枚 引く'],yu:['癒しの祈り','CB1：ダメージを 1枚 回復・パワー＋3000'],
   o_amateru:['天穹の号令','GB1：自分の リアガード 全員 パワー＋5000'],o_tenen:['天焔の審判','GB1：相手の 前列リアガードを すべて 退却'],o_tsukuyo:['月詠の影','GB1：相手は 手札を 2枚 捨てる'],o_seraph:['救世の光','GB1：ダメージ 1枚 回復・★＋1'],
-  mono:['百鬼夜行','CB1：自分の リアガード 全員 パワー＋3000'],e_白服:['白の 粛清','CB1：相手の リアガード 1体を 退却・カードを 1枚 引く'],e_黒服:['取り立て','CB1：相手は 手札を 1枚 捨てる・このユニット パワー＋5000'],gun:['物量作戦','CB1：山札の 上を リアガードに コール（G2以下）'],boss:['宿敵の威圧','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],bossg:['魔王降臨','GB1：パワー＋10000・★＋1'],
+  mono:['百鬼夜行','CB1：自分の リアガード 全員 パワー＋3000'],e_白服:['白の 粛清','CB1：相手の リアガード 1体を 退却・カードを 1枚 引く'],e_黒服:['取り立て','CB1：相手は 手札を 1枚 捨てる・このユニット パワー＋5000'],'e_闇堕ちの聖騎士 クロウバネ':['黄泉への 一閃','アタック時：相手の リアガード 1体を 退却。さらに CB1：ドロップゾーンから G2以下の ユニットを 1体 リアガードに 蘇生'],'e_冥府騎士 黄泉還りのクロウバネ':['冥府の 凱旋','GB1：パワー＋10000・★＋1・相手の リアガード 1体を 退却。さらに CB1：ドロップゾーンから G3以下の ユニットを 2体まで リアガードに 蘇生'],gun:['物量作戦','CB1：山札の 上を リアガードに コール（G2以下）'],boss:['宿敵の威圧','CB1：相手の 前列リアガード 1体 退却・パワー＋3000'],bossg:['魔王降臨','GB1：パワー＋10000・★＋1'],
   none:['創造超越','【永】ヴァンガードに いる間、 相手の トリガー効果を すべて 無効'],
   godkami:['神の一撃','GB1：パワー＋5000・★＋1'],itsuku:['開発者の閃き','GB1：パワー＋5000・カードを 1枚 引く'],legend_itsuku:['伝説の修正パッチ','GB1：★＋1・相手の リアガード 1体を 退却']};
 const VG5=id=>{if(!CH[id])return[];const r=['n','r','sr','ssr','ur'],b=RAR[CH[id].rar].n.toLowerCase();return r.map(x=>x===b?id:id+'_'+x).filter(i=>CH[i]);};
@@ -4343,6 +4348,19 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
     if(T==='draw'){draw(P);}if(T==='heal'&&P.dmg.length&&P.dmg.length>=O.dmg.length){P.drop.push(P.dmg.pop().c);sfx('heal');}
     if(T==='stand'){const rs=[0,1,2,3,4].filter(i=>P.R[i]&&P.R[i].rest);if(rs.length){let k=0;if(!P.ai&&rs.length>1){k=yield {k:'slot',title:'スタンドする リアガード',slots:rs.map(i=>({s:0,i}))};k=Math.max(0,k);}else k=rs.reduce((b,i,j)=>vgPw(P.R[i])>vgPw(P.R[rs[b]])?j:b,0);P.R[rs[k]].rest=false;}}
     yield msg(`${VG_TR[T][2]}トリガー！`,30);}
+  /* クロウバネ：退却＋CBで 蘇生 */
+  function* kurouAtk(P,O,A,me){const g4=A.c.g===4,sk=VG_SKILL[A.c.id];if(g4){A.bp+=10000;A.bc++;}
+    const r=[0,1,2,3,4].filter(i=>O.R[i]);if(r.length){let k=0;if(me&&r.length>1){k=yield {k:'slot',title:`【${sk[0]}】退却させる 相手の リアガード`,slots:r.map(i=>({s:1,i}))};k=Math.max(0,k);}else k=r.reduce((b,i,j)=>vgPw(O.R[i])>vgPw(O.R[r[b]])?j:b,0);retire(O,r[k]);sfx('hit');}
+    yield msg(`${g4?'GB1':''}【${sk[0]}】！ ${r.length?'相手の リアガードを 退却！':''}${g4?' パワー＋10000・★＋1':''}`,40);
+    const mx=g4?3:2,cand=()=>P.drop.map((c,i)=>({c,i})).filter(x=>x.c.g<=mx&&!x.c.main&&!(x.c.g===4));
+    if(!faceUp(P)||!cand().length)return;let use=true;if(me){const k=yield {k:'menu',title:`CB1：ドロップから ${g4?'2体まで':'1体'} 蘇生する？`,opts:['蘇生する','しない'],cancel:0};use=k===0;}
+    if(!use||!cb1(P))return;const n=g4?2:1;let got=0;
+    for(let t2=0;t2<n;t2++){const L=cand();if(!L.length)break;let pick;
+      if(me){const k=yield {k:'menu',title:`蘇生する ユニット（${t2+1}/${n}）`,opts:[...L.slice(0,8).map(x=>`G${x.c.g} ${x.c.n}（${x.c.pw}）`),...(t2?['やめる']:[])],cancel:0};if(k<0||k>=Math.min(8,L.length))break;pick=L[k];}
+      else pick=L.reduce((b,x)=>x.c.pw>b.c.pw?x:b,L[0]);
+      const em=[0,1,2,3,4].filter(i=>!P.R[i]);let sl;if(em.length){sl=em[0];if(me&&em.length>1){const k=yield {k:'slot',title:`${pick.c.n} を 蘇生する 場所`,slots:em.map(i=>({s:0,i}))};sl=em[Math.max(0,k)];}}
+      else if(me){const all=[0,1,2,3,4];const k=yield {k:'slot',title:'蘇生する 場所（いる ユニットは 退却）',slots:all.map(i=>({s:0,i}))};sl=all[Math.max(0,k)];retire(P,sl);}else break;
+      P.drop.splice(P.drop.indexOf(pick.c),1);P.R[sl]={c:pick.c,rest:false,bp:0,bc:0};got++;sfx('magic');F.fx.push({k:'trig',tr:'heal',t:0});yield msg(`黄泉還り… ${pick.c.n} が 蘇った！`,40);}}
   const nzSearch=function*(P,g){const j=P.deck.findIndex(x=>x.nz===g);if(j<0)return;const f=P.deck.splice(j,1)[0];P.hand.push(f);for(let i=P.deck.length-1;i>0;i--){const k=Math.floor(rnd()*(i+1));[P.deck[i],P.deck[k]]=[P.deck[k],P.deck[i]];}sfx('lvup');yield msg(`サーチ！ 山札から ${f.n}を 手札に`,40);};
   const nzUpd=P=>{const k=P.soul.filter(x=>x.nz!=null).length;P.V.nzb=P.V.c.nz!=null&&!P.V.heart?2000*k:0;};
   function* kobuSC(P,n){let got=0;for(let k=0;k<n;k++){const j=P.deck.findIndex(x=>x.nz!=null&&x.g<4);if(j<0)break;P.soul.push(P.deck.splice(j,1)[0]);got++;}
@@ -4391,7 +4409,8 @@ function vgFight(opp,cb){const S=vgS(),DB=vgDB();
         if(boost&&me){const k=yield {k:'menu',title:`${B.c.n} で ブーストする？`,opts:['ブーストする','しない'],cancel:0};boost=k===0;}
         A.rest=true;if(boost)B.rest=true;F.atk={s:F.cur,i:ai,t:ti,b:boost?bi:null};sfx('hit');
         /* アタック時 スキル */
-        if(ai==='V'){const vc=A.c;if(vc.g===4&&!vc.main){const gb=P.gz.filter(x=>x.up).length+1;if(gb>=1){const gid=vc.id;if(vc.enemy){A.bp+=10000;A.bc++;}else if(gid==='godkami'){A.bp+=5000;A.bc++;}else if(gid==='itsuku'){A.bp+=5000;draw(P);}else if(gid==='o_amateru'){P.R.forEach(u=>u&&(u.bp+=5000));}else if(gid==='o_tenen'){[0,1].forEach(i=>retire(O,i));}
+        if(ai==='V'&&A.c.root==='kurou'&&(A.c.g===3||(A.c.g===4&&!A.c.main)))yield* kurouAtk(P,O,A,me);
+        else if(ai==='V'){const vc=A.c;if(vc.g===4&&!vc.main){const gb=P.gz.filter(x=>x.up).length+1;if(gb>=1){const gid=vc.id;if(vc.enemy){A.bp+=10000;A.bc++;}else if(gid==='godkami'){A.bp+=5000;A.bc++;}else if(gid==='itsuku'){A.bp+=5000;draw(P);}else if(gid==='o_amateru'){P.R.forEach(u=>u&&(u.bp+=5000));}else if(gid==='o_tenen'){[0,1].forEach(i=>retire(O,i));}
             else if(gid==='o_tsukuyo'){for(let k=0;k<2&&O.hand.length;k++)O.drop.push(O.hand.splice(Math.floor(rnd()*O.hand.length),1)[0]);}else if(gid==='o_seraph'){A.bc++;if(P.dmg.length)P.drop.push(P.dmg.pop().c);}else{A.bc++;const r=[0,1,2,3,4].filter(i=>O.R[i]);if(r.length)retire(O,r[0]);}yield msg(`GB1【${(VG_SKILL[vc.id]||VG_SKILL.bossg)[0]}】！`,40);}}
           else if(vc.g===3){const sk=VG_SKILL[vc.id]||VG_SKILL[vc.cl];if(vc.cl==='rei'){if(P.dmg.length>=4){A.bp+=5000;A.bc++;yield msg(`LB4【${sk[0]}】！`,35);}}
             else if(sk&&vc.cl!=='none'&&faceUp(P)>0){let use=true;if(me){const k=yield {k:'menu',title:`【${sk[0]}】${sk[1]}`,opts:['使う','使わない'],cancel:0};use=k===0;}
@@ -7359,6 +7378,21 @@ function drawShirofuku(x,y,t,v){const W2='#fcfcfc',Wd='#d8d8e0',b=(t>>4)&1;
   if(v===2){R(x+12,y-28+b,10,3,'#5c5c5c');R(x+21,y-29+b,2,5,'#3c3c3c');const f=(t>>2)&1;pc(x+27,y-27+b,3+f,'#f87800');pc(x+31+f,y-27+b,2,'#f8f800');pc(x+24,y-27+b,2,'#d82800');}
   if(v===3){R(x-21,y-44,11,30,'#5c7c9c');R(x-20,y-43,9,28,'#a8c8e8');R(x-20,y-43,9,2,'#fcfcfc');R(x-17,y-38,3,3,'#fcfcfc');R(x-21,y-30,11,1,'#3c5c7c');}}
 const OC_OF=n=>/闘魔王 ガルゴス/.test(n)?'gargos':/オオワダツミ/.test(n)?'wadatsumi':/深海竜/.test(n)?'wadatsumi_s':/白服/.test(n)?('shiro'+(/部隊長/.test(n)?1:/焼き払い|火炎放射/.test(n)?2:/護送/.test(n)?3:/親衛隊/.test(n)?4:0)):/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+/* 闇堕ちの聖騎士 クロウバネ（オリジナル）：黒紫の 甲冑・ひび割れた 黒い 光輪・ぼろぼろの 外套・紫の 呪紋が 走る 大剣。 G4は 影の 翼と 茨の 冠 */
+function drawFallenKnight(x,y,t,big){const A='#24203c',A2='#3c3458',Hi='#6c6488',P='#a800a8',Pg='#f878f8',Rd='#fc3c3c',b=(t>>4)&1;
+  if(big){ctx.save();ctx.globalAlpha=.85;for(let k=0;k<6;k++){const L=26+k*5,f=Math.sin(t/14+k)*2;R(x-14-L,y-62+k*7+f,L,4,k%2?'#14101c':'#2c0c3c');R(x+14,y-62+k*7+f,L,4,k%2?'#14101c':'#2c0c3c');}ctx.restore();
+    for(let k=0;k<7;k++)R(x-9+k*3,y-78-(k%2)*3,2,4,'#3c0c3c');}
+  /* 光輪（ひび割れ・黒） */const hy=y-(big?84:70);ctx.strokeStyle='#5c5c6c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,hy,9,3.5,5.2);ctx.stroke();ctx.beginPath();ctx.arc(x,hy,9,5.5,6.1);ctx.stroke();ctx.strokeStyle=P;ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,hy,9,.2,1.4);ctx.stroke();
+  /* 外套 */for(let k=0;k<8;k++)R(x-16+k*4,y-42,4,30+((k*7)%3)*4-(k%2?4:0),'#100c18');
+  /* 脚 */R(x-9,y-14,7,14,A);R(x+2,y-14,7,14,A);R(x-10,y-3,9,3,'#000');R(x+1,y-3,9,3,'#000');R(x-8,y-12,2,6,Hi);R(x+3,y-12,2,6,Hi);
+  /* 胴 */R(x-11,y-42,22,28,A);R(x-9,y-40,18,4,A2);R(x-2,y-36,4,18,P);R(x-1,y-34,2,14,Pg);R(x-11,y-16,22,3,'#14101c');R(x-3,y-17,6,4,P);
+  /* 肩当て（片方は 欠けている） */R(x-19,y-46,10,8,A2);R(x-19,y-46,10,2,Hi);R(x+9,y-44,8,6,A2);R(x+15,y-44,2,2,'#000');
+  /* 腕 */R(x-18,y-38,6,18,A);R(x+12,y-38,6,18,A);
+  /* 兜：片角・赤い 目 */R(x-7,y-56,14,13,A);R(x-6,y-58,12,3,A2);R(x-5,y-50,10,2,'#000');R(x-4,y-50,3,2,Rd);R(x+1,y-50,3,2,Rd);R(x+6,y-64,3,8,'#14101c');R(x+8,y-68,2,5,'#14101c');R(x-1,y-58,2,3,P);
+  /* 大剣：地に 突き立てる（G4は 掲げる） */
+  if(big){const sx=x+20,sy=y-30;R(sx-1,sy-58,5,52,'#3c3c4c');R(sx,sy-58,2,52,'#7c7c8c');for(let k=0;k<6;k++)R(sx,sy-54+k*8,2,3,(t>>2)%6===k?Pg:P);R(sx-5,sy-6,13,3,'#14101c');R(sx,sy-3,3,8,'#3c2c1c');R(x+14,y-38,6,8,A);}
+  else{const sx=x-22;R(sx,y-46,4,44,'#3c3c4c');R(sx+1,y-46,2,44,'#7c7c8c');for(let k=0;k<5;k++)R(sx+1,y-42+k*8,2,3,(t>>2)%5===k?Pg:P);R(sx-4,y-48,12,3,'#14101c');R(sx+1,y-56,3,8,'#3c2c1c');R(sx-2,y-1,8,2,'#5c5c6c');}
+  /* 紫の 瘴気 */for(let k=0;k<5;k++){const ph=(t+k*13)%30;R(x-12+k*6,y-6-ph,2,2,k%2?P:'#3c0c3c');}}
 function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
 /* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
 function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
