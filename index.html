@@ -532,6 +532,12 @@ const BASE_SKILLS={
   kobu:{name:'鼓舞の舞',mp:5,target:'allies',kind:'buff',stat:'atk',amount:.5,turns:4,verb:'おどった'},
   mamori:{name:'守りの舞',mp:5,target:'allies',kind:'buff',stat:'def',amount:.6,turns:4,verb:'おどった'},
   kamui:{name:'神威',mp:12,target:'enemies',kind:'mag',power:3.2,verb:'しめした'},
+  ms_tebasaki:{name:'テバサキ 一閃',mp:16,target:'enemies',kind:'phys',power:3.0,verb:'振るった'},
+  ms_shachi:{name:'金鯱の 威光',mp:14,target:'allies',kind:'buff',stat:'atk',amount:.6,turns:4,verb:'かかげた'},
+  ti_misodan:{name:'赤味噌 大筒',mp:16,target:'enemies',kind:'mag',power:3.1,verb:'撃ちこんだ'},
+  ti_kitsune:{name:'稲荷の 加護',mp:16,target:'allies',kind:'heal',power:2.2,revive:true,verb:'祈った'},
+  su_ramen:{name:'特製 ラーメソ',mp:12,target:'allies',kind:'heal',power:2.0,verb:'ふるまった'},
+  su_spoon:{name:'スプーソ 二刀流',mp:10,target:'enemy',kind:'phys',power:.9,hits:3,verb:'くりだした'},
   kurou_issen:{name:'黄泉への 一閃',mp:30,target:'enemies',kind:'phys',power:3.8,verb:'振るった'},
   kurou_yomi:{name:'黄泉還り',mp:24,target:'allies',kind:'heal',power:1.8,revive:true,verb:'唱えた'},
   tenkei:{name:'天恵',mp:14,target:'allies',kind:'heal',power:2.6,revive:true,verb:'さずけた'},
@@ -754,6 +760,9 @@ const BASE_PACK={
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
     {id:'godkami',name:'八百万の主神 ゴッド',short:'ゴッド',rarity:'XXR',nogacha:1,weapon:'any',hp:500,mp:500,atk:135,mag:135,def:98,spd:70,skills:['dazaifu','tenkei'],look:{head:'crown',hair:'#fcfcfc',body:'#f8b800',accent:'#d82800',legs:'#fcfcfc',held:'神宝'}},
+    {id:'masumida',name:'尾張の猛将 マスミダ',short:'マスミダ',rarity:'XR',weight:1,weapon:'any',hp:190,mp:90,atk:56,mag:24,def:38,spd:22,skills:['ms_tebasaki','ms_shachi'],look:{head:'samurai',hair:'#1c1c1c',body:'#a85000',accent:'#f8d800',legs:'#3c2c1c',held:'刀'}},
+    {id:'toyokawa',name:'三河の稲荷将 トヨカワイナァリ',short:'イナァリ',rarity:'XR',weight:1,weapon:'any',hp:170,mp:120,atk:36,mag:54,def:32,spd:26,skills:['ti_misodan','ti_kitsune'],look:{head:'hair',hair:'#f8b800',body:'#d82800',accent:'#fcfcfc',legs:'#fcfcfc',held:'弓'}},
+    {id:'sukun',name:'ラーメソ屋の スー君',short:'スー君',rarity:'XR',weight:1,weapon:'any',hp:150,mp:120,atk:34,mag:40,def:28,spd:34,skills:['su_ramen','su_spoon'],look:{head:'cap',hat:'#fcfcfc',hair:'#3c2c1c',body:'#fcfcfc',accent:'#d82800',legs:'#3c3c5c',held:'メイス'}},
     {id:'kurouhane',name:'冥府騎士 クロウバネ',short:'クロウバネ',rarity:'XXR',nogacha:1,weapon:'any',hp:480,mp:420,atk:138,mag:112,def:96,spd:66,skills:['kurou_issen','kurou_yomi'],look:{head:'dknight',hair:'#14101c',body:'#24203c',accent:'#a800a8',legs:'#14101c',held:'両手剣'}},
     {id:'legend_itsuku',name:'伝説の開発者 タムライツク',short:'伝説ツク',rarity:'？？？',nogacha:1,weapon:'any',hp:780,mp:1000,atk:200,mag:200,def:150,spd:100,skills:[],look:{head:'hair',hair:'#141414',body:'#f8d878',accent:'#fc74b4',legs:'#fc74b4',held:'パソコン'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
@@ -788,7 +797,7 @@ const BASE_PACK={
     ['w_doji','童子切安綱','UR','刀'],['w_kanabo','鬼神の金棒','UR','メイス'],['w_norito','天津祝詞の大幣','UR','大幣'],['w_houou','鳳凰の舞扇','UR','扇'],['w_raijodo','雷上動','UR','弓'],['w_nyoi','如意宝珠の杖','UR','杖'],
     ['w_totsuka','十握剣','LR','片手剣',110],['w_ryujin','龍神の大太刀','LR','両手剣',110],['w_seishin','星辰の神杖','LR','杖',110],
     ['w_longinus','ロンギヌスの槍','XR','聖槍',200],['w_amanuboko','天乃沼鉾','XR','神宝',220],['w_cassius','カシウスの槍','XR','聖槍',200],
-    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_godshintai','GODの御神体','XR','神宝',260],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_ryuck','無駄に 重い リュックサック','XR','リュック',230],['w_eiria','エイリア石','UR','神器',80],['w_koban','猫の小判','UR','小判',70],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
+    ['w_sakahoko','天乃逆鉾','XR','神宝',230],['w_gaius','ガイウスの槍','XR','聖槍',210],['w_futonorito','太祝詞','UR','祝詞',90],['w_umegae','梅枝の笏','XR','笏',220],['w_godshintai','GODの御神体','XR','神宝',260],['w_tgphone','元幹部の スマホ','XR','スマホ',220],['w_kusanagi_ep','クサナギの イヤホン','XR','神器',235],['w_misono','ダイナムミソノの 会員カード','XR','会員カード',220],['w_kinsho','禁書 鸚鵡籠中記','XR','書',220],['w_brokenpc','壊れたパソコン','XXR','パソコン',2600],['w_ryuck','無駄に 重い リュックサック','XR','リュック',230],['w_eiria','エイリア石','UR','神器',80],['w_koban','猫の小判','UR','小判',70],['w_hakkyo','神剣 八鏡剣','UR','片手剣',85],['w_shichishi','七支刀','XR','神宝',225],['w_jidori','自撮り棒','SR','メイス'],['w_kinbat','金メッキの バット','SR','メイス'],['w_gamaguchi','なかなか 開かない がま口財布','XR','がま口',220],
     ['w_jisho','辞書','XR','本',230],['w_jihyo','辞表','LR','本',110],['w_kyuyo','給与明細書','UR','本',80],['w_roppo','六法全書','UR','本',85],['w_kensho','神社本庁憲章の解説','UR','本',85],
     ['w_inubou','犬が歩いて拾った棒','SR','棒'],['w_butaki','豚が上った木の枝','SR','棒'],['w_kaki','隣の客の柿','SR','果物'],['w_knuckle','アメリケンサック','N','拳'],
   ].map(([id,name,rarity,type,power])=>power?{id,name,rarity,type,power}:{id,name,rarity,type}),
@@ -923,7 +932,7 @@ function rebuild(){
   for(const p of loadPacks()){if(!checkPack(p).length)registerPack(p,p.name);}
 }
 rebuild();
-const NOGACHA=['w_godshintai','w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc','w_koban','w_ryuck'];
+const NOGACHA=['w_kusanagi_ep','w_godshintai','w_gaius','w_umegae','w_tgphone','w_misono','w_gamaguchi','w_kinsho','w_brokenpc','w_koban','w_ryuck'];
 const hasSkW=(cid,w)=>{const c=G&&G.chars[cid];return !!c&&[baseW(c.wpn),baseW(c.wpn2)].includes(w);};
 const hasTgPhone=id=>{const c=G&&G.chars[id];return !!c&&id==='tagaba'&&[baseW(c.wpn),baseW(c.wpn2)].includes('w_tgphone');};
 const WSK={w_jisho:'ws_jisho',w_jihyo:'ws_jihyo',w_ryuck:'ws_ryuck',w_kinbat:'ws_kinbat',w_kinsho:'ws_kinsho',w_shichishi:'ws_shichisei',w_eiria:'ws_eiria',w_misono:'ws_misono',w_gamaguchi:'ws_gamaguchi',w_tgphone:'ws_tgphone',w_amakago:'ws_amakago',w_murasame:'ws_murasame',w_nuboko:'ws_nuboko',w_habakiri:'ws_habakiri',w_futsu:'ws_futsu',w_ikuyumi:'ws_ikuyumi',w_hikata:'ws_hikata',w_milktea:'ws_milktea',w_juzu:'ws_juzu',w_chukei:'ws_chukei',w_ame:'ws_ame',w_magatama:'ws_magatama',w_doji:'ws_doji',w_kanabo:'ws_kanabo',w_norito:'ws_norito',w_houou:'ws_houou',w_raijodo:'ws_raijodo',w_nyoi:'ws_nyoi',w_futonorito:'ws_futonorito',w_beatmic:'ws_beatmic',w_yakisnipe:'ws_yakisnipe',w_yata:'ws_yata',w_totsuka:'ws_totsuka',w_ryujin:'ws_ryujin',w_seishin:'ws_seishin',w_longinus:'ws_longinus',w_cassius:'ws_cassius',w_gaius:'ws_gaius',w_amanuboko:'ws_amanuboko',w_sakahoko:'ws_sakahoko'};
@@ -933,8 +942,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=200,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31,SHURA:32,SHIN:33};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31,SHURA:32,SHIN:33,KABE:34,ATSUTA:35,ATSUTA_O:36};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -1064,6 +1073,17 @@ const SKR={x0:132,y0:136,x1:188,y1:178};
     ['レジスタンスの集落 マツゥヤマ','箭弓稲荷神社',150,167,1,2,A+4,[],'ナメガワマチから 逃げ出した 人々が 身を 寄せる 丘の 集落'],
     ['防衛団の町 カスカベ','春日部八幡神社',178,151,3,2,A+7,[],'大きな 凧と 元気な 子どもたちの 町']];
   SV.forEach(([name,shrine,x,y,size,rank,from,f,desc])=>VIL.push({x,y,name,shrine,rank,tier:12,size,from,sk:1,kqf:f,desc,...(name.endsWith('ナメガワマチ')?{skn:'namegawa',skb:'sktower'}:{}),...(name.endsWith('マツゥヤマ')?{skb:'skjin'}:{})}));}
+  /* 11/25：アイヂ（サキタマの 南。 西が ヲワリ、 東が ミカワ） */
+  {const OM=VIL.findIndex(v=>v.name==='鉄道の街 オオミヤ'),A=VIL.length;
+    [['境の宿 サカイガワ','市原稲荷神社',163,180,2,3,OM,['aiyatai'],'ヲワリと ミカワの 境の 宿場町'],
+     ['城下町 イヌヤマ','針綱神社',143,180,2,3,A,[],'木曽川を 見おろす 白い 天守の 城下町'],
+     ['尾張の都 ナコヤ','那古野神社',148,186,5,4,A+1,['aimasu'],'金の シャチホコが かがやく ヲワリの 都'],
+     ['杜の宮 アツタ','熱田神宮',157,193,3,8,A+2,['aimori'],'千年の 楠に 守られた 杜の 宮'],
+     ['焼き物の港 トコナメ','神明社',146,196,3,2,A+3,['aitoko'],'土管坂と 招き猫の 焼き物の 港'],
+     ['八丁味噌の城下町 オカザキ','伊賀八幡宮',170,186,4,4,OM,['aimiso'],'八丁味噌の 蔵が 並ぶ ミカワの 城下町'],
+     ['稲荷の門前町 トヨカワ','砥鹿神社',177,191,3,5,A+5,['aitoyo'],'朱い 鳥居が つらなる ミカワの 本陣'],
+     ['東の港町 トユハシ','安久美神戸神明社',181,196,4,3,A+6,[],'路面電車と ちくわの 港町']]
+    .forEach(([name,shrine,x,y,size,rank,from,f,desc])=>VIL.push({x,y,name,shrine,rank,tier:12,size,from,ai:1,kqf:f,desc}));}
   /* 11/19：隠岐（島後）の 村を 追加 */
   VIL.push({x:78,y:35,name:'岬の村 クミ',shrine:'伊勢命神社',rank:2,tier:7,size:2,from:VIL.findIndex(v=>v.name==='隠岐の港 サイゴウ'),island:1,oki:1,desc:'島後の 西の 岬に ある 漁村'});
   /* 11/19：シマネの 南西に ツワノ（島根県だが 経済圏は 山口＝マホロバ が 事実上 支配） */
@@ -1099,7 +1119,7 @@ const STADS=[],BB_TEAMS=[
   {id:'leons',n:'サキタマ・レオンズ',s:'レオンズ',c:'オオミヤ',par:'yaotetsu',lg:1,col:'#0058f8'},{id:'emperors',n:'グンマー・エンペラーズ',s:'エンペラーズ',c:'帝都 グンマー',par:'teiai',lg:1,col:'#000000'},
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
-const AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
+const AIM=new Set(),AI_WALL={x:163,y0:183,gy:194},AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
 const SHINS=[],SHURAS=[],SHURA_CONT=[{n:'出雲の 大陸',at:['ヒノミサキ','オクイズモ','ウンナン']},{n:'新大陸',at:['ムロト','フクベ','クラヨシ']},{n:'九州',at:['タラ','ヨブコ','カラツ']},{n:'マホロバの 大陸',at:['イイヤマ','アブ','セタ']},{n:'サキタマ',at:['チチブ','ギョウダ','ソウカ']}];
 const TUNS=[],TUN_LINES=[{n:'山陰 地下線',c:'#3cbcfc',st:['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト']},{n:'九州 地下線',c:'#f87800',st:['タク','イマリ','サガ','ヨシノガリ']},{n:'八百万 環状線',c:'#f8d800',ring:1,st:['イズモ','八雲市','ヨナゴ','マホロバ','グンマー','ナメガワマチ','コクラ','ヨシノガリ','サガ']}];
 function genMap(){
@@ -1143,6 +1163,10 @@ function genMap(){
     for(let y=N.y0-3;y<=N.y1+3;y++)for(let x=N.x0-3;x<=N.x1+3;x++){if(x<0||y<0||x>=MW||y>=MH)continue;if(y<=GUN.y1&&x>=GUN.x0&&x<=GUN.x1&&tileAt(x,y)!==T.SEA)continue;
       const edge=Math.min(x-N.x0,y-N.y0+8,N.x1-x,N.y1-y)+(g4(x,y)-.5)*6;if(edge<0)continue;
       const e=g1(x,y)*.7+g2(x,y)*.3+(x<146?Math.max(0,(146-x)/30):0);setT(x,y,e>.72?T.MOUNT:e<.18?T.WATER:g3(x,y)>.66?T.FOREST:T.GRASS);}}
+  /* 11/25：アイヂの 大地（サキタマの 南に 地続き。 霧と 壁は 道を 引いた あとで 置く） */
+  {AIM.clear();const a1=mkNoise(601,5,MW),a2=mkNoise(613,3,MW),b1=mkNoise(631,7,MW),b2=mkNoise(641,4,MW),b3=mkNoise(653,5,MW);for(let y=SKR.y1-6;y<MH;y++)for(let x=SKR.x0;x<=SKR.x1+1;x++){if(tileAt(x,y)!==T.SEA)continue;
+      const w=(a1(x,y)-.5)*8,lx=SKR.x0+6+w+Math.max(0,(y-188)*.6),rx=SKR.x1-2-w-Math.max(0,(y-190)*.4);if(x<lx||x>rx)continue;
+      if(y<SKR.y1-2&&a2(x,y)<.55)continue;AIM.add(y*MW+x);const e=b1(x,y)*.7+b2(x,y)*.3+(x>176&&y<190?.18:0);setT(x,y,e>.74?T.MOUNT:e<.16?T.WATER:b3(x,y)>.64?T.FOREST:T.GRASS);}}
   const pts=[...VIL.filter(v=>v.from==null&&!v.island),CAVE];
   for(let i=0;i<pts.length-1;i++){
     const a=pts[i],b=pts[i+1],path=[];
@@ -1211,13 +1235,13 @@ function genMap(){
       let cx=v.x,cy=v.y;while(cx!==x||cy!==y){if(cx!==x)cx+=Math.sign(x-cx);else cy+=Math.sign(y-cy);if(cx===x&&cy===y)break;const t2=tileAt(cx,cy);if(!isTownT(t2)&&t2!==T.SHR&&t2!==T.KEIBAJO&&t2!==T.CONV&&t2!==T.LOVEH&&t2!==T.WALL&&t2!==T.GGATE)setT(cx,cy,t2===T.WATER||t2===T.SEA?T.BRIDGE:t2===T.MOUNT?T.YAMA:T.ROAD);}
       setT(x,y,T.STAD);STADS.push({x,y,vi});done=true;}});
   /* 11/20：アイヂ編の 予告（サキタマの 南の はずれに 手がかり） */
-  /* 11/20：サキタマの 南に 地続きの アイヂの 陸地（まだ 進めない） */
-  {const a1=mkNoise(601,5,MW),a2=mkNoise(613,3,MW);for(let y=SKR.y1-6;y<MH;y++)for(let x=SKR.x0;x<=SKR.x1+1;x++){if(tileAt(x,y)!==T.SEA)continue;
-      const w=(a1(x,y)-.5)*8,lx=SKR.x0+6+w+Math.max(0,(y-188)*.6),rx=SKR.x1-2-w-Math.max(0,(y-190)*.4);if(x<lx||x>rx)continue;
-      if(y<SKR.y1-2&&a2(x,y)<.55)continue;setT(x,y,T.AIDI);}}
+  /* 11/25：アイヂの 霧（サキタマとの 境）と 国を 割る 壁・熱田の 杜の 結界 */
+  {const isM=(x,y)=>AIM.has(y*MW+x);for(const k of AIM){const x=k%MW,y=(k-x)/MW;let edge=false;for(let dy=-2;dy<=2&&!edge;dy++)for(let dx=-2;dx<=2&&!edge;dx++){const u=tileAt(x+dx,y+dy);if(!isM(x+dx,y+dy)&&u!==T.SEA&&u!==T.WATER&&u!==T.BRIDGE)edge=true;}
+      if(edge&&!isTownT(tileAt(x,y)))setT(x,y,T.AIDI);}
+    for(let y=AI_WALL.y0;y<MH;y++){const x=AI_WALL.x;if(!isM(x,y))continue;const t=tileAt(x,y);if(isTownT(t))continue;setT(x,y,Math.abs(y-AI_WALL.gy)<=1?T.ATSUTA:T.KABE);}}
   AIDI_H.length=0;[[146,176,'teba'],[157,177,'miso'],[167,176,'ebi'],[176,178,'shachi'],[185,176,'sign']].forEach(([tx,ty,k])=>{let done=false;
     for(let r=0;r<=6&&!done;r++)for(let dy=-r;dy<=r&&!done;dy++)for(let dx=-r;dx<=r&&!done;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=tx+dx,y=ty+dy,t=tileAt(x,y);
-      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y))continue;AIDI_H.push({x,y,k});done=true;}});
+      if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND&&t!==T.ROAD)continue;if(AIM.has(y*MW+x))continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y))continue;AIDI_H.push({x,y,k});done=true;}});
   /* 11/24：地下道路の 入口（大きな 都市の そばに トンネルの 口を 置く。 地下は 海の 下も 通れる） */
   {const byN=n=>VIL.findIndex(v=>v.name===n||v.name.replace(/^.* /,'')===n);TUNS.length=0;
     TUN_LINES.forEach((L,li)=>L.st.forEach(n=>{const vi=byN(n);if(vi<0)return;const v=VIL[vi];let done=false;const ex=TUNS.find(o=>o.vi===vi);if(ex){if(!ex.lis.includes(li))ex.lis.push(li);return;}
@@ -1279,6 +1303,9 @@ TILES[T.TUN]=[mkTile(P=>{grassBase(P);P(1,5,14,11,'#8c7c6c');P(2,4,12,1,'#8c7c6c
 TILES[T.SHURA]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=4+r,x=8-Math.ceil(w/2);P(x,3+r,w,1,r%4===1?'#4c3c3c':'#3c2c2c');}
   P(4,9,8,7,'#000');P(5,8,6,1,'#000');P(6,7,4,1,'#000');P(5,13,6,3,f?'#d82800':'#a81000');P(6,11,4,2,f?'#a81000':'#580000');P(7,10,2,1,'#fc7460');
   P(3,4,1,1,'#d82800');P(12,5,1,1,'#d82800');P(7,1,2,2,'#d82800');P(6,2,1,1,'#fcfcfc');P(9,2,1,1,'#fcfcfc');}));
+TILES[T.KABE]=[mkTile(P=>{P(0,0,16,16,'#7c7c7c');for(let y=0;y<16;y+=4)for(let x=(y/4%2)*4;x<16;x+=8){P(x,y,7,3,'#9c9c9c');P(x,y,7,1,'#bcbcbc');}P(0,0,16,1,'#5c5c5c');})];
+TILES[T.ATSUTA]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#0c3c14');for(const [a,b] of [[3,3],[11,2],[7,7],[2,11],[12,11]]){P(a-2,b-1,6,5,'#1c602c');P(a-1,b-2,4,1,'#2c7c3c');}P(0,6,16,1,'#d8b888');for(let x=1;x<16;x+=4)P(x,7,2,3,f?'#fcfcfc':'#e8e8e8');}));
+TILES[T.ATSUTA_O]=[mkTile(P=>{grassBase(P);P(2,4,2,12,'#d8b888');P(12,4,2,12,'#d8b888');P(0,3,16,2,'#d8b888');P(1,6,14,1,'#d8b888');P(0,1,2,2,'#1c602c');P(14,1,2,2,'#1c602c');})];
 TILES[T.SHIN]=[0,1].map(f=>mkTile(P=>{grassBase(P);P(2,6,12,10,'#101010');P(3,4,10,2,'#101010');P(5,2,6,2,'#101010');P(1,6,14,1,'#f8b800');P(7,0,2,2,'#f8b800');
   P(6,10,4,6,f?'#d82800':'#880000');P(4,8,1,1,'#f8b800');P(11,8,1,1,'#f8b800');P(7,7,2,2,'#fcfcfc');P(7,8,1,1,'#d82800');}));
 TILES[T.AIDI]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let y=0;y<16;y+=2)for(let x=(y/2+f)%2;x<16;x+=2)P(x,y,1,1,'#9cb894');P(3,4,3,1,'#d8e0d0');P(10,11,4,1,'#d8e0d0');}));
@@ -1291,7 +1318,7 @@ TILES[T.CONV]=[mkTile(grassBase)];TILES[T.STAD]=[mkTile(grassBase)];TILES[T.LOVE
 TILES[T.KEIBAJO]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#00a800');P(1,4,14,10,'#e4c890');P(3,6,10,6,'#00a800');P(4,7,8,4,'#00c800');P(1,4,14,1,'#fcfcfc');P(1,13,14,1,'#fcfcfc');
   P(2,0,12,4,'#3c3c3c');P(1,0,14,1,'#00a800');for(let x=3;x<13;x+=2)P(x,2,1,1,['#d82800','#fcfcfc','#f8b800','#0058f8'][(x+f)%4]);P(f?5:9,8,3,2,'#7c4c10');P(f?6:10,7,1,1,'#d82800');}));
 TILES[T.GSEAL]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#3c3c3c');P(2,4,12,12,'#5c5c5c');P(4,1,8,3,'#7c7c7c');P(5,8,6,8,'#000');P(2,4,12,1,'#bcbcbc');P(6,10,4,1,f?'#d82800':'#f8b800');P(1,13,14,1,'#f8b800');P(1,14,14,1,'#000');for(let x=1;x<15;x+=4)P(x,13,2,1,'#000');}));
-function drawTile(t,x,y){const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a.length],x,y);}
+function drawTile(t,x,y){if(t===T.AIDI&&aidiOpen())t=T.GRASS;else if(t===T.ATSUTA&&aiCh()>=4)t=T.ATSUTA_O;const a=TILES[t]||TILES[0];ctx.drawImage(a[(frame>>5)%a.length],x,y);}
 
 /* ===================== ゲーム状態 ===================== */
 const SKEY='yaoyorozu-quest-v1';
@@ -1373,7 +1400,7 @@ function wEffect(wid){const d=WPD[wid];if(!d)return[];const b=baseW(wid),L=[],t=
   if(b==='w_gaius')L.push('装備すると 全ステータス +200%','固有スキル「neonGenesis」（1戦に1回）：','\tHP・MP 1.5倍で 全回復＋敵全体に 超絶ダメージ','\t＋アディショナルインパクト','※ロンギヌス・カシウスとは 同じ編成に 入れられない');
   if(!L.length)L.push('特殊な 効果は ない');return L;}
 const XRW_LV=6000;/* XR武器は キャラLv6000以下では 装備できない */
-const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||baseW(wid)==='w_ryuck'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
+const xrwOk=(cid,wid)=>!(WPD[wid]&&WPD[wid].rar===6)||baseW(wid)==='w_umegae'||baseW(wid)==='w_tgphone'||baseW(wid)==='w_kusanagi_ep'||baseW(wid)==='w_misono'||baseW(wid)==='w_gamaguchi'||baseW(wid)==='w_kinsho'||baseW(wid)==='w_ryuck'||!!(G.chars[cid]&&G.chars[cid].lv>XRW_LV);
 const GOD_BOOST={w_amanuboko:2,w_sakahoko:2};/* 誰でも装備できるが 神が持つと さらに強い */
 function canEquip(cid,wid){const d=CH[cid],t=WPD[wid].type;if(t==='本'||t==='棒'||t==='果物'||t==='拳')return true;if(t==='祝詞')return /^kn\d/.test(cid);if(t==='聖槍'||t==='小判'||GOD_BOOST[wid])return true;if(t==='神宝')return isGod(cid);if(t==='仏具')return cid==='buddha';if(t==='飲料')return cid==='yarimasu';if(t==='マイク')return cid==='beatkun';if(t==='狙撃銃')return cid==='snipekun';if(t==='笏')return cid==='michizane';if(t==='スマホ')return cid==='tagaba';if(t==='会員カード')return cid==='tomoya';if(t==='がま口')return cid==='jouchan';if(t==='書')return cid==='shoin';if(t==='パソコン')return cid==='itsuku';if(t==='リュック')return cid==='umagami';return d.wt==='any'||t==='神器'||(Array.isArray(d.wt)&&d.wt.includes(t));}
 const ownedChars=()=>Object.keys(G.chars).filter(id=>CH[id]).sort((a,b)=>CH[b].rar-CH[a].rar||Object.keys(CH).indexOf(a)-Object.keys(CH).indexOf(b));
@@ -1453,7 +1480,7 @@ function fixSave(){
   if(typeof spearClash==='function'&&spearClash(G.party))G.party.forEach(id=>{const c=G.chars[id];if(baseW(c.wpn)==='w_gaius')c.wpn=null;if(baseW(c.wpn2)==='w_gaius')c.wpn2=null;});
   if(!G.party.length){const o=ownedChars();if(!o.length){addChar('yusha1');}G.party=[ownedChars()[0]];}
   for(const id in G.chars){const c=G.chars[id];if(c.wpn&&!WPD[c.wpn])c.wpn=null;if(c.wpn&&!xrwOk(id,c.wpn))c.wpn=null;if(c.wpn2&&WPD[c.wpn2]&&!xrwOk(id,c.wpn2))c.wpn2=null;if(c.wpn2&&(!WPD[c.wpn2]||!twoSlot(id)))c.wpn2=null;}
-  if(!PASS[tileAt(G.pos.x,G.pos.y)])G.pos={x:VIL[0].x,y:VIL[0].y+1};
+  if(!PASS[tileAt(G.pos.x,G.pos.y)]&&!aiPass(tileAt(G.pos.x,G.pos.y)))G.pos={x:VIL[0].x,y:VIL[0].y+1};
 }
 
 /* ===================== スプライト ===================== */
@@ -1595,7 +1622,7 @@ function drawEnemy(e,x,y,t){
     case 'kgod':drawKGod(x,y,t);break;
     case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;case 'gargos':drawGargos(x,y,t);break;case 'wadatsumi':drawWadatsumi(x,y,t,0);break;case 'wadatsumi_s':drawWadatsumi(x,y,t,1);break;
     case 'shiro0':case 'shiro1':case 'shiro2':case 'shiro3':case 'shiro4':drawShirofuku(x,y,t,+e.shape.slice(5));break;
-    case 'tanouwe':drawTanouwe(x,y,t);break;
+    case 'tanouwe':drawTanouwe(x,y,t);break;case 'tito':drawTito(x,y,t);break;
     case 'fknight':drawFallenKnight(x,y,t,0);break;case 'fknight4':drawFallenKnight(x,y,t,1);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
@@ -1769,7 +1796,7 @@ const fieldScr={full:true,mv:null,bt:0,idle:0,
     let dx=0,dy=0;if(I.u)dy=-1;else if(I.d)dy=1;else if(I.l)dx=-1;else if(I.r)dx=1;
     if(!dx&&!dy&&fieldPtr){const px=fieldPtr.x-128,py=fieldPtr.y-120;if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(dx||dy){this.idle=0;const nx=G.pos.x+dx,ny=G.pos.y+dy,ntt=tileAt(nx,ny);if(dx)this.dir=dx;
-      if(PASS[ntt]){const dv=carDrive(ntt);this.mv={x1:nx,y1:ny,dx,dy,t:0,sp:dv?dv.sp:2};}else if(!this.bt){sfx('bump');this.bt=14;if(tileAt(nx,ny)===T.AIDI)toast('この先は アイヂの 国… 霧が 深くて まだ 進めない');}}
+      if(PASS[ntt]||aiPass(ntt)){const dv=carDrive(ntt);this.mv={x1:nx,y1:ny,dx,dy,t:0,sp:dv?dv.sp:2};}else if(!this.bt){sfx('bump');this.bt=14;if(ntt===T.AIDI)toast('この先は アイヂの 国… 霧が 深くて まだ 進めない');else if(ntt===T.KABE)toast('国を まっぷたつに 割る 巨大な 石の 壁だ…');else if(ntt===T.ATSUTA)toast('熱田の 杜の 結界が 道を ふさいでいる…');}}
     else this.idle++;
   },
   drw(a){
@@ -2152,6 +2179,7 @@ function goalInfo(){const g=[];const at=(vi)=>vi>=0?{x:VIL[vi].x,y:VIL[vi].y,n:V
   if(!sk.clear){const D={0:'黒幕の 根城は 南の サキタマ。\n国境門を 出て 南の 町 クマガヤへ',1:'クマガヤの 自警団長 アツミの 話を 聞こう。\n…何かを 隠している ようだ'};
     return {t:'ぶっ飛びサキタマ編：ナメガワマチを 取り戻せ',d:D[sk.ch]||`サキタマの 町を めぐって 仲間と 情報を 集め\nナメガワマチを 取り戻そう（第${sk.ch}章）`,p:at(vByName(sk.ch<=1?'国境の町 クマガヤ':'完全平和都市 ナメガワマチ'))};}
   if(typeof nmS==='function'&&!nmS().clear){const N=nmS();return {t:'ナメガワマチ総長選挙編',d:['ナメガワマチに 行こう。\n首長が いない 街で 選挙が 開かれるらしい','解放改革の会の 応援演説を しよう。\nクマガヤ・コエド・オオミヤの 演説台へ'+`（${(N.rally||[]).length}/3）`,'ナメガワマチで 投票日を むかえよう'][N.ch]||'',p:at(vByName(N.ch===1?['国境の町 クマガヤ','小江戸 コエド','鉄道の街 オオミヤ'].find(n=>!(N.rally||[]).includes(n))||'完全平和都市 ナメガワマチ':'完全平和都市 ナメガワマチ'))};}
+  if(aidiOpen())return aiGoal();
   return {t:'つぎの 物語を 待つ',d:'人類保管計画の 物語は 完結した！\n次回「アイヂ大戦編」は\n2027年1月1日 配信予定。\nそれまで 八岐大蛇 Lv30・裏闘技場・経営などで\n強くなっておこう',p:null};}
 function goalScr(){const g=goalInfo(),pg=[`【目的】${g.t}`,g.d];if(g.p)pg.push(`行き先：${g.p.n}\n${dirTo(g.p.x,g.p.y)}`);
   const side=[];if(G.job)side.push(`ジョブ「${G.job.name}」 ${G.job.prog}/${G.job.need}`);
@@ -2414,7 +2442,7 @@ function rollRar(min){
   return k;
 }
 /* ガチャに 出ない キャラ（宝箱などで 入手） */
-const NOGACHA_C=['michizane','itsuku','legend_itsuku','umagami'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear));
+const NOGACHA_C=['michizane','itsuku','legend_itsuku','umagami'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear))||(['masumida','toyokawa','sukun'].includes(id)&&!(G&&G.ai&&G.ai.clear));
 function poolFor(b,rar){
   const all=(b.type==='weapon'?wpList():chList().filter(p=>!noGachaC(p.id))).filter(p=>p.rar===rar);
   return all;
@@ -3206,7 +3234,7 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={lotto:{n:'宝くじ売り場',s:'籤',c:'#d82800'},inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},cardeal:{n:'カーディーラー',s:'車',c:'#3cbcfc'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},cardeal:{n:'カーディーラー',s:'車',c:'#3cbcfc'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},aiyatai:{n:'スー君の 屋台',s:'ラ',c:'#d82800'},aimasu:{n:'ナコヤ城 本陣',s:'陣',c:'#a85000'},aitoyo:{n:'ミカワ 本陣',s:'陣',c:'#d82800'},aitoko:{n:'トコナメ港',s:'港',c:'#0058f8'},aimiso:{n:'八丁味噌蔵',s:'味',c:'#5c3c1c'},aimori:{n:'熱田の 杜',s:'杜',c:'#1c602c'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank','card'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan','card','cardeal']];
 const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase','bgr','bdirt','bpath','bline','bwarn','bdug','bplate','bmound','bbase','bconc']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
@@ -3247,7 +3275,7 @@ function buildTown(vi){
   if(sz>=2){const fy=h-2;set(cx+3,fy,{t:'fount'});set(cx-3,fy,{t:'fount'});}
   {const lm=lmkOf(vi),fy=h-2,pos=[cx-3,cx+3,cx-5,cx+5];lm.forEach((id,j)=>{if(pos[j]>0&&pos[j]<w-1)set(pos[j],fy,{t:'lmk',id});});}
   const DI=dinfo(v),LINES=occupied(vi)?[`${DI.boss}さまに 逆らっては いけない…`,`店も 神社も 閉められてしまった。\nだれか ${DI.title}を たおして くれないか…`,'親衛隊「なにを じろじろ 見ている！」',`${DI.hall}は 町の いちばん 奥の 豪華な 建物だ。`]:v.dict?[`${DI.title}が いなくなって 町が 明るく なった！`,'ありがとう！ あなたは 町の 恩人だ！',`${v.shrine}の お祭りも 再開されたよ。`]:v.colo?['魔物コロシアムの 優勝者は 英雄だ！','コロシアムの 決勝の 相手は\n闘魔王 ガルゴスらしい…','挑戦料は 高いが 優勝賞品も すごいぞ。']:v.shugen?['山伏「ムロトの 山頂には 奥宮が ある。」','山伏「滝行は 心を 清める。」','峰入り修行は きびしいぞ。 覚悟して いけ。','山道は 魔物が 多い。 気を つけて。']:v.depop?(ruin?(v.depop==='ruin'?['…わしが この村の 最後の ひとりじゃ。\n神社の 神主さまも おらんように なってのう。','魔物さえ こなければ\nみんな 帰って くるかも しれんのう…']:['子どもの 声を 聞かなくなって ひさしいねえ。','神社の お祭りも もう 何年も やっとらんよ。','若い もんは みんな 都会へ 出てしもうた。','集会所で 村の 仕事を 手伝って くれんかね。']):['村が にぎやかに なったねえ！','神主さまが 来てから 毎日が たのしいよ。','ワープの鳥居で 遠くからも 人が 来るんだ。']):NPC_LINES;
-  const LN=v.gm==='cap'?gmLines():v.kq?kqLines(vi):v.sk?skLines(vi):LINES;
+  const LN=v.gm==='cap'?gmLines():v.kq?kqLines(vi):v.sk?skLines(vi):v.ai?aiLines(vi):LINES;
   const npcs=[],cols=['#0058f8','#d82800','#00a800','#6844fc','#e45c10','#008888','#fcfcfc'];
   const nN=v.gm==='cap'&&gmS().ch===6?0:v.depop?(ruin?(v.depop==='ruin'?1:4):5):2+sz;
   let tries=0;while(npcs.length<nN&&tries++<300){const k=Math.floor(r()*streets),y=6+5*k+1,x=1+Math.floor(r()*(w-2));/* 町の人は 道の 下側の 列に 立つ（店の 入口を ふさがない） */
@@ -3669,7 +3697,7 @@ function enterVillage(i,atShrine){
   curVil=i;TW=buildTown(i);if(atShrine){TW.py=4+(TW.top||0);}
   townScr.mv=null;setBase(townScr);playBGM('village');
   const first=!G.seen['v'+i];G.seen['v'+i]=1;
-  const msgs=[...(first||VIL[i].name.replace(/^.* /,'')==='アキラギ'?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc.split('|')[0]:''}`,...(VIL[i].desc||'').split('|').slice(1)]:[]),...(VIL[i].kq&&kqS().ch===0?kqIntro():[]),...(VIL[i].sk?fkIntroMsg(i):[]),...(first&&hatan(i)?['この 村は 財政破綻して\n財政再生団体に なっている…','税金が 高く 店の 値段も 5割増し。\n不動産の 固定資産税も 重く\n入居者も なかなか 集まらない。','（村を 再生すれば 財政も 再建される）']:[]),...jobProgress('deliver',i)];
+  const msgs=[...(first||VIL[i].name.replace(/^.* /,'')==='アキラギ'?[`${VIL[i].name}に ついた。${VIL[i].desc?'\n'+VIL[i].desc.split('|')[0]:''}`,...(VIL[i].desc||'').split('|').slice(1)]:[]),...(VIL[i].kq&&kqS().ch===0?kqIntro():[]),...(VIL[i].sk?fkIntroMsg(i):[]),...(VIL[i].ai?aiArrive(i):[]),...(first&&hatan(i)?['この 村は 財政破綻して\n財政再生団体に なっている…','税金が 高く 店の 値段も 5割増し。\n不動産の 固定資産税も 重く\n入居者も なかなか 集まらない。','（村を 再生すれば 財政も 再建される）']:[]),...jobProgress('deliver',i)];
   save();if(msgs.length)dialog(msgs);
 }
 function leaveTown(){TW=null;startField();}
@@ -3678,11 +3706,11 @@ function openFac(kind){
   sfx('ok');
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
-  if(kind==='kagu'){kaguFac();return;}if(kind==='dspara'){kaguFac('Dスパラ');return;}if(kind==='arkun'){kaguFac('アークン');return;}if(kind.startsWith('fk')){fkFac(kind);return;}if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
+  if(kind==='kagu'){kaguFac();return;}if(kind==='dspara'){kaguFac('Dスパラ');return;}if(kind==='arkun'){kaguFac('アークン');return;}if(kind.startsWith('fk')){fkFac(kind);return;}if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(kind.startsWith('ai')&&['aiyatai','aimasu','aitoyo','aitoko','aimiso','aimori'].includes(kind)){aiFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
   if(kind==='lotto'){lottoFac();return;}
   if(kind==='card'){vgShop();return;}
   if(kind==='cardeal'){carFac();return;}
-  switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
+  switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':if(!aiPachiNpc())pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
   const m=mkMenu(items,{x:4,y:20,w:248,rows:Math.min(11,items.length),title});
@@ -3954,6 +3982,141 @@ function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.i
 /* ===================== 真賭郎（チンチロリン 一発勝負）
    勝てば 100億イェソ。 負ければ 財布は 全額・口座は 半額を 取られ 地下労働 1年。
    真賭郎が 負けると ロケットで 宇宙へ 出稼ぎ（コオロギ人間と 戦う）→ しばらく 戻らない ===================== */
+/* ===================== アイヂ大戦編 〜ヲワリミカワ大戦〜 =====================
+   サキタマ編 クリア後に 霧が 晴れて 解放。 ヲワリ（マスミダ）と ミカワ（トヨカワイナァリ）の どちらに つくかで 物語が 変わる。
+   最後は アツタの森で 黒幕の 影（Tイトシロ）を 退け、 アツタノオオカミの 力で アイヂが 元に 戻る（国都は アツタ朝廷）。
+   クリア報酬：クサナギの イヤホン ＋ ガチャに マスミダ・トヨカワイナァリ・スー君。 陣営は クリア後に 選び直せる。 */
+const aidiOpen=()=>!!(G&&G.sk&&G.sk.clear);
+const aiS=()=>G.ai||(G.ai={ch:0,side:null,clear:0,done:[]});
+const aiCh=()=>G&&G.ai?G.ai.ch:0;
+const aiPass=t=>(t===T.AIDI&&aidiOpen())||(t===T.ATSUTA&&aiCh()>=4);
+const AI_SN={w:'ヲワリ',e:'ミカワ'},AI_LD={w:'マスミダ',e:'トヨカワイナァリ'},AI_OP=s=>s==='w'?'e':'w';
+const aiVi=n=>VIL.findIndex(v=>v.ai&&v.name.replace(/^.* /,'')===n);
+const aiGo=(n)=>{const vi=aiVi(n);return vi>=0?{x:VIL[vi].x,y:VIL[vi].y,n:VIL[vi].name}:null;};
+function aiGoal(){const A=aiS(),s=A.side,cap=s==='e'?'トヨカワ':'ナコヤ';
+  if(A.clear&&A.ch>=5)return {t:'つぎの 物語を 待つ',d:'アイヂ大戦の 物語は 完結した！\n次回「侵略国家イトシロ編」は\n2027年1月1日 配信予定。\n（サカイガワの 屋台で もう一方の 陣営の 物語も 見られる）',p:null};
+  const D={0:['アイヂ大戦編：霧が 晴れた アイヂへ','サキタマの 南の 霧が 晴れた！\nアイヂの 国境の 宿場 サカイガワへ 向かおう',aiGo('サカイガワ')],
+    1:[`アイヂ大戦編：${AI_SN[s]}の 本陣へ`,`${AI_SN[s]}に つくと 決めた。\n${cap}の 本陣で ${AI_LD[s]}に 会おう`,aiGo(cap)],
+    2:[`アイヂ大戦編：${s==='e'?'味噌蔵を 守れ':'トコナメ港を 取り戻せ'}`,s==='e'?'オカザキの 八丁味噌蔵が ヲワリの\n手羽先隊に ねらわれている！':'トコナメの 港を ミカワ水軍から 取り戻そう',aiGo(s==='e'?'オカザキ':'トコナメ')],
+    3:[`アイヂ大戦編：壁の 前の 決戦`,`${cap}の 本陣へ もどり\n${AI_LD[AI_OP(s)]}との 決戦に のぞもう`,aiGo(cap)],
+    4:['アイヂ大戦編：アツタの森へ','壁の 森の 結界が 開いた！\nアツタの 杜の 奥で 黒幕を 追え',aiGo('アツタ')]};
+  const d=D[A.ch]||D[0];return {t:d[0],d:d[1],p:d[2]};}
+/* 町に 着いた ときの 一言 */
+function aiArrive(vi){if(!aidiOpen())return[];const A=aiS(),nm=VIL[vi].name.replace(/^.* /,'');
+  if(A.ch===0&&nm==='サカイガワ')return['…霧の 向こうから\nどこか なつかしい スープの 香りが する。','（宿場の 屋台へ 行ってみよう）'];
+  if(A.ch===0)return['町の人「よそもんか？ いまは 戦の 最中だでよ。\n国境の 宿場 サカイガワで 話を 聞いてりゃあ」'];
+  return[];}
+/* 町の 人の 声 */
+function aiLines(vi){const A=aiS(),nm=VIL[vi].name.replace(/^.* /,''),W=['ナコヤ','イヌヤマ','アツタ','トコナメ'].includes(nm);
+  if(A.ch>=5)return[...(nm==='ナコヤ'?['ナコヤは パチンコ 発祥の 地だでよ！\nパチ屋に 有名な 打ち手が 来とるらしいわ','手羽先も 味噌カツも ぜんぶ うみゃあで！']:[]),
+    'アツタ朝廷が 国都に なって\nヲワリも ミカワも 仲直りしたでよ','壁は 壊して 道に なったんだわ。\nどえりゃあ 見晴らしが ええがね','スー君の ラーメソ 食べた？\nスプーソで 食べるんだでよ','北の 山の 向こう… イトシロって 国が\n兵を 集めとるって うわさだがや',...(nm==='トユハシ'?['ちくわ 食べてきゃあ！ 名物だで']:[]),...(nm==='オカザキ'?['八丁味噌は 二夏二冬 寝かせるんだわ']:[])];
+  if(A.ch>=4)return['壁の 森の 結界が 開いたって ほんとか！？','アツタの 杜の 奥に 黒い 人影が\n入っていくのを 見たでよ…'];
+  if(W)return['ミカワの 連中は 味噌の 弾を 撃ってくるでよ！','ナコヤ城の 金の シャチホコが\n最近 くすんで 見えるんだわ…','手羽先は 骨まで しゃぶるのが ヲワリ流だで',nm==='トコナメ'?'港が ミカワ水軍に おさえられて\n船が 出せんのだわ…':nm==='アツタ'?'熱田さまの 森の 結界が 壁の 道を\nふさいどるでよ… 神さまが お怒りなのかね':'マスミダさまは 気は 荒いけど\n町の もんには やさしいお方だで'];
+  return['ヲワリの 連中は 手羽先を 投げてくるだら！','壁が できてから 尾張の 親戚に 会えんのだら…','トヨカワイナァリさまは お狐さまの 末裔なんだら',nm==='オカザキ'?'八丁味噌の 蔵が ヲワリに ねらわれとるだら…':nm==='トユハシ'?'ちくわでも 食っていかまい！':'ミカワの 赤味噌は 天下一だら'];}
+/* 施設 */
+function aiFac(kind){const A=aiS(),s=A.side;
+  if(!aidiOpen()){dialog('…霧が 濃くて 何も 見えない。');return;}
+  if(kind==='aiyatai')return aiYatai();
+  if(kind==='aimasu'||kind==='aitoyo'){const mine=(kind==='aimasu'&&s==='w')||(kind==='aitoyo'&&s==='e');
+    if(!s){dialog(kind==='aimasu'?['ナコヤ城の 本陣だ。','門番「なにもんだ！ 怪しい やつは 通さんでよ！」']:['トヨカワの 本陣だ。','門番「よそもんは 入れんだら！」']);return;}
+    if(!mine){dialog(A.ch>=5?[kind==='aimasu'?'マスミダ「おお、 来たか！ 手羽先 食ってけ！」':'トヨカワイナァリ「よう 来なさった。 味噌おでんでも どうだら」']:[kind==='aimasu'?'門番「ミカワの 加勢か！ 帰れ帰れ！」':'門番「ヲワリの 味方は 通さんだら！」']);return;}
+    if(A.ch===1)return aiCh1();if(A.ch===3)return aiCh3();
+    dialog(s==='w'?['マスミダ「トコナメの 港を 頼んだでよ！」']:A.ch===2?['トヨカワイナァリ「オカザキの 味噌蔵を 頼むだら」']:[s==='w'?'マスミダ「アツタの 杜へ 急げ！」':'トヨカワイナァリ「アツタの 杜へ 急ぐだら」']);return;}
+  if(kind==='aitoko'){if(s==='w'&&A.ch===2){scene('ai_toko',['── 焼き物の港 トコナメ ──','港には ミカワの 赤い 旗が ずらりと 並んでいる。','漁師「ミカワ水軍が 港を おさえてまって\n船が 出せんのだわ！」','ミカワ水軍「ここは もう ミカワの 港だら！\n手羽先くさい やつは 帰りん！」'],()=>startGm('ai_toko'));return;}
+    dialog(['土管坂に 焼き物の 壺が 並んでいる。','招き猫の 窯元「うちの 招き猫は 日本一 でかいでよ」']);return;}
+  if(kind==='aimiso'){if(s==='e'&&A.ch===2){scene('ai_miso',['── 八丁味噌の城下町 オカザキ ──','杉の 大樽が 並ぶ 味噌蔵に\n香ばしい 匂いが 立ちこめる。','蔵人「たいへんだら！ ヲワリの 手羽先隊が\n蔵に 火を つけに 来るだら！」','手羽先隊「味噌なんぞ 燃やして しまえ！\n…でも ちょっと 味噌カツに したいでよ」'],()=>startGm('ai_miso'));return;}
+    dialog(['二夏二冬 寝かせた 八丁味噌の 大樽だ。','蔵人「味噌は 石を 積んで 押すんだら」']);return;}
+  if(kind==='aimori'){if(A.ch<4){dialog(['熱田の 杜だ。 大きな 楠が 空を おおっている。','宮司「壁が できてから\n杜の 奥の 結界が 閉じたまま なのです…」']);return;}
+    if(A.ch===4)return aiCh4();
+    dialog(['アツタ朝廷の 社殿が 朝日に かがやいている。','宮司「アツタノオオカミさまの おかげで\nアイヂは 一つに なりました」']);return;}
+  dialog('…');}
+function aiYatai(){const A=aiS();
+  if(A.ch===0){scene('ai_sakai',['── アイヂ　国境の 宿場 サカイガワ ──','霧の 晴れた 宿場町に ぽつんと\nラーメソの 屋台が 出ている。','白い 帽子の 少年「いらっしゃい！\nボク スー君！ 一杯 どう？」','スー君「…あ、 霧の 向こうから 来たの？\nじゃあ アイヂの いまを 知らないよね」',
+      'スー君「いま アイヂは まっぷたつ。\n西の ヲワリと 東の ミカワが 戦争中なんだ」','スー君「ヲワリの 大将は 猛将 マスミダ。\nテバサキ刀を 振り回す こわい 人」','スー君「ミカワの 大将は トヨカワイナァリ。\nお狐さまの 末裔で 赤味噌の 大筒を 撃つんだ」',
+      'スー君「真ん中には 大きな 壁が 建って…\n行き来 できるのは この 北の 宿場だけ。\n壁の 根もとの アツタの 杜の 抜け道も 結界で 閉じちゃった」','スー君「ほんとは 手羽先も 味噌も\nどっちも おいしいのに ね……」','スー君「…ねえ。 どっちかに 加勢して\nこの 戦を 終わらせて くれない？」','【アイヂ大戦編】\n〜ヲワリミカワ大戦〜'],()=>aiChoose());return;}
+  const opts=['ラーメソを 食べる',...(A.clear&&A.ch>=5?['もう一方の 陣営の 物語を 見る']:[]),'やめる'];
+  choice(`スー君「いらっしゃい！」${A.side?'\n（いまの 陣営：'+AI_SN[A.side]+'）':''}`,opts,k=>{if(k<0||opts[k]==='やめる')return;
+    if(opts[k]==='ラーメソを 食べる'){if(G.coins<500){dialog('スー君「500イェソ だよ… 足りないみたい」');return;}G.coins-=500;G.party.forEach(id=>{const st=cstat(id),c=G.chars[id];c.hp=st.hp;c.mp=st.mp;});sfx('heal');save();
+      dialog(['ずずっ… あっさり 和風とんこつだ！','スプーソで スープと 麺を いっしょに すくう。\nHPと MPが 全回復した！（500イェソ）']);return;}
+    const o=AI_OP(A.side);choice(`${AI_SN[o]}に ついて\nもう一度 戦の 物語を 見ますか？\n（クリアの 記録は そのまま）`,[`${AI_SN[o]}に つく`,'やめる'],r=>{if(r!==0)return;A.side=o;A.ch=1;save();dialog([`${AI_SN[o]}に つくことに した。`,`${o==='e'?'トヨカワ':'ナコヤ'}の 本陣へ 向かおう。`]);},110);},110);}
+function aiChoose(){const A=aiS();
+  choice('どちらの 陣営に つきますか？\n（クリア後に 選び直せる）',['ヲワリ（マスミダ）','ミカワ（トヨカワイナァリ）'],k=>{if(k<0){aiChoose();return;}A.side=k===0?'w':'e';A.ch=1;save();
+    const tg=G.party.includes('tagaba')||G.party.includes('jouchan');
+    dialog([`スー君「${A.side==='w'?'ヲワリ… ナコヤの マスミダさまの ところだね！':'ミカワ… トヨカワの トヨカワイナァリさまの ところだね！'}」`,...(tg&&A.side==='e'?['（タガバソウ「ミカワか… 故郷の 空気だ」）']:tg?['（ジョウチャン「…ミカワとは 戦う ことに なるのか」）']:[]),'スー君「ボクは この 屋台で 待ってる。\n…死なないでね」',`目標：${A.side==='w'?'尾張の都 ナコヤ':'稲荷の門前町 トヨカワ'}の 本陣へ`]);},110);}
+function aiCh1(){const A=aiS(),w=A.side==='w';
+  scene(w?'ai_nakoya':'ai_toyo',w?['── 尾張の都 ナコヤ　ナコヤ城 本陣 ──','金の シャチホコを いただく 天守の 下、\n大柄な 武将が テバサキ刀を 肩に かついでいる。','マスミダ「おみゃあが 霧の 向こうから 来た 加勢か！」','マスミダ「ミカワの 連中は 壁を 建てて\nヲワリを 閉じこめよった！ 許さんでよ！」','マスミダ「…だが 口だけの 加勢は いらん。\nうちの 先鋒を 倒して 力を 見せてみゃあ！」']
+      :['── 稲荷の門前町 トヨカワ　本陣 ──','朱い 鳥居が 並ぶ 奥に\n狐の 面を 頭に のせた 武将が いる。','トヨカワイナァリ「霧の 向こうの お人か。\nようこそ ミカワへ」','トヨカワイナァリ「ヲワリの マスミダは 壁を 建てて\nミカワを 締めだした。 許せんだら」','トヨカワイナァリ「…じゃが 力の ない 者は 足手まとい。\nわしの 狐たちと 一戦 交えて もらうだら」'],()=>startGm('ai_test'));}
+function aiCh3(){const A=aiS(),w=A.side==='w',op=AI_LD[AI_OP(A.side)];
+  scene('ai_kabe',[`── 壁の 前　${w?'ヲワリ':'ミカワ'}軍 本陣 ──`,'見上げるほどの 石の 壁が\n国を まっぷたつに 割っている。',`${AI_LD[A.side]}「いよいよ 決戦だ${w?'でよ':'だら'}！」`,`${AI_LD[A.side]}「${op}は 壁の 上に 陣を 張った。\n一気に 攻め落とす${w?'でよ':'だら'}！」`,'壁の 上から 法螺貝の 音が 響く……！'],()=>startGm('ai_kessen'));}
+function aiCh4(){scene('ai_atsuta',['── 杜の宮 アツタ　熱田の 杜の 奥 ──','千年の 楠が 空を おおう 杜の 奥…','崩れた 社殿の 前に\nだれかが 立っている。','手に 持っているのは… ダンボールで できた 笏だ。','???「…ほう。 壁を 越えて ここまで 来たか」','???「ヲワリと ミカワを 争わせ\nアツタの 神力を 吸い上げる 手筈だったのだが」','???「この 国の 神力が あれば\nわが イトシロの 侵略は 完成する……！」','???「GPAの 低い 者に 用は ない。\n消えて もらおう」'],()=>startGm('ai_kuro'));}
+/* 勝ったとき */
+function aiWin(sp,pages){const A=aiS(),w=sp.wave||1,NW=GSTG[sp.st].waves;
+  if(w<NW){pages.push(sp.st==='ai_kuro'?'尖兵たちは 霧に なって 消えた…\n（HP・MPは 回復しない）':sp.st==='ai_kessen'?'壁の 上の 陣を 突破した！\n（HP・MPは 回復しない）':'まだ 来る…！\n（HP・MPは 回復しない）');dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
+  const after=(more,cb)=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more,cb);else if(cb)cb();});
+  const s=A.side,ws=s==='w';
+  if(sp.st==='ai_test'){A.ch=2;save();after([ws?'マスミダ「ほう！ やるでよ！ 気に入った！」':'トヨカワイナァリ「見事だら。 狐たちも 認めた ようだ」',ws?'マスミダ「では 頼みが ある。 トコナメの 港を\nミカワ水軍から 取り戻してちょう！」':'トヨカワイナァリ「頼みが ある。 オカザキの 味噌蔵が\nヲワリに ねらわれとるだら。 守ってくれ」',gmGive(15,15,1),`目標：${ws?'焼き物の港 トコナメ':'八丁味噌の城下町 オカザキ'}へ`]);return;}
+  if(sp.st==='ai_toko'||sp.st==='ai_miso'){A.ch=3;save();after([ws?'港に ヲワリの 旗が 戻った！':'味噌蔵は 守られた！','倒れた 敵兵の 懐から\n妙な ものが 落ちた。','……ダンボールで できた 笏の かけらだ。','敵兵「…黒い 霧の 男が… 言ったんだ…\n『相手が 攻めてくる。 先に 叩け』って……」',ws?'（ミカワも 誰かに あおられていた…？）':'（ヲワリも 誰かに あおられていた…？）',gmGive(15,15,1),`目標：${ws?'ナコヤ':'トヨカワ'}の 本陣へ もどろう`]);return;}
+  if(sp.st==='ai_kessen'){const op=AI_LD[AI_OP(s)];A.ch=4;save();
+    dialog(pages,()=>{BT=null;scene('ai_kabe',[`${op}は 膝を ついた…`,`${op}「…なぜだ… なぜ 戦って おったのだ${ws?'だら':'でよ'}…」`,`${op}「霧の 男が 言ったのだ。\n『${ws?'ヲワリ':'ミカワ'}が 攻めてくる。 壁を 建てよ』と…」`,`${AI_LD[s]}「…わしも だ${ws?'でよ':'だら'}。\n同じ 男に 同じ ことを 言われた」`,'二人の 大将は 顔を 見合わせた。',
+      '…そのとき 壁の 根もとの 森が 光った！','スー君「みんなー！ 熱田の 杜の 結界が\n開いたよー！」','スー君「その 霧の 男… ダンボールの 笏を 持って\n杜の 奥へ 入っていったって！」',`${AI_LD[s]}「…頼む。 わしらの 代わりに\nその 男を 追ってくれ」`,gmGive(20,20,2),'目標：壁の 森を 抜けて アツタの 杜へ'],()=>{returnField();});});return;}
+  if(sp.st==='ai_kuro'){const first=!A.clear;A.clear=1;A.ch=5;if(!A.done.includes(s))A.done.push(s);save();
+    const rw=[];if(first){const nw=addWeapon('w_kusanagi_ep');rw.push('【クリア報酬】',`XR「クサナギの イヤホン」を 手に入れた！${nw?'':'（かぶり）'}`,'XR「尾張の猛将 マスミダ」\nXR「三河の稲荷将 トヨカワイナァリ」\nXR「ラーメソ屋の スー君」が\nガチャに 登場する ように なった！',gmGive(40,40,5,1e10));}
+    else rw.push(`${AI_SN[s]}の 物語も 見届けた！`,gmGive(20,20,2));
+    dialog(pages,()=>{BT=null;scene('ai_atsuta',['ダンボールの 笏が 真っ二つに 折れた！','???「…くっ。 その 力… 予想 以上だ」','???「だが アイヂの 神力は\nもう 半分 いただいた」','???「わが 名は Tイトシロ。\n北の 山の 国 イトシロの 主……」','Tイトシロ「次は イトシロで 待つ。\n…資格の ない 者に 神は 救えぬと 知れ」','Tイトシロは 黒い 霧に なって 北の 空へ 消えた……',
+      '…静かに なった 杜の 奥で\n楠の 葉が ざわめいた。','まばゆい 光の 中から\n大いなる 神が 姿を あらわした！','アツタノオオカミ「よくぞ 杜を 取り戻して くれた」','アツタノオオカミ「わが 神剣の 力で\nこの 地を 一つに もどそう」','光が アイヂ 全土に ひろがっていく……！'],()=>
+      scene('ai_end',['── それから ──','壁は くずれ 一本の 大きな 道に なった。','アツタ朝廷が アイヂの 国都と なり\nヲワリと ミカワは ともに 朝廷を 支えることに なった。',
+        ...(ws?['マスミダ「わしは 朝廷の 武の 守りを つとめるでよ！」','トヨカワイナァリ「ヲワリの 加勢人に 救われた。\n…借りは 返すだら」','（ヲワリに ついた あなたは 朝廷の 客将として 迎えられた）']:['トヨカワイナァリ「わしは 朝廷の 祭祀を 支えるだら」','マスミダ「ミカワの 加勢人に 負けたでよ！\nがっはっは！ 手羽先 食ってけ！」','（ミカワに ついた あなたは 稲荷の 守り人として 迎えられた）']),
+        'スー君「みんな 仲直り！ ラーメソ 屋台も\nアツタの 門前に 出すことに したんだ！」',...(G.chars.tomoya?['トモヤヨシダ「…あっ！ それ！\n俺が 熱田の 実習で なくした イヤホン！」','トモヤヨシダ「…いや、 神剣の 力が 宿っちまってる。\nあんたが 持ってて くれ」']:['杜の 宮司「神剣の 力が 宿った\nイヤホンが 社殿に 落ちていました」','宮司「むかし 実習に 来た 若者の 落とし物の ようです」']),...rw],()=>{returnField();save();if(first)aiEndingScr(()=>{});}));});return;}
+  after([]);}
+/* 戦闘ステージ */
+const AISTG={
+  ai_test:{waves:2,f:w=>1.05+w*.02,mk:(sp,w)=>{const W=aiS().side==='w';return w<2?(W?[['ヲワリの 先鋒 足軽','bones','#a85000','#f8b800',2,1.3],['手羽先 槍兵','bones','#a85000','#fce0a8',2,1.3],['ヲワリの 先鋒 足軽','bones','#a85000','#f8b800',2,1.3]]:[['稲荷の 狐火','spirit','#f87800','#fcfcfc',2,1.3],['稲荷の 白狐','beast','#fcfcfc','#d82800',2,1.3],['稲荷の 狐火','spirit','#f87800','#fcfcfc',2,1.3]])
+      :(W?[['手羽先 槍兵','bones','#a85000','#fce0a8',2,1.3],['先鋒大将 エビフリャー','oni','#f87800','#fce0a8',12,1.6,1]]:[['稲荷の 白狐','beast','#fcfcfc','#d82800',2,1.3],['九尾の 稲荷狐','beast','#f8b800','#fcfcfc',12,1.6,1]]);},
+    intro:sp=>sp.wave<2?(aiS().side==='w'?'マスミダ「先鋒隊！ かかれー！」':'トヨカワイナァリ「狐たちよ、 試すだら！」'):'先鋒の 大将が 前に 出た！'},
+  ai_toko:{waves:2,f:w=>1.1+w*.02,mk:(sp,w)=>w<2?[['ミカワ水軍 赤味噌 鉄砲隊','bones','#a81000','#fce0a8',2.1,1.35],['ちくわ 兵','blob','#e8c8a0','#a05000',2.1,1.35],['ミカワ水軍 赤味噌 鉄砲隊','bones','#a81000','#fce0a8',2.1,1.35]]
+      :[['ちくわ 兵','blob','#e8c8a0','#a05000',2.2,1.35],['ミカワ水軍 船大将 ハッチョウ','oni','#a81000','#f8b800',14,1.65,1],['ちくわ 兵','blob','#e8c8a0','#a05000',2.2,1.35]],intro:sp=>sp.wave<2?'ミカワ水軍「味噌の 弾を くらうだら！」':'船大将 ハッチョウ「港は 渡さんだら！」'},
+  ai_miso:{waves:2,f:w=>1.1+w*.02,mk:(sp,w)=>w<2?[['手羽先隊 火付け役','bones','#a85000','#f83800',2.1,1.35],['エビフリャー 騎兵','beast','#f87800','#fce0a8',2.1,1.35],['手羽先隊 火付け役','bones','#a85000','#f83800',2.1,1.35]]
+      :[['エビフリャー 騎兵','beast','#f87800','#fce0a8',2.2,1.35],['手羽先隊 組頭 コーチン','oni','#a85000','#f8b800',14,1.65,1],['エビフリャー 騎兵','beast','#f87800','#fce0a8',2.2,1.35]],intro:sp=>sp.wave<2?'手羽先隊「味噌蔵を 燃やせー！」':'組頭 コーチン「名古屋コーチンの 意地を 見せたるでよ！」'},
+  ai_kessen:{waves:2,f:w=>1.15+w*.03,mk:(sp,w)=>{const W=aiS().side==='w';
+      if(w<2)return W?[['ミカワ 赤味噌 鉄砲隊','bones','#a81000','#fce0a8',2.3,1.4],['稲荷の 白狐','beast','#fcfcfc','#d82800',2.3,1.4],['ミカワ 赤味噌 鉄砲隊','bones','#a81000','#fce0a8',2.3,1.4]]:[['ヲワリの 先鋒 足軽','bones','#a85000','#f8b800',2.3,1.4],['シャチホコ 砲','snake','#f8b800','#fcfcfc',2.3,1.4],['ヲワリの 先鋒 足軽','bones','#a85000','#f8b800',2.3,1.4]];
+      return W?[['九尾の 稲荷狐','beast','#f8b800','#fcfcfc',2.5,1.4],['三河の稲荷将 トヨカワイナァリ','oni','#d82800','#fcfcfc',20,1.75,1,'ch:toyokawa'],['九尾の 稲荷狐','beast','#f8b800','#fcfcfc',2.5,1.4]]:[['シャチホコ 砲','snake','#f8b800','#fcfcfc',2.5,1.4],['尾張の猛将 マスミダ','oni','#a85000','#f8b800',20,1.75,1,'ch:masumida'],['シャチホコ 砲','snake','#f8b800','#fcfcfc',2.5,1.4]];},
+    intro:sp=>sp.wave<2?'壁の 上から 敵の 大軍が おそいかかる！':(aiS().side==='w'?'トヨカワイナァリ「ここは 通さんだら！」':'マスミダ「どえりゃあ 根性だでよ！ かかってこやあ！」')},
+  ai_kuro:{waves:2,f:w=>1.2+w*.03,mk:(sp,w)=>w<2?[['イトシロの 尖兵','bones','#24306c','#bcbcbc',2.5,1.45],['ダンボールの 式神','blob','#c8a060','#7c4c10',2.5,1.45],['イトシロの 尖兵','bones','#24306c','#bcbcbc',2.5,1.45]]
+      :[['ダンボールの 式神','blob','#c8a060','#7c4c10',2.6,1.45],['笏の 男（Tイトシロの 影）','spirit','#101018','#c8a060',24,1.8,1,'tito'],['ダンボールの 式神','blob','#c8a060','#7c4c10',2.6,1.45]],
+    intro:sp=>sp.wave<2?'???「行け、 わが 式神たちよ」':'???「…わたしが 直々に 相手を しよう」'}};
+/* 背景 */
+function aiSceneBg(k){if(!k.startsWith('ai_'))return false;const t=frame;
+  if(k==='ai_sakai'){R(0,0,W,H,'#14142c');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%90,1,1,'#7c7c9c');R(0,150,W,90,'#3c2c1c');for(let i=0;i<4;i++){R(10+i*60,90,50,60,'#5c3c24');R(14+i*60,96,42,20,'#fce0a8');}
+    R(96,110,64,40,'#a81000');R(90,104,76,8,'#fcfcfc');txt('ラーメソ',128,104,'#d82800','center');pc(110,120,6,(t>>4)&1?'#f8b800':'#f87800');pc(146,120,6,(t>>4)&1?'#f87800':'#f8b800');for(let i=0;i<3;i++)R(120+i*6,92-((t>>2)+i*5)%20,2,4,'#bcbcbc');return true;}
+  if(k==='ai_nakoya'){R(0,0,W,H,'#3cbcfc');R(0,150,W,90,'#5c9c38');R(90,60,76,90,'#fcfcfc');R(84,56,88,8,'#3c5c4c');R(98,40,60,18,'#fcfcfc');R(92,36,72,6,'#3c5c4c');R(110,22,36,16,'#fcfcfc');R(104,18,48,6,'#3c5c4c');
+    R(104,8,6,10,'#f8d800');R(146,8,6,10,'#f8d800');R(102,6,4,4,'#f8d800');R(150,6,4,4,'#f8d800');for(let i=0;i<4;i++)R(100+i*16,76,8,10,'#3c3c3c');R(60,140,136,10,'#7c7c7c');return true;}
+  if(k==='ai_toyo'){R(0,0,W,H,'#fce0a8');R(0,150,W,90,'#a8a8a8');for(let i=0;i<7;i++){const x=20+i*34,h=70-i*4;R(x,150-h,4,h,'#d82800');R(x+20,150-h,4,h,'#d82800');R(x-4,150-h,32,5,'#d82800');R(x,150-h+10,24,3,'#d82800');}
+    pc(200,40,14,'#fcfcfc');R(190,30,6,8,'#fcfcfc');R(204,30,6,8,'#fcfcfc');R(194,40,3,2,'#d82800');R(203,40,3,2,'#d82800');return true;}
+  if(k==='ai_kabe'){R(0,0,W,H,'#5c6c8c');R(0,150,W,90,'#5c4c2c');R(0,40,W,110,'#7c7c7c');for(let y=40;y<150;y+=10)for(let x=(y/10%2)*10;x<W;x+=20)R(x,y,19,9,'#8c8c8c');for(let x=0;x<W;x+=16)R(x,32,10,8,'#7c7c7c');
+    for(let i=0;i<5;i++){R(20+i*50,20,2,14,'#3c3c3c');R(22+i*50,20,10,6,i%2?'#d82800':'#f8b800');}return true;}
+  if(k==='ai_atsuta'){R(0,0,W,H,'#0c2c14');for(let i=0;i<9;i++){const x=i*30-6;R(x+10,40,14,110,'#3c2c1c');pc(x+17,40,26,'#1c4c24');pc(x+10,30,18,'#24602c');}R(0,150,W,90,'#2c3c1c');
+    R(98,96,60,54,'#7c5c3c');R(92,88,72,10,'#3c3c3c');R(104,70,4,30,'#d8b888');R(148,70,4,30,'#d8b888');R(100,70,56,5,'#d8b888');R(102,78,52,3,'#fcfcfc');for(let i=0;i<5;i++)R(106+i*10,81,3,6,'#fcfcfc');
+    for(let i=0;i<12;i++){const y=((t>>1)+i*23)%140;R((i*37)%W,y,1,2,'#bcfcbc');}return true;}
+  if(k==='ai_toko'){R(0,0,W,H,'#3cbcfc');R(0,120,W,30,'#0058f8');R(0,150,W,90,'#a86030');for(let i=0;i<6;i++){R(10+i*42,100,30,50,'#7c4c2c');pc(25+i*42,96,12,'#a86030');}for(let i=0;i<5;i++)R(20+i*50,60,4,40,'#d82800');R(180,110,60,14,'#5c3c1c');R(196,80,4,30,'#7c7c7c');R(200,80,20,14,'#d82800');return true;}
+  if(k==='ai_miso'){R(0,0,W,H,'#3c2c1c');R(0,150,W,90,'#5c3c1c');for(let i=0;i<4;i++){R(10+i*62,70,54,80,'#a86030');for(let j=0;j<4;j++)R(10+i*62,78+j*18,54,3,'#5c3c1c');R(14+i*62,60,46,10,'#7c7c7c');for(let j=0;j<4;j++)pc(22+i*62+j*10,58,4,'#9c9c9c');}return true;}
+  if(k==='ai_end'){R(0,0,W,H,'#fc9838');pc(128,150,40,'#fcfc00');pc(128,150,30,'#fcfcfc');R(0,150,W,90,'#5c9c38');R(0,170,W,12,'#c8a060');for(let i=0;i<6;i++)R(20+i*40,140,6,10,'#d82800');return true;}
+  return false;}
+/* Tイトシロの 影（オリジナル）：黒い 狩衣・ダンボールの 笏・GPAと 書かれた 帳面・冷たい 目 */
+function drawTito(x,y,t){ocAura(x,y,t,'#3c3c5c');R(x-12,y-34,24,32,'#101018');R(x-14,y-36,28,6,'#24242c');R(x-10,y-6,20,6,'#24242c');R(x-6,y-48,12,12,'#d8b898');R(x-4,y-44,3,1,'#000');R(x+1,y-44,3,1,'#000');R(x-7,y-56,14,8,'#101018');R(x-2,y-62,4,8,'#101018');
+  R(x+12,y-46,4,22,'#c8a060');R(x+12,y-46,4,2,'#7c4c10');R(x+13,y-40,2,1,'#7c4c10');R(x-22,y-30,10,12,'#fcfcfc');txtS('GPA',x-17,y-30,'#d82800','center');if((t>>4)&1)R(x-1,y-40,2,1,'#3cbcfc');}
+/* エンディング（短い スタッフロール ＋ 次回予告） */
+function aiEndingScr(cb){let t=0,nx=0,y=0;const L=['アイヂ大戦編','〜ヲワリミカワ大戦〜','','── 登場 ──','尾張の猛将 マスミダ','三河の稲荷将 トヨカワイナァリ','ラーメソ屋の スー君','アツタノオオカミ','Tイトシロ（の 影）','','── 制作 ──','田村企画','','アイヂ大戦編　完'];const TOTAL=L.length*16+H;
+  push({full:true,upd(){t++;if(nx){nx++;if(nx===60){tone(196,1.2,'square',.12);tone(98,1.4,'triangle',.18);}if(nx===110)[523,659,784,1047].forEach((f,k)=>tone(f,1.4,'triangle',.12,null,k*.06));if((nx>150&&(I.A||I.B))||nx>=600){pop();cb&&cb();}return;}y+=I.A?2.4:.6;if(y>=TOTAL)nx=1;},
+    drw(){const cl=v=>Math.max(0,Math.min(1,v));R(0,0,W,H,'#05030a');
+      if(nx){for(let i=0;i<48;i++)R((i*67)%W,((i*41)+(nx>>1))%H,1,1,i%4?'#1c2c3c':'#8cbcfc');
+        ctx.globalAlpha=cl((nx-15)/25);big('次回　新編',128,50,'#8cbcfc','center',14);ctx.globalAlpha=1;
+        if(nx>=60){const sh=nx<70?(70-nx)/2:0;if(nx<64){ctx.globalAlpha=.8;R(0,0,W,H,'#fcfcfc');ctx.globalAlpha=1;}big('侵略国家',128+Math.round((Math.random()-.5)*sh),88,'#fcfcfc','center',20);big('イトシロ',128+Math.round((Math.random()-.5)*sh),116,'#fcfcfc','center',28);}
+        ctx.globalAlpha=cl((nx-110)/30);txt('2027年1月1日　配信予定',128,170,'#f8d878','center');ctx.globalAlpha=1;if(nx>150&&(nx>>4)%2)txt('（ボタンで つづく）',128,218,'#5c5c7c','center');region(0,0,W,H,()=>{vA=true;});return;}
+      L.forEach((l,i)=>{const yy=H-y+i*16;if(yy<-10||yy>H)return;txt(l,128,yy,i<2?'#f8d878':l.startsWith('──')?'#8cbcfc':'#fcfcfc','center');});region(0,0,W,H,()=>{vA=true;});}});}
+/* 復興後の ナコヤの パチ屋 */
+function aiPachiNpc(){if(!(TW&&VIL[TW.vi]&&VIL[TW.vi].ai&&VIL[TW.vi].name.endsWith('ナコヤ')&&aiS().clear))return false;const A=aiS();if(A.pd===G.day)return false;A.pd=G.day;
+  dialog(['店の 奥の ハナハナの 島に\n見覚えの ある 二人組が いる。','もり田「おっ、 いらっしゃい。\n今日も ハナハナ 一本で 勝負だよ」','もり田「パチンコ 発祥の 地で 打てるって\nやっぱり 気分が ちがうよね」','たかし「もり田さん、 こっちの 台\nビッグ 先に 3回 来てます！」','もり田「たかし、 慌てない 慌てない。\nまずは しっかり 回して から だよ」'],()=>pachiFac());return true;}
+
 const SHIN_WIN=1e10,SHIN_AWAY=7;
 const shinAway=()=>!!(G.shinGone&&G.day<G.shinGone);
 function drawShin(x,y,f){R(x+4,y,8,4,'#101010');R(x+3,y+1,2,3,'#101010');R(x+11,y+1,2,3,'#101010');R(x+5,y,2,1,'#d82800');R(x+5,y+4,6,4,'#fcbcb0');R(x+5,y+5,2,1,'#000');R(x+9,y+5,2,1,'#000');R(x+6,y+7,4,1,'#880000');
@@ -5470,7 +5633,7 @@ function warpScr(){
 /* 11/19：マップから えらぶ ワープ（町・競馬場・球場・オロチの山） */
 let WARP_IMG=null;
 function warpImg(){if(WARP_IMG)return WARP_IMG;const c=document.createElement('canvas');c.width=MW;c.height=MH;const g=c.getContext('2d'),im=g.createImageData(MW,MH);
-  const COL={[T.TUN]:[40,40,40],[T.SHURA]:[200,0,0],[T.SHIN]:[248,184,0],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
+  const COL={[T.TUN]:[40,40,40],[T.SHURA]:[200,0,0],[T.KABE]:[124,124,124],[T.ATSUTA]:[0,72,24],[T.SHIN]:[248,184,0],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tileAt(x,y),q=COL[t]||(isTownT(t)?[252,252,252]:t===T.SHR?[216,40,0]:[88,200,84]),i=(y*MW+x)*4;im.data[i]=q[0];im.data[i+1]=q[1];im.data[i+2]=q[2];im.data[i+3]=255;}
   g.putImageData(im,0,0);return WARP_IMG=c;}
 function warpMap(seen,goTown){const trap=gmTrap(),P=[];
@@ -7688,7 +7851,7 @@ function gmLines(){const ch=gmS().ch;
   return['ていこくに ふこうは そんざいしない。','このまちは なんでも そろう。\nただし じぶんで えらぶことだけは むずかしい。','ていこくに ふこうは そんざいしない。','夜に なると となりの 人が いなくなるの。\nでも 朝には 戻ってるわ… 同じ 顔で。','ていこくに ふこうは そんざいしない。','しゅっこく？ そんな ことを\nかんがえる ひとは いないよ。','看板「帝国に 不幸は 存在しない」','役人「規則なので。」'];}
 /* 紙芝居の 背景 */
 function drawScene(k){
-  if(tiSceneBg(k))return;if(fkSceneBg(k))return;if(skSceneBg(k))return;
+  if(tiSceneBg(k))return;if(fkSceneBg(k))return;if(skSceneBg(k))return;if(aiSceneBg(k))return;
   if(k==='gs'||k==='gsend'){const e=k==='gsend';R(0,0,W,H,e?'#fc9838':'#1c0008');for(let i=0;i<30;i++)R((i*53)%W,(i*29)%70,1,1,e?'#fce0a8':'#7c3c3c');R(60,70,136,80,e?'#5c3c24':'#24101c');R(56,64,144,8,e?'#a05000':'#3c1c24');for(let i=0;i<5;i++)R(72+i*26,84,10,66,e?'#7c4c10':'#3c1c24');
     R(116,104,24,46,'#a80020');R(112,98,32,8,'#f8b800');R(120,92,16,8,'#f8b800');if(!e)for(let i=0;i<8;i++)R(10+i*30,160+((frame>>3)+i)%4,14,8,'#d82800');R(0,150,W,90,e?'#3c2410':'#100008');return;}
   if(k==='kq'||k==='kqpeace'){const pc_=k==='kq';R(0,0,W,H,pc_?'#2c0000':'#000030');for(let i=0;i<40;i++)R((i*53)%W,(i*29)%80,1,1,pc_?'#7c3c3c':'#fcfcfc');
@@ -7746,13 +7909,14 @@ const MLV_MAX=100,mlvMul=lv=>lv?1+(Math.min(MLV_MAX,lv)-1)/(MLV_MAX-1)*2:1;
 const gmWaves=sp=>sp.st==='minus'&&sp.lv?5:GSTG[sp.st].waves;
 const gmStage=sp=>GSTG[sp.st];
 function gmEnemies(sp,en){const d=gmStage(sp),w=sp.wave||1,F=GM_F*d.f(w,sp);
-  for(const [n,sh,c1,c2,hm,sm,boss,look] of d.mk(sp,w)){const e=mkEnemy(12,[n,sh,c1,c2]);if(look){e.shape=look;if(look==='kgod'){e.w=90;e.h=86;}else{e.w=36;e.h=52;}}for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm*F);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*sm*F);
+  for(const [n,sh,c1,c2,hm,sm,boss,look] of d.mk(sp,w)){const e=mkEnemy(12,[n,sh,c1,c2]);if(look&&look.startsWith('ch:')){e.chId=look.slice(3);e.w=60;e.h=70;}else if(look){e.shape=look;if(look==='kgod'){e.w=90;e.h=86;}else{e.w=36;e.h=52;}}for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*hm*F);for(const q of ['atk','mag','def'])e[q]=Math.round(e[q]*sm*F);
     if(boss){e.magic=true;e.dboss=true;e.mag=Math.max(e.mag,e.atk);}en.push(e);}}
 function startGm(st,extra){fullHeal();G.townBack=TW?{vi:TW.vi,px:TW.px,py:TW.py}:null;while(stack.length>1)pop();startBattle(false,null,Object.assign({kind:'gunma',st,wave:1},extra||{}));}
 const gmGive=(b,o,u,c)=>{G.items.b[4]=(G.items.b[4]||0)+b;G.items.o[4]=(G.items.o[4]||0)+o;if(u)G.items.urtk=(G.items.urtk||0)+u;if(c)noCount(()=>{G.coins+=c;});
   return `経験値祝詞×${b}・極上鉱石×${o}`+(u?`\nUR確定チケット×${u}`:'')+(c?`・${fmt(c)}イェソ`:'')+'を 手に入れた！';};
 function gmWin(pages){const sp=BT.sp,d=gmStage(sp),w=sp.wave||1,st=gmS(),NW=gmWaves(sp);
   if(sp.st.startsWith('fk_')){fkWin(sp,pages);return;}
+  if(sp.st.startsWith('ai_')){aiWin(sp,pages);return;}
   if(sp.st.startsWith('sk_')){skWin(sp,more=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more);}),pages);return;}
   if(w<NW){
     if(sp.st==='gs_final'&&w===3){pages.push('ジョソウソと ギムトモコは 膝を ついた…');dialog(pages,()=>{BT=null;scene('gs',['ジョソウソ「ぐ… まだだ… まだ 終わらん…！」','そのとき 帝城の 地下から\n赤黒い 霧が 噴き出した！','霧「…ワガ 理想ハ… 終ワラセハ セヌ…」','ギムトモコ「この 声… お父さま…！？」','ギムの残滓が ジョソウソと ギムトモコに\n憑依した！','二人の 目が 赤く 光る…！\n（HP・MPは 回復しない）'],()=>startBattle(false,null,Object.assign({},sp,{wave:4})));});return;}
@@ -9691,7 +9855,7 @@ const KQSTG={
     intro:(sp)=>sp.wave<3?`${KQB[sp.id].where}　第${sp.wave}区画\n${KQB[sp.id].intro}`:`${KQB[sp.id].n}が 立ちはだかった！`},
   kqashura:{waves:3,f:(w,sp)=>(sp&&sp.re?.66:.6)+(w-1)*.02,mk:(sp,w)=>w<3?[['修羅の 武者','bones','#3c3c3c','#d82800',1.2,1.1],['修羅の 武者','bones','#3c3c3c','#d82800',1.2,1.1],['修羅の 鬼火','spirit','#5c0000','#fc7460',1.2,1.1]]:[['修羅の 武者','bones','#3c3c3c','#d82800',1.5,1.1],['修羅王 タノウヱ','oni','#5c0000','#d82800',10,1.5,1],['修羅の 武者','bones','#3c3c3c','#d82800',1.5,1.1]],
     intro:(sp)=>sp.wave<3?`コクラ城　天守への 階段　第${sp.wave}層\n黒い 霧が 渦を 巻いている…`:'修羅王 タノウヱ「霧を 晴らした 者は おまえか！」'}};
-Object.assign(GSTG,KQSTG);
+Object.assign(GSTG,KQSTG);Object.assign(GSTG,AISTG);
 function kqIntro(){const st=kqS();st.ch=1;
   return['…空気が ピリピリ している。','町の人「よそもんかい？ 気ぃつけり。\nこの キタキュウは いま 修羅の 霧に\nおおわれとるっちゃ。」','「霧を 吸うと だれでも 気が 荒くなって\nケンカっ早く なってしまうんよ。\nほんとは みんな 人情の ある 町なんやけど…」','「くわしい ことは 城下町 コクラの\n奉行所で 聞いてみり。」','（キタキュウの 推奨レベルは Lv22222）'];}
 function kqLines(vi){const ch=kqS().ch,v=VIL[vi];
