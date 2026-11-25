@@ -516,7 +516,7 @@ const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===8?((frame>>2)%3===0?'#fcfcfc':(frame>>2)%3===1?'#fc74b4':'#f8d878'):r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
 const WT={'本':{a:.9,m:1.9},'棒':{a:1.1,m:.3},'果物':{a:.9,m:.9},'拳':{a:1.25,m:0},'リュック':{a:1.7,m:1.1},'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
-const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami'];
+const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami','dknight'];
 const BASE_SKILLS={
   hayabusa:{name:'はやぶさ斬り',mp:3,target:'enemy',kind:'phys',power:.75,hits:2,verb:'はなった'},
   kabuto:{name:'かぶと割り',mp:5,target:'enemy',kind:'phys',power:2.1,verb:'はなった'},
@@ -532,6 +532,8 @@ const BASE_SKILLS={
   kobu:{name:'鼓舞の舞',mp:5,target:'allies',kind:'buff',stat:'atk',amount:.5,turns:4,verb:'おどった'},
   mamori:{name:'守りの舞',mp:5,target:'allies',kind:'buff',stat:'def',amount:.6,turns:4,verb:'おどった'},
   kamui:{name:'神威',mp:12,target:'enemies',kind:'mag',power:3.2,verb:'しめした'},
+  kurou_issen:{name:'黄泉への 一閃',mp:30,target:'enemies',kind:'phys',power:3.8,verb:'振るった'},
+  kurou_yomi:{name:'黄泉還り',mp:24,target:'allies',kind:'heal',power:1.8,revive:true,verb:'唱えた'},
   tenkei:{name:'天恵',mp:14,target:'allies',kind:'heal',power:2.6,revive:true,verb:'さずけた'},
   beatbox:{name:'超絶ビートボックス',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'刻んだ'},
   boooon:{name:'ブンブン・ウェーブ',mp:12,target:'enemies',kind:'mag',power:2.0,verb:'放った'},
@@ -752,6 +754,7 @@ const BASE_PACK={
     {id:'krmatsu',name:'クリマッツ',short:'クリマッツ',rarity:'UR',weapon:'any',hp:90,mp:120,atk:14,mag:640,def:18,spd:14,skills:['krmz_power','krmz_kikoku'],look:{head:'hair',hair:'#5c3c24',body:'#24306c',accent:'#f8b800',legs:'#3c3c3c',held:'杖'}},
     {id:'takao',name:'タカヲマニワ',short:'タカヲ',rarity:'LR',weapon:'any',hp:120,mp:70,atk:34,mag:22,def:26,spd:22,skills:['ikki_sakura','ikki_taiyo'],look:{head:'hair',hair:'#181818',body:'#1c1c2c',accent:'#2c4ca8',legs:'#1c1c2c',held:'扇'}},
     {id:'godkami',name:'八百万の主神 ゴッド',short:'ゴッド',rarity:'XXR',nogacha:1,weapon:'any',hp:500,mp:500,atk:135,mag:135,def:98,spd:70,skills:['dazaifu','tenkei'],look:{head:'crown',hair:'#fcfcfc',body:'#f8b800',accent:'#d82800',legs:'#fcfcfc',held:'神宝'}},
+    {id:'kurouhane',name:'冥府騎士 クロウバネ',short:'クロウバネ',rarity:'XXR',nogacha:1,weapon:'any',hp:480,mp:420,atk:138,mag:112,def:96,spd:66,skills:['kurou_issen','kurou_yomi'],look:{head:'dknight',hair:'#14101c',body:'#24203c',accent:'#a800a8',legs:'#14101c',held:'両手剣'}},
     {id:'legend_itsuku',name:'伝説の開発者 タムライツク',short:'伝説ツク',rarity:'？？？',nogacha:1,weapon:'any',hp:780,mp:1000,atk:200,mag:200,def:150,spd:100,skills:[],look:{head:'hair',hair:'#141414',body:'#f8d878',accent:'#fc74b4',legs:'#fc74b4',held:'パソコン'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
     {id:'shoin',name:'導きの師 吉田松陰',short:'松陰',rarity:'LR',weapon:'any',hp:170,mp:170,atk:14,mag:30,def:28,spd:14,skills:['ishin_vg','oyagokoro'],look:{head:'samurai',hair:'#202020',body:'#3c3c5c',accent:'#f8f0d8',legs:'#2c2c3c',held:'扇'}},
@@ -1466,6 +1469,7 @@ function drawChar(id,x,y,f=0,sc=1){
   P(2,8,2,4,body);P(12,8,2,4,body);P(2,11,2,1,L.skin);P(12,11,2,1,L.skin);
   P(5,3,6,5,L.skin);P(6,5,1,1,'#000');P(9,5,1,1,'#000');
   switch(L.head){
+    case 'dknight':P(4,1,8,7,'#24203c');P(4,1,8,1,'#3c3458');P(5,5,6,1,'#000');P(5,5,2,1,'#fc3c3c');P(9,5,2,1,'#fc3c3c');P(10,-2,2,3,'#14101c');P(11,-4,1,2,'#14101c');P(7,2,2,2,'#a800a8');P(3,-4,1,1,'#5c5c6c');P(4,-5,3,1,'#5c5c6c');P(9,-5,2,1,'#5c5c6c');P(12,-4,1,1,'#a800a8');P(3,8,10,1,'#100c18');P(2,9,1,6,'#100c18');P(13,9,1,6,'#100c18');break;
     case 'helm':P(4,1,8,3,'#bcbcbc');P(4,4,1,2,'#bcbcbc');P(11,4,1,2,'#bcbcbc');P(7,0,2,1,L.acc);P(5,2,6,1,'#fcfcfc');break;
     case 'hair':P(5,2,6,2,L.hair);P(4,3,1,3,L.hair);P(11,3,1,3,L.hair);P(5,1,2,1,L.hair);P(9,1,2,1,L.hair);break;
     case 'witch':P(3,3,10,1,L.hat);P(5,1,6,2,L.hat);P(6,-1,4,2,L.hat);P(8,-3,2,2,L.hat);P(5,2,6,1,L.acc);break;
@@ -3937,8 +3941,8 @@ function shuraEnter(o){const S=shuraS(),best=S.best[o.id]==null?-1:S.best[o.id],
 function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.id===sp.cv);S.best[sp.cv]=Math.max(S.best[sp.cv]==null?-1:S.best[sp.cv],fl);save();
   const out=()=>{BT=null;if(o)G.pos={x:o.x,y:o.y+1};startField();save();};
   if(fl===11&&sp.boss==='kurou'){S.clr[sp.cv]=(S.clr[sp.cv]||0)+1;S.n++;S.kurou=(S.kurou||0)+1;const V=vgS();V.col=V.col||{};vgDB();
-    ['e_'+VG_KUROU[0],'e_'+VG_KUROU[1]].forEach(id=>{V.col[id]=(V.col[id]||0)+2;});G.items.urtk=(G.items.urtk||0)+3;sfx('g5');fullHeal();save();
-    pages.push('クロウバネ「…見事だ… この 剣… おまえに 託そう」','★ 幻の 修羅の 主を うちたおした！！',`ヴァンガルドの カードを 手に入れた！\n「${VG_KUROU[0]}」×2\n「${VG_KUROU[1]}」×2`,'UR確定チケット ×3 を 手に入れた！','修羅の洞窟を 踏破した！');dialog(pages,out);return;}
+    ['e_'+VG_KUROU[0],'e_'+VG_KUROU[1]].forEach(id=>{V.col[id]=(V.col[id]||0)+2;});G.items.urtk=(G.items.urtk||0)+3;const nw=addChar('kurouhane');sfx('g5');fullHeal();save();
+    pages.push('クロウバネ「…見事だ… この 剣… おまえに 託そう」','★ 幻の 修羅の 主を うちたおした！！',`XXR「冥府騎士 クロウバネ」が 仲間に なった！！`+(nw?'':`\n（かぶり：基礎Lv${G.chars.kurouhane.dup+1}に アップ）`),`ヴァンガルドの カードを 手に入れた！\n「${VG_KUROU[0]}」×2\n「${VG_KUROU[1]}」×2`,'UR確定チケット ×3 を 手に入れた！','修羅の洞窟を 踏破した！');dialog(pages,out);return;}
   if(fl===11){const id=sp.boss,nw=addChar(id);S.clr[sp.cv]=(S.clr[sp.cv]||0)+1;S.n++;sfx('g5');G.items.found=(G.items.found||0)+1;fullHeal();save();
     pages.push(`${CH[id].name}「…見事だ。 おまえに ついていこう」`,`XR「${CH[id].name}」が 仲間に なった！！`+(nw?'':`\n（かぶり：基礎Lv${G.chars[id].dup+1}に アップ）`),'修羅の洞窟を 踏破した！');dialog(pages,out);return;}
   const nx=fl+1,full=fl===3||fl===7||fl===10;
