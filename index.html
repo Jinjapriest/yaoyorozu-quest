@@ -1595,6 +1595,7 @@ function drawEnemy(e,x,y,t){
     case 'kgod':drawKGod(x,y,t);break;
     case 'kuro':drawKurofuku(x,y,t);break;case 'hancho':drawHancho(x,y,t);break;case 'himuro':drawHimuro(x,y,t);break;case 'tagaba':drawTagaba(x,y,t,1);break;case 'nizu':drawNizu(x,y,t,0);break;case 'nizu_y':drawNizuY(x,y,t);break;case 'nizu_g':drawNizuG(x,y,t);break;case 'kobushide':drawKobushide(x,y,t,0);break;case 'kobushide_r':drawKobushideR(x,y,t);break;case 'gargos':drawGargos(x,y,t);break;case 'wadatsumi':drawWadatsumi(x,y,t,0);break;case 'wadatsumi_s':drawWadatsumi(x,y,t,1);break;
     case 'shiro0':case 'shiro1':case 'shiro2':case 'shiro3':case 'shiro4':drawShirofuku(x,y,t,+e.shape.slice(5));break;
+    case 'tanouwe':drawTanouwe(x,y,t);break;
     case 'fknight':drawFallenKnight(x,y,t,0);break;case 'fknight4':drawFallenKnight(x,y,t,1);break;
     case 'blob':{const sq=(t>>4)&1;pe(x,y-10+sq,14,10-sq,c1);pc(x,y-21+sq,4,c1);R(x-1,y-27+sq,2,3,c1);pe(x-6,y-14+sq,3,2,c2);
       R(x-6,y-13+sq,4,4,Wt);R(x+2,y-13+sq,4,4,Wt);R(x-5,y-12+sq,2,3,K);R(x+3,y-12+sq,2,3,K);R(x-4,y-6+sq,8,1,K);R(x-5,y-7+sq,1,1,K);R(x+4,y-7+sq,1,1,K);break;}
@@ -2768,7 +2769,7 @@ function startBattle(boss,rift=null,sp=null){
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   if(!boss&&!sp&&rift==null)en.forEach(e=>{for(const q of ['maxhp','hp','atk','mag'])e[q]=Math.max(1,Math.round(e[q]*.85));e.def=Math.max(1,Math.round(e.def*.9));});/* 野良の 敵：少し 弱く */
   en.forEach(e=>{if(/の 複製$/.test(e.name||'')&&sp&&sp.st==='sk_nizu2'){e.atk*=1.75;e.mag*=1.75;}});
-  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={fknight:[44,64],fknight4:[84,88],kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90],gargos:[72,92],wadatsumi:[90,84],wadatsumi_s:[66,62],shiro4:[40,74]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
+  en.forEach(e=>{const oc=OC_OF(e.name||'');if(oc){e.shape=oc;if(oc==='nizu_y'){e.passive=1;e.def=Math.round(e.def*3);e.cap=.06;}if(oc==='nizu'&&e.dboss){e.multi=2;e.nz=1;e.atk*=1.6;e.mag*=1.6;}if(oc==='nizu_g'){e.multi=2;e.nz=3;e.cap=.08;e.atk*=1.1;e.mag*=1.1;}const sz={tanouwe:[60,92],fknight:[44,64],fknight4:[84,88],kobushide_r:[70,80],nizu:[44,52],nizu_y:[84,72],nizu_g:[74,90],gargos:[72,92],wadatsumi:[90,84],wadatsumi_s:[66,62],shiro4:[40,74]}[oc]||[36,56];e.w=sz[0];e.h=sz[1];}});
   const tw=en.reduce((s,e)=>s+e.w,0)+(en.length-1)*8;let x=128-tw/2;en.forEach(e=>{e.x=Math.round(x+e.w/2);e.y=boss?140:138;x+=e.w+8;});
   const bt=tileAt(G.pos.x,G.pos.y);
   /* 11/19：ボスが 弱いと 言われたので 強化（HP 1.8倍・攻撃/魔力 1.3倍・守備 1.15倍） */
@@ -7409,7 +7410,7 @@ function drawShirofuku(x,y,t,v){const W2='#fcfcfc',Wd='#d8d8e0',b=(t>>4)&1;
   if(v===1){R(x+12,y-40+b,2,16,'#000');R(x+11,y-41+b,4,2,'#f8b800');R(x-10,y-30,20,2,'#f8b800');R(x-6,y-58,12,2,'#d82800');}
   if(v===2){R(x+12,y-28+b,10,3,'#5c5c5c');R(x+21,y-29+b,2,5,'#3c3c3c');const f=(t>>2)&1;pc(x+27,y-27+b,3+f,'#f87800');pc(x+31+f,y-27+b,2,'#f8f800');pc(x+24,y-27+b,2,'#d82800');}
   if(v===3){R(x-21,y-44,11,30,'#5c7c9c');R(x-20,y-43,9,28,'#a8c8e8');R(x-20,y-43,9,2,'#fcfcfc');R(x-17,y-38,3,3,'#fcfcfc');R(x-21,y-30,11,1,'#3c5c7c');}}
-const OC_OF=n=>/闘魔王 ガルゴス/.test(n)?'gargos':/オオワダツミ/.test(n)?'wadatsumi':/深海竜/.test(n)?'wadatsumi_s':/白服/.test(n)?('shiro'+(/部隊長/.test(n)?1:/焼き払い|火炎放射/.test(n)?2:/護送/.test(n)?3:/親衛隊/.test(n)?4:0)):/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
+const OC_OF=n=>/タノウヱ/.test(n)?'tanouwe':/闘魔王 ガルゴス/.test(n)?'gargos':/オオワダツミ/.test(n)?'wadatsumi':/深海竜/.test(n)?'wadatsumi_s':/白服/.test(n)?('shiro'+(/部隊長/.test(n)?1:/焼き払い|火炎放射/.test(n)?2:/護送/.test(n)?3:/親衛隊/.test(n)?4:0)):/ニズゥーイッツァイ/.test(n)?(/幼体/.test(n)?'nizu_y':/生体/.test(n)?'nizu_g':'nizu'):/コブシデ/.test(n)?(/暴走/.test(n)?'kobushide_r':'kobushide'):/タガバソウ/.test(n)?'tagaba':/クロヌマ/.test(n)?'hancho':/ヒムロ/.test(n)?'himuro':/黒服/.test(n)?'kuro':/ギム総書記/.test(n)?(/残滓/.test(n)?'gimz':'gim'):/ジョソウソ/.test(n)?(/残滓憑き/.test(n)?'josouso_p':'josouso'):/ギムトモコ/.test(n)?(/残滓憑き/.test(n)?'tomoko_p':'tomoko'):null;
 /* 闇堕ちの聖騎士 クロウバネ（オリジナル）：黒紫の 甲冑・ひび割れた 黒い 光輪・ぼろぼろの 外套・紫の 呪紋が 走る 大剣。 G4は 影の 翼と 茨の 冠 */
 function drawFallenKnight(x,y,t,big){const A='#24203c',A2='#3c3458',Hi='#6c6488',P='#a800a8',Pg='#f878f8',Rd='#fc3c3c',b=(t>>4)&1;
   if(big){ctx.save();ctx.globalAlpha=.85;for(let k=0;k<6;k++){const L=26+k*5,f=Math.sin(t/14+k)*2;R(x-14-L,y-62+k*7+f,L,4,k%2?'#14101c':'#2c0c3c');R(x+14,y-62+k*7+f,L,4,k%2?'#14101c':'#2c0c3c');}ctx.restore();
@@ -7425,6 +7426,30 @@ function drawFallenKnight(x,y,t,big){const A='#24203c',A2='#3c3458',Hi='#6c6488'
   if(big){const sx=x+20,sy=y-30;R(sx-1,sy-58,5,52,'#3c3c4c');R(sx,sy-58,2,52,'#7c7c8c');for(let k=0;k<6;k++)R(sx,sy-54+k*8,2,3,(t>>2)%6===k?Pg:P);R(sx-5,sy-6,13,3,'#14101c');R(sx,sy-3,3,8,'#3c2c1c');R(x+14,y-38,6,8,A);}
   else{const sx=x-22;R(sx,y-46,4,44,'#3c3c4c');R(sx+1,y-46,2,44,'#7c7c8c');for(let k=0;k<5;k++)R(sx+1,y-42+k*8,2,3,(t>>2)%5===k?Pg:P);R(sx-4,y-48,12,3,'#14101c');R(sx+1,y-56,3,8,'#3c2c1c');R(sx-2,y-1,8,2,'#5c5c6c');}
   /* 紫の 瘴気 */for(let k=0;k<5;k++){const ph=(t+k*13)%30;R(x-12+k*6,y-6-ph,2,2,k%2?P:'#3c0c3c');}}
+/* 修羅王 タノウヱ（オリジナル）：ひと昔前の 任侠風。 黒光りする リーゼント・頬の 古傷・
+   紫の 羽織を 片肌脱ぎ（右肩を 出す）で 刺青の 腕・さらし・白鞘の ドス・雪駄 */
+function drawTanouwe(x,y,t){const Sk='#e8b890',Sd='#c08860',Hr='#101014',Ha='#3c1c4c',Hd='#24102c',Wt='#f0f0e8',b=(t>>4)&1;
+  ocAura(x,y,t,'#d82800');
+  /* 雪駄・足袋 */R(x-12,y-3,9,3,'#5c3c1c');R(x+3,y-3,9,3,'#5c3c1c');R(x-11,y-6,7,3,Wt);R(x+4,y-6,7,3,Wt);
+  /* 着流しの 裾（黒） */R(x-13,y-30,26,24,'#1c1c24');R(x-1,y-30,2,24,'#0c0c10');R(x-13,y-8,26,2,'#2c2c34');
+  /* 羽織：左肩（画面右）だけ 着て、右（画面左）は 腰へ 垂らす */
+  R(x+1,y-60,15,40,Ha);R(x+13,y-58,6,34,Ha);R(x+16,y-56,4,26,Hd);R(x+1,y-60,4,30,'#5c2c6c');
+  pc(x+9,y-48,4,Wt);pc(x+9,y-48,2,Ha);R(x+8,y-49,2,2,Wt);/* 家紋 */
+  R(x-18,y-30,14,10,Ha);R(x-18,y-30,14,2,'#5c2c6c');R(x-20,y-22,5,8,Hd);/* 脱いだ 片袖が 腰に */
+  /* 帯 */R(x-13,y-32,28,4,'#a81000');R(x-13,y-31,28,1,'#f8b800');
+  /* 白鞘の ドス（帯に 差す） */R(x+2,y-36,16,3,'#fcfcfc');R(x+2,y-36,5,3,'#e4e4d8');R(x+7,y-36,1,3,'#7c7c7c');
+  /* 右肩・胸（素肌）＋ さらし */R(x-12,y-58,14,10,Sk);R(x-12,y-48,14,16,Wt);for(let k=0;k<4;k++)R(x-12,y-46+k*4,14,1,'#d8d8d0');
+  /* 刺青の 右腕（画面左）：昇り龍の 鱗 */R(x-20,y-58,9,6,Sk);R(x-21,y-52,7,18,Sk);R(x-21,y-52,7,18,'#2c5c8c');R(x-20,y-58,9,6,'#2c5c8c');/* 墨の 地 */for(let k=0;k<12;k++){const dx=Math.round(Math.sin(k*.9)*2);R(x-19+dx,y-57+k*2,3,2,k%2?'#00a844':'#3cbc6c');}R(x-18,y-58,3,2,'#d82800');R(x-16,y-57,2,1,'#f8b800');/* 龍頭 */for(let k=0;k<4;k++)R(x-21+(k%2)*5,y-50+k*4,2,2,'#d82800');/* 牡丹 */R(x-14,y-56,4,3,'#2c5c8c');
+  R(x-22,y-34+b,8,6,Sk);R(x-22,y-34+b,8,1,Sd);/* 握り拳 */
+  /* 左腕（羽織の 袖の 中・懐手） */R(x+3,y-40,10,4,Hd);
+  /* 首・顔 */R(x-4,y-63,8,5,Sk);R(x-7,y-76,14,14,Sk);R(x-7,y-64,14,2,Sd);
+  R(x-6,y-72,5,1,'#000');R(x+1,y-72,5,1,'#000');R(x-5,y-71,3,1,'#000');R(x+2,y-71,3,1,'#000');/* にらむ 目と 太い 眉 */
+  R(x-6,y-74,5,2,Hr);R(x+1,y-74,5,2,Hr);R(x-1,y-69,2,3,Sd);R(x-3,y-65,6,1,'#7c2c1c');
+  R(x+3,y-70,1,5,'#a85040');R(x+4,y-69,1,1,'#a85040');/* 頬の 古傷 */
+  /* リーゼント：前に 大きく せり出す 黒光り */R(x-8,y-79,16,4,Hr);R(x-8,y-76,2,3,Hr);R(x+6,y-76,2,3,Hr);/* もみあげ */
+  R(x-8,y-86,17,7,Hr);R(x-7,y-91,18,5,Hr);R(x-5,y-95,19,4,Hr);R(x-2,y-97,15,2,Hr);R(x+8,y-94,8,6,Hr);R(x+12,y-92,4,4,Hr);/* 前へ 突き出す リーゼント */
+  R(x-5,y-94,16,1,'#7c7c90');R(x-6,y-89,14,1,'#5c5c70');R(x-7,y-84,12,1,'#3c3c4c');R(x+13,y-91,2,2,'#7c7c90');/* つや *//* つや */
+  if((t>>5)&1)txtS('ゴゴゴ',x+22,y-84,'#d82800','left');}
 function ocAura(x,y,t,col){for(let k=0;k<14;k++){const ph=(t*1.5+k*37)%40,ax=x-16+(k*11)%32+Math.sin((t+k*9)/9)*2;R(ax,y-6-ph,2,3,k%3?col:'#000000');}}
 /* ギム総書記：赤い 軍服の 老人・白い ひげ・歯車の 徽章の 高い 軍帽 */
 function drawGim(x,y,t,ghost){if(ghost){ocAura(x,y,t,'#d82800');ctx.globalAlpha=.6+.15*Math.sin(t/8);}
