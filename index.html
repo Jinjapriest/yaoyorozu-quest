@@ -4027,7 +4027,7 @@ function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.i
 /* ===================== アイヂ大戦編 〜ヲワリミカワ大戦〜（シナリオ 2026/11/16 版） =====================
    サキタマ編 クリア後に 開始（配信は AI_LIVE で 切り替え）。 全7章：序章 → 第1章 焼け野原 → 第2章 どちらにつく？ → 第3・4章 各ルート → 第5章 黒幕の影と停戦 → 最終章 アツタの森 → エンディング。
    どちらの ルートでも 国都は アツタ朝廷。 アツタノオオカミの 力で 焼け野原が 元に 戻る（壁は 取り壊し・ミカワ湾大橋が 架かる）。 */
-const AI_LIVE=false;/* 配信スイッチ：true で アイヂ大戦編を 公開 */
+const AI_LIVE=true;/* 配信スイッチ：true で アイヂ大戦編を 公開 */
 const aiDev=()=>!!(G&&G.aiDev);/* テスト用：G.aiDev=1 で 配信前でも 遊べる */
 const aidiOpen=()=>(AI_LIVE||aiDev())&&!!(G&&G.sk&&G.sk.clear);
 const aiS=()=>G.ai||(G.ai={ch:0,side:null,clear:0,done:[],v:{}});
