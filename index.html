@@ -4030,7 +4030,7 @@ function shuraWin(pages){const sp=BT.sp,fl=sp.fl,S=shuraS(),o=SHURAS.find(q=>q.i
 const AI_LIVE=true;/* 配信スイッチ：true で アイヂ大戦編を 公開 */
 const aiDev=()=>!!(G&&G.aiDev);/* テスト用：G.aiDev=1 で 配信前でも 遊べる */
 const aidiOpen=()=>(AI_LIVE||aiDev())&&!!(G&&G.sk&&G.sk.clear);
-const aiS=()=>G.ai||(G.ai={ch:0,side:null,clear:0,done:[],v:{}});
+const aiS=()=>{const A=G.ai||(G.ai={});if(A.ch==null)A.ch=0;if(A.side===undefined)A.side=null;if(!A.clear)A.clear=0;if(!Array.isArray(A.done))A.done=[];if(!A.v||typeof A.v!=='object')A.v={};return A;};/* 古い セーブにも 足りない 項目を 補う */
 const aiCh=()=>G&&G.ai?G.ai.ch:0;
 const aiRestored=()=>!!(G&&G.ai&&G.ai.clear);
 const aiPass=t=>(t===T.AIDI&&aidiOpen())||((t===T.KABE||t===T.AIBR)&&aiRestored());
