@@ -2812,6 +2812,9 @@ function startBattle(boss,rift=null,sp=null){
   else if(sp&&sp.kind==='yakuza'){const N=['鬼瓦組 組員','鬼瓦組 若頭','鬼瓦組 組長'];for(let k=0;k<3;k++){const e=mkEnemy(Math.max(9,tierAt(G.pos.x,G.pos.y)),['ヤクザ','oni','#000000',k===2?'#f8b800':'#d82800']);e.name=N[k];const m=k===2?3:k===1?1.8:1.2;for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*m*1.5);for(const q of ['atk','def'])e[q]=Math.round(e[q]*m);en.push(e);}}
   else if(sp&&sp.kind==='bouei'){const N=['防衛団員 リーダー','防衛団員 おにぎり','防衛団員 メガネ'];for(let k=0;k<3;k++){const e=mkEnemy(9,ETIER[9][k%3]);e.name=N[k];for(const q of ['maxhp','hp','atk','mag','def'])e[q]=Math.round(e[q]*(k?1:1.6));en.push(e);}}
   else if(sp&&sp.kind==='shura'){shuraEnemies(sp,en,ta);}
+  else if(sp&&sp.kind==='muhoub'){en.push(mkEnemy(ta,['自称天才無法者','oni','#fcfcfc','#3cbcfc']),mkEnemy(ta,['長兄無法者','oni','#5c3c1c','#d82800']));
+    {const ps=G.party.map(id=>cstat(id)),av=f=>ps.reduce((a,c)=>a+f(c),0)/Math.max(1,ps.length),A=av(c=>Math.max(c.atk,c.mag)),D=av(c=>c.def),Hp=av(c=>c.hp);
+    en.forEach(e=>{e.maxhp=e.hp=Math.max(20,Math.round(A*2));e.atk=e.mag=Math.max(1,Math.round(D*.6));e.def=Math.max(1,Math.round(A*.2));});}}/* 見かけ倒し：すごく 弱い（味方の 強さに 合わせて 2〜3発で 倒れる） */
   else if(sp&&sp.kind==='tunrich'){const P=[['黄金の 地底モグラ','beast','#ac7c00','#fcfc00'],['金脈 ナマズ','snake','#f8b800','#fcfcfc'],['宝珠の 鬼火','spirit','#f87800','#fcfc00']],n=ri(1,3);
     for(let k=0;k<n;k++){const e=mkEnemy(ta,P[ri(0,2)]);e.rich=1;en.push(e);}fitEnemies(en);
     en.forEach(e=>{for(const q of ['maxhp','hp'])e[q]=Math.round(e[q]*1.3);e.atk=Math.round(e.atk*.7);if(e.mag)e.mag=Math.round(e.mag*.7);});}
@@ -2823,7 +2826,7 @@ function startBattle(boss,rift=null,sp=null){
   else{const n=Math.min(4,ri(1,2+Math.floor(t/3))+(rnd()<.3?1:0)),sc=(1+.08*G.rifts.length)*(FIELD_F[t]||1);for(let k=0;k<n;k++){const e=mkEnemy(t,ETIER[t][ri(0,2)]);for(const s of ['maxhp','hp','atk','mag','def'])e[s]=Math.max(1,Math.round(e[s]*sc*NORA_W[s]));en.push(e);}}
   {const im=sp&&sp.st==='minus'?(infMul()>1?1.1:1):infMul();if(im!==1)en.forEach(e=>{for(const s_ of ['maxhp','hp','atk','mag','def'])if(e[s_])e[s_]=Math.round(e[s_]*im);});}
   if(!boss&&!sp)fitEnemies(en);
-  if(!boss&&!sp&&aidiOpen()&&!aiRestored()&&AIM.has(G.pos.y*MW+G.pos.x))en.forEach(e=>{if(rnd()<.6)e.name=rnd()<.05?'自称天才無法者':'荒野の 無法者';});/* 焼け野原の アイヂには 無法者が うろつく */
+  if(!boss&&!sp&&aidiOpen()&&AIM.has(G.pos.y*MW+G.pos.x)){const pr=aiRestored()?.25:.6;en.forEach(e=>{if(rnd()<pr){e.name='荒野の 無法者';e.muhou=1;}});}/* 焼け野原の アイヂには 無法者が うろつく */
   const cnt={};en.forEach(e=>cnt[e.name]=(cnt[e.name]||0)+1);const seen={};
   en.forEach(e=>{if(cnt[e.name]>1){seen[e.name]=(seen[e.name]||0)+1;e.label=e.name+'ABCD'[seen[e.name]-1];}else e.label=e.name;});
   if(!boss&&!sp&&rift==null)en.forEach(e=>{for(const q of ['maxhp','hp','atk','mag'])e[q]=Math.max(1,Math.round(e[q]*.85));e.def=Math.max(1,Math.round(e.def*.9));});/* 野良の 敵：少し 弱く */
@@ -2838,6 +2841,7 @@ function startBattle(boss,rift=null,sp=null){
   const groups={};en.forEach(e=>groups[e.name]=(groups[e.name]||0)+1);
   if(sp&&sp.kind==='shura')BT.pend.push(...shuraIntro(sp,en));
   if(sp&&sp.st==='ai_fin')aiFinBuff();
+  if(sp&&sp.kind==='muhoub')BT.pend.push('ズシン… ズシン…','長兄無法者「弟分を 五十人も やってくれたそうだな…」','自称天才無法者「計算上 おまえは もう 負けている！」','長兄無法者と 自称天才無法者が あらわれた！');
   if(sp&&sp.kind==='tunrich')BT.pend.push('地下の 暗がりで 何かが 金色に 光った！','黄金の まものが あらわれた！\n（倒せば 大もうけ！）');
   if(sp&&sp.kind==='gimrift')BT.pend.push('烈穴から 暴走した 魔力が あふれだした！');
   if(sp&&sp.kind==='gunma'){const d=gmStage(sp);if(d.intro)BT.pend.push(typeof d.intro==='function'?d.intro(sp):d.intro);}
@@ -3247,6 +3251,10 @@ function winBattle(){
   if(BT.sp&&BT.sp.kind==='shura'){shuraWin(pages);return;}
   if(BT.sp&&BT.sp.kind==='tokoyo'){const w=BT.sp.wave;if(w<4){pages.push(`第${w}の試練を 突破した！\n（HP・MPは 回復しない）`,'つぎの 試練が はじまる…');dialog(pages,()=>{BT=null;startBattle(false,null,{kind:'tokoyo',wave:w+1});});return;}
     dialog(pages,()=>{BT=null;startField();tokoyoClear();});return;}
+  if(BT.sp&&BT.sp.kind==='muhoub'){G.muhouB=(G.muhouB||0)+1;G.items.tk+=3;G.items.srtk=(G.items.srtk||0)+1;save();
+    pages.push('長兄無法者「ば、ばかな… 長兄の おれが…！」','自称天才無法者「け、計算ちがいだぁ〜！」\nふたりは 荒野の 向こうへ 逃げていった！','ガチャチケット 3枚と SR以上確定チケットを てにいれた！');dialog(pages,returnField);return;}
+  {const mk=BT.en.filter(e=>e.muhou).length;if(mk){const b=G.muhouK||0;G.muhouK=b+mk;save();
+    if(Math.floor(G.muhouK/50)>Math.floor(b/50)){pages.push(`無法者を ${Math.floor(G.muhouK/50)*50}体 たおした！`,'……荒野の 向こうから 地響きが 近づいてくる！');dialog(pages,()=>{BT=null;startBattle(false,null,{kind:'muhoub'});});return;}}}
   dialog(pages,returnField);
 }
 function loseBattle(){
@@ -4117,7 +4125,7 @@ function aiC6(){const ws=aiS().side==='w';
 function aiWin(sp,pages){const A=aiS(),w=sp.wave||1,NW=GSTG[sp.st].waves,s=A.side,ws=s==='w';
   if(w<NW){pages.push(sp.st==='ai_fin'?'合体爆弾が 崩れ落ちた！ …煙の 中から Tイトシロが 降りてくる！\n（HP・MPは 回復しない）':'まだ 来る…！\n（HP・MPは 回復しない）');dialog(pages,()=>{BT=null;startBattle(false,null,Object.assign({},sp,{wave:w+1}));});return;}
   const after=(more,cb)=>dialog(pages,()=>{returnField();if(more&&more.length)dialog(more,cb);else if(cb)cb();});
-  if(sp.st==='ai_c1'){A.ch=2;save();after(['長兄無法者「…覚えて おけ…！」\n無法者たちは 荒野の 向こうへ 逃げていった！','ジョウチャン「助かった！ …おまえ やっぱり 強えな」','？？？「…みなさん ご無事ですか」','穏やかな 顔の 男が 歩み出た。',
+  if(sp.st==='ai_c1'){A.ch=2;save();after(['頭目「…覚えて おけ…！ 兄貴たちが だまっちゃいねえぞ！」\n無法者たちは 荒野の 向こうへ 逃げていった！','ジョウチャン「助かった！ …おまえ やっぱり 強えな」','？？？「…みなさん ご無事ですか」','穏やかな 顔の 男が 歩み出た。',
       'ミツタニ「わたしは ミツタニ。 両州の 和平を 説いて まわっています」','ミツタニ「…おかげで 両方から『裏切り者』と 狙われて いますが」','ミツタニ「国外の 方。 わたしと いっしょに\n両州の 陣を 訪ねては くれませんか」',gmGive(15,15,1),'目標：ヲワリの 本陣 イチノミヤと ミカワの 本陣 トヨカワを 訪ねよう']);return;}
   if(sp.st==='ai_c3'){A.ch=4;save();after([ws?'ハッチョウミソ爆弾の 樽を 押さえた！':'テバサキボンバーの 窯を 止めた！','部隊長「…くっ。 この 爆弾の 作り方は\nよそから 来た 男に 教わったんだ…」','部隊長「ダンボールの 笏を 持った 男だ……」',
       ws?'マスミダ「よう やった！ 次は トヨカワイナァリとの 一騎打ちだ！」':'トヨカワイナァリ「ようやった。 次は マスミダとの 一騎打ちだら」',gmGive(15,15,1),`目標：${ws?'トヨカワ':'イチノミヤ'}へ`]);return;}
@@ -4147,8 +4155,8 @@ function aiRestoreScr(order,cb){let t=0;const N=order.length;push({full:true,upd
     if(k>=N)txt('アイヂの 町が 元の 姿に 戻った！',W/2,206,'#f8d878','center');region(0,0,W,H,()=>{vA=true;});}});}
 /* 戦闘ステージ（第3・4章は ルートで 相手が 入れ替わる） */
 const AISTG={
-  ai_c1:{waves:2,f:w=>1.05+w*.02,mk:(sp,w)=>w<2?[['無法者','bones','#5c3c1c','#bcbcbc',2,1.3],['自称天才無法者','oni','#fcfcfc','#3cbcfc',6,1.5,1],['無法者','bones','#5c3c1c','#bcbcbc',2,1.3]]
-      :[['無法者','bones','#5c3c1c','#bcbcbc',2,1.3],['略奪集団の 頭目 長兄無法者','oni','#5c3c1c','#d82800',14,1.65,1],['無法者','bones','#5c3c1c','#bcbcbc',2,1.3]],intro:sp=>sp.wave<2?'自称天才無法者「この 天才に かかれば 自警団など 一ひねり！\n…計算上はな！」':'長兄無法者「弟が 世話に なったな…\nこの 荒野は 長兄の おれの ものだ！」'},
+  ai_c1:{waves:2,f:w=>1.05+w*.02,mk:(sp,w)=>w<2?[['無法者','bones','#5c3c1c','#bcbcbc',2,1.3],['無法者の 突撃隊長','bones','#5c3c1c','#d82800',6,1.5,1],['無法者','bones','#5c3c1c','#bcbcbc',2,1.3]]
+      :[['無法者','bones','#5c3c1c','#bcbcbc',2,1.3],['略奪集団の 頭目 無法者','bones','#3c2c1c','#d82800',14,1.65,1],['無法者','bones','#5c3c1c','#bcbcbc',2,1.3]],intro:sp=>sp.wave<2?'突撃隊長「ヒャッハー！ 自警団なんぞ ひとひねりだぁ！」':'頭目「おれの 子分を かわいがって くれたな…\nこの 荒野は おれたちの ものだ！」'},
   ai_c3:{waves:2,f:w=>1.1+w*.02,mk:(sp,w)=>{const W_=aiS().side==='w';return w<2?(W_?[['ハッチョウミソ 擲弾兵','bones','#5c3c1c','#a86030',2.1,1.35],['味噌樽 ゴーレム','blob','#7c4c10','#3c2c1c',2.1,1.35],['ハッチョウミソ 擲弾兵','bones','#5c3c1c','#a86030',2.1,1.35]]:[['テバサキ 擲弾兵','bones','#a85000','#f8b800',2.1,1.35],['手羽先の 亡霊','spirit','#f8b800','#a85000',2.1,1.35],['テバサキ 擲弾兵','bones','#a85000','#f8b800',2.1,1.35]])
       :(W_?[['味噌樽 ゴーレム','blob','#7c4c10','#3c2c1c',2.2,1.35],['ハッチョウミソ爆弾部隊長','oni','#5c3c1c','#d82800',14,1.65,1],['味噌樽 ゴーレム','blob','#7c4c10','#3c2c1c',2.2,1.35]]:[['手羽先の 亡霊','spirit','#f8b800','#a85000',2.2,1.35],['テバサキボンバー部隊長','oni','#a85000','#f8b800',14,1.65,1],['手羽先の 亡霊','spirit','#f8b800','#a85000',2.2,1.35]]);},
     intro:sp=>sp.wave<2?'爆弾部隊が おそいかかってきた！':(aiS().side==='w'?'部隊長「ハッチョウミソ爆弾の 威力を 見せたるだら！」':'部隊長「テバサキボンバーの 威力を 見せたるでよ！」')},
