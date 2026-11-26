@@ -4100,9 +4100,9 @@ function aiC1(){scene('ai_karia',['── 第1章　焼け野原の アイヂ �
     'イジケン「…ただし 爆弾の 部品だけは 扱わねえ。\nあれは 町を 焼く 道具だ」','スー君「みんなー！ ラーメソ 届けに 来たよー！」','……そのとき 広場に 砂煙が 上がった！','無法者たち「食い物と 水を 置いていけぇ！」','ジョウチャン「来やがったな 略奪集団！ 手を 貸してくれ！」'],()=>startGm('ai_c1'));}
 function aiC2Visit(c){const A=aiS();
   if(c==='w'){scene('ai_nakoya',['── イチノミヤ　マスミダ本陣 ──','赤い 兜に 金の 鍬形… 立派な ひげの 武将が 立っている。','ミツタニ「マスミダ殿。 和平の 話を しに 参りました」','マスミダ「和平だと？ ヲワリこそ 天下の 真ん中だがや！」',
-      'マスミダ「人も 商いも 集まる ヲワリが 国都に なるのが 道理！\nミカワが 頭を 下げるまで 戦は 終わらんでよ！」','マスミダ「…そっちの よそもんは 腕が 立ちそうだな。\nヲワリに つくなら 歓迎するでよ！」','ミツタニ「…（やはり 一筋縄では いかないか）」'],()=>{A.v.w=1;save();returnField();aiC2Choose();});return;}
+      'マスミダ「人も 商いも 集まる ヲワリが 国都に なるのが 道理！\nミカワが 頭を 下げるまで 戦は 終わらんでよ！」','マスミダ「…そっちの よそもんは 腕が 立ちそうだな。\nヲワリに つくなら 歓迎するでよ！」','ミツタニ「…（やはり 一筋縄では いかないか）」'],()=>{A.v.w=1;save();aiC2Choose();});return;}
   scene('ai_toyo',['── トヨカワ　トヨカワイナァリ本陣 ──','白狐の 耳の 兜に 小さな 狐面… 長い 槍を 持った 武将だ。','ミツタニ「トヨカワイナァリ殿。 和平の 話を…」','トヨカワイナァリ「急いては 事を 仕損じるじゃん。\nミカワは 一歩も 引かんよ」',
-    'トヨカワイナァリ「ものづくりと 歴史の ミカワこそ 国都に ふさわしい。\nヲワリの 派手好きには 任せられんだら」','トヨカワイナァリ「…国外の お人か。 ミカワに 力を 貸すなら\n稲荷の 守りを 約束するだら」','ミツタニ「…両方とも 譲る 気は ないようですね」'],()=>{A.v.e=1;save();returnField();aiC2Choose();});}
+    'トヨカワイナァリ「ものづくりと 歴史の ミカワこそ 国都に ふさわしい。\nヲワリの 派手好きには 任せられんだら」','トヨカワイナァリ「…国外の お人か。 ミカワに 力を 貸すなら\n稲荷の 守りを 約束するだら」','ミツタニ「…両方とも 譲る 気は ないようですね」'],()=>{A.v.e=1;save();aiC2Choose();});}
 function aiC2Choose(){const A=aiS();if(!A.v.w||!A.v.e){dialog([`目標：${A.v.w?'ミカワの 本陣 トヨカワ':'ヲワリの 本陣 イチノミヤ'}へ`]);return;}
   dialog(['ミツタニ「両方の 話を 聞きましたね」','ミツタニ「…わたしは 両方から『裏切り者』と 呼ばれている。\n和平を 説くには 力が いる」','ミツタニ「あなたが どちらかに つけば\n戦の 流れが 変わる かもしれない」'],()=>
     choice('どちらに つきますか？\n（この 選択は あとから 変えられない）',['マスミダに つく（ヲワリ）','トヨカワイナァリに つく（ミカワ）'],k=>{if(k<0){aiC2Choose();return;}A.side=k===0?'w':'e';A.ch=3;save();const ws=A.side==='w';
@@ -11147,9 +11147,14 @@ function draw(){
 let last=0,acc=0;
 function loop(ts){
   if(!last)last=ts;acc+=Math.min(100,ts-last);last=ts;
-  let n=0;while(acc>=1000/60&&n<4){update();acc-=1000/60;n++;}
-  draw();requestAnimationFrame(loop);
+  let n=0;try{while(acc>=1000/60&&n<4){update();acc-=1000/60;n++;}draw();}catch(e){acc=0;errRecover(e);}
+  requestAnimationFrame(loop);
 }
+/* エラーで 固まらないように：上に 重なった 画面を 閉じて 復帰する */
+let errN=0;function errRecover(e){errN++;const m=(e&&e.message||String(e)).slice(0,80);try{localStorage.setItem('yq_lastErr',new Date().toISOString()+' '+m+' | '+((e&&e.stack)||'').slice(0,600));}catch(_){}
+  try{console.error(e);}catch(_){}
+  try{BT=null;while(stack.length>1)pop();if(!stack.length||(stack[0]!==fieldScr&&stack[0]!==townScr)){if(TW)setBase(townScr);else startField();}save();}catch(_){try{TW=null;startField();}catch(__){}}
+  try{toast('エラーから 復帰しました：'+m);}catch(_){}}
 
 /* ===================== セーブ引き継ぎUI ===================== */
 {const ta=document.getElementById('saveText'),msg=document.getElementById('saveMsg');const say=(t,ok)=>{msg.textContent=t;msg.className=ok?'ok':'err';msg.style.color=ok?'#7ee07e':'#fc7460';};
