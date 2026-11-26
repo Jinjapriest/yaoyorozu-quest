@@ -3777,7 +3777,7 @@ function openFac(kind){
   if(kind==='lotto'){lottoFac();return;}
   if(kind==='card'){vgShop();return;}
   if(kind==='cardeal'){carFac();return;}
-  switch(kind){case 'kanraku':enterKanraku();break;case 'race':raceFac();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':if(!aiPachiNpc())pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
+  switch(kind){case 'kanraku':enterKanraku();break;case 'race':enterKyotei();break;case 'kpachi':pachiFac();break;case 'shugyo':shugyoFac();break;case 'palace':palaceFac(curVil);break;case 'boat':boatFac();break;case 'hall':hallFac();break;case 'pachi':if(!aiPachiNpc())pachiFac();break;case 'kokan':kokanFac();break;case 'inn':innFac();break;case 'shop':openShop(curVil);break;case 'gacha':openGacha();break;case 'rest':restFac();break;case 'job':jobFac();break;case 'dojo':dojoFac();break;case 'stock':stockFac();break;case 'casino':casinoFac();break;case 'kinyu':kinyuFac();break;case 'gate':tokoyoGate();break;case 'colo':coloFac();break;case 'bank':bankFac();break;}
 }
 function listPick(title,items,cb,foot){
   const m=mkMenu(items,{x:4,y:20,w:248,rows:Math.min(11,items.length),title});
@@ -11039,30 +11039,34 @@ function airBump(c){const op=centrairOpen();
   if(c.t==='kfood'){kjoFood(c.shop);return true;}
   return false;}
 /* ===================== ボートレース ガマゴオリ（中に 入れる 競艇場） ===================== */
-function buildKyotei(vi){const w=17,h=14,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
+const kyoName=vi=>'ボートレース '+VIL[vi].name.replace(/^.* /,'').replace(/港$/,'');
+function kyoHours(vi){const P=BPOST(vi);return[P[0]-70,P[11]+50];}
+function buildKyotei(vi){const w=17,h=14,C=[],ga=isGama(vi),ty=BTYPE(vi),nm=kyoName(vi);for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
   for(let x=0;x<w;x++){C[0][x]={t:'bwater',x,y:0};C[1][x]={t:'bwater',x,y:1,ln:1};C[2][x]={t:'bwater',x,y:2,ln:2};C[3][x]={t:'bwater',x,y:3};C[4][x]={t:'kyfence'};C[5][x]={t:'kstep'};C[6][x]={t:'kstep'};C[h-1][x]={t:'kwall'};}
   C[0][1]={t:'bmark',x:1,y:0};C[3][15]={t:'bmark',x:15,y:3};
   for(let y=5;y<h;y++){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}
   for(let k=0;k<5;k++)C[8][6+k]={t:'kboard',k};
   for(let k=0;k<3;k++)C[10][2+k]={t:'bwin',k};C[10][5]={t:'kvote',k:0};
-  C[10][12]={t:'kfood',dx:0,shop:'ai_teba',sg:'手',sg2:'羽'};C[10][13]={t:'kfood',dx:1,shop:'ai_teba',sg:'手',sg2:'羽'};C[12][12]={t:'kfood',dx:0,shop:'ai_miso',sg:'味',sg2:'噌'};C[12][13]={t:'kfood',dx:1,shop:'ai_miso',sg:'味',sg2:'噌'};
+  const F1=ga?['ai_teba','手','羽']:['yaki','焼','う'],F2=ga?['ai_miso','味','噌']:['ramen','ラ','メ'];
+  C[10][12]={t:'kfood',dx:0,shop:F1[0],sg:F1[1],sg2:F1[2]};C[10][13]={t:'kfood',dx:1,shop:F1[0],sg:F1[1],sg2:F1[2]};C[12][12]={t:'kfood',dx:0,shop:F2[0],sg:F2[1],sg2:F2[2]};C[12][13]={t:'kfood',dx:1,shop:F2[0],sg:F2[1],sg2:F2[2]};
   C[8][2]={t:'tvmon',k:0};C[8][14]={t:'tvmon',k:1};
   C[h-1][8]={t:'exit'};
-  const r=lcg(vi*733+G.day*17),npcs=[{x:3,y:11,col:'#003c8c',hair:'#3c3c3c',line:'窓口の 係員「ボートレース ガマゴオリへ ようこそ！\nナイターの 水面が 自慢です」'},
-    {x:4,y:5,col:'#d82800',hair:'#000000',line:'観客「いけーっ！ 差せ 差せーっ！」'},{x:11,y:6,col:'#00a800',hair:'#7c4c10',line:'観客「ミカワ湾の 風が 強い日は\n荒れるけえ 穴を 狙うんよ」'},
+  const tyN={morning:'朝の 水面が',day:'昼の 水面が',night:'ナイターの 水面が'}[ty];
+  const r=lcg(vi*733+G.day*17),npcs=[{x:3,y:11,col:'#003c8c',hair:'#3c3c3c',line:`窓口の 係員「${nm}へ ようこそ！\n${tyN} 自慢です」`},
+    {x:4,y:5,col:'#d82800',hair:'#000000',line:'観客「いけーっ！ 差せ 差せーっ！」'},{x:11,y:6,col:'#00a800',hair:'#7c4c10',line:ga?'観客「ミカワ湾の 風が 強い日は\n荒れるけえ 穴を 狙うんよ」':'観客「風と 潮で 水面が 変わる。\n展示を 見んと 買えんのよ」'},
     {x:7,y:9,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「イン逃げ ばっかり 買うとったら\nいつか 当たる…と 思うとる」'},
-    {x:11,y:11,col:'#fcfcfc',hair:'#5c5c5c',line:'手羽先屋「レースの あいまに 手羽先！\n手は 汚れても 舟券は 汚させんよ」'},{x:11,y:12,col:'#7c4c10',hair:'#000000',line:'味噌煮込み屋「ぐつぐつの 味噌煮込み、\n負けた 日ほど うまいがね」'}];
-  if(!aiRestored())npcs.push({x:14,y:9,col:'#5c3c1c',hair:'#3c3c3c',line:'客「戦争中でも レースは 止めん。\nここだけは ヲワリも ミカワも 関係ないがや」'});
+    {x:11,y:11,col:'#fcfcfc',hair:'#5c5c5c',line:ga?'手羽先屋「レースの あいまに 手羽先！\n手は 汚れても 舟券は 汚させんよ」':'焼きうどん屋「舟券の おともに 焼きうどん！」'},{x:11,y:12,col:'#7c4c10',hair:'#000000',line:ga?'味噌煮込み屋「ぐつぐつの 味噌煮込み、\n負けた 日ほど うまいがね」':'ラーメン屋「負けた 日の ラーメンは\nしょっぱいけど うまいよ」'}];
+  if(ga&&!aiRestored())npcs.push({x:14,y:9,col:'#5c3c1c',hair:'#3c3c3c',line:'客「戦争中でも レースは 止めん。\nここだけは ヲワリも ミカワも 関係ないがや」'});
   if(r()<.15)npcs.push({x:9,y:12,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
-  return{jogai:true,kyo:true,title:'ボートレース ガマゴオリ',vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
-function enterKyotei(){const vi=curVil,m=nowMin();if(m<14*60||m>=21*60+30){dialog(['ボートレース ガマゴオリは 閉まっている。','「ナイター開催　開門 14:00〜21:30」']);return;}
-  jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKyotei(vi);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('ボートレース ガマゴオリに 入った');}
+  return{jogai:true,kyo:true,kty:ty,title:nm,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
+function enterKyotei(){const vi=curVil,m=nowMin(),[o,c]=kyoHours(vi),nm=kyoName(vi);if(m<o||m>=c){dialog([`${nm}は 閉まっている。`,`「${BTYPEN[BTYPE(vi)]}開催　開門 ${hm(o)}〜${hm(c)}」`]);return;}
+  jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKyotei(vi);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast(nm+'に 入った');}
 function kyoBump(c){const vi=TW.vi;
   if(c.t==='bwin'){raceFac(vi);return true;}
   if(c.t==='kvote'){dialog('マークカードは 舟券窓口で 使えます。\n（窓口で「マークカードで 買う」）');return true;}
   if(c.t==='kboard'){const cd=raceCard(vi);dialog([`次は 第${cd.no}R`,cd.boats.map(b=>`${b.lane}号艇 ${b.name}（${b.cls}）`).slice(0,3).join('\n'),cd.boats.map(b=>`${b.lane}号艇 ${b.name}（${b.cls}）`).slice(3).join('\n')]);return true;}
   if(c.t==='tvmon'){dialog('モニターに 展示航走が 映っている。\nスタート展示の 1号艇が 速い…！');return true;}
-  if(c.t==='bwater'||c.t==='bmark'||c.t==='kyfence'){dialog(c.t==='bmark'?'ターンマークの ブイだ。\nここで 抜くか 抜かれるかが 決まる。':'ナイターの 光に 照らされた 水面。\n6艇が 波しぶきを 上げて 走っている。');return true;}
+  if(c.t==='bwater'||c.t==='bmark'||c.t==='kyfence'){dialog(c.t==='bmark'?'ターンマークの ブイだ。\nここで 抜くか 抜かれるかが 決まる。':(TW.kty==='night'?'ナイターの 光に 照らされた 水面。':TW.kty==='morning'?'朝日に きらめく 水面。':'陽の 光に かがやく 水面。')+'\n6艇が 波しぶきを 上げて 走っている。');return true;}
   if(c.t==='kstep'){dialog('観戦スタンド。 水面が よく 見える。');return true;}
   if(c.t==='kfood'){kjoFood(c.shop);return true;}
   return false;}
