@@ -283,7 +283,8 @@ function keibaClosed(){const m=nowMin();
   if(m<9*60)return['まだ 開門前です。（開門 9:00）','1R の 発走は 9:55 です。'];
   if(!keibaRaceNo())return['本日の 全レースは 終了しました。','またの ご来場を お待ちしております。'];return null;}
 /* ボートレース：トイシは モーニング、 ほかは デイ／ナイター。 毎日 12レース */
-const BTYPE=vi=>VIL[vi].kyotei?'morning':(vi%3===0?'night':'day'),BTYPEN={morning:'モーニング',day:'デイ',night:'ナイター'};
+const isGama=vi=>!!VIL[vi]&&VIL[vi].name==='海辺の町 ガマゴオリ';
+const BTYPE=vi=>VIL[vi].kyotei?'morning':isGama(vi)?'night':(vi%3===0?'night':'day'),BTYPEN={morning:'モーニング',day:'デイ',night:'ナイター'};
 const BPOST=vi=>{const t=BTYPE(vi),[st,g]=t==='morning'?[510,25]:t==='night'?[910,30]:[645,30];return [...Array(12)].map((_,k)=>st+k*g);};
 const boatRaceNo=vi=>{const m=nowMin(),P=BPOST(vi),i=P.findIndex(t=>t>=m);return i<0?0:i+1;};
 function boatClosed(vi){const m=nowMin(),P=BPOST(vi),info=`（${BTYPEN[BTYPE(vi)]}開催　1R ${hm(P[0])} 〜 12R ${hm(P[11])}）`;
@@ -947,8 +948,8 @@ const chList=()=>Object.values(CH),wpList=()=>Object.values(WPD).filter(w=>!w.co
 
 /* ===================== マップ ===================== */
 const MW=190,OW=130,MH=200,MAINW=64,MH0=56;
-const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31,SHURA:32,SHIN:33,KABE:34,ATSUTA:35,ATSUTA_O:36,ASH:37,DEADF:38,AIBR:39};
-const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1,1,1,0];
+const T={SEA:0,GRASS:1,FOREST:2,MOUNT:3,WATER:4,ROAD:5,BRIDGE:6,VIL:7,SHR:8,CAVE:9,TOWN:10,HUT:11,CITY:12,RUIN:13,YAMA:14,DICT:15,SAND:16,MINE:17,OIL:18,COAL:19,WALL:20,GGATE:21,GSEAL:22,KQSPOT:23,KEIBAJO:24,CONV:25,LOVEH:26,STAD:27,AIDI:28,HWYH:29,HWYV:30,TUN:31,SHURA:32,SHIN:33,KABE:34,ATSUTA:35,ATSUTA_O:36,ASH:37,DEADF:38,AIBR:39,AIRPORT:40};
+const PASS=[0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1,1,1,0,1];
 const isTownT=t=>t===7||t===10||t===11||t===12||t===13||t===15;
 const RANKS=[
   {n:'無格社',bonus:5,dur:5,gift:10,v:0,lv:0},
@@ -1081,16 +1082,16 @@ const SKR={x0:132,y0:136,x1:188,y1:178};
   /* 11/26：アイヂ（シナリオ版）。 西が ヲワリ州・東が ミカワ州・真ん中に アツタの森（DMZ）。 規模は 復興の 前後で 変わる */
   {const A=VIL.length;
     [['アツタの森','熱田神宮',162,190,1,5,8,['aimori','aiyatai'],'ヲワリと ミカワの 間の 非武装地帯の 森'],
-     ['尾張一宮 イチノミヤ','真清田神社',146,182,1,2,6,['aimasu','aiyatai'],'ヲワリの 北・マスミダの 本陣'],
+     ['尾張一宮 イチノミヤ','真清田神社',146,182,1,2,6,['aiyatai'],'ヲワリの 北・マスミダの 本陣'],
      ['尾張の都 ナコヤ','那古野神社',151,187,3,6,4,['aiyami','aishoku'],'ヲワリの 中心の 大きな 町'],
      ['天王の町 ツシマ','津島神社',141,187,1,1,5,[],'ヲワリの 西の 門前町'],
      ['焼き物の町 セト','深川神社',157,183,1,1,3,['aiseto'],'窯が 並ぶ 焼き物の 町'],
      ['新大陸の玄関 トコナメ港','神明社',147,197,1,2,2,[],'南の 半島の 先の 港町'],
      ['国境の町 カリヤ','市原稲荷神社',165,186,1,2,3,['aikariya','aiyatai'],'壁の すぐ東の 国境の 町'],
      ['八丁味噌の町 オカザキ','伊賀八幡宮',169,183,1,2,4,['aiokazaki'],'ミカワの 西の 城下町'],
-     ['稲荷の町 トヨカワ','砥鹿神社',176,189,1,2,6,['aitoyo','aiyatai'],'ミカワ・トヨカワイナァリの 本陣'],
+     ['稲荷の町 トヨカワ','砥鹿神社',176,189,1,2,6,['aiyatai'],'ミカワ・トヨカワイナァリの 本陣'],
      ['東三河の都 トユハシ','安久美神戸神明社',182,192,3,6,3,['aishoku'],'ミカワの 東の 大きな 町'],
-     ['海辺の町 ガマゴオリ','八百富神社',171,193,1,1,3,[],'ミカワ湾の 海辺の 町'],
+     ['海辺の町 ガマゴオリ','八百富神社',171,193,1,1,3,['gkyotei'],'ミカワ湾の 海辺の 町'],
      ['半島の町 タハラ','神明社',178,197,1,1,2,[],'ミカワの 南の 半島の 町']]
     .forEach(([name,shrine,x,y,s0,s1,rank,f,desc],k)=>VIL.push({x,y,name,shrine,rank,tier:12,s0,s1,get size(){try{return aiRestored()?this.s1:this.s0;}catch(_){return this.s0;}},from:A+k,ai:1,kqf:f,desc}));}
   /* 11/19：隠岐（島後）の 村を 追加 */
@@ -1129,7 +1130,7 @@ const STADS=[],BB_TEAMS=[
   {id:'irons',n:'コクラ・アイアンズ',s:'アイアンズ',c:'コクラ',par:'koutetsu',lg:1,col:'#7c7c7c'},{id:'coals',n:'タク・コールズ',s:'コールズ',c:'炭都 タク',par:'hoppou',lg:1,col:'#3c3c3c'},
   {id:'gladiators',n:'ヨシノガリ・グラディエーターズ',s:'グラディエーターズ',c:'闘都 ヨシノガリ',par:'colokogyo',lg:1,col:'#d82800'},{id:'whites',n:'ナメガワ・ホワイツ',s:'ホワイツ',c:'ナメガワマチ',par:'kagura',lg:1,col:'#bcbcbc'}];
 const AIM=new Set(),AI_WALL={x:162,gy:190,bay:195,bx0:153,bx1:175,by:197},AIDI_H=[],ROADSIDE=[],CONV_N=['ローソソ','エイトトゥウェルブ','オヒトリマート'],LOVE_N=['ホテル 夢の城','ホテル 月の雫','ホテル アモーレ','ホテル プリンセス','ホテル 星降る夜'];
-const SHINS=[],SHURAS=[],SHURA_CONT=[{n:'出雲の 大陸',at:['ヒノミサキ','オクイズモ','ウンナン']},{n:'新大陸',at:['ムロト','フクベ','クラヨシ']},{n:'九州',at:['タラ','ヨブコ','カラツ']},{n:'マホロバの 大陸',at:['イイヤマ','アブ','セタ']},{n:'サキタマ',at:['チチブ','ギョウダ','ソウカ']}];
+const CENTRAIR={x:-1,y:-1},SHINS=[],SHURAS=[],SHURA_CONT=[{n:'出雲の 大陸',at:['ヒノミサキ','オクイズモ','ウンナン']},{n:'新大陸',at:['ムロト','フクベ','クラヨシ']},{n:'九州',at:['タラ','ヨブコ','カラツ']},{n:'マホロバの 大陸',at:['イイヤマ','アブ','セタ']},{n:'サキタマ',at:['チチブ','ギョウダ','ソウカ']}];
 const TUNS=[],TUN_LINES=[{n:'山陰 地下線',c:'#3cbcfc',st:['イズモ','八雲市','ヤスギ','ヨナゴ','サカイミナト']},{n:'九州 地下線',c:'#f87800',st:['タク','イマリ','サガ','ヨシノガリ']},{n:'八百万 環状線',c:'#f8d800',ring:1,st:['イズモ','八雲市','ヨナゴ','マホロバ','グンマー','ナメガワマチ','コクラ','ヨシノガリ','サガ']}];
 function genMap(){
   const n1=mkNoise(11,9),n2=mkNoise(23,4),n3=mkNoise(37,6),n4=mkNoise(51,5);
@@ -1273,6 +1274,11 @@ function genMap(){
       if(t!==T.GRASS&&t!==T.FOREST&&t!==T.SAND)continue;if(ROADSIDE.some(o=>o.x===x&&o.y===y)||STADS.some(o=>o.x===x&&o.y===y)||AIDI_H.some(o=>o.x===x&&o.y===y)||TUNS.some(o=>o.x===x&&o.y===y)||SHURAS.some(o=>Math.abs(o.x-x)+Math.abs(o.y-y)<3))continue;
       setT(x,y,T.SHURA);SHURAS.push({x,y,ci,id:'s'+ci+'_'+k,n:`修羅の洞窟（${tn}）`});done=true;}}));
   }
+  /* 11/26：トコナメ港の 西の 人工島に 中部国際空港 セントレア（イトシロ編の あとで 就航） */
+  {const v=VIL.find(q=>q.name==='新大陸の玄関 トコナメ港');if(v){const ax=v.x-9,ay=v.y;
+    for(let y=ay-1;y<=ay+1;y++)for(let x=ax-1;x<=ax+1;x++)setT(x,y,T.SAND);
+    for(let x=ax+2;x<v.x;x++){const t=tileAt(x,ay);if(t===T.SEA||t===T.WATER)setT(x,ay,T.BRIDGE);}
+    setT(ax,ay,T.AIRPORT);CENTRAIR.x=ax;CENTRAIR.y=ay;}}
   /* ワカトゥオー橋：モジから 東へ グンマー帝国の 外へ */
   {const m=VIL.find(v=>v.name==='レトロ港 モジ');for(let x=m.x+1;x<GWALL.x0;x++){const t=tileAt(x,m.y);if(isTownT(t)||t===T.SHR)continue;setT(x,m.y,t===T.WATER||t===T.SEA?T.BRIDGE:t===T.MOUNT?T.YAMA:T.ROAD);}}
 }
@@ -1317,6 +1323,9 @@ TILES[T.CAVE]=[mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=1+r;P(8-Mat
 TILES[T.HWYH]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(0,1,16,1,'#fcfcfc');P(0,14,16,1,'#fcfcfc');P(0,0,16,1,'#7c7c7c');P(0,15,16,1,'#7c7c7c');P(2,7,5,2,'#f8d800');P(10,7,5,2,'#f8d800');P(4,4,1,1,'#5c5c64');P(12,11,1,1,'#5c5c64');})];
 TILES[T.HWYV]=[mkTile(P=>{P(0,0,16,16,'#4c4c54');P(1,0,1,16,'#fcfcfc');P(14,0,1,16,'#fcfcfc');P(0,0,1,16,'#7c7c7c');P(15,0,1,16,'#7c7c7c');P(7,2,2,5,'#f8d800');P(7,10,2,5,'#f8d800');P(4,4,1,1,'#5c5c64');P(11,12,1,1,'#5c5c64');})];
 TILES[T.TUN]=[mkTile(P=>{grassBase(P);P(1,5,14,11,'#8c7c6c');P(2,4,12,1,'#8c7c6c');P(0,9,1,7,'#7c6c5c');P(15,9,1,7,'#7c6c5c');P(4,8,8,8,'#000');P(5,7,6,1,'#000');P(3,7,1,9,'#bcbcbc');P(12,7,1,9,'#bcbcbc');P(4,6,8,1,'#bcbcbc');P(6,1,4,3,'#f8b800');P(7,2,2,1,'#000');P(6,13,1,1,'#f8d800');P(9,11,1,1,'#f8d800');})];
+TILES[T.AIRPORT]=[0,1].map(f=>mkTile(P=>{P(0,0,16,16,'#e0c890');P(0,12,16,4,'#5c5c5c');for(let x=1;x<16;x+=4)P(x,13,2,1,'#fcfcfc');
+  P(1,4,14,8,'#bcbcbc');P(1,3,14,1,'#fcfcfc');for(let x=2;x<14;x+=3)P(x,6,2,3,'#3cbcfc');P(6,9,4,3,'#24188c');P(7,1,2,2,f?'#d82800':'#fcfcfc');P(8,0,1,2,'#7c7c7c');
+  const px=f?3:9;P(px,13,6,1,'#fcfcfc');P(px+2,12,2,3,'#fcfcfc');P(px+5,12,1,2,'#0058f8');}));
 TILES[T.SHURA]=[0,1].map(f=>mkTile(P=>{grassBase(P);for(let r=0;r<13;r++){const w=4+r,x=8-Math.ceil(w/2);P(x,3+r,w,1,r%4===1?'#4c3c3c':'#3c2c2c');}
   P(4,9,8,7,'#000');P(5,8,6,1,'#000');P(6,7,4,1,'#000');P(5,13,6,3,f?'#d82800':'#a81000');P(6,11,4,2,f?'#a81000':'#580000');P(7,10,2,1,'#fc7460');
   P(3,4,1,1,'#d82800');P(12,5,1,1,'#d82800');P(7,1,2,2,'#d82800');P(6,2,1,1,'#fcfcfc');P(9,2,1,1,'#fcfcfc');}));
@@ -1852,6 +1861,7 @@ function startField(){if(!window._goalShown&&G&&G.day>1){window._goalShown=1;set
 function onStep(pv){const DV=carDrive(tileAt(G.pos.x,G.pos.y));timeAdd(DV?(DV.hw?1:Math.max(1,Math.round(10/DV.sp))):5);dqHit('step');fkHeatStep();
   const x=G.pos.x,y=G.pos.y,t=tileAt(x,y);
   if(t===T.TUN){const o=TUNS.find(q=>q.x===x&&q.y===y);if(o){tunnelEnter(o);return;}}
+  if(t===T.AIRPORT){enterCentrair();return;}
   if(t===T.SHURA){const o=SHURAS.find(q=>q.x===x&&q.y===y);if(o){shuraEnter(o);return;}}
   if(aidiOpen()&&aiCh()===0&&AIM.has(y*MW+x)&&!isTownT(t)){aiPrologue();return;}
   if(G.ajito&&G.ajito.x===x&&G.ajito.y===y&&ajOK()){ajEnter();return;}
@@ -3275,9 +3285,9 @@ function returnField(){BT=null;ngClamp();const tb=G.townBack;G.townBack=null;if(
 /* ===================== 町の中 ===================== */
 const FAC={lotto:{n:'宝くじ売り場',s:'籤',c:'#d82800'},inn:{n:'宿坊',s:'宿',c:'#7c4c10'},shop:{n:'道具屋',s:'道',c:'#0058f8'},gacha:{n:'ガチャ堂',s:'ガ',c:'#d82800'},rest:{n:'レストラン',s:'食',c:'#e45c10'},
   job:{n:'職安',s:'職',c:'#008888'},dojo:{n:'鍛錬場',s:'鍛',c:'#5c5c5c'},bank:{n:'銀行',s:'銀',c:'#6844fc'},
-  kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},cardeal:{n:'カーディーラー',s:'車',c:'#3cbcfc'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},aiyatai:{n:'スー君の 屋台',s:'ラ',c:'#f87800'},aikariya:{n:'焼け跡の 広場',s:'広',c:'#7c4c3c'},aiokazaki:{n:'味噌蔵',s:'味',c:'#5c3c1c'},aiseto:{n:'焼き物の 窯',s:'窯',c:'#a85000'},aiyami:{n:'闇市',s:'闇',c:'#3c3c3c'},aishoku:{n:'名物 食堂',s:'食',c:'#d82800'},aimasu:{n:'ナコヤ城 本陣',s:'陣',c:'#a85000'},aitoyo:{n:'ミカワ 本陣',s:'陣',c:'#d82800'},aitoko:{n:'トコナメ港',s:'港',c:'#0058f8'},aimiso:{n:'八丁味噌蔵',s:'味',c:'#5c3c1c'},aimori:{n:'熱田の 杜',s:'杜',c:'#1c602c'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
+  gkyotei:{n:'ボートレース ガマゴオリ',s:'艇',c:'#0058f8'},kinyu:{n:'金融プラザ',s:'金',c:'#00a888'},card:{n:'カードショップ 先導堂',s:'札',c:'#e45c10'},cardeal:{n:'カーディーラー',s:'車',c:'#3cbcfc'},casino:{n:'エスポワール号',s:'C',c:'#d82800'},hall:{n:'集会所',s:'集',c:'#7c7c7c'},race:{n:'ボートレース場',s:'艇',c:'#0058f8'},kanraku:{n:'歓楽街',s:'歓',c:'#f878f8'},kpachi:{n:'過疎パチ屋',s:'P',c:'#7c7c7c'},shugyo:{n:'修行場',s:'修',c:'#a05000'},palace:{n:'党本部',s:'独',c:'#000000'},boat:{n:'渡し船',s:'船',c:'#0058f8'},pachi:{n:'パチンコ店',s:'P',c:'#f878f8'},kokan:{n:'景品交換所',s:'換',c:'#3c3c3c'},gate:{n:'常世の門',s:'門',c:'#00a888'},colo:{n:'魔物コロシアム',s:'闘',c:'#a81000'},stock:{n:'証券取引所',s:'証',c:'#00a888'},kqbugyo:{n:'奉行所',s:'奉',c:'#503000'},keiba:{n:'コクラ競馬場',s:'馬',c:'#00a800'},yakusho:{n:'役所',s:'役',c:'#5c5c74'},jogai:{n:'場外発売所',s:'券',c:'#008888'},kqjo:{n:'コクラ城',s:'城',c:'#3c3c3c'},kqtetsu:{n:'製鉄所',s:'鉄',c:'#a81000'},skkuma:{n:'自警団',s:'自',c:'#e45c10'},aiyatai:{n:'スー君の 屋台',s:'ラ',c:'#f87800'},aikariya:{n:'焼け跡の 広場',s:'広',c:'#7c4c3c'},aiokazaki:{n:'味噌蔵',s:'味',c:'#5c3c1c'},aiseto:{n:'焼き物の 窯',s:'窯',c:'#a85000'},aiyami:{n:'闇市',s:'闇',c:'#3c3c3c'},aishoku:{n:'名物 食堂',s:'食',c:'#d82800'},aimasu:{n:'ナコヤ城 本陣',s:'陣',c:'#a85000'},aitoyo:{n:'ミカワ 本陣',s:'陣',c:'#d82800'},aitoko:{n:'トコナメ港',s:'港',c:'#0058f8'},aimiso:{n:'八丁味噌蔵',s:'味',c:'#5c3c1c'},aimori:{n:'熱田の 杜',s:'杜',c:'#1c602c'},kagu:{n:'太陽家具',s:'家',c:'#f8b800'},dspara:{n:'パソコンショップ Dスパラ',s:'D',c:'#d82800'},arkun:{n:'パソコンショップ アークン',s:'A',c:'#202020'},fkyuki:{n:'雪くま屋',s:'氷',c:'#68ccfc'},fkhie:{n:'市役所 暑さ対策課',s:'暑',c:'#e45c10'},fkriver:{n:'荒川 河川敷',s:'川',c:'#0058f8'},skjin:{n:'レジスタンスの アジト',s:'レ',c:'#3c3c3c'},sktower:{n:'セントラルドグマ',s:'塔',c:'#fcfcfc'},skkofun:{n:'さきたま古墳',s:'墳',c:'#2c7c1c'},sknegi:{n:'ネギ畑',s:'葱',c:'#00a800'},skkodo:{n:'武甲山 坑道',s:'坑',c:'#5c5c5c'},skomiya:{n:'車両基地',s:'車',c:'#24306c'},kqcable:{n:'皿倉山ケーブル',s:'索',c:'#0058f8'},kqyagura:{n:'提灯櫓',s:'灯',c:'#d82800'},kqkanmon:{n:'橋の案内所',s:'橋',c:'#008888'},gkan:{n:'出国管理局',s:'官',c:'#24188c'},kaitaku:{n:'開拓所',s:'拓',c:'#a05000'},kosho:{n:'古書店',s:'書',c:'#7c4c10'},hokan:{n:'保管区画',s:'禁',c:'#3c3c3c'}};
 const FAC_SIZE=[['inn','shop','kpachi','kokan'],['inn','shop','gacha','rest','job','kpachi','kokan'],['inn','shop','gacha','rest','job','dojo','bank','card'],['inn','shop','gacha','rest','job','dojo','bank','pachi','kokan','card','cardeal']];
-const TPASS=new Set(['g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase','bgr','bdirt','bpath','bline','bwarn','bdug','bplate','bmound','bbase','bconc']);
+const TPASS=new Set(['jgr','g','s','torii','flower','exit','pz','gate','deck','kbr','kfl','kstep','dcarp','kanst','kanfl','rfl','rtat','rgrass','rdirt','rbase','bgr','bdirt','bpath','bline','bwarn','bdug','bplate','bmound','bbase','bconc']);
 const NPC_LINES=['近ごろ 魔界の烈穴が あちこちに 開くらしい。\n塞がないと 魔物が どんどん 強くなるぞ。',
   '職安で ジョブを こなすと 研修歴が つく。\n15回ごとに 経験値の 伸びが よくなるそうだ。',
   '銀行に あずけた イェソは\nぜんめつしても へらないよ。',
@@ -3619,13 +3629,27 @@ function drawCell(c,sx,sy,city){
     case 'kpad':{R(sx,sy,16,16,'#00a800');if(c.e)R(sx,sy+(c.e===1?0:13),16,3,'#fcfcfc');if(c.e===0){const gx=(frame>>1)%96;if(Math.floor(gx/16)===c.dx)drawHorse(sx+(gx%16)-6,sy+2,'#f878f8',frame,'#f878f8');}break;}
     case 'tvmon':{R(sx,sy,16,16,'#3c3c3c');R(sx+1,sy+2,14,11,'#000');const bt=((frame>>8)+c.k)%2;R(sx+2,sy+3,12,9,bt?'#0058f8':'#00a800');R(sx+2,sy+7,12,1,bt?'#3cbcfc':'#fcfcfc');
       const q=((frame>>1)+c.k*7)%14;if(bt){R(sx+2+q,sy+5,3,2,'#fcfcfc');R(sx+2+((q+5)%12),sy+9,3,2,'#f8b800');}else{R(sx+2+q,sy+4,3,2,'#7c4c10');R(sx+2+((q+4)%12),sy+9,3,2,'#7c4c10');}R(sx+6,sy+13,4,3,'#3c3c3c');break;}
+    case 'bwater':case 'bmark':{R(sx,sy,16,16,'#0050a0');const wv=((frame>>3)+c.x+c.y)%4;R(sx+wv*3,sy+4+(c.y%2)*6,5,1,'#3c8cd8');R(sx+((wv+2)%4)*3+2,sy+11,4,1,'#3c8cd8');
+      if(c.t==='bmark'){pc(sx+8,sy+9,4,'#f87800');R(sx+7,sy+3,2,3,'#fcfcfc');}
+      if(c.ln){const L=15*16,ph=(frame*1.5)%(L*2);for(let k=0;k<6;k++){let g=ph-k*13;if(g<0)g+=L*2;const right=g<L,gx=right?16+g:16+L*2-g,lane=right?1:2;if(lane!==c.ln)continue;const bx=gx-c.x*16;if(bx>-10&&bx<16){const X=sx+bx;R(X+(right?-5:9),sy+8,5,2,'#fcfcfc');R(X,sy+6,9,4,BCOL[k]);R(X+(right?7:0),sy+7,2,2,BCOL[k]);R(X+3,sy+4,3,3,'#fcd8a8');R(X+3,sy+4,3,1,BCOL[k]===BCOL[0]?'#bcbcbc':BCOL[k]);}}}
+      break;}
+    case 'awin':{R(sx,sy,16,16,'#68ccfc');R(sx,sy+10,16,6,'#5c5c5c');R(sx,sy+12,16,1,'#fcfcfc');R(sx,sy,16,1,'#bcbcbc');R(sx+15,sy,1,16,'#bcbcbc');
+      if(c.x!=null){const ph=(frame>>1)%(19*16+40)-20,bx=ph-c.x*16;if(bx>-14&&bx<16){const X=sx+bx,Y=sy+9-Math.max(0,ph-120)/30;R(X,Y,12,3,'#fcfcfc');R(X+2,Y-3,4,3,'#fcfcfc');R(X+9,Y-2,3,2,'#d82800');R(X+3,Y+1,1,1,'#0058a8');R(X+5,Y+1,1,1,'#0058a8');R(X+7,Y+1,1,1,'#0058a8');}}break;}
+    case 'aboard':{R(sx,sy,16,16,'#000');R(sx,sy,16,1,'#5c5c5c');for(let y=2;y<14;y+=4){R(sx+2,sy+y,7,2,'#f8b800');R(sx+10,sy+y,4,2,centrairOpen()?'#7ee07e':((frame>>4)&1?'#d82800':'#580000'));}break;}
+    case 'acnt':R(sx,sy,16,16,'#bcb49c');R(sx,sy+6,16,10,'#3c3c8c');R(sx,sy+6,16,2,'#fcfcfc');R(sx+3,sy+1,10,4,'#fcfcfc');R(sx+4,sy+2,8,2,'#0058a8');break;
+    case 'agate':R(sx,sy,16,16,'#bcb49c');R(sx+2,sy+2,3,14,'#7c7c7c');R(sx+11,sy+2,3,14,'#7c7c7c');R(sx+2,sy+2,12,2,'#5c5c5c');R(sx+5,sy+8,6,1,centrairOpen()?'#7ee07e':'#d82800');break;
+    case 'jmaku':{const W_=c.w;R(sx,sy,16,16,'#fcfcfc');R(sx,sy,16,2,'#3c3c3c');R(sx,sy+14,16,2,'#3c3c3c');R(sx+15,sy,1,16,'#bcbcbc');if(c.mon){pc(sx+8,sy+8,4,W_?'#d82800':'#0058a8');pc(sx+8,sy+8,2,'#fcfcfc');}break;}
+    case 'jflag':R(sx,sy,16,16,'#a07848');R(sx+3,sy,2,16,'#5c3c1c');R(sx+5,sy+1,8,12,c.w?'#d82800':'#0058a8');R(sx+6,sy+3,6,1,'#fcfcfc');R(sx+6,sy+7,6,1,'#fcfcfc');break;
+    case 'jgr':R(sx,sy,16,16,'#a07848');R(sx+3+(c.x*5%9),sy+4+(c.y*3%7),2,1,'#8c6438');break;
+    case 'jfire':{R(sx,sy,16,16,'#a07848');R(sx+5,sy+10,6,5,'#3c3c3c');const fl=(frame>>2)%3;R(sx+6,sy+4+fl,4,6-fl,'#f87800');R(sx+7,sy+6,2,4,'#fcfc00');break;}
+    case 'kyfence':R(sx,sy,16,16,'#0050a0');R(sx,sy+8,16,8,'#7c7c7c');R(sx,sy+7,16,2,'#fcfcfc');R(sx+2,sy+7,2,9,'#fcfcfc');R(sx+10,sy+7,2,9,'#fcfcfc');break;
     case 'bwin':R(sx,sy,16,16,'#003c8c');R(sx+1,sy+2,14,8,'#fcfcfc');R(sx+2,sy+3,12,6,'#68ccfc');R(sx+5,sy+10,6,6,'#0058f8');R(sx+1,sy+12,14,1,'#fcfcfc');txtS('舟',sx+8,sy+3,'#000','center');break;
     case 'kseat':R(sx,sy,16,16,'#bcb49c');for(const x of [1,9]){R(sx+x,sy+3,6,6,'#d82800');R(sx+x,sy+9,6,3,'#a81000');R(sx+x+1,sy+12,1,3,'#3c3c3c');R(sx+x+4,sy+12,1,3,'#3c3c3c');}break;
     case 'kbooth':{const ab=c.shop==='abura';R(sx,sy,16,16,'#bcb49c');R(sx,sy,16,5,ab?'#000000':'#f87800');R(sx,sy+5,16,1,ab?'#d82800':'#a05000');R(sx+1,sy+6,14,9,'#fcfcfc');R(sx+1,sy+12,14,3,ab?'#d82800':'#f8b800');txtS(c.sg?(c.dx===1?c.sg:''):(ab?['脂','蕎','麦']:['う','ど','ん'])[c.dx],sx+8,sy-1,ab?'#f8b800':'#fcfcfc','center');if(c.dx===1){R(sx+5,sy+7,6,4,'#a05000');R(sx+6,sy+8,4,2,'#f8d878');}else{R(sx+4,sy+7,8,3,'#5c5c5c');}if(c.dx===0)R(sx,sy,1,16,'#a05000');if(c.dx===2)R(sx+15,sy,1,16,'#a05000');break;}
     case 'kfood':if(c.shop==='tako'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,c.dx?'#f8b800':'#d82800');R(sx+1,sy+5,14,7,'#a05000');R(sx+3,sy+6,10,4,'#3c3c3c');for(let k=0;k<3;k++)pc(sx+5+k*3,sy+8,1,'#e45c10');txtS(c.dx?'こ':'た',sx+8,sy-1,'#fcfcfc','center');R(sx+1,sy+12,14,4,'#503000');break;}
       if(c.shop==='tori'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#3c3c3c');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+3,sy+8,10,2,'#d82800');for(let k=0;k<3;k++)R(sx+4+k*3,sy+6,1,4,'#bcbcbc');if((frame>>3)&1)R(sx+5,sy+2+((frame>>2)&1),6,2,'#bcbcbc');txtS(c.dx?'鳥':'焼',sx+8,sy-1,'#fcfcfc','center');if(c.dx)R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');R(sx+1,sy+12,14,4,'#503000');break;}
       if(c.shop==='ramen'){R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,5,'#000');R(sx+1,sy+5,14,7,'#7c4c10');R(sx+2,sy+5,12,3,'#d82800');R(sx+3,sy+9,10,2,'#fcfcfc');txtS(c.dx?'メ':'ラ',sx+8,sy-1,'#fcfcfc','center');if(c.dx){R(sx+11,sy+1,4,5,(frame>>4)&1?'#fc7460':'#d82800');}else{R(sx+4,sy+8,8,3,'#fcfcfc');R(sx+5,sy+6,1,2,'#bcbcbc');R(sx+9,sy+5,1,3,'#bcbcbc');}R(sx+1,sy+12,14,4,'#503000');break;}
-      R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,4,c.dx?'#d82800':'#fcfcfc');R(sx+1,sy+4,14,8,'#a05000');R(sx+3,sy+5,10,4,'#3c3c3c');R(sx+4,sy+6,8,2,'#f8b800');if(!c.dx)txtS(c.sg||'焼',sx+8,sy,'#000','center');else txtS('う',sx+8,sy,'#fcfcfc','center');break;
+      R(sx,sy,16,16,'#bcb49c');R(sx+1,sy,14,4,c.dx?'#d82800':'#fcfcfc');R(sx+1,sy+4,14,8,'#a05000');R(sx+3,sy+5,10,4,'#3c3c3c');R(sx+4,sy+6,8,2,'#f8b800');if(!c.dx)txtS(c.sg||'焼',sx+8,sy,'#000','center');else txtS(c.sg2||'う',sx+8,sy,'#fcfcfc','center');break;
     case 'kown':R(sx,sy,16,16,'#3c2800');R(sx+3,sy+2,10,14,'#7c4c10');R(sx+3,sy+2,10,2,'#f8b800');R(sx+10,sy+9,2,2,'#f8b800');break;
     case 'moat':R(sx,sy,16,16,'#0038a8');R(sx,sy,16,3,'#8c8c8c');R(sx,sy+3,16,1,'#5c5c5c');for(let k=0;k<3;k++)R(sx+((k*6+(frame>>3)+c.dx*3)%14),sy+6+k*3,3,1,'#3cbcfc');if(((frame>>4)+c.dx)%5===0)R(sx+5,sy+9,4,2,'#f878f8');break;
     case 'kbr':R(sx,sy,16,16,'#0038a8');R(sx+2,sy,12,16,'#a05000');for(let y=1;y<16;y+=3)R(sx+2,sy+y,12,1,'#7c4c10');R(sx,sy,3,16,'#d82800');R(sx+13,sy,3,16,'#d82800');R(sx,sy+2,3,2,'#f8b800');R(sx+13,sy+2,3,2,'#f8b800');R(sx,sy+12,3,2,'#f8b800');R(sx+13,sy+12,3,2,'#f8b800');break;
@@ -3660,7 +3684,7 @@ function drawCell(c,sx,sy,city){
     case 'torii':ground();R(sx+2,sy+4,2,12,'#d82800');R(sx+12,sy+4,2,12,'#d82800');R(sx,sy+1,16,3,'#d82800');R(sx,sy,16,1,'#000');R(sx+2,sy+6,12,2,'#d82800');break;
   }
 }
-function drawNPC(n,x,y,f){if(n.zan!=null){const b=f?1:0;pe(x+8,y+11-b,6,5,'#3c0c14');pc(x+8,y+5-b,4,'#3c0c14');R(x+4,y+4-b,8,2,'#d82800');R(x+6,y+4-b,4,1,'#fce0e0');R(x+3,y+14,2,2,'#5c0c1c');R(x+11,y+14,2,2,'#5c0c1c');if((frame>>4)&1)R(x+4,y+6-b,1,4,'#b01020');return;}if(n.gambler&&n.shin){drawShin(x,y,f);if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
+function drawNPC(n,x,y,f){if(n.chId){drawChar(n.chId,x,y-8,f,1);if(n.jin&&(frame>>5)&1)txtS('！',x+8,y-16,'#f8b800','center');return;}if(n.zan!=null){const b=f?1:0;pe(x+8,y+11-b,6,5,'#3c0c14');pc(x+8,y+5-b,4,'#3c0c14');R(x+4,y+4-b,8,2,'#d82800');R(x+6,y+4-b,4,1,'#fce0e0');R(x+3,y+14,2,2,'#5c0c1c');R(x+11,y+14,2,2,'#5c0c1c');if((frame>>4)&1)R(x+4,y+6-b,1,4,'#b01020');return;}if(n.gambler&&n.shin){drawShin(x,y,f);if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}if(n.gambler){const U=n.ura;R(x+4,y+1,8,3,U?'#fcfcfc':'#000');R(x+3,y+2,2,2,U?'#fcfcfc':'#000');R(x+11,y+2,2,2,U?'#fcfcfc':'#000');R(x+5,y+4,6,4,U?'#d8b0a8':'#fcbcb0');R(x+5,y+5,6,1,U?'#d82800':'#000');R(x+3,y+8,10,6,U?'#000':'#3c3c3c');R(x+7,y+8,2,4,U?'#940084':'#d82800');R(x+5,y+14,2,2,'#000');R(x+9,y+14,2,2,'#000');if((frame>>5)&1)txtS('！',x+8,y-10,'#f8b800','center');return;}R(x+5,y+3,6,5,'#fcbcb0');R(x+5,y+2,6,2,n.hair);R(x+6,y+5,1,1,'#000');R(x+9,y+5,1,1,'#000');R(x+4,y+8,8,5,n.col);R(x+4,y+11,8,1,'#000');
   R(x+5,y+13+(f?0:1),2,3-(f?0:1),'#3c3c3c');R(x+9,y+13+(f?1:0),2,3-(f?1:0),'#3c3c3c');}
 const townScr={full:true,mv:null,bt:0,
   upd(){
@@ -3675,7 +3699,7 @@ const townScr={full:true,mv:null,bt:0,
     if(!dx&&!dy&&fieldPtr){const cam=townCam(),px=fieldPtr.x-(TW.px*16-cam.x+8),py=fieldPtr.y-(TW.py*16-cam.y+8);if(Math.abs(px)>8||Math.abs(py)>8){if(Math.abs(px)>Math.abs(py))dx=Math.sign(px);else dy=Math.sign(py);}}
     if(!dx&&!dy)return;
     const nx=TW.px+dx,ny=TW.py+dy,npc=TW.npcs.find(p=>p.x===nx&&p.y===ny),c=(TW.C[ny]||[])[nx];
-    if(npc){if(fresh){if(npc.sp){spTalk(npc);return;}if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.shin)shinTalk();else if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
+    if(npc){if(fresh){if(npc.jin){aiFac(npc.jin);return;}if(npc.sp){spTalk(npc);return;}if(npc.debtor){debtorTalk(npc);return;}if(npc.loser){loserTalk(npc);return;}if(npc.trial){trialTalk(npc);return;}if(npc.zan!=null){skZanTalk(npc);return;}if(npc.kan){kanNpc(npc);return;}if(npc.yoso){yosoTalk();return;}if(npc.gambler){if(npc.shin)shinTalk();else if(npc.ura)uraTalk();else gamblerTalk();return;}const k=TW.npcs.indexOf(npc);dialog([npc.line,...jobProgress('talk',{vi:TW.vi,n:k})]);return;}
       /* 方向キーを 押しつづけると 通行人と 入れかわって 通りぬける（道を ふさがれない ように） */
       if(!(npc.debtor||npc.loser||npc.trial||npc.kan||npc.yoso||npc.gambler||npc.fix||npc.zan!=null)&&c&&TPASS.has(c.t)){npc.x=TW.px;npc.y=TW.py;this.mv={x1:nx,y1:ny,dx,dy,t:0};}return;}
     if(!c)return;
@@ -3702,7 +3726,7 @@ const townScr={full:true,mv:null,bt:0,
     if(fresh&&c.t==='sdoor'&&occupied(TW.vi)){dialog(`鳥居に 鎖が かけられている…\n${dinfo(TW.v).boss}が 神社を 閉ざしたのだ。`);return;}
     if(fresh&&c.t==='sdoor'){const v=TW.v,D=v.depop?dep(TW.vi):null;
       if(D&&!D.revived&&!D.kn.length){dialog([`${v.shrine}は 不活動宗教法人に なっている。\n神職が おらず お祭りも 途絶えている…`,'集会所で 神主を 配置すれば\n祭祀を 再開できる。']);return;}
-      const rk=D&&!D.revived?0:v.rank,hl=(G.hono||{})['v'+TW.vi]||0,vi_=TW.vi;choice(`${D&&!D.revived?'不活動宗教法人':RANKS[rk].n}　${v.shrine}${hl?`（造営${hl}段階）`:''}\n参拝しますか？`,['参拝する',...(D&&!D.revived?[]:['奉納・造営']),'やめる'],r=>{if(r===0)prayScr(rk,v.shrine,'v'+TW.vi,()=>{});else if(r===1&&!(D&&!D.revived))honoScr(vi_);});return;}
+      const rk=D&&!D.revived?0:v.rank,hl=(G.hono||{})['v'+TW.vi]||0,vi_=TW.vi;const jk=aiJinOf(vi_),opts=['参拝する',...(D&&!D.revived?[]:['奉納・造営']),...(jk?['奥の 本陣へ']:[]),'やめる'];choice(`${D&&!D.revived?'不活動宗教法人':RANKS[rk].n}　${v.shrine}${hl?`（造営${hl}段階）`:''}\n参拝しますか？`,opts,r=>{if(jk&&opts[r]==='奥の 本陣へ'){enterJinya(jk);return;}if(r===0)prayScr(rk,v.shrine,'v'+TW.vi,()=>{});else if(r===1&&!(D&&!D.revived))honoScr(vi_);});return;}
     if(fresh&&c.t==='lmk'){dialog(c.id==='statue'?`名誉市長の 黄金の 銅像だ。\n台座に「この 町の 恩人」と 刻まれている。`:`あなたが 建てた ${LMK.find(x=>x.id===c.id).n}だ。\n町の 名物に なっている！`);return;}
     if(fresh&&(c.t==='front'||c.t==='roof')&&c.b&&c.b.kind==='house'){if(TW.ship){dialog('船室だ。');return;}reTown(TW.vi);return;}
     if(!this.bt){sfx('bump');this.bt=14;}
@@ -3746,6 +3770,7 @@ function leaveTown(){TW=null;startField();}
 const tierCost=b=>Math.ceil(b*Math.pow(1.7,VIL[curVil].tier)*(1-SIZES[VIL[curVil].size].off/100)*(hatan(curVil)?1.5:1)*((G.mayor||{})['v'+curVil]&&G.mayor['v'+curVil].t===1?.9:1));
 function openFac(kind){
   sfx('ok');
+  if(kind==='gkyotei'){enterKyotei();return;}
   if(TW&&occupied(TW.vi)&&kind!=='palace'){dialog('「総書記の 命令により 営業停止中」と\n書かれた 紙が 貼ってある…');return;}
   if(TW&&TW.v.gm==='cap'&&gmS().ch===6&&!['gkan','kosho','hokan'].includes(kind)){dialog(['だれも いない…','棚には 商品が 並んだまま、\n店員の 姿だけが 消えている。']);return;}
   if(kind==='kagu'){kaguFac();return;}if(kind==='dspara'){kaguFac('Dスパラ');return;}if(kind==='arkun'){kaguFac('アークン');return;}if(kind.startsWith('fk')){fkFac(kind);return;}if(kind==='kaitaku'){kaitakuFac();return;}if(kind.startsWith('kq')){kqFac(kind);return;}if(kind.startsWith('sk')){skFac(kind);return;}if(AI_FACS.includes(kind)){aiFac(kind);return;}if(kind==='keiba'){keibaFac();return;}if(kind==='jogai'){enterJogai();return;}if(kind==='yakusho'){yakushoFac(curVil);return;}if(kind==='gkan'){gkanFac();return;}if(kind==='kosho'){koshoFac();return;}if(kind==='hokan'){hokanFac();return;}
@@ -4044,9 +4069,9 @@ function aiGoal(){const A=aiS(),s=A.side,ws=s==='w';
   if(A.clear&&A.ch>=7)return {t:'つぎの 物語を 待つ',d:'アイヂ大戦の 物語は 完結した！\n次回「侵略国家イトシロ編」\nTイトシロとの 決着へ…\n（アツタ朝廷の スー君の 店で\nもう一方の ルートも 遊べる）',p:null};
   const D={0:['序章：アイヂへ','霧が 晴れた！\nサキタマの 南の アイヂへ 足を 踏み入れよう',null],
     1:['第1章：焼け野原の アイヂ','壁の すぐ東、 国境の 町 カリヤへ 向かおう',aiGo('カリヤ')],
-    2:['第2章：どちらに つく？',!A.v.w?'和平の 使者 ミツタニと いっしょに\nヲワリの 本陣 イチノミヤへ':!A.v.e?'ミツタニと いっしょに\nミカワの 本陣 トヨカワへ':'どちらに つくか 決めよう',!A.v.w?aiGo('イチノミヤ'):aiGo('トヨカワ')],
+    2:['第2章：どちらに つく？',!A.v.w?'和平の 使者 ミツタニと いっしょに\nイチノミヤの 神社の 奥の 本陣へ':!A.v.e?'ミツタニと いっしょに\nトヨカワの 神社の 奥の 本陣へ':'どちらに つくか 決めよう',!A.v.w?aiGo('イチノミヤ'):aiGo('トヨカワ')],
     3:[`第3章：${ws?'ハッチョウミソ爆弾を 止めろ':'テバサキボンバーを 止めろ'}`,ws?'ミカワの 爆弾部隊が オカザキに いる！':'ヲワリの 爆弾部隊が セトに いる！',aiGo(ws?'オカザキ':'セト')],
-    4:[`第4章：総大将との 一騎打ち`,`${ws?'トヨカワ':'イチノミヤ'}の 本陣で\n${AI_LD[AI_OP(s)]}と 決着を つけよう`,aiGo(ws?'トヨカワ':'イチノミヤ')],
+    4:[`第4章：総大将との 一騎打ち`,`${ws?'トヨカワ':'イチノミヤ'}の 神社の 奥の 本陣で\n${AI_LD[AI_OP(s)]}と 決着を つけよう`,aiGo(ws?'トヨカワ':'イチノミヤ')],
     5:['第5章：黒幕の 影と 停戦','ナコヤの 焼け跡の 闇市で\nイジケンと ルパンが 待っている',aiGo('ナコヤ')],
     6:['最終章：アツタの森の 決戦','アツタの森で Tイトシロを 迎え撃て！',aiGo('アツタの森')]};
   const d=D[A.ch]||D[0];return {t:'アイヂ大戦編 '+d[0],d:d[1],p:d[2]};}
@@ -4103,7 +4128,7 @@ function aiC2Visit(c){const A=aiS();
       'マスミダ「人も 商いも 集まる ヲワリが 国都に なるのが 道理！\nミカワが 頭を 下げるまで 戦は 終わらんでよ！」','マスミダ「…そっちの よそもんは 腕が 立ちそうだな。\nヲワリに つくなら 歓迎するでよ！」','ミツタニ「…（やはり 一筋縄では いかないか）」'],()=>{A.v.w=1;save();aiC2Choose();});return;}
   scene('ai_toyo',['── トヨカワ　トヨカワイナァリ本陣 ──','白狐の 耳の 兜に 小さな 狐面… 長い 槍を 持った 武将だ。','ミツタニ「トヨカワイナァリ殿。 和平の 話を…」','トヨカワイナァリ「急いては 事を 仕損じるじゃん。\nミカワは 一歩も 引かんよ」',
     'トヨカワイナァリ「ものづくりと 歴史の ミカワこそ 国都に ふさわしい。\nヲワリの 派手好きには 任せられんだら」','トヨカワイナァリ「…国外の お人か。 ミカワに 力を 貸すなら\n稲荷の 守りを 約束するだら」','ミツタニ「…両方とも 譲る 気は ないようですね」'],()=>{A.v.e=1;save();aiC2Choose();});}
-function aiC2Choose(){const A=aiS();if(!A.v.w||!A.v.e){dialog([`目標：${A.v.w?'ミカワの 本陣 トヨカワ':'ヲワリの 本陣 イチノミヤ'}へ`]);return;}
+function aiC2Choose(){const A=aiS();if(!A.v.w||!A.v.e){dialog([`目標：${A.v.w?'トヨカワ':'イチノミヤ'}の 神社の 奥の 本陣へ`]);return;}
   dialog(['ミツタニ「両方の 話を 聞きましたね」','ミツタニ「…わたしは 両方から『裏切り者』と 呼ばれている。\n和平を 説くには 力が いる」','ミツタニ「あなたが どちらかに つけば\n戦の 流れが 変わる かもしれない」'],()=>
     choice('どちらに つきますか？\n（この 選択は あとから 変えられない）',['マスミダに つく（ヲワリ）','トヨカワイナァリに つく（ミカワ）'],k=>{if(k<0){aiC2Choose();return;}A.side=k===0?'w':'e';A.ch=3;save();const ws=A.side==='w';
       dialog([ws?'マスミダ「よう 決めた！ ヲワリこそ 天下の 真ん中だがや！ かかってこい！」':'トヨカワイナァリ「よう 決めなさった。 ミカワは 一歩も 引かんよ」','スー君「どっちに ついても、 ボクは 両方の 陣に\nラーメソ 届けに 行くからね！」',ws?'マスミダ「まずは ミカワの 爆弾部隊だ！\nオカザキで ハッチョウミソ爆弾を 作っとるらしいでよ」':'トヨカワイナァリ「まずは ヲワリの 爆弾部隊じゃ。\nセトの 窯で テバサキボンバーを 焼いとるらしいだら」',`目標：${ws?'オカザキ':'セト'}へ`]);},110));}
@@ -5771,7 +5796,7 @@ function warpScr(){
 /* 11/19：マップから えらぶ ワープ（町・競馬場・球場・オロチの山） */
 let WARP_IMG=null;
 function warpImg(){if(WARP_IMG)return WARP_IMG;const c=document.createElement('canvas');c.width=MW;c.height=MH;const g=c.getContext('2d'),im=g.createImageData(MW,MH);
-  const COL={[T.TUN]:[40,40,40],[T.SHURA]:[200,0,0],[T.ASH]:[108,76,52],[T.DEADF]:[60,40,28],[T.AIBR]:[0,88,248],[T.KABE]:[124,124,124],[T.ATSUTA]:[0,72,24],[T.SHIN]:[248,184,0],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
+  const COL={[T.AIRPORT]:[252,252,252],[T.TUN]:[40,40,40],[T.SHURA]:[200,0,0],[T.ASH]:[108,76,52],[T.DEADF]:[60,40,28],[T.AIBR]:[0,88,248],[T.KABE]:[124,124,124],[T.ATSUTA]:[0,72,24],[T.SHIN]:[248,184,0],[T.HWYH]:[80,80,90],[T.HWYV]:[80,80,90],[T.AIDI]:[150,170,140],[T.SEA]:[0,64,200],[T.WATER]:[60,150,252],[T.GRASS]:[88,200,84],[T.FOREST]:[0,110,0],[T.MOUNT]:[150,110,40],[T.YAMA]:[150,110,40],[T.SAND]:[230,210,140],[T.ROAD]:[200,160,90],[T.BRIDGE]:[160,100,40],[T.WALL]:[90,90,90],[T.GGATE]:[90,90,90]};
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tileAt(x,y),q=COL[t]||(isTownT(t)?[252,252,252]:t===T.SHR?[216,40,0]:[88,200,84]),i=(y*MW+x)*4;im.data[i]=q[0];im.data[i+1]=q[1];im.data[i+2]=q[2];im.data[i+3]=255;}
   g.putImageData(im,0,0);return WARP_IMG=c;}
 function warpMap(seen,goTown){const trap=gmTrap(),P=[];
@@ -10980,15 +11005,79 @@ function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push
   if(r()<.12)npcs.push({x:14,y:9,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
   return{jogai:true,title:`場外発売所（${VIL[vi].name.replace(/^.* /,'')}）`,vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
 function enterJogai(){const m=nowMin();if(m<9*60||m>=21*60){dialog(['場外発売所は 閉まっている。','「営業時間 9:00〜21:00」']);return;}jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
-function exitJogai(){const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;townScr.lock=1;setBase(townScr);}
+/* ===================== アイヂ：神社の 奥の 本陣（単独の 陣屋） ===================== */
+function aiJinOf(vi){if(!aidiOpen())return null;const n=VIL[vi]&&VIL[vi].name||'';return /イチノミヤ$/.test(n)?'aimasu':/トヨカワ$/.test(n)?'aitoyo':null;}
+function buildJinya(kind){const vi=curVil,wc=kind==='aimasu',w=13,h=11,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'jgr',x,y});}
+  for(let x=0;x<w;x++){C[0][x]={t:'jmaku',w:wc,mon:x%3===0};C[h-1][x]={t:'jmaku',w:wc,mon:x%3===0};}for(let y=0;y<h;y++){C[y][0]={t:'jmaku',w:wc,mon:y%3===1};C[y][w-1]={t:'jmaku',w:wc,mon:y%3===1};}
+  for(const x of [2,4,8,10])C[1][x]={t:'jflag',w:wc};C[5][2]={t:'jfire'};C[5][10]={t:'jfire'};C[h-1][6]={t:'exit'};
+  const R_=aiRestored(),npcs=[{x:6,y:2,chId:wc?'masumida':'toyokawa',jin:kind,line:''},
+    {x:4,y:3,col:wc?'#d82800':'#0058a8',hair:'#3c3c3c',line:wc?'近習「殿は 手羽先を 食べ終わるまで 機嫌が 悪いでよ」':'近習「殿は 狐の 声で 戦の 吉凶を 占われるだら」'},
+    {x:8,y:3,col:wc?'#d82800':'#0058a8',hair:'#000000',line:R_?(wc?'近習「戦が 終わって 殿も 丸く なられた」':'近習「平和が いちばん だら」'):(wc?'近習「ミカワの 狐どもに 負けて たまるか！」':'近習「ヲワリの 鳥頭には 負けんだら！」')},
+    {x:5,y:9,col:'#5c5c5c',hair:'#000000',line:'門番「本陣の 中では 静かに せえよ」'},{x:7,y:9,col:'#5c5c5c',hair:'#3c3c3c',line:wc?'門番「ここは 真清田の 杜の 奥。 マスミダ様の 本陣だ」':'門番「ここは 杜の 奥。 トヨカワイナァリ様の 本陣だら」'}];
+  return{jogai:true,jin:kind,title:wc?'マスミダ本陣（神社の 奥）':'トヨカワイナァリ本陣（神社の 奥）',vi,v:VIL[vi],w,h,cx:6,C,npcs,city:true,sz:VIL[vi].size,px:6,py:h-2,top:0};}
+function enterJinya(kind){jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJinya(kind);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast(TW.title+'に 入った');}
+/* ===================== 中部国際空港 セントレア（ターミナル） ===================== */
+const centrairOpen=()=>!!(G&&G.ito&&G.ito.clear);/* イトシロ編 クリアで 就航 */
+function buildCentrair(){const vi=VIL.findIndex(q=>q.name==='新大陸の玄関 トコナメ港'),w=19,h=13,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'awin',x};C[h-1][x]={t:'kwall'};}for(let y=0;y<h;y++){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}
+  for(let k=0;k<5;k++)C[3][7+k]={t:'aboard',k};
+  for(let k=0;k<4;k++)C[6][2+k]={t:'acnt',k};for(let k=0;k<3;k++)C[6][13+k]={t:'agate',k};
+  C[9][3]={t:'kfood',dx:0,shop:'ai_teba',sg:'手',sg2:'羽'};C[9][4]={t:'kfood',dx:1,shop:'ai_teba',sg:'手',sg2:'羽'};C[9][14]={t:'kfood',dx:0,shop:'ai_miso',sg:'味',sg2:'噌'};C[9][15]={t:'kfood',dx:1,shop:'ai_miso',sg:'味',sg2:'噌'};
+  C[h-1][9]={t:'exit'};
+  const op=centrairOpen(),npcs=[{x:3,y:7,col:'#0058a8',hair:'#3c3c3c',line:op?'係員「ご搭乗 ありがとう ございます！」':'係員「申し訳 ございません。\n現在 すべての 便が 運休中です」'},
+    {x:9,y:1,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「展望デッキから 見る 飛行機は\nええもんだで」'},
+    {x:14,y:7,col:'#5c5c5c',hair:'#000000',line:op?'保安係「搭乗口は こちらです」':'保安係「イトシロとの 情勢が 落ちつくまで\n保安検査場は 閉鎖中です」'},
+    {x:6,y:10,col:'#d82800',hair:'#7c4c10',line:'旅行客「いつか ここから 海の 向こうへ\n飛んで いきたいねえ」'},
+    {x:12,y:10,col:'#f8b800',hair:'#000000',line:'子ども「ひこうき！ ひこうき！」'}];
+  return{jogai:true,air:true,title:'中部国際空港 セントレア',vi,v:VIL[vi],w,h,cx:9,C,npcs,city:true,sz:3,px:9,py:h-2,top:0};}
+function enterCentrair(){curVil=VIL.findIndex(q=>q.name==='新大陸の玄関 トコナメ港');jogaiPrev=null;TW=buildCentrair();townScr.mv=null;townScr.lock=1;setBase(townScr);playBGM('village');sfx('bell');toast('中部国際空港 セントレアに 着いた');}
+function airBump(c){const op=centrairOpen();
+  if(c.t==='awin'){dialog('展望デッキの 窓から 滑走路が 見える。\n'+(op?'飛行機が 次々と 飛び立っていく！':'飛行機は 翼を たたんで 眠っている…'));return true;}
+  if(c.t==='aboard'){dialog(op?['出発案内「まもなく 就航先を 発表します」']:['出発案内','全便　運休\n（イトシロとの 情勢により）','…いつか この 掲示板が 動きだす 日が 来るのだろうか。']);return true;}
+  if(c.t==='acnt'){dialog(op?'チェックインカウンター。\n「行き先は 準備中です」':'チェックインカウンター。\n「全便 運休中」の 札が 立っている。');return true;}
+  if(c.t==='agate'){dialog(op?'搭乗口だ。':'保安検査場は 閉鎖されている。\n（イトシロ編の あとで 使えるように なりそうだ）');return true;}
+  if(c.t==='kfood'){kjoFood(c.shop);return true;}
+  return false;}
+/* ===================== ボートレース ガマゴオリ（中に 入れる 競艇場） ===================== */
+function buildKyotei(vi){const w=17,h=14,C=[];for(let y=0;y<h;y++){C.push([]);for(let x=0;x<w;x++)C[y].push({t:'kfl'});}
+  for(let x=0;x<w;x++){C[0][x]={t:'bwater',x,y:0};C[1][x]={t:'bwater',x,y:1,ln:1};C[2][x]={t:'bwater',x,y:2,ln:2};C[3][x]={t:'bwater',x,y:3};C[4][x]={t:'kyfence'};C[5][x]={t:'kstep'};C[6][x]={t:'kstep'};C[h-1][x]={t:'kwall'};}
+  C[0][1]={t:'bmark',x:1,y:0};C[3][15]={t:'bmark',x:15,y:3};
+  for(let y=5;y<h;y++){C[y][0]={t:'kwall'};C[y][w-1]={t:'kwall'};}
+  for(let k=0;k<5;k++)C[8][6+k]={t:'kboard',k};
+  for(let k=0;k<3;k++)C[10][2+k]={t:'bwin',k};C[10][5]={t:'kvote',k:0};
+  C[10][12]={t:'kfood',dx:0,shop:'ai_teba',sg:'手',sg2:'羽'};C[10][13]={t:'kfood',dx:1,shop:'ai_teba',sg:'手',sg2:'羽'};C[12][12]={t:'kfood',dx:0,shop:'ai_miso',sg:'味',sg2:'噌'};C[12][13]={t:'kfood',dx:1,shop:'ai_miso',sg:'味',sg2:'噌'};
+  C[8][2]={t:'tvmon',k:0};C[8][14]={t:'tvmon',k:1};
+  C[h-1][8]={t:'exit'};
+  const r=lcg(vi*733+G.day*17),npcs=[{x:3,y:11,col:'#003c8c',hair:'#3c3c3c',line:'窓口の 係員「ボートレース ガマゴオリへ ようこそ！\nナイターの 水面が 自慢です」'},
+    {x:4,y:5,col:'#d82800',hair:'#000000',line:'観客「いけーっ！ 差せ 差せーっ！」'},{x:11,y:6,col:'#00a800',hair:'#7c4c10',line:'観客「ミカワ湾の 風が 強い日は\n荒れるけえ 穴を 狙うんよ」'},
+    {x:7,y:9,col:'#7c7c7c',hair:'#bcbcbc',line:'おじさん「イン逃げ ばっかり 買うとったら\nいつか 当たる…と 思うとる」'},
+    {x:11,y:11,col:'#fcfcfc',hair:'#5c5c5c',line:'手羽先屋「レースの あいまに 手羽先！\n手は 汚れても 舟券は 汚させんよ」'},{x:11,y:12,col:'#7c4c10',hair:'#000000',line:'味噌煮込み屋「ぐつぐつの 味噌煮込み、\n負けた 日ほど うまいがね」'}];
+  if(!aiRestored())npcs.push({x:14,y:9,col:'#5c3c1c',hair:'#3c3c3c',line:'客「戦争中でも レースは 止めん。\nここだけは ヲワリも ミカワも 関係ないがや」'});
+  if(r()<.15)npcs.push({x:9,y:12,col:'#3c3c3c',hair:'#000000',gambler:true,loser:1,line:''});
+  return{jogai:true,kyo:true,title:'ボートレース ガマゴオリ',vi,v:VIL[vi],w,h,cx:8,C,npcs,city:true,sz:VIL[vi].size,px:8,py:h-2,top:0};}
+function enterKyotei(){const vi=curVil,m=nowMin();if(m<14*60||m>=21*60+30){dialog(['ボートレース ガマゴオリは 閉まっている。','「ナイター開催　開門 14:00〜21:30」']);return;}
+  jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildKyotei(vi);townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('ボートレース ガマゴオリに 入った');}
+function kyoBump(c){const vi=TW.vi;
+  if(c.t==='bwin'){raceFac(vi);return true;}
+  if(c.t==='kvote'){dialog('マークカードは 舟券窓口で 使えます。\n（窓口で「マークカードで 買う」）');return true;}
+  if(c.t==='kboard'){const cd=raceCard(vi);dialog([`次は 第${cd.no}R`,cd.boats.map(b=>`${b.lane}号艇 ${b.name}（${b.cls}）`).slice(0,3).join('\n'),cd.boats.map(b=>`${b.lane}号艇 ${b.name}（${b.cls}）`).slice(3).join('\n')]);return true;}
+  if(c.t==='tvmon'){dialog('モニターに 展示航走が 映っている。\nスタート展示の 1号艇が 速い…！');return true;}
+  if(c.t==='bwater'||c.t==='bmark'||c.t==='kyfence'){dialog(c.t==='bmark'?'ターンマークの ブイだ。\nここで 抜くか 抜かれるかが 決まる。':'ナイターの 光に 照らされた 水面。\n6艇が 波しぶきを 上げて 走っている。');return true;}
+  if(c.t==='kstep'){dialog('観戦スタンド。 水面が よく 見える。');return true;}
+  if(c.t==='kfood'){kjoFood(c.shop);return true;}
+  return false;}
+function exitJogai(){if(TW&&TW.air){TW=null;jogaiPrev=null;startField();return;}const p=jogaiPrev;TW=p?p.TW:buildTown(curVil);if(p){TW.px=p.px;TW.py=p.py+1<TW.h?p.py:p.py;}jogaiPrev=null;townScr.mv=null;townScr.lock=1;setBase(townScr);}
 const KOKURA=()=>VIL.findIndex(v=>v.name==='城下町 コクラ');
 /* 場外で 買える 競馬場：中央（コクラ・マホロバ）＋ 地方 */
 function jogaiTracks(){const cst=i=>()=>keibaRaceNo()?(keibaCard(i).sp?keibaCard(i).gname:`${keibaRaceNo()}R ${hm(KPOST[keibaRaceNo()-1])}`):'発売なし';
   return[...[KOKURA(),VIL.findIndex(v=>v.capital)].map(i=>({vi:i,nm:(VIL[i].capital?'マホロバ':'コクラ')+'競馬場',st:cst(i)})),
     ...CHIHO.filter(L=>L.x!=null).map(L=>({vi:L.vi,L,nm:(L.banei?'ばんえい':'')+L.name+'競馬場'+(L.chuo?'':'（地方）'),st:()=>{const n=chihoRaceNo(L);if(!n)return '発売なし';if(chihoClosed(L))return '発売前';const cd=L.chuo?chihoCard(L):null;return cd&&cd.sp?cd.gname:`${n}R ${hm(L.post[n-1])}`;}}))];}
 function jogaiBump(c){
+  if(TW.kyo)return kyoBump(c);
+  if(TW.air)return airBump(c);
+  if(TW.jin){if(c.t==='jfire'){dialog('かがり火が 燃えている。');return true;}if(c.t==='jflag'){dialog(TW.jin==='aimasu'?'ヲワリの 赤い 旗指物だ。':'ミカワの 青い 旗指物だ。');return true;}if(c.t==='jmaku'){dialog('陣幕に 家紋が 染め抜かれている。');return true;}return false;}
   if(c.t==='kwin'||c.t==='kvote'){const L=jogaiTracks(),mk=c.t==='kvote';listPick(mk?'マークカード：どの 競馬場？':'どの 競馬場の 馬券を 買いますか？',L.map(x=>({t:x.nm,r:x.st(),col:x.L&&!x.L.chuo?'#7ee07e':null})),k=>{const x=L[k];if(mk)markCard(x.vi,bs=>keibaFac(x.vi,bs,x.L),x.L?Object.assign({},KEIBA_CF,{closed:()=>chihoClosed(x.L),card:()=>chihoCard(x.L)}):undefined);else keibaFac(x.vi,null,x.L);});return true;}
-  if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>(VIL[i].port||VIL[i].kyotei)&&!VIL[i].depop);
+  if(c.t==='bwin'){const P=VIL.map((v,i)=>i).filter(i=>(VIL[i].port||VIL[i].kyotei||isGama(i))&&!VIL[i].depop);
     listPick('どの レース場の 舟券を 買いますか？',P.map(i=>({t:VIL[i].name+' ボートレース場',r:boatRaceNo(i)&&nowMin()>=BPOST(i)[0]-60?`${boatRaceNo(i)}R ${hm(BPOST(i)[boatRaceNo(i)-1])}（${BTYPEN[BTYPE(i)]}）`:'発売なし'})),k=>raceFac(P[k]));return true;}
   if(c.t==='tvmon'){dialog('モニターに 各地の レースが 映っている。\n競馬と ボートレースが 交互に 流れる。');return true;}
   if(c.t==='kboard'){const cd=keibaCard(KOKURA());dialog([`コクラ 次は ${cd.sp?cd.gname:'第'+cd.no+'R'}　${cd.dist}（${cd.baba}）`,`1番人気 ${cd.horses.find(h=>h.pop===1).name}`+(cd.horses.some(h=>h.rare!=null)?'\n★激レア馬 出走！':'')]);return true;}
