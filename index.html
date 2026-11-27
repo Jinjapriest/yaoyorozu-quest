@@ -10645,12 +10645,12 @@ function lmkScr(vi){G.lmk=G.lmk||{};const v=VIL[vi],have=lmkOf(vi),L=LMK.filter(
     i=>{const x=L[i];return x?(x.id==='statue'?'町の すべてを 買い取り 名誉市長に なる。\n広場に 黄金の 銅像が 建つ':'町の 広場に 建つ 巨大な 名物。\n家賃は 入らない'):'';});}
 /* 累進課税と 税務署の 査察 */
 /* 11/27：納税日（10日ごと）に 納めた 税額に 応じて ガチャチケットを 配布 */
-const TAX_DAY=10,TAX_TIER=[[1e16,{tk:100,xrtk:1,urtk:3},'納税 長者番付 1位'],[1e14,{tk:50,urtk:3},'特別 高額納税者'],[1e12,{tk:20,urtk:1},'高額納税者'],[1e10,{tk:10,srtk:2},'優良納税者'],[1e8,{tk:5,srtk:1},'納税者 表彰'],[1e6,{tk:3},'納税 感謝'],[1e4,{tk:1},'納税 感謝']];
+const TAX_DAY=10,TAX_TIER=[[1e16,{tk:1000,urtk:20,lrtk:5,xrtk:5},'納税 長者番付 1位',.3],[1e14,{tk:500,urtk:10,lrtk:3,xrtk:1},'特別 高額納税者',.25],[1e12,{tk:200,urtk:5,lrtk:1},'高額納税者',.2],[1e10,{tk:100,urtk:3},'優良納税者',.15],[1e8,{tk:50,srtk:5,urtk:1},'納税者 表彰',.1],[1e6,{tk:30,srtk:3},'納税 感謝',.1],[1e4,{tk:10},'納税 感謝',.1]];
 function addTax(n){n=Math.floor(n||0);if(n>0&&G)G.taxAcc=(G.taxAcc||0)+n;}
 function taxDayGift(msgs){if(G.day%TAX_DAY!==0)return;const t=G.taxAcc||0;G.taxAcc=0;G.taxTot=(G.taxTot||0)+t;
   const T_=TAX_TIER.find(x=>t>=x[0]);if(!T_){if(t>0)msgs.push(`今日は 納税日。\n納税額 ${fmt(t)}イェソ（1万イェソ 未満は 対象外）`);return;}
-  const g=T_[1],nm={tk:'ガチャチケット',srtk:'SR以上確定チケット',urtk:'UR確定チケット',xrtk:'XR確定チケット'};for(const k in g)G.items[k]=(G.items[k]||0)+g[k];
-  msgs.push(`今日は 納税日！【${T_[2]}】\nこの 10日間の 納税額 ${fmt(t)}イェソ\n税務局から お礼が とどいた。`,Object.keys(g).map(k=>`${nm[k]} ×${g[k]}`).join('\n'));}
+  const g=T_[1],nm={tk:'ガチャチケット',srtk:'SR以上確定チケット',urtk:'UR確定チケット',lrtk:'LR確定チケット',xrtk:'XR確定チケット'};for(const k in g)G.items[k]=(G.items[k]||0)+g[k];const back=Math.floor(t*T_[3]);if(G.bank)G.bank.sav+=back;else G.coins+=back;
+  msgs.push(`今日は 納税日！【${T_[2]}】\nこの 10日間の 納税額 ${fmt(t)}イェソ\n税務局から お礼が とどいた。`,Object.keys(g).map(k=>`${nm[k]} ×${g[k]}`).join('\n'),`さらに 還付金（納税額の ${Math.round(T_[3]*100)}%）\n${fmt(back)}イェソが ${G.bank?'普通預金に 入った':'とどいた'}！`);sfx('lvup');}
 function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=TH)return;
   const tax=Math.floor((tot-TH)*.004*polMul('kin'));let rest=tax;const a=Math.min(G.coins,rest);G.coins-=a;rest-=a;if(rest>0&&G.bank)G.bank.sav-=Math.min(G.bank.sav,rest);
   addTax(tax);
