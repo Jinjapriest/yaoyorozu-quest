@@ -3640,13 +3640,13 @@ function drawCell(c,sx,sy,city){
     case 'flower':ground();if(c.weed){[[3,9],[7,6],[11,10],[5,13]].forEach(([x,y])=>{R(sx+x,sy+y,1,4,'#00a800');R(sx+x+1,sy+y-1,1,3,'#58d854');});break;}[[3,4,'#d82800'],[10,3,'#f8b800'],[6,10,'#f878f8'],[12,11,'#d82800']].forEach(([x,y,k])=>{R(sx+x,sy+y,2,2,k);R(sx+x,sy+y+2,1,2,'#00a800');});break;
     case 'lamp':ground();R(sx+7,sy+4,2,11,'#3c3c3c');R(sx+5,sy+1,6,4,'#3c3c3c');R(sx+6,sy+2,4,2,'#fce0a8');R(sx+5,sy+14,6,2,'#3c3c3c');break;
     case 'fount':ground();pc(sx+8,sy+9,6,'#bcbcbc');pc(sx+8,sy+9,4,'#3cbcfc');R(sx+7,sy+3,2,5,'#a4e4fc');R(sx+6,sy+2+((frame>>4)&1),4,1,'#fcfcfc');break;
-    case 'roof':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,0,city);break;}{const b=c.b;
+    case 'roof':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,0,city);break;}if(c.b&&c.b.kind==='crdist'){crBldCell(c,sx,sy,0);break;}{const b=c.b;
       if(b.city&&b.kind==='house'){R(sx,sy,16,16,'#7c7c8c');for(let y=2;y<16;y+=4)for(let x=2;x<16;x+=5)R(sx+x,sy+y,3,2,'#a4e4fc');break;}
       ground();R(sx,sy+3,16,13,b.c);R(sx,sy+3,16,1,'#000');for(let y=6;y<16;y+=3)R(sx,sy+y,16,1,'rgba(0,0,0,.25)');if(b.ruin&&b.kind==='house'&&c.dx!==1){R(sx+4,sy+6,5,4,'#000');R(sx+6,sy+5,2,1,'#000');}
       if(c.dx===0)R(sx,sy+3,2,6,GC);if(c.dx===2)R(sx+14,sy+3,2,6,GC);
       if(c.dx===1&&b.kind!=='house'){R(sx+2,sy+4,12,11,'#fce0a8');R(sx+2,sy+4,12,1,'#000');txt(FAC[b.kind].s,sx+8,sy+6,'#000','center');}
       break;}
-    case 'front':case 'door':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,1,city);break;}{const b=c.b;
+    case 'front':case 'door':if(c.b&&c.b.kind==='kanraku'){kanGateCell(c,sx,sy,1,city);break;}if(c.b&&c.b.kind==='crdist'){crBldCell(c,sx,sy,1);break;}{const b=c.b;
       if(b.city&&b.kind==='house'){R(sx,sy,16,16,'#7c7c8c');for(let y=2;y<14;y+=4)for(let x=2;x<16;x+=5)R(sx+x,sy+y,3,2,'#fce0a8');R(sx,sy+15,16,1,'#3c3c3c');break;}
       R(sx,sy,16,16,b.city?'#d8d8d8':'#fce0a8');R(sx,sy+15,16,1,'#a05000');
       if(c.t==='door'){R(sx+3,sy+3,10,13,'#503000');R(sx+3,sy+3,10,4,b.c);R(sx+7,sy+3,1,4,'#fcfcfc');R(sx+11,sy+10,1,2,'#f8b800');}
@@ -11262,6 +11262,21 @@ function crSceneBg(k){if(!k.startsWith('cr_'))return false;const t=frame;
   if(k==='cr_plan'){R(0,0,W,160,'#0c2c6c');for(let x=0;x<W;x+=16)R(x,0,1,160,'#1c3c8c');for(let y=0;y<160;y+=16)R(0,y,W,1,'#1c3c8c');R(100,20,30,120,'none');R(110,20,20,110,'#a8c8fc');R(112,22,16,106,'#0c2c6c');for(let i=0;i<6;i++)R(110,32+i*16,20,2,'#a8c8fc');R(150,90,40,20,'#a8c8fc');txt('合体爆弾 量産ライン',170,120,'#fcfcfc','center');if((t>>4)&1){R(214,128,18,3,'#d82800');R(221,128,4,16,'#d82800');}return true;}
   if(k==='cr_tower'){R(0,0,W,160,'#1c1c2c');R(108,0,40,160,'#7c7c7c');for(let i=0;i<8;i++)R(108,i*20,40,2,'#5c5c5c');return true;}
   return false;}
+/* 豪華な 蒸留所の 建物（赤レンガ・金の 装飾・銅の 蒸留塔と 煙突） */
+function crBldCell(c,sx,sy,row){const dx=c.dx,BR='#a8401c',BR2='#7c2c10',GD='#f8b800',GD2='#a07800',CU='#c86c2c',t=frame;
+  const brick=(y0,h)=>{R(sx,sy+y0,16,h,BR);for(let y=y0;y<y0+h;y+=3){R(sx,sy+y,16,1,BR2);for(let x=((y/3)%2?0:4);x<16;x+=8)R(sx+x,sy+y,1,3,BR2);}};
+  if(row===0){
+    if(dx===1){/* 銅の 連続式蒸留塔（屋根の 上へ） */R(sx+4,sy-22,8,24,CU);R(sx+5,sy-22,2,24,'#e8a060');R(sx+3,sy-24,10,3,GD);for(let y=-18;y<0;y+=5)R(sx+4,sy+y,8,1,'#7c3c10');pc(sx+8,sy-26,2,GD);}
+    if(dx===2){R(sx+9,sy-16,5,18,'#5c3c3c');R(sx+8,sy-17,7,2,'#3c2c2c');for(let i=0;i<3;i++){const y=(t*.4+i*8)%24;R(sx+8+(i%2)*3-y*.15,sy-20-y,6,4,'rgba(252,252,252,'+(1-y/24)*.8+')');}}
+    if(dx===0){R(sx+3,sy-6,2,8,'#5c5c5c');R(sx+5,sy-6,7,5,(t>>4)&1?'#d82800':'#f8b800');R(sx+6,sy-5,5,1,'#fcfcfc');}
+    brick(2,14);/* 切妻の 金縁 */R(sx,sy+2,16,2,GD);R(sx,sy+4,16,1,GD2);
+    if(dx===1){R(sx+2,sy+5,12,10,'#2c1c0c');R(sx+3,sy+6,10,8,GD);R(sx+4,sy+7,8,6,'#5c1c0c');txtS('蒸',sx+8,sy+6,GD,'center');}
+    else{R(sx+4,sy+7,8,8,'#3c2c1c');pc(sx+8,sy+8,4,'#3c2c1c');R(sx+5,sy+8,6,7,'#fcd860');pc(sx+8,sy+8,3,'#fcd860');R(sx+7,sy+5,2,10,'#3c2c1c');R(sx+4,sy+11,8,1,'#3c2c1c');R(sx+3,sy+15,10,1,GD);}
+    return;}
+  brick(0,16);R(sx,sy,16,1,GD);
+  if(dx===1){/* 大扉 */R(sx+1,sy+1,14,15,GD);pc(sx+8,sy+5,6,GD);R(sx+2,sy+3,12,13,'#3c1c0c');pc(sx+8,sy+5,5,'#3c1c0c');R(sx+7,sy+2,2,14,GD2);R(sx+5,sy+9,1,2,GD);R(sx+10,sy+9,1,2,GD);R(sx,sy+15,16,1,'#bcbcbc');}
+  else{R(sx+3,sy+2,10,8,'#3c2c1c');R(sx+4,sy+3,8,6,'#fcd860');R(sx+7,sy+3,2,6,'#3c2c1c');R(sx+2,sy+10,12,1,GD);
+    /* 樽と ランプ */pc(sx+(dx?11:5),sy+13,3,'#7c4c10');R(sx+(dx?8:2),sy+12,6,1,'#3c2c1c');R(sx+(dx?2:12),sy+9,2,7,'#3c3c3c');R(sx+(dx?1:11),sy+7,4,3,(t>>5)&1?'#fce0a8':'#fcd860');}}
 /* 酔いどれ無法者（金で 買収された 無法者：赤ら顔・酒瓶・銭袋） */
 function drawYoiMuhou(x,y,t){drawMuhou(x,y,t);const b=(t>>4)&1;R(x-7,y-34,4,2,'#fc7460');R(x+3,y-34,4,2,'#fc7460');R(x+12,y-30+b,4,10,'#3c8c3c');R(x+13,y-33+b,2,3,'#fcfcfc');R(x-18,y-20,8,8,'#a07848');R(x-16,y-22,4,2,'#5c3c1c');txtS('¥',x-14,y-19,'#f8d800','center');if(b)txtS('ヒック',x+14,y-46,'#fcfcfc','center');}
 
