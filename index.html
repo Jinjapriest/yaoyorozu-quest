@@ -2290,7 +2290,7 @@ const CODE_KIND=[
   {n:g=>['XR ガイウスの槍（希望の槍）','XR GODの御神体（基礎Lv100）','XXR 八百万の主神 ゴッド（基礎Lv100）','？？？ 伝説の開発者 タムライツク（基礎Lv100）'][g],gmax:3,un:g=>g<=1?'本':'体',
     give:(g,a)=>{if(g===0){for(let i=0;i<a;i++)addWeapon('w_gaius');return;}for(let i=0;i<a;i++){if(g===1)lv100W('w_godshintai');else lv100C(g===2?'godkami':'legend_itsuku');}fullHeal();},u:'本'},
   {n:()=>'【不動産融資キャンペーン】 イェソ',give:(g,a)=>{G.coins+=a*1e4;},u:'イェソ',mul:1e4},
-  {n:()=>'XR 可能性の獣 トモヤヨシダ',give:(g,a)=>{for(let i=0;i<a;i++)addChar('tomoya');applyXR();fullHeal();},u:'体'},
+  {n:g=>g===1?'XXR 無限有限の φさん（基礎Lv100）＋\n専用武器 1円玉サイズの ブラックホール（基礎Lv100）':'XR 可能性の獣 トモヤヨシダ',gmax:1,un:g=>g===1?'セット':'体',give:(g,a)=>{if(g===1){for(let i=0;i<a;i++){lv100C('phi');lv100W('w_bh1yen');}fullHeal();return;}for(let i=0;i<a;i++)addChar('tomoya');applyXR();fullHeal();},u:'体'},
   {n:()=>'XR 捕食植物 タケウチジョウチャン',give:(g,a)=>{for(let i=0;i<a;i++)addChar('jouchan');applyXR();fullHeal();},u:'体'},
   {n:()=>'XR ダイナムミソノの 会員カード',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_misono');},u:'枚'},
   {n:()=>'XR なかなか 開かない がま口財布',give:(g,a)=>{for(let i=0;i<a;i++)addWeapon('w_gamaguchi');},u:'個'},
