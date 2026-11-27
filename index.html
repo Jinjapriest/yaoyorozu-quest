@@ -519,7 +519,7 @@ const RATES=[45,32,16,6,.9,.1];
 const rcol=r=>r===8?((frame>>2)%3===0?'#fcfcfc':(frame>>2)%3===1?'#fc74b4':'#f8d878'):r===7?((frame>>2)&1?'#f8d878':`hsl(${(frame*12)%360},100%,60%)`):r===6?((frame>>3)&1?'#fcfcfc':`hsl(${(frame*9)%360},100%,72%)`):r===5?`hsl(${(frame*6)%360},100%,66%)`:RAR[r].c;
 const WT={'本':{a:.9,m:1.9},'棒':{a:1.1,m:.3},'果物':{a:.9,m:.9},'拳':{a:1.25,m:0},'リュック':{a:1.7,m:1.1},'レンゲ':{a:.8,m:1.8},'手羽先刀':{a:2,m:.4},'味噌銃':{a:1.7,m:.8},'小判':{a:.6,m:.6},'パソコン':{a:2,m:2},'書':{a:.8,m:1.9},'祝詞':{a:.6,m:1.9},'会員カード':{a:1.45,m:1.1},'がま口':{a:1.1,m:1.5},'笏':{a:1.1,m:1.9},'スマホ':{a:1.2,m:1.8},'聖槍':{a:1.6,m:1.6},'神宝':{a:1.35,m:1.35},'仏具':{a:.9,m:1.6},'飲料':{a:1.5,m:1},'マイク':{a:.8,m:1.7},'狙撃銃':{a:1.7,m:.6},'片手剣':{a:1,m:.2},'両手剣':{a:1.35,m:0},'杖':{a:.3,m:1.2},'メイス':{a:.85,m:.6},'大幣':{a:.4,m:1.05},'扇':{a:.7,m:.75},'弓':{a:1.1,m:.3},'刀':{a:1.2,m:.1},'神器':{a:1.2,m:1.2}};
 const WPOW=[6,10,16,26,42,70];
-const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami','dknight','sukun','kbt_r','kbt_fox'];
+const HEADS=['helm','hair','witch','hood','eboshi','crown','bard','band','miko','cap','buddha','sun','storm','moon','okuni','gambler','samurai','afro','hostess','momo','maid','umagami','dknight','phi','sukun','kbt_r','kbt_fox'];
 const BASE_SKILLS={
   hayabusa:{name:'はやぶさ斬り',mp:3,target:'enemy',kind:'phys',power:.75,hits:2,verb:'はなった'},
   kabuto:{name:'かぶと割り',mp:5,target:'enemy',kind:'phys',power:2.1,verb:'はなった'},
@@ -546,6 +546,8 @@ const BASE_SKILLS={
   ws_misodanmaku:{name:'ハッチョウミソ弾幕',mp:22,target:'enemies',kind:'phys',power:3.3,verb:'撃ちまくった'},
   kurou_issen:{name:'黄泉への 一閃',mp:30,target:'enemies',kind:'phys',power:3.8,verb:'振るった'},
   kurou_yomi:{name:'黄泉還り',mp:24,target:'allies',kind:'heal',power:1.8,revive:true,verb:'唱えた'},
+  phi_spiral:{name:'黄金螺旋 1.618',mp:34,target:'enemies',kind:'mag',power:4.2,verb:'描いた'},
+  phi_mugen:{name:'無限有限',mp:28,target:'allies',kind:'heal',power:2.0,revive:true,verb:'証明した'},
   tenkei:{name:'天恵',mp:14,target:'allies',kind:'heal',power:2.6,revive:true,verb:'さずけた'},
   beatbox:{name:'超絶ビートボックス',mp:14,target:'allies',kind:'song',power:1.2,amount:.6,turns:4,verb:'刻んだ'},
   boooon:{name:'ブンブン・ウェーブ',mp:12,target:'enemies',kind:'mag',power:2.0,verb:'放った'},
@@ -769,6 +771,7 @@ const BASE_PACK={
     {id:'sukun',name:'ラーメソ屋の スー君',short:'スー君',rarity:'XR',weight:1,weapon:'any',hp:150,mp:130,atk:30,mag:48,def:28,spd:34,skills:['su_atsuatsu','su_ramen'],look:{head:'sukun',hair:'#7c4c10',body:'#f87800',accent:'#fcfcfc',legs:'#1c2c7c',held:'レンゲ'}},
     {id:'masumida',name:'尾張の猛将 マスミダ',short:'マスミダ',rarity:'LR',weight:1,weapon:'any',hp:150,mp:70,atk:46,mag:18,def:30,spd:20,skills:['ms_tebasaki','ms_shachi'],look:{head:'kbt_r',hair:'#1c1c1c',body:'#d82800',accent:'#f8b800',legs:'#3c3c3c',held:'手羽先刀'}},
     {id:'toyokawa',name:'三河の稲荷将 トヨカワイナァリ',short:'イナァリ',rarity:'LR',weight:1,weapon:'any',hp:140,mp:90,atk:34,mag:40,def:30,spd:22,skills:['ti_kitsunebi','ti_misodan'],look:{head:'kbt_fox',hair:'#1c1c1c',body:'#a86030',accent:'#d82800',legs:'#5c3c1c',held:'味噌銃'}},
+    {id:'phi',name:'無限有限の φさん',short:'φさん',rarity:'XXR',nogacha:1,weapon:'any',hp:618,mp:618,atk:144,mag:161,def:100,spd:89,skills:['phi_spiral','phi_mugen'],look:{head:'phi',hair:'#dcdce4',body:'#fcfcfc',accent:'#f8b800',legs:'#bcb49c',held:'神器'}},
     {id:'kurouhane',name:'冥府騎士 クロウバネ',short:'クロウバネ',rarity:'XXR',nogacha:1,weapon:'any',hp:480,mp:420,atk:138,mag:112,def:96,spd:66,skills:['kurou_issen','kurou_yomi'],look:{head:'dknight',hair:'#14101c',body:'#24203c',accent:'#a800a8',legs:'#14101c',held:'両手剣'}},
     {id:'legend_itsuku',name:'伝説の開発者 タムライツク',short:'伝説ツク',rarity:'？？？',nogacha:1,weapon:'any',hp:780,mp:1000,atk:200,mag:200,def:150,spd:100,skills:[],look:{head:'hair',hair:'#141414',body:'#f8d878',accent:'#fc74b4',legs:'#fc74b4',held:'パソコン'}},
     {id:'itsuku',name:'開発者神主 タムライツク',short:'タムライツク',rarity:'XXR',weight:1,weapon:'any',hp:520,mp:520,atk:140,mag:140,def:100,spd:72,skills:[],look:{head:'hair',hair:'#141414',body:'#fcfcfc',accent:'#5cc8c8',legs:'#5cc8c8',held:'パソコン'}},
@@ -1528,6 +1531,8 @@ function drawChar(id,x,y,f=0,sc=1){
     case 'sukun':P(4,1,8,3,L.hair);P(3,0,2,2,L.hair);P(7,-1,2,2,L.hair);P(11,0,2,2,L.hair);P(4,3,8,1,'#fcfcfc');P(12,3,2,1,'#fcfcfc');P(13,4,1,1,'#fcfcfc');P(4,8,8,4,'#1c2c7c');P(6,8,4,1,'#fcfcfc');break;
     case 'kbt_r':P(4,1,8,3,'#d82800');P(3,3,10,1,'#a81000');P(2,-1,3,1,'#f8b800');P(11,-1,3,1,'#f8b800');P(4,0,1,1,'#f8b800');P(11,0,1,1,'#f8b800');P(7,0,2,1,'#f8b800');P(5,6,6,1,'#1c1c1c');P(5,7,1,1,'#1c1c1c');P(10,7,1,1,'#1c1c1c');P(4,9,8,1,'#f8b800');break;
     case 'kbt_fox':P(4,1,8,3,'#7c4c10');P(3,3,10,1,'#5c3000');P(4,-2,2,3,'#fcfcfc');P(10,-2,2,3,'#fcfcfc');P(5,-1,1,1,'#f878a8');P(10,-1,1,1,'#f878a8');P(7,1,2,2,'#fcfcfc');P(7,2,1,1,'#d82800');P(4,9,8,1,'#f8b800');break;
+    case 'phi':{const g=(frame>>3)&1?'#fcd800':'#f8b800';P(4,1,8,2,L.hair);P(3,2,1,8,L.hair);P(12,2,1,8,L.hair);P(4,3,1,2,L.hair);P(11,3,1,2,L.hair);P(5,5,2,1,g);P(9,5,2,1,g);
+      P(4,-3,8,1,g);P(3,-2,1,1,g);P(12,-2,1,1,g);P(4,-1,8,1,'#a07800');P(6,-9,3,1,g);P(5,-8,1,2,g);P(9,-8,1,2,g);P(6,-6,3,1,g);P(7,-10,1,6,'#fcfcfc');break;}
     case 'dknight':P(4,1,8,7,'#24203c');P(4,1,8,1,'#3c3458');P(5,5,6,1,'#000');P(5,5,2,1,'#fc3c3c');P(9,5,2,1,'#fc3c3c');P(10,-2,2,3,'#14101c');P(11,-4,1,2,'#14101c');P(7,2,2,2,'#a800a8');P(3,-4,1,1,'#5c5c6c');P(4,-5,3,1,'#5c5c6c');P(9,-5,2,1,'#5c5c6c');P(12,-4,1,1,'#a800a8');P(3,8,10,1,'#100c18');P(2,9,1,6,'#100c18');P(13,9,1,6,'#100c18');break;
     case 'helm':P(4,1,8,3,'#bcbcbc');P(4,4,1,2,'#bcbcbc');P(11,4,1,2,'#bcbcbc');P(7,0,2,1,L.acc);P(5,2,6,1,'#fcfcfc');break;
     case 'hair':P(5,2,6,2,L.hair);P(4,3,1,3,L.hair);P(11,3,1,3,L.hair);P(5,1,2,1,L.hair);P(9,1,2,1,L.hair);break;
@@ -2482,7 +2487,7 @@ function rollRar(min){
   return k;
 }
 /* ガチャに 出ない キャラ（宝箱などで 入手） */
-const NOGACHA_C=['michizane','itsuku','legend_itsuku','umagami'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear))||(['masumida','toyokawa','sukun'].includes(id)&&!(G&&G.ai&&G.ai.clear));
+const NOGACHA_C=['phi','michizane','itsuku','legend_itsuku','umagami'],noGachaC=id=>NOGACHA_C.includes(id)||(id==='tagaba'&&!(G&&G.ti&&G.ti.clear))||((id==='tomoya'||id==='jouchan')&&!(G&&G.sk&&G.sk.clear))||(['masumida','toyokawa','sukun'].includes(id)&&!(G&&G.ai&&G.ai.clear));
 function poolFor(b,rar){
   const all=(b.type==='weapon'?wpList():chList().filter(p=>!noGachaC(p.id))).filter(p=>p.rar===rar);
   return all;
@@ -10649,8 +10654,8 @@ const TAX_DAY=10,TAX_TIER=[[1e16,{tk:1000,urtk:20,lrtk:5,xrtk:5},'納税 長者�
 function addTax(n){n=Math.floor(n||0);if(n>0&&G)G.taxAcc=(G.taxAcc||0)+n;}
 function taxDayGift(msgs){if(G.day%TAX_DAY!==0)return;const t=G.taxAcc||0;G.taxAcc=0;G.taxTot=(G.taxTot||0)+t;
   const T_=TAX_TIER.find(x=>t>=x[0]);if(!T_){if(t>0)msgs.push(`今日は 納税日。\n納税額 ${fmt(t)}イェソ（1万イェソ 未満は 対象外）`);return;}
-  const g=T_[1],nm={tk:'ガチャチケット',srtk:'SR以上確定チケット',urtk:'UR確定チケット',lrtk:'LR確定チケット',xrtk:'XR確定チケット'};for(const k in g)G.items[k]=(G.items[k]||0)+g[k];const back=Math.floor(t*T_[3]);if(G.bank)G.bank.sav+=back;else G.coins+=back;
-  msgs.push(`今日は 納税日！【${T_[2]}】\nこの 10日間の 納税額 ${fmt(t)}イェソ\n税務局から お礼が とどいた。`,Object.keys(g).map(k=>`${nm[k]} ×${g[k]}`).join('\n'),`さらに 還付金（納税額の ${Math.round(T_[3]*100)}%）\n${fmt(back)}イェソが ${G.bank?'普通預金に 入った':'とどいた'}！`);sfx('lvup');}
+  const g=T_[1],nm={tk:'ガチャチケット',srtk:'SR以上確定チケット',urtk:'UR確定チケット',lrtk:'LR確定チケット',xrtk:'XR確定チケット'};for(const k in g)G.items[k]=(G.items[k]||0)+g[k];const phiNew=t>=1e16?addChar('phi'):null;const back=Math.floor(t*T_[3]);if(G.bank)G.bank.sav+=back;else G.coins+=back;
+  msgs.push(`今日は 納税日！【${T_[2]}】\nこの 10日間の 納税額 ${fmt(t)}イェソ\n税務局から お礼が とどいた。`,Object.keys(g).map(k=>`${nm[k]} ×${g[k]}`).join('\n'),`さらに 還付金（納税額の ${Math.round(T_[3]*100)}%）\n${fmt(back)}イェソが ${G.bank?'普通預金に 入った':'とどいた'}！`,...(phiNew!==null?['……税務局の 奥から まばゆい 黄金の 光が！',`XXR「無限有限の φさん」が ${phiNew?'仲間に なった！！':`かけつけた！\n（かぶり：基礎Lv${G.chars.phi.dup+1}に アップ）`}`,'φさん「有限の 税が 無限の 恵みに なる…\nそれが 1.618の ことわり です」']:[]));sfx('lvup');}
 function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=TH)return;
   const tax=Math.floor((tot-TH)*.004*polMul('kin'));let rest=tax;const a=Math.min(G.coins,rest);G.coins-=a;rest-=a;if(rest>0&&G.bank)G.bank.sav-=Math.min(G.bank.sav,rest);
   addTax(tax);
