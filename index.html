@@ -11111,7 +11111,7 @@ function buildJogai(){const vi=curVil,w=17,h=13,C=[];for(let y=0;y<h;y++){C.push
 function enterJogai(){const m=nowMin();if(m<9*60||m>=21*60){dialog(['場外発売所は 閉まっている。','「営業時間 9:00〜21:00」']);return;}jogaiPrev={TW,px:TW.px,py:TW.py};TW=buildJogai();townScr.mv=null;townScr.lock=1;setBase(townScr);sfx('bell');toast('場外発売所に 入った');}
 /* CR_MODULE */
 /* ===================== 中間シナリオ：チリュウウヰスキーを守れ！（配信前：CR_LIVE=false） ===================== */
-const CR_LIVE=false;
+const CR_LIVE=true;
 const crDev=()=>!!(G&&G.crDev);
 const crS=()=>{const A=G.cr||(G.cr={});if(A.ch==null)A.ch=0;if(!A.v||typeof A.v!=='object')A.v={};if(!A.wh)A.wh={};const W_=A.wh;if(!Array.isArray(W_.casks))W_.casks=[];if(!W_.cap)W_.cap=10;if(!W_.st)W_.st={};if(!Array.isArray(W_.ord))W_.ord=[];return A;};
 const crOpen=()=>{try{return (CR_LIVE||crDev())&&aiRestored();}catch(_){return false;}};
