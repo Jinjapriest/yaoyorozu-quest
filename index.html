@@ -2894,6 +2894,7 @@ function startBattle(boss,rift=null,sp=null){
 }
 const P_=x=>BT.pend.push(x),NOW=arr=>BT.pend.unshift(...arr);
 function pump(){
+  if(BT.singFx){BT.singFx.t+=(I.holdA||G.fast)?3:1;if(!BT.singFx.k){if(BT.singFx.t%40===1)sfx(BT.singFx.t<140?'magic':'lvup');if(BT.singFx.t===140)sfx('g5');}else if(BT.singFx.t%30===1)sfx(BT.singFx.k==='mugen'?'heal':'magic');if(BT.singFx.t>=(BT.singFx.dur||SING_DUR))BT.singFx=null;return false;}
   if(BT.wait>0){BT.wait-=(I.holdA||G.fast)?3:1;return false;}
   while(BT.pend.length){let l=BT.pend.shift();if(typeof l==='function')l=l();if(l==null)continue;if(l==='\f'){BT.log=[];continue;}
     BT.log.push(l);if(BT.log.length>4)BT.log.shift();BT.wait=20;return false;}
@@ -2912,7 +2913,7 @@ function healM(m,amt){if(BT&&BT.urx)amt=Math.round(amt*BT.urx);const c=G.chars[m
 function pAct(i){
   const m=BT.pt[i],cmd=BT.cmds[i];if(!isAlive(m)||!cmd)return;
   const d=CH[m.id],c=G.chars[m.id],nm=d.short;BT.pend.push('\f');
-  if(BT.singNow&&BT.singNow.includes(m)){BT.singNow=BT.singNow.filter(x=>x!==m);P_(()=>{sfx('g5');BT.shake=18;return `！！ ${nm}の 演算が 爆発的に 加速した ！！\n技術的特異点（シンギュラリティ） 到達！`;});P_('みかた 全員の 攻撃・魔力・守備・素早さが\nバトル終了まで 5倍に なった！');}
+  if(BT.singNow&&BT.singNow.includes(m)){BT.singNow=BT.singNow.filter(x=>x!==m);P_(()=>{BT.singFx={t:0,id:m.id};sfx('magic');return null;});P_(()=>{sfx('g5');BT.shake=18;return `！！ ${nm}の 演算が 爆発的に 加速した ！！\n技術的特異点（シンギュラリティ） 到達！`;});P_('みかた 全員の 攻撃・魔力・守備・素早さが\nバトル終了まで 5倍に なった！');}
   if(m.stun>0){m.stun--;if(m.stunWhy){P_(`${nm}は ${m.stunWhy}`);if(m.stun<=0)m.stunWhy=null;return;}P_(m.stun>0?`${nm}は 活動休止中…（あと${m.stun}ターン）`:`${nm}は 活動休止中…\n次のターンから 活動再開！`);return;}
   if(cmd.type==='atk'){P_(`${nm}の こうげき！`);P_(()=>{const e=liveEn(cmd.t);if(!e)return null;const st=cstat(m.id,m);let v=phys(st.atk,e.def,1);
       if(rnd()<.06){v=Math.round(v*1.8);sfx('crit');NOW([dmgEnemy(e,v)]);return 'かいしんの いちげき！';}return dmgEnemy(e,v);});P_(()=>kinPeel(m));return;}
@@ -2923,7 +2924,7 @@ function pAct(i){
     const sk=SK[cmd.k];if(!sk)return;const ok={v:true};const rm=d.rm||1;
     P_(`${nm}は ${sk.name}を ${sk.v}！`);
     const cost=skCost(m.id,cmd.k);
-    P_(()=>{if(c.mp<cost){ok.v=false;return 'しかし MPが たりない！';}c.mp-=cost;sfx(sk.k==='phys'||sk.k==='drain'?'hit':sk.k==='mag'?'magic':sk.k==='heal'||sk.k==='revive'?'heal':'buff');return null;});
+    P_(()=>{if(c.mp<cost){ok.v=false;return 'しかし MPが たりない！';}c.mp-=cost;if(PHI_FX[cmd.k])BT.singFx={t:0,k:PHI_FX[cmd.k],dur:160};sfx(sk.k==='phys'||sk.k==='drain'?'hit':sk.k==='mag'?'magic':sk.k==='heal'||sk.k==='revive'?'heal':'buff');return null;});
     const st=()=>cstat(m.id,m);
     const healAmt=p=>Math.round(st().mag*1.8*p*rm*(.95+rnd()*.1));
     switch(sk.k){
@@ -3222,7 +3223,60 @@ const battleScr={full:true,upd:battleUpd,drw(a){
       txt(`やくそう ×${G.items.herb}`,134,218,'#bcbcbc','left',112);}}
   }else{win(0,150,256,86);BT.log.forEach((l,k)=>txt(l,12,160+k*17,'#fcfcfc','left',232));}
   if(G.auto&&BT.ph!=='end')txtS('オート中（Bで解除）',246,134,'#f8b800','right');
+  if(BT.singFx){const F=BT.singFx;if(F.k==='horizon')drawHorizonFx(F.t);else if(F.k==='mugen')drawMugenFx(F.t);else drawSingFx(F.t,F.id);}
 }};
+/* φさん 専用演出：事象の地平線・無限有限 */
+const PHI_FX={phi_spiral:'horizon',phi_mugen:'mugen'};
+function drawHorizonFx(t){const c=ctx,cx=128,cy=80,E=x=>Math.min(1,Math.max(0,x));
+  c.globalAlpha=E(t/15)*.9;R(0,0,256,240,'#000');c.globalAlpha=1;
+  // 光が 曲げられて 吸いこまれる
+  for(let k=0;k<36;k++){const a=k/36*Math.PI*2+Math.sin(t*.03+k)*.2,r1=140-((t*2.2+k*9)%120),r0=r1+14;if(r1<10)continue;
+    c.strokeStyle=k%4?'#3c58a8':'#a8c8fc';c.lineWidth=1;c.beginPath();c.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0*.7);c.quadraticCurveTo(cx+Math.cos(a+.4)*(r0+r1)/2,cy+Math.sin(a+.4)*(r0+r1)*.35,cx+Math.cos(a+.6)*r1,cy+Math.sin(a+.6)*r1*.7);c.stroke();}
+  // 敵が 引きのばされる（スパゲッティ化）
+  const pulled=E((t-40)/60);const AL=BT.en.filter(e=>e.alive);AL.forEach((e,i)=>{const ex=cx+(i-(AL.length-1)/2)*70,ey=cy+30;for(let k=0;k<10;k++){const f=pulled*(k/10);R(Math.round(ex+(cx-ex)*f)-2,Math.round(ey+(cy-ey)*f)-1,Math.max(1,10-k),Math.max(1,6-k*.5),['#fc3c3c','#d82800','#880000','#fcd800'][k%4]);}});
+  // 地平線の 円盤
+  const R0=t<110?6+E((t-10)/60)*44:Math.max(0,50-(t-110)*2.5);
+  if(R0>1){pc(cx,cy,R0+4,'#d82800');pc(cx,cy,R0+2,(t>>2)&1?'#fcfcfc':'#fcd800');pc(cx,cy,R0,'#000');
+    for(let k=0;k<70;k++){const a=k/70*Math.PI*2+t*.09,rr=R0*1.6+(k%3)*3,x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.22;if(Math.sin(a)<0&&Math.abs(x-cx)<R0)continue;R(Math.round(x)-1,Math.round(y),3,2,['#fcfcfc','#fcd800','#f87800','#d82800'][(k+(t>>2))%4]);}}
+  if(t>=110&&t<135){c.globalAlpha=1-(t-110)/25;pc(cx,cy,Math.round((t-110)*9),'#fcfcfc');c.globalAlpha=1;}
+  if(t>30){c.globalAlpha=E((t-30)/20);big('EVENT HORIZON',cx,150,'#a8c8fc','center',14);big('事象の地平線',cx,172,'#fcfcfc','center',14);
+    if(t>70)txt('光さえも 二度と 戻れない',cx,196,'#fc7460','center');c.globalAlpha=1;}}
+function drawMugenFx(t){const c=ctx,cx=128,cy=70,E=x=>Math.min(1,Math.max(0,x));
+  c.globalAlpha=E(t/15)*.88;R(0,0,256,240,'#0c0818');c.globalAlpha=1;
+  // 黄金螺旋（フィボナッチ）
+  const gr=E(t/70);c.strokeStyle='#5c4800';c.lineWidth=1;let fb=[1,1,2,3,5,8,13,21,34];const sc=2.2;
+  c.strokeStyle='#f8b800';c.lineWidth=2;c.beginPath();const N=Math.floor(gr*360*4);for(let i=0;i<=N;i+=4){const th=i*Math.PI/180,r=1.5*Math.pow(1.618,th/(Math.PI/2))*sc;const x=cx+Math.cos(th+t*.02)*r,y=cy+Math.sin(th+t*.02)*r*.8;if(r>120)break;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();
+  // ∞（レムニスケート）を 光の粒が 走る
+  for(let k=0;k<40;k++){const u=(t*.05+k/40*Math.PI*2),d=1+Math.sin(u)**2,x=cx+70*Math.cos(u)/d,y=cy+70*Math.sin(u)*Math.cos(u)/d;R(Math.round(x)-1,Math.round(y)-1,k%5?2:3,k%5?2:3,k%3?'#fcf0a8':'#fcfcfc');}
+  // 中心の 小さな 特異点から ホーキング放射
+  pc(cx,cy,5,'#fcfcfc');pc(cx,cy,4,'#000');
+  for(let k=0;k<30;k++){const a=k*2.4,r=((t*1.5+k*13)%110);R(Math.round(cx+Math.cos(a)*r),Math.round(cy+Math.sin(a)*r*.8),2,2,k%2?'#7ee07e':'#fcfcfc');}
+  // 味方に 癒やしの 光
+  if(t>60){const P=BT.pt;P.forEach((m,i)=>{const x=cx-(P.length-1)*28+i*56-16;c.globalAlpha=E((t-60)/20);drawChar(m.id,x,128,(t>>4)&1,2);for(let k=0;k<5;k++){const yy=118+((t*2+k*17+i*9)%50);R(x+4+k*6,yy,1,4,'#7ee07e');}c.globalAlpha=1;});}
+  if(t>20){c.globalAlpha=E((t-20)/20);big('∞ 無限有限 ∞',cx,182,'#fcd800','center',16);if(t>80)txt('ホーキング放射が みかたを 満たしていく',cx,206,'#7ee07e','center');c.globalAlpha=1;}}
+/* 技術的特異点（シンギュラリティ）専用演出 */
+const SING_DUR=230;
+function drawSingFx(t,id){const c=ctx,cx=128,cy=96,hot=['#fcfcfc','#fcf0a8','#fcd800','#f87800','#d82800'],ease=x=>Math.min(1,Math.max(0,x));
+  c.globalAlpha=ease(t/20)*.96;R(0,0,256,240,'#04020c');c.globalAlpha=1;
+  // 0と1の 演算の 流れが 中心へ 吸いこまれる
+  const n=Math.min(70,Math.floor(t*1.2));c.font='8px '+FONT;c.textAlign='center';c.textBaseline='middle';
+  for(let i=0;i<n;i++){const a0=i*2.399,life=((t*1.6+i*7)%90)/90,r=150*(1-life)+(t>60?8:20),a=a0+life*4+t*.01;
+    const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r*.75;c.fillStyle=life>.8?'#fcfcfc':i%3?'#3cbcfc':'#7ee07e';c.globalAlpha=Math.min(1,life*1.5);c.fillText(i%2?'1':'0',x,y);}
+  c.globalAlpha=1;
+  // ブラックホール 成長
+  const g=ease((t-30)/70)*(t>160?ease(1-(t-160)/15):1),R0=4+g*26;
+  if(t>30&&R0>4.5){const D=(fr)=>{for(let k=0;k<120;k++){const a=k/120*Math.PI*2+t*.07,rr=R0*(1.35+(k%3)*.25)+Math.sin(k*3+t*.2)*1.5,x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.26,front=Math.sin(a)>=0;if(front!==fr)continue;if(!fr&&Math.abs(x-cx)<R0)continue;R(Math.round(x)-1,Math.round(y)-1,3,2,hot[(k%3)+((k+(t>>2))%2)]);}};
+    D(false);pc(cx,cy,R0+2,(t>>2)&1?'#fcfcfc':'#fcd800');pc(cx,cy,R0,'#000');for(let k=0;k<20;k++){const a=k/20*Math.PI+t*.05;R(Math.round(cx+Math.cos(a)*(R0+3))-1,Math.round(cy-Math.abs(Math.sin(a))*(R0*.5+3)),2,1,'#f87800');}D(true);}
+  // SINGULARITY の 文字
+  if(t>60&&t<150){const S='SINGULARITY',k=Math.min(S.length,Math.floor((t-60)/4));big(S.slice(0,k),cx,150,'#fcfcfc','center',16);
+    if(t>110)big('技術的特異点',cx,174,'#f8b800','center',12);}
+  // 閃光
+  if(t>=140&&t<175){const f=(t-140)/35;c.globalAlpha=1-f;pc(cx,cy,Math.round(20+f*220),'#fcfcfc');c.globalAlpha=1;}
+  // 到達
+  if(t>=160){const a=ease((t-160)/20);c.globalAlpha=a;big('特異点 到達',cx,22,'#fcfcfc','center',16);
+    const P=BT.pt;P.forEach((m,i)=>{const x=cx-(P.length-1)*28+i*56-16;drawChar(m.id,x,128,(t>>4)&1,2);if((t>>3)&1)txtS('×5',x+16,170,'#fcd800','center');});
+    big('全ステータス ×5',cx,196,'#fcd800','center',14);txt('バトル終了まで つづく',cx,218,'#bcbcbc','center');c.globalAlpha=1;}
+  c.textAlign='left';}
 const HIGH_X=10;
 function toBooks(v){const out=[0,0,0,0];for(let i=3;i>=0;i--){out[i]=Math.floor(v/BOOKV[i]);v-=out[i]*BOOKV[i];}if(v>0)out[0]++;return out;}
 function winBattle(){
