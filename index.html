@@ -2912,7 +2912,7 @@ function healM(m,amt){if(BT&&BT.urx)amt=Math.round(amt*BT.urx);const c=G.chars[m
 function pAct(i){
   const m=BT.pt[i],cmd=BT.cmds[i];if(!isAlive(m)||!cmd)return;
   const d=CH[m.id],c=G.chars[m.id],nm=d.short;BT.pend.push('\f');
-  if(BT.singNow&&BT.singNow.includes(m)){BT.singNow=BT.singNow.filter(x=>x!==m);P_(()=>{sfx('g5');BT.shake=18;return `！！ ${nm}の 演算が 爆発的に 加速した ！！\n技術的特異点（シンギュラリティ） 到達！`;});P_('攻撃・魔力・守備・素早さが\nバトル終了まで 5倍に なった！');}
+  if(BT.singNow&&BT.singNow.includes(m)){BT.singNow=BT.singNow.filter(x=>x!==m);P_(()=>{sfx('g5');BT.shake=18;return `！！ ${nm}の 演算が 爆発的に 加速した ！！\n技術的特異点（シンギュラリティ） 到達！`;});P_('みかた 全員の 攻撃・魔力・守備・素早さが\nバトル終了まで 5倍に なった！');}
   if(m.stun>0){m.stun--;if(m.stunWhy){P_(`${nm}は ${m.stunWhy}`);if(m.stun<=0)m.stunWhy=null;return;}P_(m.stun>0?`${nm}は 活動休止中…（あと${m.stun}ターン）`:`${nm}は 活動休止中…\n次のターンから 活動再開！`);return;}
   if(cmd.type==='atk'){P_(`${nm}の こうげき！`);P_(()=>{const e=liveEn(cmd.t);if(!e)return null;const st=cstat(m.id,m);let v=phys(st.atk,e.def,1);
       if(rnd()<.06){v=Math.round(v*1.8);sfx('crit');NOW([dmgEnemy(e,v)]);return 'かいしんの いちげき！';}return dmgEnemy(e,v);});P_(()=>kinPeel(m));return;}
@@ -2928,7 +2928,7 @@ function pAct(i){
     const healAmt=p=>Math.round(st().mag*1.8*p*rm*(.95+rnd()*.1));
     switch(sk.k){
       case 'tthate':P_(()=>{if(!ok.v)return null;BT.taunt={i,t:3};m.db=Math.max(m.db||0,3);m.dv=Math.max(m.dv||0,.6);BT.shake=6;return `${nm}が 盾を かかげた！\n敵は ${nm}しか 攻撃できない（3ターン）\n${nm}の 守備力 +60%！`;});break;
-      case 'sing':P_(()=>{if(!ok.v)return null;if(m.sing)return '特異点は すでに 越えている…';if(m.singT>0)return 'すでに 自己改良が 進んでいる…\n（そのときは 突然 やってくる）';m.singT=1+Math.floor(rnd()*5);sfx('magic');return `${CH[m.id].short}の 演算が 自己改良を はじめた…\nいつか 特異点に 到達する！`;});break;
+      case 'sing':P_(()=>{if(!ok.v)return null;if(m.sing)return '特異点は すでに 越えている…';if(BT.pt.some(t=>t.singT>0))return 'すでに 自己改良が 進んでいる…\n（そのときは 突然 やってくる）';m.singT=1+Math.floor(rnd()*5);sfx('magic');return `${CH[m.id].short}の 演算が 自己改良を はじめた…\nいつか 特異点に 到達する！`;});break;
       case 'krmz1':P_(()=>{if(!ok.v)return null;const mg=st().mag,use=mg*.3;m.mgMul=(m.mgMul||1)*.7;m.atAdd=(m.atAdd||0)+use*.5;return `魔力を ${fmt(Math.round(use))} 燃やした！\n${CH[m.id].short}の 攻撃力が ${fmt(Math.round(use*.5))} あがった！`;});break;
       case 'krmz2':P_(()=>{if(!ok.v)return null;const mg=st().mag,al=BT.pt.filter(t=>t!==m&&isAlive(t));G.chars[m.id].hp=0;al.forEach(t=>{t.mgAdd=(t.mgAdd||0)+mg*.5/Math.max(1,al.length);});return `「…帰国の 準備が できたでやんす」\n${CH[m.id].short}は 力を 使い果たして 倒れた…\n味方の 魔力が ${fmt(Math.round(mg*.5/Math.max(1,al.length)))}ずつ あがった！`;});break;
       case 'eiria':P_(()=>{if(!ok.v)return null;const mg=st().mag,al=BT.pt.filter(t=>t!==m&&isAlive(t));if(!al.length)return 'しかし 分ける 相手が いない！';m.mgMul=(m.mgMul||1)*.5;al.forEach(t=>{t.mgAdd=(t.mgAdd||0)+mg*.5/al.length;});return `エイリア石が 妖しく 光った！\n${CH[m.id].short}の 魔力を 味方に 分け与えた！\n（ひとり ${fmt(Math.round(mg*.5/al.length))}ずつ）`;});break;
@@ -3133,7 +3133,7 @@ const XR_DESC={toku:'究極の トーク力で 場を 支配する。\n敵全体
 function skDesc(k,id){const s=SK[k];if(!s)return '';const tg={enemy:'敵1体',enemies:'敵全体',ally:'味方1体',allies:'味方全体',dead:'倒れた 味方1体'}[s.tg]||'';const pct=v=>Math.round(v*100)+'%';
   switch(s.k){
     case 'tthate':return '3ターンの 間 敵の 攻撃を\nすべて 自分に 引きつけ\n自分の 守備力を 60% あげる';
-    case 'sing':return '発動すると ランダムな ターン後に\n特異点に 到達し 全ステータスが\nバトル終了まで 5倍に 急上昇する';
+    case 'sing':return '発動すると ランダムな ターン後に\n特異点に 到達し みかた全員の 全ステータスが\nバトル終了まで 5倍に 急上昇する';
     case 'krmz1':return '魔力の 3割を 燃やし\nその 半分を 自分の 攻撃力に 上乗せする\n（戦闘中 ずっと／重ねがけ できる）';
     case 'krmz2':return '自分の HPが 0に なる かわりに\n自分の 魔力の 半分を\n味方全員に 分けて 底上げする';
     case 'shichisei':return '七支刀の 固有スキル\n敵1体に 7回 攻撃。 1回ごとの 威力は\n小・中・大・特大・超絶から ランダム\n使うと 30%で 次の ターン 動けない';
@@ -3192,7 +3192,7 @@ function battleUpd(){
     if(BT.en.every(e=>!e.alive)){winBattle();return;}
     if(BT.pt.every(m=>!isAlive(m))){loseBattle();return;}
     if(BT.q.length){const a=BT.q.shift();if(a.flee)fleeAct();else if(a.p!=null){if(a.extra)pExtra(a.p);else pAct(a.p);}else eAct(a.e);}
-    else{BT.pt.forEach(m=>{if(m.singT>0&&--m.singT<=0&&!m.sing){m.sing=5;BT.singNow=(BT.singNow||[]).concat(m);}if(m.ab>0)m.ab--;if(m.db>0)m.db--;if(m.extra>0)m.extra--;if(m.shT>0&&--m.shT<=0)m.shield=0;
+    else{BT.pt.forEach(m=>{if(m.singT>0&&--m.singT<=0&&!m.sing){BT.pt.forEach(t=>t.sing=5);BT.singNow=(BT.singNow||[]).concat(m);}if(m.ab>0)m.ab--;if(m.db>0)m.db--;if(m.extra>0)m.extra--;if(m.shT>0&&--m.shT<=0)m.shield=0;
         if(m.regen>0){m.regen--;if(isAlive(m))healM(m,Math.round(cstat(m.id,m).hp*.35*(m.regenM||1)));}});
       BT.en.forEach(e=>{if(e.stun>0)e.stun--;if(e.deb>0&&--e.deb<=0&&e._deb){Object.assign(e,e._deb);e._deb=null;}});
       if(BT.taunt&&--BT.taunt.t<=0)BT.taunt=null;toCmd();}
