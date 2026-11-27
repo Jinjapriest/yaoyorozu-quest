@@ -5620,7 +5620,7 @@ function advanceDay(){
   if(G.cryUp>0){const f=1.25+rnd()*.15;M.cry.p*=f;M.cry.h[M.cry.h.length-1]=M.cry.p;if(G.token){G.token.p=Math.round(G.token.p*f*1000)/1000;}G.cryUp--;msgs.push(`仮想通貨高騰券の 効果！\nヤオコインが ${Math.round((f-1)*100)}% 高騰した！${G.cryUp>0?`（あと${G.cryUp}日）`:'（効果 終了）'}`);}
   M.fx.p=clamp(M.fx.p+(150-M.fx.p)*.03+gauss()*1.4,80,250);M.fx.h.push(M.fx.p);if(M.fx.h.length>30)M.fx.h.shift();
   if(B.fx){const pl=fxPL();if(pl<=-B.fx.margin*.8){const back=Math.max(0,Math.floor(B.fx.margin+pl));B.sav+=back;msgs.push(`FXが ロスカット された…\n証拠金 ${fmt(B.fx.margin)}イェソの うち\n${fmt(back)}イェソが 普通預金に もどった。`);B.fx=null;}}
-  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...ykDaily(),...taDaily(),...bbDaily());msgs.push(...ajDaily());
+  msgs.push(...depDaily());mineDaily();resDaily();tokenDaily();msgs.push(...cardDaily());msgs.push(...myDaily(),...stockDaily(),...reDaily(),...kanDaily(),...ykDaily(),...taDaily(),...bbDaily());msgs.push(...ajDaily());taxDayGift(msgs);
   if(G.shockUntil&&G.day===G.shockUntil)msgs.push('ショックから 立ち直った！\n攻撃力と HPが 元に もどった。');
   if(G.rifts.length<3&&rnd()<.55){const q=spawnRift();if(q)msgs.push(`${VIL[q.vi].name}の 近くに\n魔界の烈穴が 開いた！\n塞がないと 魔物が 強くなっていく…`);}
   return msgs;
@@ -5678,7 +5678,7 @@ function bankAsset(k){
     if(r===3&&upT){G.items.cryup--;G.cryUp=(G.cryUp||0)+2;sfx('g5');save();dialog(['仮想通貨高騰券を 使った！','これから 2日間（ゲーム内）\n仮想通貨が 高騰する！','（ヤオコインと 自分の 仮想通貨が 対象）']);return;}
     if(r===0)fromSrc('いくら 分 買いますか？',a=>{B[k]+=a/o.p;B[k+'Cost']+=a;sfx('coin');save();toast(`${fmt(a)}イェソ 分 買いました`);});
     if(r===1||r===2){if(B[k]<=0){toast('持っていません');return;}const part=r===1?.5:1,u=B[k]*part,c=B[k+'Cost']*part,get=u*o.p,gain=get-c,tx=tax&&gain>0?Math.floor(gain*.2):0;
-      B[k]-=u;B[k+'Cost']-=c;if(r===2){B[k]=0;B[k+'Cost']=0;}const net=Math.floor(get-tx);sfx('coin');save();
+      B[k]-=u;B[k+'Cost']-=c;if(r===2){B[k]=0;B[k+'Cost']=0;}const net=Math.floor(get-tx);addTax(tx);sfx('coin');save();
       toDest(net,`${fmt(get)}イェソで 売った。${tx?`\n税金 ${fmt(tx)}イェソを ひかれた。`:''}\n手取り ${fmt(net)}イェソ（損益 ${gain>=0?'+':''}${fmt(gain)}）`);}
   },110);
 }
@@ -7929,7 +7929,7 @@ function reDaily(){const S=G.re;if(!S||!S.p.length)return[];const msgs=[];
       if(p.ar.law&&G.day>=p.ar.law){const got=Math.floor(p.ar.amt*.7);G.bank.sav+=got;msgs.push(`裁判所の 支払督促で\n${VIL[p.vi].name}の 滞納家賃を 回収！\n${fmt(got)}イェソが 普通預金に 入った。（7割）`);p.ar=null;}
       else if(!p.ar.law&&G.day-p.ar.since>=30){msgs.push(`${VIL[p.vi].name}の ${RET[p.t].n}で\n${p.ar.n}が 夜逃げした！\n滞納家賃 ${fmt(p.ar.amt)}イェソは 回収不能…`);p.ar=null;}}
     else{S.pend+=r;S.tx=(S.tx||0)+Math.round(r*taxRate(p.vi));if(rnd()<(hb?.012:.004)){p.ar={n:TENANTS[Math.floor(rnd()*TENANTS.length)],amt:0,since:G.day};msgs.push(`【家賃滞納】${VIL[p.vi].name}の ${RET[p.t].n}\n入居者「${p.ar.n}」の 家賃が 入らない！\n（開拓所で 取り立てできる）`);}}}
-  if(G.day%RE_PAYDAY===0&&S.pend>0){const tx=S.tx!=null?S.tx:Math.floor(S.pend*.15),net=Math.max(0,S.pend-tx);S.tx=0;
+  if(G.day%RE_PAYDAY===0&&S.pend>0){const tx=S.tx!=null?S.tx:Math.floor(S.pend*.15),net=Math.max(0,S.pend-tx);S.tx=0;addTax(tx);
     if(G.reco){const sh=Math.min(1,stockOwn('reco')/RE_OUT),mine=Math.floor(net*sh);G.bank.sav+=mine;S.total+=mine;
       msgs.push(`${G.reco.n}の 決算日！\n家賃収入 ${fmt(net)}イェソ（税・管理費 引き後）\n持株 ${Math.round(sh*100)}%分の 配当 ${fmt(mine)}イェソが\n普通預金に 入った。`);}
     else{G.bank.sav+=net;S.total+=net;msgs.push(`家賃の 振込日！\n家賃 ${fmt(S.pend)}イェソから 管理費・税金\n${fmt(tx)}イェソを 引いた ${fmt(net)}イェソが\n普通預金に 入った。`);}
@@ -10644,8 +10644,16 @@ function lmkScr(vi){G.lmk=G.lmk||{};const v=VIL[vi],have=lmkOf(vi),L=LMK.filter(
       rePay(x.c,()=>{(G.lmk['v'+vi]=G.lmk['v'+vi]||[]).push(x.id);sink(x.c);sfx('lvup');save();dialog([`${v.name}に ${x.n.replace(/（.*）/,'')}が 完成した！`,x.id==='statue'?`町の 広場に あなたの 銅像が 建った。\nあなたは ${v.name}の 名誉市長に なった！`:'町の 人たちが 見上げて 歓声を あげている！','（次に 町に 入ると 見られる）']);});},96);},
     i=>{const x=L[i];return x?(x.id==='statue'?'町の すべてを 買い取り 名誉市長に なる。\n広場に 黄金の 銅像が 建つ':'町の 広場に 建つ 巨大な 名物。\n家賃は 入らない'):'';});}
 /* 累進課税と 税務署の 査察 */
+/* 11/27：納税日（10日ごと）に 納めた 税額に 応じて ガチャチケットを 配布 */
+const TAX_DAY=10,TAX_TIER=[[1e16,{tk:100,xrtk:1,urtk:3},'納税 長者番付 1位'],[1e14,{tk:50,urtk:3},'特別 高額納税者'],[1e12,{tk:20,urtk:1},'高額納税者'],[1e10,{tk:10,srtk:2},'優良納税者'],[1e8,{tk:5,srtk:1},'納税者 表彰'],[1e6,{tk:3},'納税 感謝'],[1e4,{tk:1},'納税 感謝']];
+function addTax(n){n=Math.floor(n||0);if(n>0&&G)G.taxAcc=(G.taxAcc||0)+n;}
+function taxDayGift(msgs){if(G.day%TAX_DAY!==0)return;const t=G.taxAcc||0;G.taxAcc=0;G.taxTot=(G.taxTot||0)+t;
+  const T_=TAX_TIER.find(x=>t>=x[0]);if(!T_){if(t>0)msgs.push(`今日は 納税日。\n納税額 ${fmt(t)}イェソ（1万イェソ 未満は 対象外）`);return;}
+  const g=T_[1],nm={tk:'ガチャチケット',srtk:'SR以上確定チケット',urtk:'UR確定チケット',xrtk:'XR確定チケット'};for(const k in g)G.items[k]=(G.items[k]||0)+g[k];
+  msgs.push(`今日は 納税日！【${T_[2]}】\nこの 10日間の 納税額 ${fmt(t)}イェソ\n税務局から お礼が とどいた。`,Object.keys(g).map(k=>`${nm[k]} ×${g[k]}`).join('\n'));}
 function taxDaily(msgs){const tot=G.coins+(G.bank?G.bank.sav:0),TH=1e13;if(tot<=TH)return;
   const tax=Math.floor((tot-TH)*.004*polMul('kin'));let rest=tax;const a=Math.min(G.coins,rest);G.coins-=a;rest-=a;if(rest>0&&G.bank)G.bank.sav-=Math.min(G.bank.sav,rest);
+  addTax(tax);
   msgs.push(`【超富裕層 課税】資産が 10兆イェソを 超えているので\n超えた 分の 0.4%を 納税した。\n税額 ${fmt(tax)}イェソ`);
   if(tot>1e14&&rnd()<.03*polMul('kin')){const ch=Math.floor((tot-1e14)*.2);const b=Math.min(G.coins,ch);G.coins-=b;if(ch>b&&G.bank)G.bank.sav-=Math.min(G.bank.sav,ch-b);
     msgs.push('【税務署の 査察】\nマルサの 調査官が 押しかけてきた！',`「申告漏れが 見つかりましたね…」\n追徴課税 ${fmt(ch)}イェソを 支払った…`);}}
@@ -10780,7 +10788,7 @@ function kanDaily(){if(!G.kan)return[];const msgs=[];let net=0;
       else if(e<.01&&!(L.guard&&G.chars.guard_n&&rnd()<.6)){L.rep=Math.max(.4,Math.round((L.rep-.1)*100)/100);msgs.push(`【${L.nm}】 悪い 口コミが 広まった…\n評判が 下がった。`);}
       else if(e<.014){L.rep=Math.min(2.5,Math.round((L.rep+.08)*100)/100);msgs.push(`【${L.nm}】 常連客が 増えてきた！\n評判が 上がった。`);}
       if(L.since!=null&&G.day-L.since<=30&&L.rep<1)L.rep=Math.min(1,Math.round((L.rep+.007)*1000)/1000);
-      let p=gross-cost;if(p>0)p*=1-tx;p=Math.round(p);L.last=p;L.tot=(L.tot||0)+p;net+=p;});}
+      let p=gross-cost;if(p>0){addTax(p*tx);p*=1-tx;}p=Math.round(p);L.last=p;L.tot=(L.tot||0)+p;net+=p;});}
   if(net&&G.bank){G.bank.sav=Math.max(0,G.bank.sav+net);G.kanAcc=(G.kanAcc||0)+net;}
   if(G.day%10===0&&G.kanAcc){msgs.push(`【歓楽街の 決算】 この 10日の 収支\n${G.kanAcc>=0?'+':''}${fmt(G.kanAcc)}イェソ\n（毎日 普通預金に 反映済み）`);G.kanAcc=0;}
   return msgs;}
